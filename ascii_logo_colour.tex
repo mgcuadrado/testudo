@@ -1,0 +1,30 @@
+\documentclass[]{article}
+\usepackage{fontspec}
+\setmonofont{DejaVu Sans Mono}
+\usepackage{fancyvrb}
+\usepackage{xcolor, soul}
+
+\pagestyle{empty}
+
+\newcommand*\brown[1]{\textcolor{brown}{#1}}
+\newcommand*\gray[1]{\textcolor{gray}{#1}}
+\newcommand*\green[1]{\textcolor{green!50!black}{#1}}
+\newcommand*\red[1]{\textcolor{red!60!black}{#1}}
+\newcommand*\ok[1]{\textcolor{green!80!black}{#1}}
+\newcommand*\fail[1]{\textcolor{red}{\sethlcolor{yellow}\hl{#1}}}
+\newcommand*\blue[1]{\textcolor{blue}{#1}}
+
+\begin{document}
+
+\begin{Verbatim}[commandchars=+\{\}]
+         ____ _______ ___ _ _ __   __         +green{__} +blue{?}
+        |_   | _ |  _|   | | |  \ /  |    +red{.-.}+green{/}'+green{_)}  [ +ok{OK} ]
+          | || _|\_  \| || | | | | | |  +green{,}+red{/___\}+green{/}    [+fail{FAIL}]
+    +brown{------}|_||___|___/|_|+brown{-}\__|__/|__/+brown{-----}+green{U}+brown{-}+green{U}+brown{----------------}+gray{mgc}+brown{--}
+\end{Verbatim}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

@@ -1,0 +1,223 @@
+#!/bin/bash
+
+line_length=78
+
+while getopts "blsw:" option; do
+    case $option in
+        b) black=true ;;
+        l) latex=true ;;
+        s) summary=true ;;
+        w) line_length=${OPTARG} ;;
+        *) echo "invalid option"; exit 1 ;;
+    esac
+done
+
+if [ -n "$black" ]; then
+    normal=""
+    bold=""
+    lines=""
+    failure=""
+    successtag=""
+    failuretag=""
+    error=""
+    ident=""
+elif [ -n "$latex" ]; then
+    normal="@color{black}@mdseries{}"
+    bold="@bfseries{}"
+    lines="@color{orange}"
+    failure="@color{red}"
+    successtag="@color{green}"
+    # "failure" and "error" below is a horrible hack to have red bg; they must
+    # have identical patterns in "remove_escapes" below
+    failuretag="@color{red}@makebox[0pt][l]{@sethlcolor{yellow}@hl{     }}"
+    error="@color{yellow}@makebox[0pt][l]{@sethlcolor{red}@hl{     }}"
+    ident="@color{blue}"
+else
+    normal=$(echo  -e "\033[0;39m")
+    bold=$(echo    -e "\033[1;39m")
+    lines=$(echo   -e "\033[0;33m")
+    failure=$(echo -e "\033[1;31m")
+    successtag=$(echo -e "\033[0;32m")
+    failuretag=$(echo -e "\033[1;43;31m")
+    error=$(echo -e "\033[1;41;33m")
+    ident=$(echo   -e "\033[1;34m")
+fi
+
+if [ -z $summary ]; then
+    xml_format=testarudo.xslt
+else
+    xml_format=testarudo_summary.xslt
+fi
+
+if [ -n "$latex" ]; then
+    replace_specials='s/@/@atsign@@/g
+                      s/{/@openbrace@@/g
+                      s/}/@closebrace@@/g
+                      s/\(@atsign\|@openbrace\|@closebrace\)@@/\1{}/g'
+    remove_escapes='s/@\(color{[a-z]*}\|mdseries{}\|bfseries{}\)//g
+                    # see "failure" and "error" above
+                    s/@makebox\[0pt\]\[l\]{@sethlcolor{[^}]*}@hl{     }}//g
+                    s/@atsign{}/_/g
+                    s/@openbrace{}/{/g
+                    s/@closebrace{}/}/g'
+    global_cleaning='${/^$/d}' # remove last line if empty
+else
+    replace_specials=''
+    remove_escapes="s/$(echo  -e "\033"'\[[^m]*m')//g" # regex for escape code
+    global_cleaning=''
+fi
+
+line_length_times_first=$(for n in $(seq $line_length); do echo -n '\1'; done)
+
+if [ -n "$latex" ]; then
+    echo "% use packages fancyvrb and soul"
+    echo "% make \\sethlcolor{red}"
+    echo "% define \\openbrace{}, \\closebrace{}, and \\atsign{}"
+    echo '\begin{Verbatim}[numbers=left, %'
+    echo '  frame=single, rulecolor=\color{black!25}, commandchars=@\{\}]'
+fi
+xsltproc "$(dirname "$0")"/$xml_format - | sed ' # colours and specials
+    '"$replace_specials"'
+    s/||~normal~||/'"$normal"'/g
+    s/||~bold~||/'"$bold"'/g
+    s/||~lines~||/'"$lines"'/g
+    s/||~failure~||/'"$failure"'/g
+    s/||~successtag~||/'"$successtag"'/g
+    s/||~failuretag~||/'"$failuretag"'/g
+    s/||~error~||/'"$error"'/g
+    s/||~ident~||/'"$ident"'/g
+' | sed ' # indents
+    /||~indent_as_b~||.*||~indent_as_e~||/{
+        h # keep the original line in hold space
+        s/.*||~indent_as_b~||\(.*\)||~indent_as_e~||.*/\1/ # keep only the name
+        s/[^.]//g # remove non-dots
+        s/\./    /g # replace each dot with an indentation
+        G # append hold space
+        s/\n// # remove newline from append
+        # replace hierarchy in test name with "-"
+        s/\(||~indent_as_b~||\).*\(\..*||~indent_as_e~||\)/\1-\2/
+        s/||~indent_as_[be]~||//g # remove indentation marks
+    }
+' | sed ' # cartouches
+    /||~cartouche~||/{
+        s/// # remove the marker
+        s/.*/ & / # surround with spaces
+        h # keep the original line in hold space
+        '"$remove_escapes"' # remove colours
+        s/./_/g # upper line
+        s/^/ / # upper left corner
+        s/^/'$lines'/ # colour the upper line
+        p # print upper line
+        x # swap upper line with original line
+        s/^/'$lines'|'$normal'/ # left vertical line
+        s/$/'$lines'|/ # right vertical line
+        p # print text (original line flanked with vertical lines)
+        x # recover upper line; we will transform it into the lower line
+        '"$remove_escapes"' # remove colours
+        s/_/-/g # raise line
+        s/^./'$lines'`/ # lower left corner
+        s/$/'"'"$normal'/ # lower right corner
+    }
+' | sed ' # multiline
+    /||~multiline_begin~||||~multiline_end~||/{ # empty multiline
+        s/// # just remove
+    }
+    /||~multiline_begin~||.\+||~multiline_end~||/{ # one-line multiline
+        s/||~multiline_begin~||/\n  '$ident'|'$normal' /
+        s/||~multiline_end~||//
+    }
+    /||~multiline_begin~||/,/||~multiline_end~||/ { # multiline multiline
+        /||~multiline_begin~||/{ # for the first line, just break and add tab
+            # no nl if there is nothing before the marker:
+            s/^||~multiline_begin~||/  '$ident'|'$normal' /
+            s/||~multiline_begin~||/\n  '$ident'|'$normal' / # otherwise, nl
+            p
+            d
+        }
+        /^||~multiline_end~||/d # remove a last empty line
+        s/||~multiline_end~||// # remove end marker
+        s/^/  '$ident'|'$normal' / # for all non-first lines, break and add tab
+    }
+' | awk '
+    { # break lines
+        margin=6 # margin at the right, so the OK and FAIL tags stand out
+        break_mark="\\\n"
+        indent="    " # indent for broken line continuations
+        line=$0
+        gsub(/\|\|~right~\|\|/, "\n", line) # replace alignment marker with nl
+        cleft='$line_length'-margin-1
+        for (i=1; i<=length(line); ++i) {
+            if (substr(line, i, 1)=="\033") # skip ANSI codes
+                while (substr(line, i, 1)!="m")
+                    ++i
+            else if ("'"$latex"'" \
+                     && substr(line, i, 1)=="@") { # skip LaTeX codes
+                code_i=i
+                while (substr(line, i, 1)!="}")
+                    ++i
+                code=substr(line, code_i, i+1-code_i)
+                if (code=="@openbrace{}" \
+                    || code=="@closebrace{}" \
+                    || code=="@atsign{}")
+                    --cleft
+            }
+            else if (substr(line, i, 1)=="\n") {
+                lleft=0 # remaining number of characters after the marker
+                for (j=i+1; j<length(line); ++j) {
+                    if (substr(line, j, 1)=="\033") # skip ANSI code
+                        while (substr(line, j, 1)!="m")
+                            ++j
+                    else if ("'"$latex"'" \
+                             && substr(line, j, 1)=="@") {# skip LaTeX codes
+                        code_j=j
+                        while (substr(line, j, 1)!="}")
+                            ++j
+                        code=substr(line, code_j, j+1-code_i)
+                        if (code=="@openbrace{}" \
+                            || code=="@closebrace{}" \
+                            || code=="@atsign{}")
+                            ++lleft
+                    }
+                    else
+                        ++lleft
+                }
+                if (lleft>cleft+margin) # not enough room; keep the nl
+                    line=substr(line, 1, i) "||~right~||" substr(line, i+1)
+                else # there is enough room to print the rest; no nl
+                    line=substr(line, 1, i-1) "||~right~||" substr(line, i+1)
+                break
+            }
+            else {
+                --cleft
+                if (cleft==0)
+                    break_position=i # mark for later breaking
+                # waiting until cleft<0 to break avoids a break when the line
+                # is just the right size but ends with an ANSI code:
+                else if (cleft<0) {
+                    # used up all the space; break the line
+                    line=(substr(line, 1, break_position) \
+                          break_mark indent substr(line, break_position+1))
+                    i=i+length(break_mark indent) # jump over new chars
+                    cleft=cleft+'$line_length'-margin-length(indent)-1
+                }
+            }
+        }
+        print line
+    }
+' | sed '
+    /||~right~||/{
+        h # keep the original line in hold space
+        '"$remove_escapes"' # remove colours
+        # remove alignment marker and its next char, and add a newline
+        # followed by line_length times the char that followed the marker:
+        s/||~right~||\(.\)\(.*\)/\2\n'$line_length_times_first'/
+        s/\(.\{'$line_length'\}\).*/\1/ # keep only first line_length chars...
+        /\n/!s/.//g # if we ate the newline, the original line was too long
+        s/.*\n// # ... but remove the original contents
+        H # ... and append the rest to the original line
+        x # get the augmented line: <original line>\n<additional space>
+        s/||~right~||\(.*\)\n\(.*\)/\2\1/ # insert additional space at marker
+    }' | sed "$global_cleaning"
+if [ -n "$latex" ]; then
+    echo '\end{Verbatim}'
+fi

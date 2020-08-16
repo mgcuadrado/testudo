@@ -1,0 +1,103 @@
+#!/bin/bash
+
+TSTFILE="$1"
+STYLE="${TSTFILE%.tst}"
+HEADERFILE="testudo_$STYLE.h"
+
+declare -A macros
+
+n_line=0
+while read -a line; do
+    ((++n_line))
+    if [ ${#line[@]} -eq 0 ]; then
+        continue
+    fi
+    if [ ${#line[@]} -ne 2 ]; then
+        echo "error: too many tokens at line $n_line: ${line[@]}" >&2
+        exit 1
+    fi
+    macros[${line[0]}]=${line[1]}
+done < "$TSTFILE"
+
+print_macro() {
+    name=$1
+    args="$2"
+    pattern="$3"
+    if [ -z "${macros[$name]}" ]; then
+        echo "error: token $name not found" >&2
+        exit 1
+    fi
+    echo "#define ${macros[$name]}$args \\"
+    echo "  $(echo "$pattern" | sed 's/@/testudo__'$name'/')"
+    unset macros[$name]
+}
+
+print_macro_no_f() {
+    print_macro $1 "" "@"
+}
+
+print_macro_forward() {
+    print_macro $1 "(...)" "@(__VA_ARGS__)"
+}
+
+print_macro_string() {
+    print_macro $1 "(...)" "@_S(#__VA_ARGS__, __VA_ARGS__)"
+}
+
+print_macro_ctc() {
+    print_macro $1 "(flag, ...)" "@_S(flag, #__VA_ARGS__, __VA_ARGS__)"
+}
+
+(
+    echo "#ifndef MGCUADRADO_TESTUDO_${STYLE}_STYLE_HEADER_"
+    echo "#define MGCUADRADO_TESTUDO_${STYLE}_STYLE_HEADER_"
+    echo
+    echo "#include \"testudo.h\""
+    echo
+    print_macro_forward TOP_TEST_NODE
+    print_macro_forward DEFINE_TOP_TEST_NODE
+    print_macro_forward DEFINE_TEST_NODE
+    echo
+    print_macro_no_f TEST_PARAMETERS
+    print_macro_no_f TEST_ARGUMENTS
+    echo
+    print_macro_forward DEFINE_TOP_TEST
+    print_macro_forward DEFINE_TEST
+    print_macro_forward WITH_FIXTURE
+    echo
+    print_macro_forward WITH_DATA_DEFINE_TOP_TEST
+    print_macro_forward WITH_DATA_DEFINE_TEST
+    echo
+    print_macro_forward PRINT_TEXT
+    print_macro_forward PRINT_MULTILINE_TEXT
+    print_macro_forward PRINT_BREAK
+    echo
+    print_macro_forward SHOW_SCOPE
+    print_macro_string  DECLARE
+    print_macro_string  PERFORM
+    print_macro_string  FAKE_DECLARE
+    print_macro_string  FAKE_PERFORM
+    print_macro_ctc     CHECK_TRY_CATCH
+    print_macro_string  SHOW_VALUE
+    print_macro_string  SHOW_MULTILINE_VALUE
+    echo
+    print_macro_forward DEFINE_APPROX_EPSILON
+    print_macro_forward SET_APPROX_EPSILON
+    print_macro_forward SHOW_APPROX_EPSILON
+    echo
+    print_macro_string CHECK
+    print_macro_string EQUAL
+    print_macro_string APPROX
+    print_macro_string TOL
+    print_macro_no_f   TRUE
+    echo
+    echo "#endif"
+
+    if [ ${#macros[@]} -ne 0 ]; then
+        for name in "${!macros[@]}"; do
+            echo error: unknown token: $name >&2
+        done
+        exit 1
+    fi
+) > "$HEADERFILE"
+

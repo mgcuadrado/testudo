@@ -1,0 +1,98 @@
+#include <list>
+#include <stdexcept>
+
+// \texttt{Hold} holds a double value; you can query it with \texttt{pop()},
+// but then, it doesn't hold it anymore; when a \texttt{Hold} that is holding a
+// value is destroyed, it adds it to a list that can be consulted with
+// \texttt{Hold::get\_forgotten()};
+class Hold {
+  bool holding{false};
+  double held;
+  static inline std::list<double> forgotten;
+public:
+  Hold()=default;
+  Hold(double i) { hold(i); } // hold on creation
+  ~Hold() { // FIXME: the list ends up in the wrong order; see failed test
+    if (holding)
+      forgotten.push_front(held);
+  }
+  void hold(double i) {
+    if (holding)
+      throw std::runtime_error("already holding a double");
+    held=i;
+    holding=true;
+  }
+  double pop() {
+    if (not holding)
+      throw std::runtime_error("not holding any double");
+    holding=false;
+    return held;
+  }
+  bool is_holding() const { return holding; }
+  static auto get_forgotten() { return forgotten; }
+  static void clear_forgotten() { forgotten.clear(); }
+  // FIXME: not yet implemented; see failed test:
+  static bool is_forgotten_empty() { return false; }
+};
+
+#ifndef NAUTOTEST // we can disable tests by defining this macro
+#include "testudo_lc.h"
+#include "testudo_ext.h" // we need the support for lists
+
+namespace {
+  using namespace std;
+  // these test steps are artificially gathered into a single test to showcase
+  // Testudo instructions and the generated report; it checks functionality for
+  // the class \texttt{HalfDouble}; in real life, this should be broken into
+  // smaller tests with focused concerns; the resulting report lays out a full
+  // narrative (you can understand it by reading only the report, without the
+  // source code) [cutting here so you can have the test in one page] \newpage
+  // this defines a test named ``\texttt{use\_instructions}'', titled ``use
+  // instructions''
+  define_top_test("testudo", use_instructions,
+                  "use instructions") {
+    print_multiline_text("index:\n"
+                         "  1. holding functionality\n"
+                         "  2. exceptions\n"
+                         "  3. list of forgotten doubles");
+    print_break(); // ------------------------------------------------------
+    declare(Hold hf);
+    check(not hf.is_holding())_true;
+    perform(hf.hold(3.14));
+    check(hf.is_holding())_true;
+    check(hf.pop())_approx(3.14);
+    check(not hf.is_holding())_true;
+    print_break(); // ------------------------------------------------------
+    print_text("hf is empty now");
+    check_try_catch(popping_empty, hf.pop());
+    // a couple of empty lines to get in sync with the report on the oposite
+    // page
+    perform(hf.hold(2.72));
+    check_try_catch(adding_to_already_holding, hf.hold(7.));
+    // ditto
+
+    print_break(); // ------------------------------------------------------
+    print_text("the forgotten doubles list is still empty");
+    check(Hold::is_forgotten_empty())_true;
+    check(Hold::get_forgotten().size())_equal(0u);
+    { show_scope("scope 1");
+      declare(Hold hf1(1.1)); // hold-on-construction syntax
+      declare(Hold hf2(2.2));
+      { show_scope(); // unnamed scope
+        declare(Hold hf3(3.3)); // will add to the list on scope closing
+      }
+      check(Hold::get_forgotten())_approx(list{3.})_tol(.5);
+      show_value(hf2.pop());
+      print_text("hf2 now empty; it won't add to the list");
+    }
+    check(not Hold::is_forgotten_empty())_true;
+    check(Hold::get_forgotten())
+      _approx(list{3.3, 1.1});
+    perform(Hold::clear_forgotten());
+    check(Hold::get_forgotten().size())_equal(0u);
+    print_text("the following will raise an error");
+    perform(hf.hold(9.9));
+    print_text("this won't show, because of the error");
+  }
+}
+#endif

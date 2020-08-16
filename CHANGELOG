@@ -1,0 +1,113 @@
+84
+  removed ".headers", since i have linked needed header files
+83
+  copied some files over, mainly from "cppfunct", for release
+81
+  put a yellow background behind the "FAIL" tag in the reports, for the
+  benefit of color-blind people
+80
+  removed the need for the "test_namespace()" macro, by using name mangling
+  instead of namespaces for test nodes and test functions
+79
+  added a notice "this is in its early stages"
+78
+  documented test nodes, tests with a test function, and fixtures
+77
+  removed "testudo" from "testudo_test_parameters" and
+  "testudo_test_arguments"
+76
+  some code simplifications
+75
+  some more cleaning
+74
+  some code simplifications (mainly, fused "TestNode" and "Test")
+73
+  added a global root test node, and a way to retrieve top nodes by name,
+  while creating them if they don't exist yet; until documented, check
+  related task in "TODO"
+72
+  added a UML diagram
+71
+  forgot to update success file
+70
+  some minor edits
+69
+  added an uncaught exception to the showcase test (had to shorten the test
+  to stay within the one-page limit for the code and the report)
+68
+  documented fake-declare instruction and uncaught-exception flagging
+67
+  coded support for red-background error flagging in LaTeX format
+66
+  removed the priority in the test that goes into the documentation, in
+  order to avoid early confusion
+65
+  added per-test detection of unexpected exceptions
+64
+  forgot to update the markup format for the summary
+63
+  managed tasks
+62
+  added a mention of the fixture on the report, and somewhat reworked the
+  way fixture specification is implemented
+61
+  changed the sequence of classes and methods for the check macros; now, new
+  kinds of checks can be added without changing the initial "Check<A>" class
+60
+  wrote some explanations about the macros in a separate text file
+59
+  simplified "testudo__TOL_S()"
+58
+  corrected some rvalue and universal reference errors, made tiny adjustments,
+  and removed some obsolete code
+57
+  slightly improved macros, for clarity
+56
+  made a better syntax for tests with fixtures
+55
+  minor corrections
+54
+  added the possibility to output to LaTeX format, and used it in the document
+53
+  handled "@" specially (the "awk" script got confused if there were "@"
+  instances in the original text)
+52
+  small change
+51
+  added an option to translate to colourful LaTeX (in a "fancyvrb"
+  "Verbatim" environment
+50
+  finished the chapter "test steps"
+49
+  removed the old one-macro check instructions
+48
+  changed the way values are stored in special short-lived classes by the
+  check instruction macros, so that lvalues are copied, and other values
+  are just referenced; this makes it possible to store a non-copyable
+  object for equality comparison, and use its conversion operator later,
+  when the second value is available
+47
+  simplified type deduction in check instructions, and avoided using
+  "decltype()" on the expressions, since it doesn't work with lambdas
+  (something about an unevaluated context)
+46
+  added dependency on the test instruction macro style generator
+45
+  finished the section about check syntax
+44
+  started the description of test instruction macros
+43
+  added the possibility to have several styles for test instructio macro
+  names, and even define your own
+42
+  coded a better (methinks) set of checking instruction syntax, that solves
+  the problem with some expressions needing to be bracketed; didn't obsolete
+  yet the old one; i'll have to remove from the doc the explanation about
+  bracketed expressions
+41
+  wrote some structure, and some text about output formats and test
+  hierarchies
+40
+  made scopes into their own structure
+39
+  first version of segregated "testudo" (from "oxys/testit")

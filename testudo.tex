@@ -1,0 +1,948 @@
+\documentclass[twoside, a4paper, article]{memoir}
+%\documentclass[oneside, 11pt, a5paper, article]{memoir}
+
+\usepackage[spanish, british]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb, graphicx, wasysym, bm, fancyvrb, soul}
+\usepackage[final]{listings}
+\usepackage{tikz, tikzpeople, pgfornament}
+\usetikzlibrary{automata}
+
+\newcommand*\testudocolor{\color{red!80!blue}}
+\newcommand*\testudo[1]{\texttt{\testudocolor{}#1}}
+\newcommand*\testudopair[2]{\testudo{#1}~--~\testudo{#2}}
+\newcommand*\keywordcolor{\color{blue!80!red}}
+\sethlcolor{red}
+
+\newcommand*\ok[1]{\textcolor{green}{#1}}
+\newcommand*\fail[1]{\textcolor{red}{#1}}
+\newcommand*\blue[1]{\textcolor{blue}{#1}}
+\newcommand*\lines[1]{\textcolor{orange}{#1}}
+\newcommand*\openbrace{\{}
+\newcommand*\closebrace{\}}
+\newcommand*\atsign{@}
+
+\newcommand*{\cpplistingindent}{1.7em}
+\lstdefinelanguage[testudo]{C++}[ANSI]{C++}%
+  {%deletekeywords={bool,double,float,int,long,char,unsigned,signed},
+    morekeywords={typename},
+    emph={
+      TOP_TEST_NODE, top_test_node,
+      DEFINE_TOP_TEST_NODE, define_top_test_node,
+      DEFINE_TEST_NODE, define_test_node,
+      TEST_PARAMETERS, test_parameters,
+      TEST_ARGUMENTS, test_arguments,
+      DEFINE_TOP_FIXTURE_TEST, define_top_fixture_test,
+      DEFINE_FIXTURE_TEST, define_fixture_test,
+      DEFINE_TOP_TEST, define_top_test,
+      DEFINE_TEST, define_test,
+      WITH_DATA_DEFINE_TOP_TEST, with_data_define_top_test,
+      WITH_DATA_DEFINE_TEST, with_data_define_test,
+      PRINT_TEXT, print_text,
+      PRINT_MULTILINE_TEXT, print_multiline_text,
+      PRINT_BREAK, print_break,
+      SHOW_SCOPE, show_scope,
+      DECLARE, declare,
+      PERFORM, perform,
+      FAKE_DECLARE, fake_declare,
+      FAKE_PERFORM, fake_perform,
+      CHECK_TRY_CATCH, check_try_catch,
+      SHOW_VALUE, show_value,
+      SHOW_MULTILINE_VALUE, show_multiline_value,
+      DEFINE_APPROX_EPSILON, define_approx_epsilon,
+      SET_APPROX_EPSILON, set_approx_epsilon,
+      SHOW_APPROX_EPSILON, show_approx_epsilon,
+      CHECK, check,
+      EQUAL, _equal,
+      APPROX, _approx,
+      TOL, _tol,
+      TRUE, _true}}
+
+\newcommand*\commonlistinglstset{%
+  \lstset{numbers=left,numberstyle=\tiny, stepnumber=1, numbersep=1em,
+    xleftmargin=\cpplistingindent,
+    lineskip=0.05pt, % this closes a gap that appears above the line whenever
+                     % there are brackets in a comment
+    columns=fullflexible,
+    basicstyle=\ttfamily,
+    keywordstyle=\ttfamily\bfseries,
+    emphstyle=\ttfamily\testudocolor{},
+    commentstyle=\rmfamily\itshape,
+    resetmargins=true,
+    backgroundcolor=\color{black!5},
+    showstringspaces=false, keepspaces=true, texcl=true, escapechar=|
+  }%
+}
+\newcommand*\cpplistinglstset{%
+  \commonlistinglstset{}%
+  \lstset{language=[testudo]C++}%
+}
+\lstnewenvironment{cpplisting}[1][]{%
+  \cpplistinglstset{}%
+  \lstset{#1}}{}
+
+\newcommand*\bashlistinglstset{%
+  \commonlistinglstset{}%
+  \lstset{language=bash,
+    backgroundcolor=\color{blue!5},
+  }%
+}
+\lstnewenvironment{bashlisting}[1][]{%
+  \bashlistinglstset{}%
+  \lstset{#1}}{}
+
+\newcommand*\makelistinglstset{%
+  \commonlistinglstset{}%
+  \lstset{language=make,
+    backgroundcolor=\color{red!5},
+  }%
+}
+\lstnewenvironment{makelisting}[1][]{%
+  \makelistinglstset{}%
+  \lstset{#1}}{}
+
+\usepackage{microtype}
+%% \usepackage[textosf, mathlf, italicgreek, openg, footnotefigures%, opticals
+%% ]%
+%% {MinionPro} % no minionint since it fails
+\usepackage{lmodern} % for the bold tt
+\usepackage[oldstyle, altP, sups]{fbb}
+
+\usepackage[pdfborder={0 0 0}]{hyperref}
+
+%\setlrmarginsandblock{1cm}{1cm}{*}
+%\setulmarginsandblock{2cm}{2cm}{*}
+%\checkandfixthelayout
+
+\newcommand*\ellipsis{\,\ldots}
+\newcommand*\Cpp{C\texttt{++}}
+
+\firmlists
+
+\newcommand*\indentitem{\hspace*{1em}}
+
+\title{\protect\includegraphics[width=\textwidth]%
+  {ascii_logo_colour_cropped.pdf}\\[1em]Testudo,\\an automatic test system\\for
+  \Cpp{} code\\[1em](version $0.01$)}
+
+\author{Miguel González Cuadrado\\\textsf{<mgcuadrado@gmail.com>}}
+
+\maxsecnumdepth{subsection}
+\maxtocdepth{section}
+
+\begin{document}
+
+\frontmatter
+
+\maketitle
+
+\tableofcontents*
+\listoffigures*
+\listoftables*
+
+\begin{quote}
+  \emph{This manual is in its early stages.  I'm going first for completeness,
+    not for clarity.  My plans: finish covering the functionality of Testudo,
+    convert into a web-friendly format, turn it into a guide rather than a
+    reference.}
+\end{quote}
+
+\chapter{Intro}
+\label{cha:intro}
+
+Automatic testing: unit testing, integrated testing, test-driven
+development\ellipsis{}  You can do all of these with Testudo.
+
+\begin{quote}
+  \emph{``Testudo'' means ``turtle'' in Esperanto and Latin.  The name of the
+    turtle in the logo is Testarudo, which means ``stubborn'' in Spanish.
+    Testarudo is indefatigable, and will tenaciously flag you errors, until you
+    correct them.}
+\end{quote}
+
+Testudo runs a suite of tests specified by the user, and produces an
+\textsc{xml} printout of the results.  You can convert the \textsc{xml} file
+into a variety of formats, for immediate perusal, result tracking, statistics,
+publication, et cetera.  The blue question mark and the green \verb|[ OK ]| and
+red \verb|[FAIL]| flags in the logo are a reference to the way instructions,
+passes, and fails are displayed when a test result is converted to a text
+report with colours.
+
+A \emph{test suite} in Testudo is composed of an ordered series of
+\emph{tests}, each test consisting of a sequence of \emph{steps}.  Tests are
+organised as a tree, with test nodes, and proper tests on some test nodes.
+
+When a test suite is run, all tests are run in order, according to their
+position in the test tree, and within each test, the test steps are executed in
+order.  Some test steps are \emph{checks}, which can succeed or fail.  Check
+successes and failures are tallied and summarised at the end of their test.
+Accumulated tallies are also kept for each test node, which combine the tallies
+of the subtree rooted at each test node.
+
+As a quick, self-paced introduction to Testudo test step syntax, i've laid out
+hereafter the source code for a class, the source code for a test for the
+functionality, and the resulting test report.  If my \LaTeX{} trickery doesn't
+fail me, and you have printed this on physical paper, you'll have the source
+code for the test and the test report on opposite pages, so you can't better
+understand how one relates to the other.
+
+The code is meant for this showcase, not for production, and shouldn't be
+construed as an example of good coding: you'll see questionably design and
+coding practices; you'll see bugs and unimplemented functionality so they can
+be pointed out in the report as test fails; you'll see weird vertical spacing
+to achieve syncing between the two printed pages; and you'll see too many test
+steps crammed into a single test.
+
+\cleartooddpage
+
+{%
+  \cpplistinglstset{}%
+  \lstinputlisting[language={[testudo]C++}]{testudo_doc.cpp}
+}
+
+\newpage
+
+\input{reports/testudo.use_instructions.tex}
+
+\mainmatter
+
+
+\chapter{Test output formats}
+\label{cha:test-output-formats}
+
+When a test suite is run, Testudo outputs a printout detailing each test node,
+test, test step, and tallies.  There are several formats for the printout.  You
+must choose the format by passing to the executable the flag ``\texttt{-f}''
+followed by the name of the format.  Standard formats are ``\texttt{xml}'' and
+``\texttt{color\_text}'', but you can add your own.
+
+The ``\texttt{xml}'' format outputs the printout in \textsc{xml} format.  This
+format records all details of the test suite, and is meant for consumption by
+an \textsc{xml} parser.  The available parser is ``\texttt{xml\_to\_color}'',
+which by default converts the printout to a full text report with colours.
+With the flag ``\texttt{-b}'', the output is identical but with no colours.
+With ``\texttt{-s}'', the output is only a summary, giving the check statistics
+for each test node and each test.  The default version uses the \textsc{xslt}
+file ``\texttt{testarudo.xslt}'' to interpret all possible elements and
+attributes in the \textsc{xml} printout.
+
+The ``\texttt{color\_text}'' format outputs the printout directly as a full
+text report with colours, virtually identical to the one
+``\texttt{xml\_to\_color}'' produces.  The difference is that this format
+produces its output synchronously, so even if an unrecoverable error happens,
+you'll get the whole output until just before the error, whereas the
+``\texttt{xml}'' won't output anything\footnote{This is so because the
+  ``\texttt{xml}'' format first builds the whole \textsc{xml} object for the
+  printout before printing it.}.
+
+
+\chapter{Test definition and test instruction styles}
+\label{cha:test-definition-test-instruction-styles}
+
+All test instructions described in this section are implemented as \Cpp{}
+macros.  You can choose among different styles for the macro names, or even
+rename them altogether to your liking
+(see~\Sref{cha:using-your-own-test-definition-test-instruction-names}).
+Out-of-the-box, the available styles are:
+\begin{itemize}
+\item ``\texttt{lc}'' (lowercase), where all macro names are in lowercase, and
+  continuing macros have a leading underscore, so that they can be stuck to the
+  preceding expression nicely; this style is easy on the eyes, but may be too
+  cluttered for some people; here's an example:
+\begin{cpplisting}
+declare(int a=7); // declare a variable
+check(a+2)_equal(9); // check for equality
+\end{cpplisting}
+
+\item ``\texttt{uc}'' (uppercase), where all macro names are in uppercase, and
+  continuing macros are expected to be separated from the preceding expression
+  by a space; this style shows clearly the parts of check instructions, but may
+  be excessively macroish; here's the same example as for ``\texttt{lc}'', but
+  in ``\texttt{uc}'' style:
+\begin{cpplisting}
+DECLARE(int a = 7); // declare a variable
+CHECK(a + 2) EQUAL(9); // check for equality
+\end{cpplisting}
+\end{itemize}
+
+Whatever the style you choose, your editor may help you writing and reading
+test instructions, for instance by giving them a specific colour;
+see~\Sref{cha:editor-configuration} for details.
+
+In the following sections, matching ``\texttt{lc}'' and ``\texttt{uc}'' test
+instruction names are shown in the subsection titles, and all examples are
+given first in the ``\texttt{lc}'', cluttered style, then in the
+``\texttt{uc}'', open style.
+
+
+\chapter{Tests and test hierarchies}
+\label{cha:tests-test-hierarchies}
+
+Tests are organised in a tree where each node, be it leaf or not, may or may
+not have an associated test.  You can choose to execute the tests in a subtree
+rooted at any node.
+
+In this context, \emph{declaring} a test node means mentioning it by full name.
+If a test node with the appropriate full name exists already, the mention
+refers to it.  Otherwise, a new test node is created, with no title, test
+function, or priority.  On the other hande, \emph{defining} a test node or a
+test means giving it full contents, including at least a name and a title, but
+possibly also a test function or a priority.
+
+Test nodes and tests are declared and defined in any number of \Cpp{}
+translation units; each declaration or definition causes an action on the test
+tree (the creation or configuration of a node).  We can't control the order in
+which translation units are executed, but Testudo gives you means to control
+the order of execution of tests.
+
+Nodes you define as siblings (i.e., with the same parent) in a given
+translation unit will be created in the order they are mentioned in the code,
+and will be run in that same order.  For sibling nodes that aren't defined in
+the same translation unit, you can control the order in which they are executed
+by giving each one a different priority (a non-negative number); nodes with
+lower priority come first.  If two sibling nodes have the same priority,
+Testudo resorts to alphabetical ordering.
+
+Test nodes have two kinds of names: the name and the full name.  The ``name''
+proper is a string with no periods or spaces in it, and represents the name the
+node has \emph{relative to its parent}.  A test node can't have two children
+with the same name.  The full name of a test node is obtained by chaining all
+the names of its ancestors in order, finishing with its own name, separated by
+periods.  The title of a test node is an arbitrary string.
+
+\section{Non-top test nodes}
+\label{sec:non-top-test-nodes}
+
+When you declare or define a test node whose parent has been defined in the
+current translation unit\footnote{I call these non-top test nodes in opposition
+  to top test nodes; see~\Sref{sec:top-test-nodes}.  Another name could have
+  been ``child nodes'', since they are children to parents that have been
+  defined in the same translation unit.}, use the ``define-test-node'' or
+``define-test'' syntaxes.  As explained before, the execution order is the
+order in the code, so no priority is specified.
+
+So, for instance, if you have already defined a test node called
+``\texttt{tricorder}'', here's how to define a child test node called
+``\texttt{medical}'', with the title ``medical capabilities'':
+\begin{cpplisting}
+define_test_node(tricorder, medical, "medical capabilities");
+\end{cpplisting}
+
+\begin{cpplisting}
+DEFINE_TEST_NODE(tricorder, medical, "medical capabilities");
+\end{cpplisting}
+
+For a test (a test node with a test function), the syntax includes the
+definition of the test function itself, as if it were a regular \Cpp{}
+function, only with its declarator part (the one where you specify the return
+type, the function name, and the parameters) replaced by a Testudo macro.  If
+you have already defined a test node called ``\texttt{medical}'', here's how to
+define a child test called ``\texttt{switch\_on}'', titled ``switch on after
+creation'', that checks a tricorder medical subunit is off upon creation of the
+tricorder, and switches on appropriately:
+\begin{cpplisting}
+define_test(medical, switch_on, "switch on after") {
+  declare(Tricorder t); // see \Sref{cha:test-steps} for the test steps syntax
+  check(not t.medical.is_on())_true;
+  perform(t.medical.push_on_button());
+  check(t.medical.is_on())_true;
+}
+\end{cpplisting}
+
+\begin{cpplisting}
+DEFINE_TEST(medical, switch_on, "switch on after")
+{
+  DECLARE(Tricorder t); // see \Sref{cha:test-steps} for the test steps syntax
+  CHECK(not t.medical.is_on()) TRUE;
+  PERFORM(t.medical.push_on_button());
+  CHECK(t.medical.is_on()) TRUE;
+}
+\end{cpplisting}
+
+\section{Top test nodes}
+\label{sec:top-test-nodes}
+
+Top test nodes are test nodes whose parent you haven't defined in the same
+translation unit.  You mention their parent by their full name, and Testudo
+makes sure the parent exists before the new child is defined.  Test nodes
+created by mentioning their full name begin as \emph{unconfigured} test nodes;
+that's \textsc{ok}, and it won't cause any harm, but it means that you're not
+controlling their relative order to other test nodes (the order is still
+deterministic, though, since they get a default priority of \texttt{0}), and
+they don't have any title.  You can \emph{configure} an unconfigured test node
+by simply defining it, preferably at an appropriately higher-level translation
+unit, for clarity.
+
+Here's how to define a top test node called ``\texttt{flux\_capacitor}'', child
+to a test node whose full name is ``\texttt{outatime.delorean}'':
+\begin{cpplisting}
+define_top_test_node("outatime.delorean", // parent full name
+                     flux_capacitor, // name
+                     "flux capacitor features", // title
+                     200); // priority
+\end{cpplisting}
+
+\begin{cpplisting}
+DEFINE_TOP_TEST_NODE("outatime.delorean", // parent full name
+                     flux_capacitor, // name
+                     "flux capacitor features", // title
+                     200); // priority
+\end{cpplisting}
+
+You can also define a top test (a top test node with a test function).  So,
+here's how to define a test called ``\texttt{doors\_closed\_on\_start}'', child
+to a test node whole full name is ``\texttt{outatime.delorean}'':
+\begin{cpplisting}
+define_top_test("outatime.delorean", // parent full name
+                doors_closed_on_start, // name
+                "doors closed after construction", // title
+                150) { // priority
+  declare(Delorean d);
+  check(not d.left_door.is_open())_true;
+  check(not d.right_door.is_open())_true;
+}
+\end{cpplisting}
+
+\begin{cpplisting}
+DEFINE_TOP_TEST("outatime.delorean", // parent full name
+                doors_closed_on_start, // name
+                "doors closed after construction", // title
+                150) // priority
+{
+  DECLARE(Delorean d);
+  CHECK(not d.left_door.is_open()) TRUE;
+  CHECK(not d.right_door.is_open()) TRUE;
+}
+\end{cpplisting}
+
+
+\chapter{Test steps}
+\label{cha:test-steps}
+
+You write a test function by declaring variables, performing actions, and
+checking their results.  You must do these things in a particular way so they
+end up in the test report.  This results in a test report that is easily
+readable and contains all information needed to understand the test.  You can
+additionally print messages to aid the comprehension, or display separators to
+show a shift in the test focus.
+
+\section{Declarations and actions}
+\label{sec:declarations-actions}
+
+\subsection{Declaration: \testudopair{declare}{DECLARE}}
+\label{sec:declaration}
+
+All declarations in a test must be enclosed in a ``declare'' instruction.  They
+will be carried out as written, and written out to the report.
+\begin{cpplisting}
+declare(using namespace std);
+declare(pair<int, double> p={2, 3.5});
+\end{cpplisting}
+
+\begin{cpplisting}
+DECLARE(using namespace std);
+DECLARE(pair<int, double> p = { 2, 3.5 });
+\end{cpplisting}
+
+\subsection{Action: \testudopair{perform}{PERFORM}}
+\label{sec:action}
+
+All non-declaration instructions in a test must be enclosed in a ``perform''
+instruction.  They will be carried out as written, and written to the report.
+\begin{cpplisting}
+perform(p.first+=10);
+\end{cpplisting}
+
+\begin{cpplisting}
+PERFORM(p.first += 10);
+\end{cpplisting}
+
+
+\section{Checks}
+\label{sec:checks}
+
+A check instruction is a verification made on the value of an expression.  It's
+outcome is true or false.  If true, it counts towards the tally of succeeded
+checks.  If false, it counts towards the tally of failed checks.
+
+\subsection{Checked expression: \testudopair{check}{CHECK}}
+\label{sec:checked-expression}
+
+An expression-check instruction starts with a ``check'' instruction containing
+the value to check (usually an expression resulting from previous actions); it
+must be followed by at least one continuing macro, stating what the expected
+value of the expression is, and how the comparison is done.
+
+\subsection{Check the expression is true:
+  \testudopair{\_true}{TRUE}}
+\label{sec:check-expression-true}
+
+In order to check the value of the expression for trueness, attach the ``true''
+macro to the ``check'' instruction: the expression is converted to
+``\texttt{bool}'', and the test check is successful if and only if the
+resulting bool is true.
+
+\begin{cpplisting}
+check(dispersion_rate<(1./accuracy))_true;
+\end{cpplisting}
+
+\begin{cpplisting}
+CHECK(dispersion_rate < (1. / accuracy)) TRUE;
+\end{cpplisting}
+
+\subsection{Check the expression is equal to a reference:
+  \testudopair{\_equal}{EQUAL}}
+\label{sec:check-expression-equal-reference}
+
+In order to check whether the value of the expression is equal to a reference,
+attach the ``equal'' macro to the ``check'' instruction, giving it an argument
+stating the reference value.  Testudo uses ``\texttt{operator==()}'' to
+compare the two values, and the test check is successful if and only if the
+result of the comparison is true.
+
+\begin{cpplisting}
+check(captain_age)_equal(26+10);
+\end{cpplisting}
+
+\begin{cpplisting}
+CHECK(captain_age) EQUAL(26 + 10);
+\end{cpplisting}
+
+\subsection{Check the expression is near a reference:
+  \testudopair{\_approx}{APPROX}}
+\label{sec:check-expression-near-reference}
+
+For non-discrete types (floating-point, for instance), checking for equality
+isn't useful, as tiny rounding errors would make such a test fail\footnote{In
+  fact, when working with floating-point magnitudes, you should instruct your
+  compiler to treat equality comparisons between floating-point values as
+  errors.}.  What you want instead is to check whether the value of the
+expression is near a reference.  In order to do this, attach the ``approx''
+macro to the ``check'' instruction, giving it an argument stating the reference
+value.  Testudo uses ``\texttt{absdiff()}''
+(see~\Sref{sec:difference-between-two-values}) to compute the absolute distance
+between the two values.  The test check is successful if and only if that
+absolute distance is less than a certain tolerance.
+
+\begin{cpplisting}
+check(computed_pi)_approx(2.*asin(1.));
+\end{cpplisting}
+
+\begin{cpplisting}
+CHECK(computed_pi) APPROX(2. * asin(1.));
+\end{cpplisting}
+
+By default, the default tolerance used for nearness checks is taken from a
+variable named ``\texttt{approx\_epsilon}'', but we'll call it
+``$\varepsilon$'' hereafter.  This variable is accessible in all tests.  When
+it isn't available in a given scope (such as in an auxiliary function used by a
+test), it must be created for the nearness checks to compile.
+
+The default value for ``\texttt{approx\_epsilon}'' is ``\texttt{1e-6}'' (one
+millionth), but it can be changed and inspected.
+
+\subsubsection{Define a value for $\bm{\varepsilon}$:
+  \testudopair{define\_approx\_epsilon}{DEFINE\_APPROX\_EPSILON}}
+\label{sec:define-value-epsilon}
+
+In order to define $\varepsilon$ (in a situation where it isn't available), use
+the ``define approx epsilon'' macro with the initial value for $\varepsilon$.
+
+\begin{cpplisting}
+define_approx_epsilon(1e-3); // one thousandth
+\end{cpplisting}
+
+\begin{cpplisting}
+DEFINE_APPROX_EPSILON(1e-3); // one thousandth
+\end{cpplisting}
+
+\subsubsection{Set the value of $\bm{\varepsilon}$:
+  \testudopair{set\_approx\_epsilon}{SET\_APPROX\_EPSILON}}
+\label{sec:set-value-epsilon}
+
+When $\varepsilon$ is accessible (in all tests, for instance), you can change
+its value with the ``set approx epsilon'' macro, giving it the new value.  The
+new value will be used for all subsequent nearness checks, until it is changed
+again.
+
+\begin{cpplisting}
+set_approx_epsilon(1e-3); // one thousandth
+\end{cpplisting}
+
+\begin{cpplisting}
+SET_APPROX_EPSILON(1e-3); // one thousandth
+\end{cpplisting}
+
+\subsubsection{Show the value of $\bm{\varepsilon}$:
+  \testudopair{show\_approx\_epsilon}{SHOW\_APPROX\_EPSILON}}
+\label{sec:show-value-epsilon}
+
+You can also show what the value of $\varepsilon$ is in the test report, by
+using the ``show approx epsilon'' macro.
+
+\begin{cpplisting}
+show_approx_epsilon();
+\end{cpplisting}
+
+\begin{cpplisting}
+SHOW_APPROX_EPSILON();
+\end{cpplisting}
+
+\subsection{Set a specific tolerance for nearness:
+  \testudopair{\_tol}{TOL}}
+\label{sec:specify-tolerance-nearness}
+
+You can also choose to override the default tolerance value for a specific
+check, by attaching the ``tol'' macro with the tolerance value after the
+``approx'' macro.
+
+\begin{cpplisting}
+check(area)_approx(3.5)_tol(.1); // use one-tenth tolerance just this once
+\end{cpplisting}
+
+\begin{cpplisting}
+CHECK(area) APPROX(3.5) TOL(.1); // use one-tenth tolerance just this once
+\end{cpplisting}
+
+
+\subsection{Exception checks:
+  \testudopair{check\_try\_catch}{CHECK\_TRY\_CATCH}}
+\label{sec:exception-checks}
+
+Instead of checking the value of an expression, you can also check that
+evaluating an expression throws an exception.  This is done with the
+``check-try-catch'' instruction, passing it a descriptive name for a boolean
+variable, and the expression that is expected to throw.  Testudo will create
+the boolean variable with an initial fals value, then run the expression within
+a try-block; if an exception is thrown, the boolean variable is made true, and
+the exception is reported.  Finally, the boolean variable is checked for
+trueness, and enters thus the test tally.
+
+\begin{cpplisting}
+declare(list<int> numbers);
+check_try_catch(dereference_null_ptr, numbers.front());
+\end{cpplisting}
+
+\begin{cpplisting}
+DECLARE(list<int> numbers);
+CHECK_TRY_CATCH(dereference_null_ptr, numbers.front());
+\end{cpplisting}
+
+
+\section{Adding information to the report}
+\label{sec:adding-information-report}
+
+Various pieces of information can be added to the report about the execution of
+the test, to help the human reader.
+
+\subsection{Showing values}
+\label{sec:showing-values}
+
+You can show the value of an expression in the report.  It doesn't add to the
+tally of tests, but it can add clarity about what's going on.
+
+\subsubsection{Show a plain value:
+  \testudopair{show\_value}{SHOW\_VALUE}}
+\label{sec:show-plain-value}
+
+The ``show value'' instruction shows the value of its argument inline.
+
+\begin{cpplisting}
+show_value(helicopter.remaining_fuel());
+\end{cpplisting}
+
+\begin{cpplisting}
+SHOW_VALUE(helicopter.remaining_fuel());
+\end{cpplisting}
+
+\subsubsection{Show a multiline value:
+  \testudopair{show\_multiline\_value}{SHOW\_MULTILINE\_VALUE}}
+\label{sec:show-multiline-value}
+
+If the value to show may contain newlines, the format used by the ``show
+multiline value'' macro will be clearer: it will be suited for multiline
+values, and it will respect the newlines.
+
+\begin{cpplisting}
+show_multiline_value(radio.communication_log());
+\end{cpplisting}
+
+\begin{cpplisting}
+SHOW_MULTILINE_VALUE(radio.communication_log());
+\end{cpplisting}
+
+\subsection{Scopes: \testudopair{show\_scope}{SHOW\_SCOPE}}
+\label{sec:scopes}
+
+In some situations, such as when we want to check the effect of the destruction
+of an object that's gone out of scope, it can be useful to show where a scope
+begins and ends.  This is done by using the ``show scope'' macro just after the
+opening brace of the scope, which writes a message to the report about the new
+scope.  You don't have to add anything to the closing brace: Testudo will
+automatically write a message when the scope ends.
+
+Most of the time, with short scopes, you don't need to name the scope.  This is
+done by using the ``show scope'' macro without any arguments.  If the scope is
+longer, it may be clearer to name it, since the scope's begin and end messages
+will display its name.  This is done by passing the scope name to the ``show
+scope'' macro.
+
+\begin{cpplisting}
+declare(LoggedDestruction ld1("1"));
+check(LoggedDestruction::n_destructions())_equal(0);
+{ show_scope("outer scope"); // named scope
+  declare(LoggedDestruction ld2("2"));
+  { show_scope(); // unnamed scope
+    declare(LoggedDestruction ld3("3"));
+  }
+  check(LoggedDestruction::n_destructions())_equal(1);
+}
+check(LoggedDestruction::n_destructions())_equal(2);
+\end{cpplisting}
+
+\begin{cpplisting}
+DECLARE(LoggedDestruction ld1("1"));
+CHECK(LoggedDestruction::n_destructions()) EQUAL(0);
+{
+  SHOW_SCOPE("outer scope"); // named scope
+  DECLARE(LoggedDestruction ld2("2"));
+  {
+    SHOW_SCOPE(); // unnamed scope
+    DECLARE(LoggedDestruction ld3("3"));
+  }
+  CHECK(LoggedDestruction::n_destructions()) EQUAL(1);
+}
+CHECK(LoggedDestruction::n_destructions()) EQUAL(2);
+\end{cpplisting}
+
+
+\section{Printing fixed text and separations}
+\label{sec:printing-text-separations}
+
+You can add fixed messages to the report, to aid the comprehension of the
+reader.  They should be considered to play the same rôle as comments is source code.
+
+\subsection{Print inline text:
+  \testudopair{print\_text}{PRINT\_TEXT}}
+\label{sec:print-inline-text}
+
+The ``print text'' instruction displays its argument inline.  The argument must
+be a string of any kind.
+
+\begin{cpplisting}
+print_text("the speed hasn't been updated yet");
+\end{cpplisting}
+
+\begin{cpplisting}
+PRINT_TEXT("the speed hasn't been updated yet");
+\end{cpplisting}
+
+
+\subsection{Print multiline text:
+  \testudopair{print\_multiline\_text}{PRINT\_MULTILINE\_TEXT}}
+\label{sec:print-multiline-text}
+
+If the message contains newlines, use the ``print multiline text'' instruction
+instead: it's suited for multiline text, and respects the newlines.
+
+\begin{cpplisting}
+print_multiline_text("the order will be:\n"
+                     "  1. insert all elements\n"
+                     "  2. sort the container");
+\end{cpplisting}
+
+\begin{cpplisting}
+PRINT_MULTILINE_TEXT("the order will be:\n"
+                     "  1. insert all elements\n"
+                     "  2. sort the container");
+\end{cpplisting}
+
+\subsection{Print a break:
+  \testudopair{print\_break}{PRINT\_BREAK}}
+\label{sec:print-break}
+
+The ``print break'' instruction just prints a break, to show a change of focus
+in the test report.
+
+\begin{cpplisting}
+print_break();
+\end{cpplisting}
+
+\begin{cpplisting}
+PRINT_BREAK();
+\end{cpplisting}
+
+
+\section{Fake declarations and actions}
+\label{sec:fake-declarations-actions}
+
+Sometimes, you want to record a declaration on an action that won't be carried
+out at all, as if it had.  This can be the case, for instance, when there's an
+instruction that makes sense for most compilation settings, but there's a
+certain combination of compilation options where it doesn't; in that case, for
+that compilation, you'll want to record a fake instruction, and then silently
+carry out explicitly a replacement instruction, with no test instruction macro,
+so that test reports are the same across compilation settings.
+
+\subsection{Fake declaration:
+  \testudopair{fake\_declare}{FAKE\_DECLARE}}
+\label{sec:fake-action}
+
+You can report a fake declaration by enclosing an instruction in a
+``fake-declare instruction.  The instruction will be written to the report,
+exactly as if it had been carried out, except it won't have.
+\begin{cpplisting}
+#ifdef DEBUGGING
+declare(LoggedInt n_cases); // optimised to \texttt{int} in production
+#else
+fake_declare(LoggedInt n_cases);
+int n_cases; // replacement declaration (naked)
+#endif
+\end{cpplisting}
+
+\begin{cpplisting}
+#ifdef DEBUGGING
+DECLARE(LoggedInt n_cases); // optimised to \texttt{int} in production
+#else
+FAKE_DECLARE(LoggedInt n_cases);
+int n_cases; // replacement declaration (naked)
+#endif
+\end{cpplisting}
+
+
+\subsection{Fake action:
+  \testudopair{fake\_perform}{FAKE\_PERFORM}}
+\label{sec:fake-action}
+
+You can report a fake action by enclosing an instruction in a ``fake-perform''
+instruction.  The instruction will be written to the report, exactly as if it
+had been carried out, except it won't have.
+\begin{cpplisting}
+#ifdef DEBUGGING
+perform(terrible_pointer.report()); // won't work in production
+#else
+fake_perform(terrible_p.report());
+log << "terrible_p reported" << endl; // replacement action (naked)
+#endif
+\end{cpplisting}
+
+\begin{cpplisting}
+#ifdef DEBUGGING
+PERFORM(terrible_pointer.report()); // won't work in production
+#else
+FAKE_PERFORM(terrible_p.report());
+log << "terrible_p reported" << endl; // replacement action (naked)
+#endif
+\end{cpplisting}
+
+
+\section{Uncaught exceptions}
+\label{sec:uncaught-exceptions}
+
+If an uncaught exception (i.e., an exception not in a ``check-try-catch''
+instruction; see~\Sref{sec:exception-checks}) is raised in the course of a
+test, that particular test ends immediately, a description of the exception is
+written to the report, with a conspicuous flag, and the test is marked as
+having one error.  Then, the test execution resumes.  Other tests are not
+affected by the exception, and are executed as normal.
+
+Errors aren't the same as failed checks.  They get their own tally.  Errors
+aren't an expected situation, even in a failed test that you may be using to do
+\textsc{tdd}.  Therefore, test summaries mention the number of errors only
+when there is at least one error.
+
+
+\chapter{Fixtures}
+\label{cha:fixtures}
+
+This is how fixtures are implemented in Testudo.  If you want to code a
+fixture, you have to code a class that derives from
+``\texttt{testudo::Fixture}''.  Its constructor must accept a set set of
+parameters (just use the ``test-parameters'' macro), and pass them out to the
+constructor of ``\texttt{testudo::Fixture}'' (use the ``test-arguments''
+macro).  The constructor is the setup procedure; the destructor, if you code
+it, is the teardown procedure.
+
+Here's an example:
+\begin{cpplisting}
+struct OutATimeFixture : testudo::Fixture {
+  OutATimeFixture(test_parameters)
+    : Fixture(test_arguments),
+      d(new Delorean) { }
+  ~OutATimeFixture() { delete d; }
+  Delorean *d; // dumb pointer, just so we can show a teardown procedure
+};
+\end{cpplisting}
+
+\begin{cpplisting}
+struct OutATimeFixture : testudo::Fixture {
+  OutATimeFixture(TEST_PARAMETERS)
+    : Fixture(TEST_ARGUMENTS),
+      d(new Delorean) { }
+  ~OutATimeFixture() { delete d; }
+  Delorean *d; // dumb pointer, just so we can show a teardown procedure
+};
+\end{cpplisting}
+
+In order to have a test use a fixture, you have to add the ``with-fixture''
+macro just after the title in the definition (before other arguments if ever);
+this works both with non-top and with top tests.  Like this:
+\begin{cpplisting}
+define_test(delorean,
+            engine_starts_off, "engine is off at start",
+            with_fixture(OutATimeFixture)) {
+  check(not d->engine.is_running())_true;
+}
+\end{cpplisting}
+
+\begin{cpplisting}
+DEFINE_TEST(delorean,
+            engine_starts_off, "engine is off at start",
+            WITH_FIXTURE(OutATimeFixture))
+{
+  CHECK(not d->engine.is_running()) TRUE;
+}
+\end{cpplisting}
+
+You can code other methods in a fixture, and you can call them from test
+functions.  In fact, the test function ends up being one of the methods of the
+fixture, so that's why and how.
+
+
+\chapter{Adding Testudo support for your types}
+\label{cha:adding-testudo-support-your-types}
+
+\section{Textual representation}
+\label{sec:textual-representation}
+
+\section{Equality}
+\label{sec:equality}
+
+\section{Difference between two values}
+\label{sec:difference-between-two-values}
+
+\chapter{Testudo support for \textsc{stl} types}
+\label{cha:testudo-support-stl-types}
+
+
+
+\appendices
+
+\chapter{Editor configuration}
+\label{cha:editor-configuration}
+
+\chapter{Using your own test definition and test
+  instruction names}
+\label{cha:using-your-own-test-definition-test-instruction-names}
+
+
+
+\backmatter
+
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

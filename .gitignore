@@ -1,0 +1,11 @@
+.object/
+.depend/
+reports/
+
+*.pdf
+*.aux
+*.out
+*.toc
+*.log
+*.lof
+*.lot

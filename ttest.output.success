@@ -1,0 +1,305 @@
+<testudo>
+  <test name="testudo" title="Testudo" n_failed="11" n_total="38" n_errors="2" success="false">
+    <test name="testudo.main" title="main() test" n_failed="0" n_total="0" n_errors="0" success="true">
+      <test name="testudo.main.show_tree" title="show test tree" n_failed="0" n_total="0" n_errors="0" success="true">
+        <declare>ostringstream trs</declare>
+        <perform>testudo::print_tree(trs, testudo::TestNode::root_node())</perform>
+        <show_multiline_value>
+          <expression1 value="--testudo&#xa;|-main&#xa;|  `-show_tree&#xa;|-use_instructions&#xa;|-testarudo&#xa;|  |-simple&#xa;|  |-complex&#xa;|  |  |-difficult&#xa;|  |  |-complicated&#xa;|  |  |-with_error&#xa;|  |  `-penultimate&#xa;|  `-disorder&#xa;|     |-du&#xa;|     |-unu&#xa;|     |-absdiff&#xa;|     |-testarudo_ext&#xa;|     `-no_representation&#xa;|-all_even&#xa;|-fixture&#xa;|  |-addition_commutativity&#xa;|  |-multiplication_commutativity&#xa;|  `-associativity&#xa;`-scope&#xa;">trs.str()</expression1>
+        </show_multiline_value>
+      </test>
+    </test>
+    <test name="testudo.use_instructions" title="use instructions" n_failed="2" n_total="12" n_errors="1" success="false">
+      <multiline_text>index:&#xa;  1. holding functionality&#xa;  2. exceptions&#xa;  3. list of forgotten doubles</multiline_text>
+      <separator/>
+      <declare>Hold hf</declare>
+      <check_true success="true">
+        <expression1>not hf.is_holding()</expression1>
+      </check_true>
+      <perform>hf.hold(3.14)</perform>
+      <check_true success="true">
+        <expression1>hf.is_holding()</expression1>
+      </check_true>
+      <check_approx max_error="eps" success="true">
+        <expression1 value="3.14">hf.pop()</expression1>
+        <expression2 value="3.14">3.14</expression2>
+      </check_approx>
+      <check_true success="true">
+        <expression1>not hf.is_holding()</expression1>
+      </check_true>
+      <separator/>
+      <text>hf is empty now</text>
+      <try flag="popping_empty">hf.pop()</try>
+      <catch>not holding any double</catch>
+      <check_true success="true">
+        <expression1>popping_empty</expression1>
+      </check_true>
+      <perform>hf.hold(2.72)</perform>
+      <try flag="adding_to_already_holding">hf.hold(7.)</try>
+      <catch>already holding a double</catch>
+      <check_true success="true">
+        <expression1>adding_to_already_holding</expression1>
+      </check_true>
+      <separator/>
+      <text>the forgotten doubles list is still empty</text>
+      <check_true success="false">
+        <expression1>Hold::is_forgotten_empty()</expression1>
+      </check_true>
+      <check_equal success="true">
+        <expression1 value="0">Hold::get_forgotten().size()</expression1>
+        <expression2 value="0">0u</expression2>
+      </check_equal>
+      <scope name="scope 1">
+        <declare>Hold hf1(1.1)</declare>
+        <declare>Hold hf2(2.2)</declare>
+        <scope name="&lt;unnamed&gt;">
+          <declare>Hold hf3(3.3)</declare>
+        </scope>
+        <check_approx max_error=".5" success="true">
+          <expression1 value="list{3.3}">Hold::get_forgotten()</expression1>
+          <expression2 value="list{3}">list{3.}</expression2>
+        </check_approx>
+        <show_value>
+          <expression1 value="2.2">hf2.pop()</expression1>
+        </show_value>
+        <text>hf2 now empty; it won&apos;t add to the list</text>
+      </scope>
+      <check_true success="true">
+        <expression1>not Hold::is_forgotten_empty()</expression1>
+      </check_true>
+      <check_approx max_error="eps" success="false">
+        <expression1 value="list{1.1, 3.3}">Hold::get_forgotten()</expression1>
+        <expression2 value="list{3.3, 1.1}">list{3.3, 1.1}</expression2>
+      </check_approx>
+      <perform>Hold::clear_forgotten()</perform>
+      <check_equal success="true">
+        <expression1 value="0">Hold::get_forgotten().size()</expression1>
+        <expression2 value="0">0u</expression2>
+      </check_equal>
+      <text>the following will raise an error</text>
+      <perform>hf.hold(9.9)</perform>
+      <uncaught_exception>already holding a double</uncaught_exception>
+    </test>
+    <test name="testudo.testarudo" title="testarudo tests" n_failed="8" n_total="16" n_errors="1" success="false">
+      <test name="testudo.testarudo.simple" title="simple testarudo tests" n_failed="0" n_total="1" n_errors="0" success="true">
+        <check_true success="true">
+          <expression1>true</expression1>
+        </check_true>
+      </test>
+      <test name="testudo.testarudo.complex" title="complex testarudo tests" n_failed="4" n_total="6" n_errors="1" success="false">
+        <test name="testudo.testarudo.complex.difficult" title="difficult test" n_failed="1" n_total="2" n_errors="0" success="false">
+          <check_equal success="false">
+            <expression1 value="7">7</expression1>
+            <expression2 value="8">8</expression2>
+          </check_equal>
+          <check_equal success="true">
+            <expression1 value="un chat">&quot;un chat&quot;</expression1>
+            <expression2 value="un chat">string(&quot;un chat&quot;)</expression2>
+          </check_equal>
+        </test>
+        <test name="testudo.testarudo.complex.complicated" title="complicated test" n_failed="2" n_total="2" n_errors="0" success="false">
+          <check_equal success="false">
+            <expression1 value="it&apos;s">&quot;it&apos;s&quot;</expression1>
+            <expression2 value="complicated">&quot;complicated&quot;</expression2>
+          </check_equal>
+          <check_equal success="false">
+            <expression1 value="54">6*9</expression1>
+            <expression2 value="42">42</expression2>
+          </check_equal>
+        </test>
+        <test name="testudo.testarudo.complex.with_error" title="test_with_error" n_failed="0" n_total="1" n_errors="1" success="false">
+          <check_equal success="true">
+            <expression1 value="44">22+22</expression1>
+            <expression2 value="44">44</expression2>
+          </check_equal>
+          <perform>throw runtime_error(&quot;see if you can catch me!&quot;)</perform>
+          <uncaught_exception>see if you can catch me!</uncaught_exception>
+        </test>
+        <test name="testudo.testarudo.complex.penultimate" title="penultimate test" n_failed="1" n_total="1" n_errors="0" success="false">
+          <check_equal success="false">
+            <expression1 value="there&apos;s nothing">&quot;there&apos;s nothing&quot;</expression1>
+            <expression2 value="penultimate">&quot;penultimate&quot;</expression2>
+          </check_equal>
+        </test>
+      </test>
+      <test name="testudo.testarudo.disorder" title="disordered tests" n_failed="4" n_total="9" n_errors="0" success="false">
+        <test name="testudo.testarudo.disorder.du" title="du, but comes first" n_failed="1" n_total="1" n_errors="0" success="false">
+          <check_true success="false">
+            <expression1>string(&quot;unu&quot;)&lt;string(&quot;du&quot;)</expression1>
+          </check_true>
+        </test>
+        <test name="testudo.testarudo.disorder.unu" title="unu, but comes last" n_failed="0" n_total="1" n_errors="0" success="true">
+          <check_true success="true">
+            <expression1>string(&quot;unu&quot;)&gt;string(&quot;du&quot;)</expression1>
+          </check_true>
+        </test>
+        <test name="testudo.testarudo.disorder.absdiff" title="absdiff()" n_failed="0" n_total="2" n_errors="0" success="true">
+          <perform>approx_epsilon=1e-10</perform>
+          <check_approx max_error="eps" success="true">
+            <expression1 value="2">testudo::absdiff(5., 7.)</expression1>
+            <expression2 value="2">2.</expression2>
+          </check_approx>
+          <check_approx max_error="eps" success="true">
+            <expression1 value="2">testudo::absdiff(7., 5.)</expression1>
+            <expression2 value="2">2.</expression2>
+          </check_approx>
+        </test>
+        <test name="testudo.testarudo.disorder.testarudo_ext" title="Testarudo support for STL objects" n_failed="2" n_total="4" n_errors="0" success="false">
+          <perform>approx_epsilon=1e-6</perform>
+          <declare>tuple&lt;float, int, double&gt; ta={3.14, 8, 7.5}</declare>
+          <declare>tuple&lt;double, float, int&gt; tb={4.14, 7., 6}</declare>
+          <check_approx max_error="eps" success="false">
+            <expression1 value="tuple{3.14, 8, 7.5}">ta</expression1>
+            <expression2 value="tuple{4.14, 7, 6}">tb</expression2>
+          </check_approx>
+          <show_value>
+            <expression1 value="3.5">absdiff(ta, tb)</expression1>
+          </show_value>
+          <declare>tuple&lt;float, int, double&gt; tc={3.14, 8, 7.5}</declare>
+          <check_approx max_error="eps" success="true">
+            <expression1 value="tuple{3.14, 8, 7.5}">ta</expression1>
+            <expression2 value="tuple{3.14, 8, 7.5}">tc</expression2>
+          </check_approx>
+          <separator/>
+          <declare>list&lt;float&gt; la={3.14, 8, 7.5}</declare>
+          <declare>list&lt;double&gt; lb={4.14, 7., 6}</declare>
+          <check_approx max_error="eps" success="false">
+            <expression1 value="list{3.14, 8, 7.5}">la</expression1>
+            <expression2 value="list{4.14, 7, 6}">lb</expression2>
+          </check_approx>
+          <show_value>
+            <expression1 value="3.5">absdiff(la, lb)</expression1>
+          </show_value>
+          <declare>list&lt;double&gt; lc={3.14, 8, 7.5}</declare>
+          <check_approx max_error="eps" success="true">
+            <expression1 value="list{3.14, 8, 7.5}">la</expression1>
+            <expression2 value="list{3.14, 8, 7.5}">lc</expression2>
+          </check_approx>
+        </test>
+        <test name="testudo.testarudo.disorder.no_representation" title="class with no representation" n_failed="1" n_total="1" n_errors="0" success="false">
+          <check_equal success="false">
+            <expression1 value="&lt;...&gt;">ClassWithNoRepresentation()</expression1>
+            <expression2 value="&lt;...&gt;">ClassWithNoRepresentation()</expression2>
+          </check_equal>
+        </test>
+      </test>
+    </test>
+    <test name="testudo.all_even" title="all_even" n_failed="1" n_total="4" n_errors="0" success="false">
+      <show_value>
+        <expression1 value="1">datum_number</expression1>
+      </show_value>
+      <show_value>
+        <expression1 value="2">datum</expression1>
+      </show_value>
+      <check_equal success="true">
+        <expression1 value="0">datum%2</expression1>
+        <expression2 value="0">0</expression2>
+      </check_equal>
+      <separator/>
+      <show_value>
+        <expression1 value="2">datum_number</expression1>
+      </show_value>
+      <show_value>
+        <expression1 value="4">datum</expression1>
+      </show_value>
+      <check_equal success="true">
+        <expression1 value="0">datum%2</expression1>
+        <expression2 value="0">0</expression2>
+      </check_equal>
+      <separator/>
+      <show_value>
+        <expression1 value="3">datum_number</expression1>
+      </show_value>
+      <show_value>
+        <expression1 value="5">datum</expression1>
+      </show_value>
+      <check_equal success="false">
+        <expression1 value="1">datum%2</expression1>
+        <expression2 value="0">0</expression2>
+      </check_equal>
+      <separator/>
+      <show_value>
+        <expression1 value="4">datum_number</expression1>
+      </show_value>
+      <show_value>
+        <expression1 value="6">datum</expression1>
+      </show_value>
+      <check_equal success="true">
+        <expression1 value="0">datum%2</expression1>
+        <expression2 value="0">0</expression2>
+      </check_equal>
+      <separator/>
+    </test>
+    <test name="testudo.fixture" title="fixture tests" n_failed="0" n_total="3" n_errors="0" success="true">
+      <test name="testudo.fixture.addition_commutativity" title="+ commutativity" n_failed="0" n_total="1" n_errors="0" success="true">
+        <text>with fixture NumbersFixture</text>
+        <show_value>
+          <expression1 value="1">x</expression1>
+        </show_value>
+        <show_value>
+          <expression1 value="-2.5">y</expression1>
+        </show_value>
+        <show_value>
+          <expression1 value="3.14">z</expression1>
+        </show_value>
+        <check_approx max_error="eps" success="true">
+          <expression1 value="-1.5">x+y</expression1>
+          <expression2 value="-1.5">y+x</expression2>
+        </check_approx>
+      </test>
+      <test name="testudo.fixture.multiplication_commutativity" title="* commutativity" n_failed="0" n_total="1" n_errors="0" success="true">
+        <text>with fixture NumbersFixture</text>
+        <show_value>
+          <expression1 value="1">x</expression1>
+        </show_value>
+        <show_value>
+          <expression1 value="-2.5">y</expression1>
+        </show_value>
+        <show_value>
+          <expression1 value="3.14">z</expression1>
+        </show_value>
+        <check_approx max_error="eps" success="true">
+          <expression1 value="-2.5">x*y</expression1>
+          <expression2 value="-2.5">y*x</expression2>
+        </check_approx>
+      </test>
+      <test name="testudo.fixture.associativity" title="associativity" n_failed="0" n_total="1" n_errors="0" success="true">
+        <text>with fixture NumbersFixture</text>
+        <show_value>
+          <expression1 value="1">x</expression1>
+        </show_value>
+        <show_value>
+          <expression1 value="-2.5">y</expression1>
+        </show_value>
+        <show_value>
+          <expression1 value="3.14">z</expression1>
+        </show_value>
+        <check_approx max_error="eps" success="true">
+          <expression1 value="0.64">x*(y+z)</expression1>
+          <expression2 value="0.64">x*y+x*z</expression2>
+        </check_approx>
+      </test>
+    </test>
+    <test name="testudo.scope" title="scope begin and end" n_failed="0" n_total="3" n_errors="0" success="true">
+      <declare>int flag=10</declare>
+      <scope name="at_destruction_flag_20">
+        <declare>AtDestruction at_destruction_flag_20([&amp;flag]() { flag=20; })</declare>
+        <scope name="&lt;unnamed&gt;">
+          <declare>AtDestruction at_destruction_flag_30([&amp;flag]() { flag=30; })</declare>
+          <check_equal success="true">
+            <expression1 value="10">flag</expression1>
+            <expression2 value="10">10</expression2>
+          </check_equal>
+        </scope>
+        <check_equal success="true">
+          <expression1 value="30">flag</expression1>
+          <expression2 value="30">30</expression2>
+        </check_equal>
+      </scope>
+      <check_equal success="true">
+        <expression1 value="20">flag</expression1>
+        <expression2 value="20">20</expression2>
+      </check_equal>
+    </test>
+  </test>
+</testudo>
