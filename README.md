@@ -53,7 +53,7 @@ define_test(flux_capacitor, // parent
 Here's an equivalent Testudo test file, expressed with a different style (there
 are two default styles; you can also add your own):
 ```c++
-#include <testudo/testudo_up.h> // default upper-case style
+#include <testudo/testudo_uc.h> // default upper-case style
 #include "flux_capacitor.h"
 #include "delorean_test.h" // defines DeloreanFixture
 
