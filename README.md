@@ -57,13 +57,13 @@ are two default styles; you can also add your own):
 #include "flux_capacitor.h"
 #include "delorean_test.h" // defines DeloreanFixture
 
-DEFINE_TOP_TEST_NODE("outatime.delorean", // parent full name
+DEFINE_TOP_TEST_NODE("testudo.outatime", // parent full name
                      flux_capacitor, // text name
-                     "flux capacitor features"); // title
+                     "FC features"); // title
 
 DEFINE_TEST(flux_capacitor, // parent
-            flux_capacitor_initial, // name
-            "flux capacitor after construction", // title
+            initial, // name
+            "FC after construction", // title
             WITH_FIXTURE(DeloreanFixture)) // use a fixture
 {
   DECLARE(FluxCapacitor fc);
