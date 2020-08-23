@@ -1,0 +1,121 @@
+         ____ _______ ___ _ _ __   __         __ ?
+        |_   | _ |  _|   | | |  \ /  |    .-./'_)  [ OK ]
+          | || _|\_  \| || | | | | | |  ,/___\/    [FAIL]
+    ------|_||___|___/|_|-\__|__/|__/-----U-U----------------mgc--
+
+---- high priority -----------------------------------------
+
+---- easy --------------------------------------------------
+
+[ ] make the separator ("print_break()") as wide as the line width
+
+[ ] actually write and test "uc.tst"
+
+---- in progress -------------------------------------------
+
+[ ] document
+
+------------------------------------------------------------
+
+[ ] convert the documentation to something browsable in a browser
+
+[ ] check
+
+    [ ] Google Mock
+    [ ] SUnit
+
+[ ] add names to each individual test case? this would make test cases
+    identifiable and easier to track, even in an automated way
+
+[ ] add options (like "just report stats", "show tests", "show failed tests",
+  "show failed checks", "no color", et cetera)
+
+[ ] add capabilities
+
+    [ ] checking of theorems with prescribed or pseudorandom data series
+
+    [ ] add (and use) a "_false()" macro?
+
+    [ ] add (and use) a "_not_equal()" macro?
+
+    [ ] add (and use) a "_not_approx()" macro?
+
+[ ] correct cartouched titles that are too long for one line
+
+[ ] add an "_relapprox()", similar to "_approx()", but using the relative
+  distance (absolute distance divided by greater magnitude) rather than the
+  absolute distance
+
+[ ] give "check_try_catch()" the possibility to specify the specific kind of
+  exception (people may be defining exceptions not derived from
+  "std::exception")
+
+[ ] refactor "xml_to_color" to do all length-related computations before the
+  specific terminal or LaTeX colour codes are added; this will simplify a lot
+  the processing
+
+[ ] in "ttest.cpp" (and all analogous files in OXYS directories), the call
+  "test_root->test(..., to.subtree)" should be replaced with
+  "test_root->test(..., to)", so that the test node and the option parsing can
+  be extending together without having to change their clients
+
+[ ] maybe add "show_fixture()", that would work like "with_fixture()", but the
+  latter would only mention the fixture, whereas the former would also show the
+  steps in the fixture constructor and destructor (the current implementation
+  of "with_fixture()" works like the intended implementation of
+  "show_fixture()"; the effect could be achieved by passing the test functions
+  an additional argument: the test format for the fixture; this test format
+  would be the regular one for "show_fixture()" and a null one for
+  "with_fixture()")
+
+---- done --------------------------------------------------
+
+[X] add fixtures à la Goggle Mock? it should be done with inheritance: each
+    test is not a function but a method of a class that inherits from the
+    fixture; the fixture's attributes are available in the test method; they're
+    initialised by the fixture constructor; the fixture can have other methods
+    that can be called by the tests
+
+[X] make "show_scope" into a proper, method-full (in "TestFormat") structure;
+  the XML version should put everything that happens while in the scope inside
+  an XML element
+
+[X] what about having, instead of
+
+      check_approx(a, b);
+
+  the parse-safe
+
+      check(a)_approx(b);
+
+  or, with an explicit tolerance,
+
+      check(a)_approx(b)_tol(1e-3);
+
+  this would apply to "check_equal()" too; this could be done by translating
+  "check(...)" to "Check(__VA_ARGS__)", and "_approx(...)", "_equal(...)", and
+  "_tol(...)" to "<< Approx(__VA_ARGS__)" and so on, and having the class
+  "Check" perform the check _on destruction_
+
+[X] transfer as a new project to "mgcuadrado.com"
+
+[X] add a try-catch around each test instruction, so that unexpected exceptions
+  are caught and reported; in fact, it can't be done around each instruction,
+  because it would be impossible for declarations; it must be done around each
+  test
+
+[X] "fake_declare()" is missing
+
+[X] another idea for managing the root of the test tree: a module in
+  "oxys/mathclass", for instance, would declare a "root" (that may not be a
+  true root) called "oxys", and a child node to it named "mathclass"; if
+  someone later declares the same root "oxys", that's ok; same thing for
+  "oxys.mathclass"; the only rule is that a given node (be it a true root, a
+  non-true root, or any node) can only be given a priority at most once;
+  otherwise, that's an error; same thing for the title; so a possible approach
+  would be for all modules in "mathclass" to declare both "oxys" and
+  "oxys.mathclass" without giving them any priority, and then the module
+  "mathclass/root_test" would declare "oxys.mathclass" with a priority if
+  needed; if there's only one declared root, then that's a true root, and the
+  test results show it as such; if there are several declared roots, they are
+  all made children to a true, undeclared root

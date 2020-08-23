@@ -1,0 +1,442 @@
+,--------------------------------------------.
+| Macros for tests and test steps in Testudo |
+`--------------------------------------------'
+
+C++ macros aren't particularly good or modern.  They actually look like a curse
+Zeus may have imposed on humanity.  Hopefully, C++ will have a proper macro
+language some day.  In the meantime, programming with C++ macros is frustrating
+and complex, and hard to document.  In a sensible programming language, if you
+have good structure and good naming, most or all of the explaining is done.
+With C++ macros, no way: you have to add prose, and quickly at that, before you
+forget how you achieved a certain effect, or why you needed an innocent-looking
+prong.
+
+So this document explains the macros defined by Testudo for the user.  I'll
+write it fast, before it leaves my working memory.
+
+
+1. Nomenclature
+
+C++ macros don't abide by namespace rules: every macro lives in the global
+macro namespace.  Therefore, to avoid name clashes, all Testudo
+/implementation/ macros follow one of these naming schemes
+
+    * "testudo__" followed by all caps and underscores, for macros that will
+      later be renamed to nice-looking macros for the user (these nice-looking
+      macros come in different styles, but they don't follow these naming
+      schemes, which are only for /implementation/ macros; see "Test definition
+      and test instruction styles" in the guide "testudo.pdf");
+
+    * "testudo___" (note the additional underscore) followed by all caps and
+      underscores, for macros that will remain implementation details, and
+      won't be renamed for the user.
+
+
+2. Common difficulties
+
+2.1 C++ macros barely understand C, and don't understand C++ at all
+
+C++ macros are still C: when parsing their arguments, they will respect
+groupings made with "(" and ")" or '"' and '"', but other means of grouping
+that are common in C++, such as "<" and ">" or "{" and "}", will be completely
+disregarded.  There's an easy way to circumvent this limitation: to only have
+one argument that could be misparsed, to make it the last one, and to match it
+with "..." (and use it with "__VA_ARGS__").  With the use of continuation
+macros (see below), which basically break a macro that may have several such
+arguments into several macros with one such argument each, i managed to apply
+this solution.  Before i did this, i used a different trick when i had several
+such arguments: i made the user enclose them in "(" and ")", and gave an option
+to leave them or remove them in the printouts.
+
+2.2 Function-like macro calls that can't be followed by ";"
+In some cases, you intend a macro to look like a function call, but the
+definition of the macro doesn't allow for a ";" to follow it (for instance, if
+the last token is a namespace-closing "}").  In those cases, end the macro
+definition with "testudo___DECL_EAT_A_SEMICOLON".
+
+2.3 The problem with "..." needing at least one argument
+
+When you use variadic macros, the final "..." must get at least one argument,
+so it can't work as optional arguments to a function would.  Sometimes, you can
+solve the problem by having an additional macro to which you delegate the work,
+with an additional argument that you may or may not use.  Here's an example:
+suppose you code a simple macro to select the first argument of a list of
+arguments:
+
+    #define FIRST(a, ...) a
+
+This works fine with expressions such as "FIRST(1, 2, 3)", but if you use this
+macro with only one argument, like for instance "FIRST(1)", and you're using a
+fully ISO-C++-compliant compiler ("g++", for example, requires the "-pedantic"
+flag), this will be an error ("g++" will say "ISO C++11 requires at least one
+argument for the '...' in a variadic macro").  The solution, as outlined, is to
+delegate to an additional macro "FIRST_IMPL()" with an additional argument (in
+this case, empty):
+
+    #define FIRST(...) FIRST_IMPL(__VA_ARGS__, )
+    #define FIRST_IMPL(a, ...) a
+
+In this example, we don't need the rest of the arguments.  If we do, we have to
+play smarter.  If "__VA_ARGS__" ends up in an overloaded function, you can add
+an additional parameter to all overloads of that function, and a matching
+argument to the delegating macro expression:
+
+    #define REGISTER_TYCOON(...)                                            \
+      REGISTER_TYCOON_IMPL(__VA_ARGS__, end_mark)
+    #define REGISTER_TYCOON_IMPL(name, ...)                                 \
+      tycoon_map[name]=show_me_the_money(__VA_ARGS__)
+
+    struct end_mark_t { } constexpr end_mark{}; // just a marker
+    map<string, string> tycoon_map;
+    string show_me_the_money(end_mark_t) { return "no money"; }
+    string show_me_the_money(double m, end_mark_t) { return to_string(m); }
+
+2.4 Unwanted expansion of macro arguments
+
+When a macro passes an argument to another macro, the argument undergoes macro
+expansion.  Sometimes it doesn't matter, but sometimes it does.
+
+In Testudo, the unpractical macros starting with "testudo__" are renamed to
+better names.  This has two objectives.  First, the user can rename them to
+whatever suits their taste.  Second, the user has the possibility to avoid name
+clashes (imagine, for instance, the code already has something called
+"declare"; you won't be able to use it in the same context where a "declare"
+macro is defined).
+
+The macro "renaming" could be done like this:
+
+    #define show_scope(...) testudo__SHOW_SCOPE(__VA_ARGS__)
+
+Here, "__VA_ARGS__" will undergo macro expansion, and it doesn't matter.  But
+consider "testudo__SHOW_VALUE()", whose naïve definition would be
+
+    #define testudo__SHOW_VALUE(...)                                  \
+      test_format->output_show_value(#__VA_ARGS__,                    \
+                                     testudo::to_text(__VA_ARGS__))
+
+If we have a macro "M_PI", defined as
+
+    #define M_PI 3.1416
+
+and do
+
+    testudo__SHOW_VALUE(2. * M_PI);
+
+this will expand to
+
+    test_format->output_show_value("2. * M_PI",
+                                   testudo::to_text(2. * M_PI));
+
+But if we use the "renamed" macro defined as
+
+    #define show_value(...) testudo__SHOW_VALUE(__VA_ARGS__)
+
+and do
+
+    show_value(2. * M_PI);
+
+because of the intermediate macro expansion between "show_value()" and
+"testudo__SHOW_VALUE()", we'll end up with
+
+    test_format->output_show_value("2. * 3.1416",
+                                   testudo::to_text(2. * 3.1416));
+
+which gives a wrong printout ("2. * 3.1416", which should've been "2. * M_PI").
+
+To solve this, as a general rule, whenever a macro uses "..." and produces a
+string "#__VA_ARGS__" from it, if it is to be "renamed", it's transformed so
+that the "renamed" macro itself does the stringification, and passes it to the
+original macro; of course, the original macro must be modified to accept the
+stringified argument before "..."; it's also renamed with an additional "_S" to
+make this situation clear.  In the example with "testudo__SHOW_VALUE()", the
+final implementation would be (or rather, is) like this
+
+    #define testudo__SHOW_VALUE_S(s, ...)                                  \
+      test_format->output_show_value(s,                                    \
+                                     testudo::to_text(__VA_ARGS__))
+
+and the rename is
+
+    #define show_value(...)                                                \
+      testudo__SHOW_VALUE_S(#__VA_ARGS__, __VA_ARGS__)
+
+
+3. General conventions for code-generating macros in Testudo
+
+When a macro declares something (a class, a global variable, a function), it
+does so in a namespace, to avoid name clashes.  The namespaces are variously
+named to avoid clashes even between different kinds of entities bearing the
+same name (it happens quite often that you name a node the same as one of its
+tests), but they all start with "testudo__":
+
+    * "testudo__root_test" for matters related to test tree root node;
+
+    * "testudo__test" for matters related to test nodes;
+
+    * "testudo__function_test" for matters related to test function
+      definitions.
+
+The namespaces are created wherever the code happens to be (i.e., not all of
+them will be the same if the macros are invoked from different namespaces).  No
+problem with that, since their purpose is to avoid name clashes.
+
+
+4. Macros for dealing with test tree nodes
+
+Nothing special here.  The macro names are
+
+    * "testudo__DECLARE_ROOT_TEST_NODE()",
+
+    * "testudo__DEFINE_ROOT_TEST_NODE()",
+
+    * and "testudo__GET_ROOT_TEST_NODE()".
+
+They use the "testudo__root_test" namespace, and end with
+"testudo___DECL_EAT_A_SEMICOLON" when appropriate.
+
+
+5. Macros for defining test nodes
+
+Once again, nothing special here.  The macro names are
+
+    * "testudo__DEFINE_TOP_TEST_NODE()",
+
+    * and "testudo__DEFINE_TEST_NODE()",
+
+and the latter is defined in terms of the former.  They use the "testudo__test"
+namespace.  Since "testudo__DEFINE_TOP_TEST_NODE()" needs three or four
+arguments, but the receiving function gets the third and possible fourth in the
+same order, the macro parameters stop after the second one; from there on, it's
+"...", which is passed as "__VA_ARGS__" to the function, so we don't have to
+deal with the problem, explained above, with "..." needing at least one
+argument.
+
+
+6. Macros for defining tests
+
+This is the most complex part, so i'll break down in separate concerns.  The
+macro names are
+
+    * "testudo__DEFINE_TOP_TEST()",
+
+    * and "testudo__DEFINE_TEST()",
+
+and the latter is defined in terms of the former.  They use the "testudo__test"
+and "testudo__function_test" namespaces.
+
+6.1 Fixtures
+
+In order to support fixtures, and not wanting to have completely separate
+constructs for fixtureful and fixtureless tests, i've made it so all tests
+actually have a fixture.  In the case of apparently fixtureless tests, it's a
+basic fixture called "Fixture".  While we're at it, i've made the variables
+that are needed for the test ("test_format", "test_stats", and
+"approx_epsilon") members of "Fixture", so they're available in the test
+definition (they could've been also parameters to the test method, but it
+would've been slightly more complex).
+
+The parameters to "testudo__DEFINE_TOP_TEST()" are "parent", "name", "title",
+an optional fixture specification, and an optional bucket specification (used
+for ordering the tests).  We'll have to extract the fixture ("Fixture" or one
+specified by the user) and the bucket specification from these optional
+arguments, so we'll need overloaded functions for all possible cases.  The
+optional fixture specification is made with the "testudo__WITH_FIXTURE()"
+macro; since the expansion of this macro will be an argument to an overloaded
+function, the macro expands to an instance of the type "FixtureSpec<F>", to
+represent the fixture type ("F"), which is also typedef'd to "fixture_type";
+"FixtureSpec<F>" also contains the name of the fixture.
+
+6.2 Avoiding the problem with "..." needing at least one argument
+
+Since the fixture specification and the bucket specification are optional, we
+make them into "...", but we have to use the solution for the problem with
+"..." needing at least one argument.  In this case, we'll use a marker:
+
+    struct end_mark_t { } constexpr end_mark{};
+    #define testudo__DEFINE_TOP_TEST(...)                                   \
+      testudo___DEFINE_TOP_TEST_IMPL(__VA_ARGS__, testudo::end_mark)
+    #define testudo___DEFINE_TOP_TEST_IMPL(parent, name, title, ...)        \
+      { ... }
+
+That means that all overloaded functions used to extract the information will
+need a last parameter with type "end_mark_t".
+
+6.3 Extracting the fixture type and the bucket specification
+
+There are three overloaded functions to treat "__VA_ARGS__":
+
+    * "select_fixture_spec(...)",
+
+    * and "select_priority(...)".
+
+The fixture specification can be there as a "FixtureSpec<>", or not at all.
+The bucket specification can be there as a "TestNode_t::priority_t" value, a
+"declaration_order_t" value, or not at all.
+
+The function "select_fixture_spec()" returns its first argument if it's a
+"FixtureSpec<F>", or "FixtureSpec<Fixture>{}" otherwise.  In the macro, the
+expression for the fixture type is
+
+    decltype(testudo::select_fixture_spec(__VA_ARGS__))::fixture_type
+
+The function "select_priority()" returns a bucket specification.  It just
+returns the appropriate argument when it exists, and the default value when it
+doesn't.
+
+6.4 Definition of the test body
+
+After the "testudo__DEFINE_TOP_TEST()" or "testudo__DEFINE_TEST()" macros, the
+test is defined surrounded by "{" and "}" as if it were a normal function with
+a weirdly-specified signature:
+
+    define_test(complex, difficult, "difficult test") {
+      check(7)_equal(8);
+      check("un chat")_equal(string("un chat"));
+    }
+
+There are three parts to this:
+
+    1. defining, inside the "testudo__function_test" namespace, a class with a
+       specific name computed from the supplied name, that derives from the
+       fixture type, and has a "do_test()" method;
+
+    2. defining, inside the "testudo__test" namespace, a "TestNode" object with
+       a test function for the test, specifying as the test function a lambda
+       expression that creates an instance of the new class defined in item 1
+       (passing it the "test_format" and "test_stats" arguments), then invokes
+       its "do_test()" method;
+
+    3. out of both namespaces, start the definition of the "do_test()" method,
+       stopping just before the opening "{", so that the test body definition
+       written by the user takes it from there.
+
+6.4 Support for the instructions, in the test body and in the fixture
+
+The test instruction macros assume there are three variables available:
+
+    * "test_format",
+
+    * "test_stats",
+
+    * and "approx_epsilon".
+
+These are supplied by the fixture, as members.  The initial value of
+"approx_epsilon" is "approx_epsilon_default", but it can be changed with
+specific macros (see below).  A fixture for a fixtureful test must derive from
+"Fixture", accept exactly two arguments "test_format" and "test_stats" on
+construction, and pass them to the it's parent "Fixture" constructor.  The
+macros "testudo__TEST_PARAMETERS" and "testudo__TEST_ARGUMENTS" make this
+easier, allowing you to write a fixture like this:
+
+    struct CoolFixture : testudo::Fixture {
+      CoolFixture(testudo_test_parameters)
+        : Fixture(testudo_test_arguments), ... { ... }
+      ...
+    };
+
+The fixture's setting up preparations are done by the fixture constructor.  The
+cleaning up after the test is done by the fixture destructor.  A fixture can
+have any number of additional attributes and methods to support definition of a
+family of tests.  When it makes sense, setting up and cleaning up instructions,
+as well as other methods, should be written as if they were a part of the test
+itself, with the test instruction macros (this is possible because the required
+variables are already in place when the fixture constructor body starts, and
+they remain so until destruction); this way, they will be shown in the test
+report.
+
+
+7. Test instruction macros
+
+Most test instruction macros are easy to understand: they take their arguments
+and generate code in a transparent way.  Sometimes, the "do { ... } while (0)"
+pattern is used.  The following subsections get into more detail for the macros
+that aren't so obvious.
+
+7.1 "testudo__SHOW_SCOPE()"
+
+This macro creates an object of type "ScopeMarker" named "testudo_scope_marker"
+(there can be only one "testudo__SHOW_SCOPE()" in a given scope, so no problem
+there).  The "ScopeMarker" gets a copy of "test_format" and uses it to write an
+opening message on construction, and a closing message on destruction, so no
+additional instruction is needed to mark the end of the scope.
+
+7.2 Check macros
+
+A expression-check instruction starts with a "testudo__CHECK_S()" instruction
+that gets the expression you want to check.  It must be followed by another
+macro, called a "continuation macro", to specify how and what to compare it to;
+this can be "testudo__TRUE", "testudo__EQUAL_S()", or "testudo__APPROX_S()".
+After "testudo__APPROX_S()" you can add an additional "testudo__TOL_S()" macro
+to specify a tolerance different from the current "approx_epsilon".
+
+So, how does this work?
+
+7.2.1 The intermediate classes for check on destruction
+
+The macro "testudo__CHECK()" instantiates a special object with type "Check<A>"
+(where "A" is the type of the checked expression) that serves two purposes:
+
+    1. it stores the value of the expression to check, and its stringification,
+
+    2. and it dispatches itself to the object created by the specific
+       continuation macro, to perform its associated checking.
+
+The continuation macro will then expand to invoke the dispatching to a second
+object that stores the new information brought by the continuation macro; the
+action triggered by the dispatching depends on the specific continuation macro.
+If the continuation macro is "testudo__TRUE" or "testudo__EQUAL_S", it will
+immediately perform the check.  If it is "testudo__APPROX_S", the check can't
+be done immediately, since a new continuation macro "testudo__TOL_S()" for
+changing the tolerance may follow; in this case, a new object is created, that
+can have its tolerance changed, and waits until destruction to perform the
+check.
+
+In order to ensure that the "testudo__CHECK_S()" is completed with a
+continuation macro, its expansion ends with a ".", ready for attachment to the
+dispatching method by the continuation macro; if the user forgets to write the
+continuation macro, the check won't compile.
+
+In the case of "testudo__APPROX_S()", an additional stored value is the check
+tolerance, taken from the current value of "approx_epsilon".  This can be
+changed by chaining the "testudo__TOL_S()" macro.  Since "testudo__TOL_S()" is
+optional, the attachment is done by leaving the "." on the expansion of
+"testudo__TOL_S()", so that whether "testudo__TOL_S()" is there or not, the
+result is valid.
+
+Here is a schematics of how the different possibilities for checks are
+organised with respect to the macros:
+
+    Check<A>(a, sa). check_cont(CheckTrue()) ;
+    '--------------' '---------------------'
+       CHECK(...)             TRUE
+
+    Check<A>(a, sa). check_cont(CheckEqual<B>(b, sb)) ;
+    '--------------' '------------------------------'
+       CHECK(...)               EQUAL(...)
+
+    Check<A>(a, sa). check_cont(Checkapprox<B>(b, sb)) ;
+    '--------------' '-------------------------------'
+       CHECK(...)                APPROX(...)
+
+    Check<A>(a, sa). check_cont(Checkapprox<B>(b, sb)) .set_tol(tol, stol) ;
+    '--------------' '-------------------------------' '-----------------'
+       CHECK(...)                APPROX(...)                 TOL(...)
+
+7.2.2 How the values are held
+
+The way the values are stored into the objects matters.  We want to avoid
+copies if possible, because copy constructors may have unwanted side-effects,
+or may be even illegal in some cases.  The rule we use is this: if an
+expression is an rvalue, we assume it is a temporary object generated by the
+instruction itself, and we are forced to store it as a copy.  Otherwise, we
+assume it existed before the instruction, and will go on existing just after
+it, so we keep a reference to it.  This is implemented by the class
+"HoldValue<T>".  There are some special cases for pointers to char, which are
+converted to strings (this will fail if you use Testudo to check raw pointers
+to char, with no string meaning).
+
+All the intermediate classes described above store values in "HoldValue<T>"
+instances.  Since we want to check whether each expression is an rvalue or not
+from the beginning, and forward them appropriately, we use universal references
+in the expansion of the macros.  Some miscellaneous additional considerations
+are described in the code comments.

@@ -1,3 +1,18 @@
+91
+  unburned version
+90
+  typo
+89
+  wrote a "README.md" for GitHub
+88
+  added a very simple example for the "README.md" documentation
+87
+  excluded the code example in the manual from being copyrighted
+86
+  testudo version 0.02rc
+85 testudo-0.01
+  small corrections to release procedure (copy permissions from original file
+  when addind license notice; match full lines when avoiding copying files)
 84
   removed ".headers", since i have linked needed header files
 83
