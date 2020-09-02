@@ -64,13 +64,11 @@ namespace {
     check(not hf.is_holding())_true;
     print_break(); // ------------------------------------------------------
     print_text("hf is empty now");
-    check_try_catch(popping_empty, hf.pop());
-    // a couple of empty lines to get in sync with the report on the oposite
-    // page
+    step_id(popping_empty);
+    check_try(hf.pop())_catch();
     perform(hf.hold(2.72));
-    check_try_catch(adding_to_already_holding, hf.hold(7.));
-    // ditto
-
+    step_id(adding_to_already_holding);
+    check_try(hf.hold(7.))_catch();
     print_break(); // ------------------------------------------------------
     print_text("the forgotten doubles list is still empty");
     check(Hold::is_forgotten_empty())_true;

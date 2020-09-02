@@ -21,6 +21,7 @@
 #include "testudo_stats.h"
 #include "named_create.h"
 #include <string>
+#include <cassert>
 
 namespace testudo {
 
@@ -45,12 +46,14 @@ namespace testudo {
     virtual void output_begin_scope(std::string name)=0;
     virtual void output_end_scope(std::string name)=0;
     virtual void output_separator()=0;
+    virtual void output_step_id(std::string id)=0;
     virtual void output_text(std::string text)=0;
     virtual void output_multiline_text(std::string text)=0;
     virtual void output_declare(std::string code_str)=0;
     virtual void output_perform(std::string code_str)=0;
-    virtual void output_try(std::string code_str, std::string flag_str)=0;
-    virtual void output_catch(std::string error)=0;
+    virtual void output_try(std::string code_str)=0;
+    virtual void output_catch(std::string exception_type, std::string error,
+                              bool caught)=0;
     virtual void output_show_value(
       std::string expr_str, std::string value_str)=0;
     virtual void output_show_multiline_value(
@@ -65,6 +68,10 @@ namespace testudo {
       std::string expr2_str, std::string val2_str,
       std::string max_error_str,
       bool approx)=0;
+    virtual void output_check_verify(
+      std::string expr_str, std::string val_str,
+      std::string pred_str,
+      bool verify)=0;
     virtual void uncaught_exception(std::string exception)=0;
     virtual void produce_summary(std::string name, TestStats test_stats)=0;
 
@@ -78,6 +85,48 @@ namespace testudo {
                        TestFormatNamedCreator,
                        TestFormat,
                        std::ostream &);
+
+  // the following implementation is just meant for fixtures, when their
+  // workings aren't shown (therefore, it mustn't be registered for creation by
+  // name); methods that shouldn't be used in that situation are implemented as
+  // "assert(false)"; some methods must delegate to the actual test format used
+  // for the non-fixture part of the test; the other methods just do nothing
+  class NullTestFormatForFixtures
+    : public TestFormat {
+  public:
+    NullTestFormatForFixtures(test_format_p non_fixture_test_format)
+      : non_fixture_test_format(non_fixture_test_format) { }
+    void output_title(std::string, std::string) override { assert(false); }
+    void output_begin_scope(std::string) override { }
+    void output_end_scope(std::string) override { }
+    void output_separator() override { }
+    void output_step_id(std::string) override { }
+    void output_text(std::string) override { }
+    void output_multiline_text(std::string) override { }
+    void output_declare(std::string) override { }
+    void output_perform(std::string) override { }
+    void output_try(std::string) override { }
+    void output_catch(std::string, std::string, bool) override { }
+    void output_show_value(std::string, std::string) override { }
+    void output_show_multiline_value(std::string, std::string) override { }
+    void output_check_true(std::string, bool) override { }
+    void output_check_equal(std::string, std::string,
+                            std::string, std::string,
+                            bool) override { }
+    void output_check_approx(std::string, std::string,
+                            std::string, std::string,
+                             std::string,
+                             bool) override { }
+    void output_check_verify(std::string, std::string,
+                             std::string,
+                             bool) override { }
+    void uncaught_exception(std::string exception) override
+      { non_fixture_test_format->uncaught_exception(exception); }
+    void produce_summary(std::string, TestStats) override { assert(false); }
+    void print_test_readout() const override { }
+  private:
+    test_format_p const non_fixture_test_format;
+  };
 
 }
 

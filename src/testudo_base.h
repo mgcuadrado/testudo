@@ -54,6 +54,7 @@ namespace testudo { // FIXME: rename to "testudo"
     template <typename...>
     using void_t=void;
 
+    // detect if a type supports "ostream <<"
     template <typename T, typename=void>
     struct has_textual_representation_t : std::false_type { };
     template <typename T>
@@ -62,7 +63,18 @@ namespace testudo { // FIXME: rename to "testudo"
       : std::true_type { };
     template <typename T>
     constexpr bool has_textual_representation_v=
-                                      has_textual_representation_t<T>::value;
+      has_textual_representation_t<T>::value;
+
+    // detect if a type supports ".what()" (meant for exceptions)
+    template <typename T, typename=void>
+    struct has_what_representation_t : std::false_type { };
+    template <typename T>
+    struct has_what_representation_t<
+      T, void_t<decltype(std::declval<T>().what())>>
+      : std::true_type { };
+    template <typename T>
+    constexpr bool has_what_representation_v=
+      has_what_representation_t<T>::value;
   }
 
   // textual representation for a value; if available, use "ostream <<";
@@ -73,6 +85,9 @@ namespace testudo { // FIXME: rename to "testudo"
       std::ostringstream oss;
       oss << std::boolalpha << t;
       return oss.str();
+    }
+    else if constexpr (implementation::has_what_representation_v<T>) {
+      return to_text(t.what());
     }
     else
       return "<...>";

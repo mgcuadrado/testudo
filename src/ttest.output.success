@@ -1,11 +1,11 @@
 <testudo>
-  <test name="testudo" title="Testudo" n_failed="11" n_total="38" n_errors="2" success="false">
+  <test name="testudo" title="Testudo" n_failed="21" n_total="63" n_errors="4" success="false">
     <test name="testudo.main" title="main() test" n_failed="0" n_total="0" n_errors="0" success="true">
       <test name="testudo.main.show_tree" title="show test tree" n_failed="0" n_total="0" n_errors="0" success="true">
         <declare>ostringstream trs</declare>
         <perform>testudo::print_tree(trs, testudo::TestNode::root_node())</perform>
         <show_multiline_value>
-          <expression1 value="--testudo&#xa;|-main&#xa;|  `-show_tree&#xa;|-use_instructions&#xa;|-testarudo&#xa;|  |-simple&#xa;|  |-complex&#xa;|  |  |-difficult&#xa;|  |  |-complicated&#xa;|  |  |-with_error&#xa;|  |  `-penultimate&#xa;|  `-disorder&#xa;|     |-du&#xa;|     |-unu&#xa;|     |-absdiff&#xa;|     |-testarudo_ext&#xa;|     `-no_representation&#xa;|-all_even&#xa;|-fixture&#xa;|  |-addition_commutativity&#xa;|  |-multiplication_commutativity&#xa;|  `-associativity&#xa;`-scope&#xa;">trs.str()</expression1>
+          <expression1 value="--testudo&#xa;|-main&#xa;|  `-show_tree&#xa;|-use_instructions&#xa;|-testarudo&#xa;|  |-simple&#xa;|  |-complex&#xa;|  |  |-difficult&#xa;|  |  |-complicated&#xa;|  |  |-with_error&#xa;|  |  |-penultimate&#xa;|  |  |-verify_syntax&#xa;|  |  |-try_catch&#xa;|  |  `-test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches&#xa;|  `-disorder&#xa;|     |-du&#xa;|     |-unu&#xa;|     |-absdiff&#xa;|     |-testarudo_ext&#xa;|     `-no_representation&#xa;|-all_even&#xa;|-fixture&#xa;|  |-addition_commutativity&#xa;|  |-multiplication_commutativity&#xa;|  `-associativity&#xa;`-scope&#xa;">trs.str()</expression1>
         </show_multiline_value>
       </test>
     </test>
@@ -29,17 +29,13 @@
       </check_true>
       <separator/>
       <text>hf is empty now</text>
-      <try flag="popping_empty">hf.pop()</try>
-      <catch>not holding any double</catch>
-      <check_true success="true">
-        <expression1>popping_empty</expression1>
-      </check_true>
+      <step_id id="popping_empty"/>
+      <try>hf.pop()</try>
+      <catch exception_type="" success="true">not holding any double</catch>
       <perform>hf.hold(2.72)</perform>
-      <try flag="adding_to_already_holding">hf.hold(7.)</try>
-      <catch>already holding a double</catch>
-      <check_true success="true">
-        <expression1>adding_to_already_holding</expression1>
-      </check_true>
+      <step_id id="adding_to_already_holding"/>
+      <try>hf.hold(7.)</try>
+      <catch exception_type="" success="true">already holding a double</catch>
       <separator/>
       <text>the forgotten doubles list is still empty</text>
       <check_true success="false">
@@ -80,13 +76,13 @@
       <perform>hf.hold(9.9)</perform>
       <uncaught_exception>already holding a double</uncaught_exception>
     </test>
-    <test name="testudo.testarudo" title="testarudo tests" n_failed="8" n_total="16" n_errors="1" success="false">
+    <test name="testudo.testarudo" title="testarudo tests" n_failed="18" n_total="35" n_errors="2" success="false">
       <test name="testudo.testarudo.simple" title="simple testarudo tests" n_failed="0" n_total="1" n_errors="0" success="true">
         <check_true success="true">
           <expression1>true</expression1>
         </check_true>
       </test>
-      <test name="testudo.testarudo.complex" title="complex testarudo tests" n_failed="4" n_total="6" n_errors="1" success="false">
+      <test name="testudo.testarudo.complex" title="complex testarudo tests" n_failed="14" n_total="25" n_errors="2" success="false">
         <test name="testudo.testarudo.complex.difficult" title="difficult test" n_failed="1" n_total="2" n_errors="0" success="false">
           <check_equal success="false">
             <expression1 value="7">7</expression1>
@@ -121,6 +117,84 @@
             <expression2 value="penultimate">&quot;penultimate&quot;</expression2>
           </check_equal>
         </test>
+        <test name="testudo.testarudo.complex.verify_syntax" title="&quot;verify&quot; syntax" n_failed="8" n_total="15" n_errors="0" success="false">
+          <declare>auto is_even=predicate_a((a%2)==0)</declare>
+          <declare>auto is_multiple_of= [](auto n) { return predicate_c_a((n), (a%n)==0); }</declare>
+          <check_verify success="true">
+            <expression1 value="8">2*4</expression1>
+            <predicate>is_even</predicate>
+          </check_verify>
+          <check_verify success="false">
+            <expression1 value="9">2*4+1</expression1>
+            <predicate>is_even</predicate>
+          </check_verify>
+          <check_verify success="false">
+            <expression1 value="8">2*4</expression1>
+            <predicate>not is_even</predicate>
+          </check_verify>
+          <check_verify success="true">
+            <expression1 value="9">2*4+1</expression1>
+            <predicate>not is_even</predicate>
+          </check_verify>
+          <check_verify success="false">
+            <expression1 value="8">2*4</expression1>
+            <predicate>is_even and is_multiple_of(3)</predicate>
+          </check_verify>
+          <check_verify success="true">
+            <expression1 value="30">6*5</expression1>
+            <predicate>is_even and is_multiple_of(3)</predicate>
+          </check_verify>
+          <check_verify success="false">
+            <expression1 value="77">7*11</expression1>
+            <predicate>is_even and is_multiple_of(3)</predicate>
+          </check_verify>
+          <check_verify success="true">
+            <expression1 value="8">2*4</expression1>
+            <predicate>is_even and not is_multiple_of(3)</predicate>
+          </check_verify>
+          <check_verify success="false">
+            <expression1 value="30">6*5</expression1>
+            <predicate>is_even and not is_multiple_of(3)</predicate>
+          </check_verify>
+          <check_verify success="false">
+            <expression1 value="77">7*11</expression1>
+            <predicate>is_even and not is_multiple_of(3)</predicate>
+          </check_verify>
+          <check_verify success="true">
+            <expression1 value="8">2*4</expression1>
+            <predicate>is_even or is_multiple_of(3)</predicate>
+          </check_verify>
+          <check_verify success="true">
+            <expression1 value="30">6*5</expression1>
+            <predicate>is_even or is_multiple_of(3)</predicate>
+          </check_verify>
+          <check_verify success="false">
+            <expression1 value="77">7*11</expression1>
+            <predicate>is_even or is_multiple_of(3)</predicate>
+          </check_verify>
+          <text>the check syntax works with pure lambdas too:</text>
+          <declare>auto is_positive=predicate([](int n) { return n&gt;0; })</declare>
+          <check_verify success="true">
+            <expression1 value="8">2*4</expression1>
+            <predicate>is_positive</predicate>
+          </check_verify>
+          <check_verify success="false">
+            <expression1 value="-8">-2*4</expression1>
+            <predicate>is_positive</predicate>
+          </check_verify>
+        </test>
+        <test name="testudo.testarudo.complex.try_catch" title="try-catch checks" n_failed="2" n_total="4" n_errors="1" success="false">
+          <try>[]() { }()</try>
+          <catch exception_type="" success="false">&lt;no exception&gt;</catch>
+          <try>throw runtime_error(&quot;this&apos;ll be caught&quot;)</try>
+          <catch exception_type="" success="true">this&apos;ll be caught</catch>
+          <try>throw &quot;this&apos;ll be too&quot;</try>
+          <catch exception_type="char const *" success="true">this&apos;ll be too</catch>
+          <try>throw &quot;but this shouldn&apos;t&quot;</try>
+          <catch exception_type="" success="false">&lt;unexpected exception&gt;</catch>
+          <uncaught_exception>but this shouldn&apos;t</uncaught_exception>
+        </test>
+        <test name="testudo.testarudo.complex.test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches" title="a test with so many characters in the name and in the title that it&apos;ll have to be broken across several lines in the cartouche" n_failed="0" n_total="0" n_errors="0" success="true"/>
       </test>
       <test name="testudo.testarudo.disorder" title="disordered tests" n_failed="4" n_total="9" n_errors="0" success="false">
         <test name="testudo.testarudo.disorder.du" title="du, but comes first" n_failed="1" n_total="1" n_errors="0" success="false">
@@ -230,54 +304,49 @@
       </check_equal>
       <separator/>
     </test>
-    <test name="testudo.fixture" title="fixture tests" n_failed="0" n_total="3" n_errors="0" success="true">
-      <test name="testudo.fixture.addition_commutativity" title="+ commutativity" n_failed="0" n_total="1" n_errors="0" success="true">
-        <text>with fixture NumbersFixture</text>
-        <show_value>
+    <test name="testudo.fixture" title="fixture tests" n_failed="0" n_total="9" n_errors="1" success="false">
+      <test name="testudo.fixture.addition_commutativity" title="+ commutativity" n_failed="0" n_total="4" n_errors="0" success="true">
+        <text>visible fixture NumbersFixture</text>
+        <declare>(fixture) double x</declare>
+        <perform>(fixture) init x(1.)</perform>
+        <declare>(fixture) double y=-2.5, z</declare>
+        <perform>(fixture) init z(3.14)</perform>
+        <text>fixture constructor done</text>
+        <perform>check_initial_values()</perform>
+        <check_approx max_error="eps" success="true">
           <expression1 value="1">x</expression1>
-        </show_value>
-        <show_value>
+          <expression2 value="1">1.</expression2>
+        </check_approx>
+        <check_approx max_error="eps" success="true">
           <expression1 value="-2.5">y</expression1>
-        </show_value>
-        <show_value>
+          <expression2 value="-2.5">-2.5</expression2>
+        </check_approx>
+        <check_approx max_error="eps" success="true">
           <expression1 value="3.14">z</expression1>
-        </show_value>
+          <expression2 value="3.14">3.14</expression2>
+        </check_approx>
         <check_approx max_error="eps" success="true">
           <expression1 value="-1.5">x+y</expression1>
           <expression2 value="-1.5">y+x</expression2>
         </check_approx>
+        <text>fixture destructor</text>
       </test>
-      <test name="testudo.fixture.multiplication_commutativity" title="* commutativity" n_failed="0" n_total="1" n_errors="0" success="true">
+      <test name="testudo.fixture.multiplication_commutativity" title="* commutativity" n_failed="0" n_total="4" n_errors="0" success="true">
         <text>with fixture NumbersFixture</text>
-        <show_value>
-          <expression1 value="1">x</expression1>
-        </show_value>
-        <show_value>
-          <expression1 value="-2.5">y</expression1>
-        </show_value>
-        <show_value>
-          <expression1 value="3.14">z</expression1>
-        </show_value>
+        <perform>check_initial_values()</perform>
         <check_approx max_error="eps" success="true">
           <expression1 value="-2.5">x*y</expression1>
           <expression2 value="-2.5">y*x</expression2>
         </check_approx>
       </test>
-      <test name="testudo.fixture.associativity" title="associativity" n_failed="0" n_total="1" n_errors="0" success="true">
+      <test name="testudo.fixture.associativity" title="associativity" n_failed="0" n_total="1" n_errors="1" success="false">
         <text>with fixture NumbersFixture</text>
-        <show_value>
-          <expression1 value="1">x</expression1>
-        </show_value>
-        <show_value>
-          <expression1 value="-2.5">y</expression1>
-        </show_value>
-        <show_value>
-          <expression1 value="3.14">z</expression1>
-        </show_value>
         <check_approx max_error="eps" success="true">
           <expression1 value="0.64">x*(y+z)</expression1>
           <expression2 value="0.64">x*y+x*z</expression2>
         </check_approx>
+        <perform>throw_something_unexpected()</perform>
+        <uncaught_exception>hey, here&apos;s something unexpected</uncaught_exception>
       </test>
     </test>
     <test name="testudo.scope" title="scope begin and end" n_failed="0" n_total="3" n_errors="0" success="true">

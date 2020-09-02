@@ -224,7 +224,7 @@ namespace kmsxml {
     std::list<std::shared_ptr<content_t>> contents;
   };
 
-  std::ostream &operator<<(std::ostream &os, element_t const &e) {
+  inline std::ostream &operator<<(std::ostream &os, element_t const &e) {
     e.output(os, "", true);
     return os;
   }

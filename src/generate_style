@@ -61,7 +61,11 @@ print_macro_string() {
     print_macro $1 "(...)" "@_S(#__VA_ARGS__, __VA_ARGS__)"
 }
 
-print_macro_ctc() {
+print_macro_v_string() {
+    print_macro $1 "(v, ...)" "@_S(#__VA_ARGS__, v, __VA_ARGS__)"
+}
+
+print_macro_ctc() { # FIXME: remove?
     print_macro $1 "(flag, ...)" "@_S(flag, #__VA_ARGS__, __VA_ARGS__)"
 }
 
@@ -81,22 +85,27 @@ print_macro_ctc() {
     print_macro_forward DEFINE_TOP_TEST
     print_macro_forward DEFINE_TEST
     print_macro_forward WITH_FIXTURE
+    print_macro_forward VISIBLE_FIXTURE
     echo
     print_macro_forward WITH_DATA_DEFINE_TOP_TEST
     print_macro_forward WITH_DATA_DEFINE_TEST
     echo
+    print_macro_forward STEP_ID
     print_macro_forward PRINT_TEXT
     print_macro_forward PRINT_MULTILINE_TEXT
     print_macro_forward PRINT_BREAK
     echo
-    print_macro_forward SHOW_SCOPE
-    print_macro_string  DECLARE
-    print_macro_string  PERFORM
-    print_macro_string  FAKE_DECLARE
-    print_macro_string  FAKE_PERFORM
-    print_macro_ctc     CHECK_TRY_CATCH
-    print_macro_string  SHOW_VALUE
-    print_macro_string  SHOW_MULTILINE_VALUE
+    print_macro_forward   SHOW_SCOPE
+    print_macro_string    DECLARE
+    print_macro_string    PERFORM
+    print_macro_string    FAKE_DECLARE
+    print_macro_string    FAKE_PERFORM
+    print_macro_string    FIXTURE_MEMBER
+    print_macro_v_string  FIXTURE_INIT
+    print_macro_string    CHECK_TRY
+    print_macro_string    CATCH
+    print_macro_string    SHOW_VALUE
+    print_macro_string    SHOW_MULTILINE_VALUE
     echo
     print_macro_forward DEFINE_APPROX_EPSILON
     print_macro_forward SET_APPROX_EPSILON
@@ -106,7 +115,12 @@ print_macro_ctc() {
     print_macro_string EQUAL
     print_macro_string APPROX
     print_macro_string TOL
+    print_macro_string VERIFY
     print_macro_no_f   TRUE
+    echo
+    print_macro_no_f    PREDICATE
+    print_macro_forward PREDICATE_A
+    print_macro_forward PREDICATE_C_A
     echo
     echo "#endif"
 

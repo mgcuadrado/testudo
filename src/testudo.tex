@@ -50,12 +50,13 @@
       DEFINE_TEST_NODE, define_test_node,
       TEST_PARAMETERS, test_parameters,
       TEST_ARGUMENTS, test_arguments,
-      DEFINE_TOP_FIXTURE_TEST, define_top_fixture_test,
-      DEFINE_FIXTURE_TEST, define_fixture_test,
       DEFINE_TOP_TEST, define_top_test,
       DEFINE_TEST, define_test,
+      WITH_FIXTURE, with_fixture,
+      VISIBLE_FIXTURE, visible_fixture,
       WITH_DATA_DEFINE_TOP_TEST, with_data_define_top_test,
       WITH_DATA_DEFINE_TEST, with_data_define_test,
+      STEP_ID, step_id,
       PRINT_TEXT, print_text,
       PRINT_MULTILINE_TEXT, print_multiline_text,
       PRINT_BREAK, print_break,
@@ -64,7 +65,10 @@
       PERFORM, perform,
       FAKE_DECLARE, fake_declare,
       FAKE_PERFORM, fake_perform,
-      CHECK_TRY_CATCH, check_try_catch,
+      FIXTURE_MEMBER, fixture_member,
+      FIXTURE_INIT, fixture_init,
+      CHECK_TRY, check_try,
+      CATCH, _catch,
       SHOW_VALUE, show_value,
       SHOW_MULTILINE_VALUE, show_multiline_value,
       DEFINE_APPROX_EPSILON, define_approx_epsilon,
@@ -73,8 +77,12 @@
       CHECK, check,
       EQUAL, _equal,
       APPROX, _approx,
+      VERIFY, _verify,
       TOL, _tol,
-      TRUE, _true}}
+      TRUE, _true,
+      PREDICATE, predicate,
+      PREDICATE_A, predicate_a,
+      PREDICATE_C_A, predicate_c_a}}
 
 \newcommand*\commonlistinglstset{%
   \lstset{numbers=left,numberstyle=\tiny, stepnumber=1, numbersep=1em,
@@ -247,11 +255,11 @@ attributes in the \textsc{xml} printout.
 The ``\texttt{color\_text}'' format outputs the printout directly as a full
 text report with colours, virtually identical to the one
 ``\texttt{xml\_to\_color}'' produces.  The difference is that this format
-produces its output synchronously, so even if an unrecoverable error happens,
-you'll get the whole output until just before the error, whereas the
-``\texttt{xml}'' won't output anything\footnote{This is so because the
-  ``\texttt{xml}'' format first builds the whole \textsc{xml} object for the
-  printout before printing it.}.
+produces its output synchronously, so even if a fatal error happens, you'll get
+the whole output until just before the error, whereas the ``\texttt{xml}''
+won't output anything\footnote{This is so because the ``\texttt{xml}'' format
+  first builds the whole \textsc{xml} object for the printout before printing
+  it.}.
 
 
 \chapter{Test definition and test instruction styles}
@@ -447,6 +455,44 @@ show a shift in the test focus.
 \section{Declarations and actions}
 \label{sec:declarations-actions}
 
+Declarations and actions are about code that makes it verbatim through the
+macros into the final \Cpp{} code for the test program.  The difference is that
+declarations introduce names that are valid until the end of the scope, and
+actions don't.  An easy way to distinguish them is to ask yourself if the
+instruction has the same effect if you surround it in curly braces; if it does,
+it's an action. Otherwise, it's a declaration.
+
+Examples of declarations are:
+\begin{itemize}
+\item variable declarations
+\begin{cpplisting}
+int n=7;
+\end{cpplisting}
+
+\item using-declarations
+\begin{cpplisting}
+using std::vector;
+\end{cpplisting}
+
+\item using-directives
+\begin{cpplisting}
+using namespace std;
+\end{cpplisting}
+\end{itemize}
+
+Examples of actions are:
+\begin{itemize}
+\item variable assignments
+\begin{cpplisting}
+n=8;
+\end{cpplisting}
+
+\item function invocations
+\begin{cpplisting}
+std::sort(v.begin(), v.end());
+\end{cpplisting}
+\end{itemize}
+
 \subsection{Declaration: \testudopair{declare}{DECLARE}}
 \label{sec:declaration}
 
@@ -606,7 +652,7 @@ show_approx_epsilon();
 SHOW_APPROX_EPSILON();
 \end{cpplisting}
 
-\subsection{Set a specific tolerance for nearness:
+\subsubsection{Set a specific tolerance for nearness:
   \testudopair{\_tol}{TOL}}
 \label{sec:specify-tolerance-nearness}
 
@@ -623,27 +669,123 @@ CHECK(area) APPROX(3.5) TOL(.1); // use one-tenth tolerance just this once
 \end{cpplisting}
 
 
+\subsection{Predicate checks: \testudopair{\_verify}{VERIFY}}
+\label{sec:predicate-checks}
+
+The checked value can also be tested with a \emph{predicate}.  In Testudo, a
+predicate is a function object that accepts one argument and returns a
+boolean.  A predicate can be constructed using in one of three ways:
+\begin{itemize}
+\item from a lambda expression: \testudopair{predicate}{PREDICATE}
+\begin{cpplisting}
+declare(auto is_negative=
+        predicate([](int x) { return x<0; }));
+\end{cpplisting}
+
+\begin{cpplisting}
+DECLARE(auto is_negative =
+        PREDICATE([](int x) { return x < 0; }));
+\end{cpplisting}
+
+\item from a boolean expression:
+  \testudopair{predicate\_a}{PREDICATE\_A} (the expression must use the
+  parameter name ``\texttt{a}'')
+\begin{cpplisting}
+declare(auto is_even=predicate_a((a%2)==0));
+\end{cpplisting}
+
+\begin{cpplisting}
+DECLARE(auto is_even = PREDICATE_A((a % 2) == 0));
+\end{cpplisting}
+
+\item from a boolean expression with capture:
+  \testudopair{predicate\_c\_a}{PREDICATE\_C\_A} (like the previous one, but a
+  first parenthesised\footnote{Captures are usually surrounded with square
+    brackets, but in this syntax, they must me surrounded by regular brackets.}
+  argument gives the list of captures)
+\begin{cpplisting}
+declare(auto is_multiple_of=
+        [](auto n)
+          { return predicate_c_a((n), (a%n)==0); });
+\end{cpplisting}
+
+\begin{cpplisting}
+DECLARE(auto is_multiple_of =
+        [](auto n)
+          { return PREDICATE_C_A((n), (a % n) == 0); });
+\end{cpplisting}
+\end{itemize}
+
+Using such predicate objects, the ``check-verify'' syntax checks whether the
+checked value verifies the predicate:
+\begin{cpplisting}
+check(number_of_cards)_verify(is_even);
+check(score)_verify(is_multiple_of(5));
+\end{cpplisting}
+
+\begin{cpplisting}
+CHECK(number_of_cards) VERIFY(is_even);
+CHECK(score) VERIFY(is_multiple_of(5));
+\end{cpplisting}
+
+Predicates can be combined with the logical operators ``\texttt{not}'',
+``\texttt{and}'', and ``\texttt{or}'':
+\begin{cpplisting}
+check(iterations)
+  _verify(not is_negative
+          and (is_even or is_multiple_of(5)));
+\end{cpplisting}
+
+\begin{cpplisting}
+CHECK(iterations)
+  VERIFY(not is_negative
+         and (is_even or is_multiple_of(5)));
+\end{cpplisting}
+
+The ``check-verify'' syntax, when it is the natural means of expression for a
+check, is superior to the ``check-true'' syntax because
+\begin{itemize}
+\item in case of failure, it shows the value of the checked value;
+\item it makes it possible to define and reuse concise predicates with good
+  names, that improve clarity and raise the level of abstraction of the tests.
+\end{itemize}
+
+
 \subsection{Exception checks:
-  \testudopair{check\_try\_catch}{CHECK\_TRY\_CATCH}}
+  \testudopair{check\_try \_catch}{CHECK\_TRY \_CATCH}}
 \label{sec:exception-checks}
 
 Instead of checking the value of an expression, you can also check that
 evaluating an expression throws an exception.  This is done with the
-``check-try-catch'' instruction, passing it a descriptive name for a boolean
-variable, and the expression that is expected to throw.  Testudo will create
-the boolean variable with an initial fals value, then run the expression within
-a try-block; if an exception is thrown, the boolean variable is made true, and
-the exception is reported.  Finally, the boolean variable is checked for
-trueness, and enters thus the test tally.
+``check-try-catch'' instruction, passing it the expression that is expected to
+throw.  Testudo will run the expression within a try-block; if an exception
+with the expected type (``\texttt{std::exception}'' by default) is thrown, the
+exception is reported, and the test step is successful.  If no exception is
+thrown, the test step is failed. If an exception with an unexpected type is
+thrown, the test step is failed, and an unexpected exception error is reported (see~\Sref{sec:unexpected-exceptions}).
 
 \begin{cpplisting}
 declare(list<int> numbers);
-check_try_catch(dereference_null_ptr, numbers.front());
+check_try(numbers.front())_catch();
 \end{cpplisting}
 
 \begin{cpplisting}
 DECLARE(list<int> numbers);
-CHECK_TRY_CATCH(dereference_null_ptr, numbers.front());
+CHECK_TRY(numbers.front()) CATCH();
+\end{cpplisting}
+
+The ``check-try-catch'' instructions expects a exception with a type derived
+from ``\texttt{std::exception}'' by default.  You can change the expected
+exception type by passing it as an argument to the ``catch'' part of the
+instruction:
+\begin{cpplisting}
+declare(my_list<int> numbers);
+check_try(numbers.front())_catch(my_list_exception);
+\end{cpplisting}
+
+\begin{cpplisting}
+DECLARE(my_list<int> numbers);
+CHECK_TRY(numbers.front()) CATCH(my_list_exception);
 \end{cpplisting}
 
 
@@ -733,12 +875,44 @@ CHECK(LoggedDestruction::n_destructions()) EQUAL(0);
 CHECK(LoggedDestruction::n_destructions()) EQUAL(2);
 \end{cpplisting}
 
+\section{Identifying steps}
+\label{sec:identifying-steps}
+
+You can identify certain steps, to make it easier to follow their evolution.
+It's particularly appropriate for checks\footnote{---FIXME---I will add a
+  feature to add a section to the full reports and summary reports with the
+  results of the identified steps; this will make it possible to make
+  id'd-step-only diffs to follow their evolution.---}.  Step \textsc{id}s are
+relative to the test they're in, and their full name is prefixed with the full
+name of the current test, so they must include only the necessary information
+within the test scope.  A step \textsc{id} must be a valid \Cpp{} variable
+name.
+
+The ``step id'' instruction prints a tag on the report that applies to the
+following step in the test.
+\begin{cpplisting}
+define_test(medical, switch_on, "switch on after") {
+  declare(Tricorder t);
+  step_id(init_off); // in the tricorder medical test; no need to mention it
+  check(not t.medical.is_on())_true;
+}
+\end{cpplisting}
+
+\begin{cpplisting}
+DEFINE_TEST(medical, switch_on, "switch on after") {
+  DECLARE(Tricorder t);
+  STEP_ID(init_off); // in the tricorder medical test; no need to mention it
+  CHECK(not t.medical.is_on()) TRUE;
+}
+\end{cpplisting}
+
 
 \section{Printing fixed text and separations}
 \label{sec:printing-text-separations}
 
 You can add fixed messages to the report, to aid the comprehension of the
-reader.  They should be considered to play the same rôle as comments is source code.
+reader.  They should be considered to play the same rôle as comments is source
+code.
 
 \subsection{Print inline text:
   \testudopair{print\_text}{PRINT\_TEXT}}
@@ -854,20 +1028,37 @@ log << "terrible_p reported" << endl; // replacement action (naked)
 \end{cpplisting}
 
 
-\section{Uncaught exceptions}
-\label{sec:uncaught-exceptions}
+\section{Unexpected exceptions}
+\label{sec:unexpected-exceptions}
 
-If an uncaught exception (i.e., an exception not in a ``check-try-catch''
-instruction; see~\Sref{sec:exception-checks}) is raised in the course of a
-test, that particular test ends immediately, a description of the exception is
-written to the report, with a conspicuous flag, and the test is marked as
-having one error.  Then, the test execution resumes.  Other tests are not
+If an unexpected exception (i.e., an exception not in a ``check-try-catch''
+instruction; see~\Sref{sec:exception-checks}, or one in a ``check-try-catch''
+instruction that isn't caught because it isn't the right type) is thrown in the
+course of a test, that particular test ends immediately, a description of the
+exception is written to the report, with a conspicuously coloured (where
+available) \verb|[ERR-]| flag, and the test is marked as having one error.
+Then, the execution of the rest of the tests resumes.  Other tests are not
 affected by the exception, and are executed as normal.
 
 Errors aren't the same as failed checks.  They get their own tally.  Errors
 aren't an expected situation, even in a failed test that you may be using to do
 \textsc{tdd}.  Therefore, test summaries mention the number of errors only
-when there is at least one error.
+when there is at least one error.  A test that has at least one error isn't
+marked with the \verb|[FAIL]| flag, but rather with \verb|[ERR-]|.
+
+
+\section{Fatal errors}
+\label{sec:fatal-errors}
+
+Fatal errors (i.e., errors that cause immediate termination of the executable,
+rather than throwing an exception) are something Testudo can't do anything
+about.  They will terminate the whole test suite execution.  There's a couple
+of things you can do to investigate what is going in.  First, you can run the
+tests using a synchronous format like ``\texttt{color\_text}''
+(see~\Sref{cha:test-output-formats}), to see where the execution stops (which
+test and which test step).  You can then go investigate and fix the error, or
+run the tests excluding that particular test to know what the current situation
+is, barring the failing test.
 
 
 \chapter{Fixtures}
@@ -885,63 +1076,141 @@ Here's an example:
 \begin{cpplisting}
 struct OutATimeFixture : testudo::Fixture {
   OutATimeFixture(test_parameters)
-    : Fixture(test_arguments),
-      d(new Delorean) { }
-  ~OutATimeFixture() { delete d; }
+    : Fixture(test_arguments)
+    { perform(d=new Delorean); }
+  ~OutATimeFixture()
+    { perform(delete d); }
   Delorean *d; // dumb pointer, just so we can show a teardown procedure
 };
 \end{cpplisting}
 
 \begin{cpplisting}
-struct OutATimeFixture : testudo::Fixture {
+struct OutATimeFixture : testudo::Fixture
+{
   OutATimeFixture(TEST_PARAMETERS)
-    : Fixture(TEST_ARGUMENTS),
-      d(new Delorean) { }
-  ~OutATimeFixture() { delete d; }
+    : Fixture(TEST_ARGUMENTS) {
+    PERFORM(d=new Delorean);
+  }
+  ~OutATimeFixture() {
+    PERFORM(delete d);
+  }
   Delorean *d; // dumb pointer, just so we can show a teardown procedure
 };
 \end{cpplisting}
 
 In order to have a test use a fixture, you have to add the ``with-fixture''
-macro just after the title in the definition (before other arguments if ever);
-this works both with non-top and with top tests.  Like this:
+macro or the ``visible-fixture'' macro just after the title in the definition
+(before other arguments if any); this works both with non-top and with top
+tests.  Like this:
 \begin{cpplisting}
 define_test(delorean,
             engine_starts_off, "engine is off at start",
-            with_fixture(OutATimeFixture)) {
+            with_fixture(OutATimeFixture)) { // with-fixture
   check(not d->engine.is_running())_true;
+}
+
+define_test(delorean,
+            no_pu_at_start, "there's no Plutonium initially",
+            visible_fixture(OutATimeFixture)) { // visible-fixture
+  check(d->pu())_approx(0.);
 }
 \end{cpplisting}
 
 \begin{cpplisting}
 DEFINE_TEST(delorean,
             engine_starts_off, "engine is off at start",
-            WITH_FIXTURE(OutATimeFixture))
+            WITH_FIXTURE(OutATimeFixture)) // with-fixture
 {
   CHECK(not d->engine.is_running()) TRUE;
 }
+
+DEFINE_TEST(delorean,
+            no_pu_at_start, "there's no Plutonium initially",
+            VISIBLE_FIXTURE(OutATimeFixture)) // visible-fixture
+{
+  CHECK(d->pu()) APPROX(0.);
+}
 \end{cpplisting}
+
+If you use the ``with-fixture'' macro, Testudo macros used in the fixture
+implementation, whether in the constructor, the destructor, or any other
+method, aren't logged to the test report.  If you use the ``visible-fixture''
+instead, Testudo macros in the fixture implementation are logged as usual, and
+the end of the constructor and the beginning of the destructor are logged.
 
 You can code other methods in a fixture, and you can call them from test
 functions.  In fact, the test function ends up being one of the methods of the
 fixture, so that's why and how.
 
+You should declare fixture attributes (member variables) and their
+initialisation with Testudo macros, so that they're logged if the fixture is
+used with the ``visible-fixture'' macro.  This is done by using the
+``fixture-member'' macro for attribute declarations\footnote{The
+  ``fixture-member'' macro has a limitation: there can only be one
+  ``fixture-member'' macro usage per source code line.  This isn't a big deal,
+  because that's how you'll use it anyway, unless you're trying to have a badly
+  packed source code, but i'm telling you just in case.}, and the
+``fixture-init'' macro for attribute initialisations.  The ``fixture-member''
+macro encloses an attribute declaration of any kind: it can contain several
+declarations, or default values.  The ``fixture-init'' macro accepts as its
+first argument the name of the attribute, and as its second argument its
+initial value.  Here's an example of usage:
+\begin{cpplisting}
+struct NumbersFixture : testudo::Fixture {
+  NumbersFixture(test_parameters)
+    : Fixture(test_arguments),
+      fixture_init(x, 1.), fixture_init(z, 3.14) { }
+  fixture_member(double x);
+  fixture_member(double y=-2.5, z);
+};
+\end{cpplisting}
+
+\begin{cpplisting}
+struct NumbersFixture
+    : testudo::Fixture
+{
+  NumbersFixture(TEST_PARAMETERS)
+    : Fixture(TEST_ARGUMENTS),
+      FIXTURE_INIT(x, 1.),
+      FIXTURE_INIT(z, 3.14) { }
+  FIXTURE_MEMBER(double x);
+  FIXTURE_MEMBER(double y=-2.5, z);
+};
+\end{cpplisting}
+
+Other actions in the fixture implementation are enclosed in Testudo macros in
+the usual way (with the ``declare'' macro, the ``perform'' macro, and so on).
+
 
 \chapter{Adding Testudo support for your types}
 \label{cha:adding-testudo-support-your-types}
 
+\begin{cpplisting}
+#include "testudo_base.h"
+\end{cpplisting}
+
+
 \section{Textual representation}
 \label{sec:textual-representation}
+
+Implement ``\texttt{ostream << t}'', or ``\texttt{to\_text(t)}''.
 
 \section{Equality}
 \label{sec:equality}
 
+Implement ``\texttt{t==u}''.
+
 \section{Difference between two values}
 \label{sec:difference-between-two-values}
+
+Implement ``\texttt{double absdiff(t, u)}''.
 
 \chapter{Testudo support for \textsc{stl} types}
 \label{cha:testudo-support-stl-types}
 
+\begin{cpplisting}
+#include "testudo_ext.h"
+\end{cpplisting}
 
 
 \appendices
@@ -949,10 +1218,16 @@ fixture, so that's why and how.
 \chapter{Editor configuration}
 \label{cha:editor-configuration}
 
+You can configure your editor to colour Testudo keywords (as defined by the
+test style file you're using).
+
+
 \chapter{Using your own test definition and test
   instruction names}
 \label{cha:using-your-own-test-definition-test-instruction-names}
 
+Write a test style file, similar to ``\texttt{lc.tst}'' or ``\texttt{cp.tst}''
+(use one of them as a template, and adapt the second half of each line).
 
 
 \backmatter

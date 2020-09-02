@@ -53,6 +53,43 @@ namespace {
     check("there's nothing")_equal("penultimate");
   }
 
+  define_test(complex, verify_syntax, "\"verify\" syntax") {
+    declare(auto is_even=predicate_a((a%2)==0));
+    declare(auto is_multiple_of=
+            [](auto n) { return predicate_c_a((n), (a%n)==0); });
+    check(2*4)_verify(is_even);
+    check(2*4+1)_verify(is_even);
+    check(2*4)_verify(not is_even);
+    check(2*4+1)_verify(not is_even);
+    check(2*4)_verify(is_even and is_multiple_of(3));
+    check(6*5)_verify(is_even and is_multiple_of(3));
+    check(7*11)_verify(is_even and is_multiple_of(3));
+    check(2*4)_verify(is_even and not is_multiple_of(3));
+    check(6*5)_verify(is_even and not is_multiple_of(3));
+    check(7*11)_verify(is_even and not is_multiple_of(3));
+    check(2*4)_verify(is_even or is_multiple_of(3));
+    check(6*5)_verify(is_even or is_multiple_of(3));
+    check(7*11)_verify(is_even or is_multiple_of(3));
+    print_text("the check syntax works with pure lambdas too:");
+    declare(auto is_positive=predicate([](int n) { return n>0; }));
+    check(2*4)_verify(is_positive);
+    check(-2*4)_verify(is_positive);
+  }
+
+  define_test(complex, try_catch, "try-catch checks") {
+    check_try([]() { }())_catch();
+    check_try(throw runtime_error("this'll be caught"))_catch();
+    check_try(throw "this'll be too")_catch(char const *);
+    check_try(throw "but this shouldn't")_catch();
+    print_text("and this text should never be printed");
+  }
+
+  define_test(
+    complex,
+    test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches,
+    "a test with so many characters in the name and in the title that it'll"
+    " have to be broken across several lines in the cartouche") { }
+
   define_test_node(testarudo, disorder, "disordered tests");
 
   define_top_test("testudo.testarudo.disorder",
@@ -107,12 +144,16 @@ namespace {
   struct NumbersFixture : testudo::Fixture {
     NumbersFixture(test_parameters)
       : Fixture(test_arguments),
-        x(1.), y(-2.5), z(3.14) {
-      show_value(x);
-      show_value(y);
-      show_value(z);
+        fixture_init(x, 1.), fixture_init(z, 3.14) { }
+    fixture_member(double x);
+    fixture_member(double y=-2.5, z);
+    void check_initial_values() const {
+      check(x)_approx(1.);
+      check(y)_approx(-2.5);
+      check(z)_approx(3.14);
     }
-    double x, y, z;
+    void throw_something_unexpected() const
+      { perform(throw "hey, here's something unexpected"); }
   };
 
   define_top_test_node("testudo", fixture, "fixture tests", 245);
@@ -120,7 +161,8 @@ namespace {
   define_test(
       fixture,
       addition_commutativity, "+ commutativity",
-      with_fixture(NumbersFixture)) {
+      visible_fixture(NumbersFixture)) {
+    perform(check_initial_values());
     check(x+y)_approx(y+x);
   }
 
@@ -128,6 +170,7 @@ namespace {
       fixture,
       multiplication_commutativity, "* commutativity",
       with_fixture(NumbersFixture)) {
+    perform(check_initial_values());
     check(x*y)_approx(y*x);
   }
 
@@ -135,6 +178,8 @@ namespace {
               associativity, "associativity",
               with_fixture(NumbersFixture)) {
     check(x*(y+z))_approx(x*y+x*z);
+    perform(throw_something_unexpected());
+    print_text("this shouldn't show");
   }
 
   struct AtDestruction {

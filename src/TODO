@@ -7,25 +7,46 @@
 
 ---- easy --------------------------------------------------
 
-[ ] make the separator ("print_break()") as wide as the line width
-
-[ ] actually write and test "uc.tst"
-
 ---- in progress -------------------------------------------
 
 [ ] document
 
 ------------------------------------------------------------
 
-[ ] convert the documentation to something browsable in a browser
+[ ] convert the documentation into something browsable in a browser
+
+[ ] correct cartouched titles that are too long for one line in the
+  "color_text" format
+
+[ ] (tip for this task: use "Boost.DLL") make a main Testudo executable that
+  can dynamically link any number of binary code files (".o", ".so",
+  executable; dunno if all these are possible), link the Testudo node tests and
+  tests found in the files, and run them, or a specified subset; this will be
+  very helpful in TDD, where you want to write tests with very small overhead;
+  you would compile as usual, find the place were your compile code ends up,
+  and run the Testudo executable on it
+
+[ ] make the step ids serve an additional purpose in keeping track of successes
+  and failures between versions of the tested software
+
+    [ ] add names to each individual test step? this would make test cases
+      identifiable and easier to track, even in an automated way; and the names
+      would serve as documentation of the test
+
+[ ] add predetermined predicates (although this may be impossible to do
+  usefully in general, since there are many possible predicates; it may be
+  better to give a lot of examples for different fields of application in the
+  documentation):
+
+    is_prime() // not very useful; find better examples
+    is_multiple_of(n) // ditto
+    contains(s) // for strings
+    matches(r) // for strings
 
 [ ] check
 
     [ ] Google Mock
     [ ] SUnit
-
-[ ] add names to each individual test case? this would make test cases
-    identifiable and easier to track, even in an automated way
 
 [ ] add options (like "just report stats", "show tests", "show failed tests",
   "show failed checks", "no color", et cetera)
@@ -40,33 +61,28 @@
 
     [ ] add (and use) a "_not_approx()" macro?
 
-[ ] correct cartouched titles that are too long for one line
-
-[ ] add an "_relapprox()", similar to "_approx()", but using the relative
-  distance (absolute distance divided by greater magnitude) rather than the
-  absolute distance
-
-[ ] give "check_try_catch()" the possibility to specify the specific kind of
-  exception (people may be defining exceptions not derived from
-  "std::exception")
-
-[ ] refactor "xml_to_color" to do all length-related computations before the
-  specific terminal or LaTeX colour codes are added; this will simplify a lot
-  the processing
+[ ] add a "_relapprox()", similar to "_approx()", but using the relative
+  distance (absolute distance divided by greater magnitude, or by reference
+  value) rather than the absolute distance; in this case, what to do about near
+  zero reference values?  is the user responsible for knowing when it's near
+  zero?  or should we have a mixed approach, where the check is considered
+  successful if "relapprox()" is below the tolerance _or_ "approx()" is below a
+  different tolerance?  we could have "_reltol()" and "_tol()", as well as
+  "rel_approx_epsilon" and "approx_epsilon" (although, at this point, it may be
+  advisable to clear up the possible confusion between these usages of
+  "epsilon" and its usage in "numeric_limits<T>::epsilon"; should i rename
+  Testudo's "epsilon" to "delta"? probly
 
 [ ] in "ttest.cpp" (and all analogous files in OXYS directories), the call
   "test_root->test(..., to.subtree)" should be replaced with
   "test_root->test(..., to)", so that the test node and the option parsing can
   be extending together without having to change their clients
 
-[ ] maybe add "show_fixture()", that would work like "with_fixture()", but the
-  latter would only mention the fixture, whereas the former would also show the
-  steps in the fixture constructor and destructor (the current implementation
-  of "with_fixture()" works like the intended implementation of
-  "show_fixture()"; the effect could be achieved by passing the test functions
-  an additional argument: the test format for the fixture; this test format
-  would be the regular one for "show_fixture()" and a null one for
-  "with_fixture()")
+[ ] do something so fixture attributes automatically show their existence and
+  their initialisation (dunno if that's possible somehow)
+
+[ ] is there any risk anyone will ever use the sequence "||~bold~||" in a test?
+  yes; so, do something about it
 
 ---- done --------------------------------------------------
 
@@ -119,3 +135,88 @@
   needed; if there's only one declared root, then that's a true root, and the
   test results show it as such; if there are several declared roots, they are
   all made children to a true, undeclared root
+
+[X] actually write and test "uc.tst"
+
+[X] document "check()_verify()" and predicates
+
+[X] add to checks support for predicates:
+
+    check(v.x)_verify([](auto x) { x>50.; });
+
+[X] add logical operations with predicates:
+
+    check(n)_verify(not is_prime and not is_multiple_of(3));
+
+[X] add shortcuts for predicates:
+
+    #define predicate(arg_nam, ...) \
+      Predicate([](auto arg_name) { return __VA_ARGS__; })
+
+  or even, forcing the name of the parameter
+
+    #define predicate(...) \
+      Predicate([](auto arg) { return __VA_ARGS__; })
+
+[X] add optional names to individual test steps; like
+
+    step("an empty map has zero size");
+    check(m.size())_equal(0);
+
+  these test step names live within the full name of the test; should i expect
+  them to be C++ valid variable names, like
+
+    step(an_empty_map_has_zero_size);
+
+  or should i convert the spaces to underscores in the supplied string?  what
+  about apostrophes?  what about periods?
+
+[X] document "step-id" syntax
+
+[X] simplify try-check report:
+
+    & expression -> " exception.what() "   [ OK ]
+
+  or
+
+    & expression -> <no catch> ----------- [FAIL]
+
+[X] make the separator ("print_break()") as wide as the line width
+
+[X] correct cartouched titles that are too long for one line
+
+[X] refactor "xml_to_color" to do all length-related computations before the
+  specific terminal or LaTeX colour codes are added; this will simplify a lot
+  the processing
+
+[X] bug: the summary report doesn't show "[ERR-]" tags
+
+[X] give "check_try_catch()" the possibility to specify the specific kind of
+  exception (people may be defining exceptions not derived from
+  "std::exception")
+
+[X] (implemented a simplification; added a new task to do the rest of the work)
+  maybe add "show_fixture()", that would work like "with_fixture()", but the
+  latter would only mention the fixture, whereas the former would also show the
+  steps in the fixture constructor and destructor (the current implementation
+  of "with_fixture()" works like the intended implementation of
+  "show_fixture()"; the effect could be achieved by passing the test functions
+  an additional argument: the test format for the fixture; this test format
+  would be the regular one for "show_fixture()" and a null one for
+  "with_fixture()")
+
+[X] change visible/hidden fixture test format handling so that even methods
+  provided by the fixture and called from the test honour the visible/hidden
+  spec; this can be done by having the full/null test format object be the
+  "test_format" for the fixture, and the full test format be a new
+  "test_format" for the test class that derives from the fixture (this
+  "test_format" hides the other one); right one, the simplified implementation
+  just changes the value of the only "test_format" (in the fixture) between
+  null and full depending on the visibility and whether it's the test that's
+  running or the fixture's constructor or destructor
+
+[X] check unexpected exceptions in hidden fixtures still report something
+  useful
+
+[X] document "with_fixture", "visible_fixture", "fixture_member", and
+  "fixture_init"

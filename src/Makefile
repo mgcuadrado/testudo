@@ -130,7 +130,13 @@ reports/%.tex: $(TEST) xml_to_color
 	mkdir -p reports
 	$< $(XML_FORMAT) -s $* | $(XML_TO_COLOR_LATEX) > $@
 
+ascii_logo.png: ascii_logo_colour_cropped.pdf
+	pdftocairo $< -png -singlefile -r 720 ascii_logo
+
+clean_ascii_logo:
+	rm -f ascii_logo.png
+
 clean_report:
 	rm -rf reports
 
-clean: clean_doc clean_exe clean_report
+clean: clean_doc clean_exe clean_report clean_ascii_logo

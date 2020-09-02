@@ -160,6 +160,32 @@ and the rename is
     #define show_value(...)                                                \
       testudo__SHOW_VALUE_S(#__VA_ARGS__, __VA_ARGS__)
 
+2.5 Generating unique names
+
+Sometimes we need to generate unique names in the same scope (this started with
+fixture member declarations needing to generate a new member to trigger the
+reporting of the declaration; each new member declaration needs to generate
+such a new member with a different name, since they all share the same scope,
+namely, the fixture class).  The general idea is to use a base name and paste
+to it something unique; the best thing we have in standard C++ is "__LINE__",
+which gives the line number in the source file.  That means there's a small
+limitation: you can't use the macro twice in the same line.
+
+We can't do "base_name ## __LINE__" in the macro, since "##" only works with
+arguments to the macro.  We have to delegate to a different macro, and pass it
+"__LINE__" as an argument.  Additionally, since "##" prevents the expansion of
+the argument, we have to delegate once more, using a macro to stick together
+the base name and the line number, so that the second macro expands "__LINE__".
+
+So, in the end, it's something like this:
+
+    #define STICK(a, b) a ## b
+    #define DELEGATED_OPERATION(s, line)                                   \
+      bool STICK(done, line)=[this]() { ... }()
+    #define operation(...)                                                 \
+      DELEGATED_OPERATION(#__VA_ARGS__, __LINE__);                         \
+      ...
+
 
 3. General conventions for code-generating macros in Testudo
 

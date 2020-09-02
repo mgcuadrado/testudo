@@ -58,6 +58,12 @@ namespace testudo {
       void output_separator() override
         { test_stack.top()->add_element("separator"); }
 
+      void output_step_id(string id) override {
+        test_stack.top()
+          ->add_element("step_id")
+            ->append_attribute("id", id);
+      }
+
       void output_text(string text) override
         { test_stack.top()->add_element("text")->append_text(text); }
 
@@ -70,15 +76,20 @@ namespace testudo {
       void output_perform(string code_str) override
         { test_stack.top()->add_element("perform")->append_text(code_str); }
 
-      void output_try(string code_str, string flag_str) override {
+      void output_try(string code_str) override {
         test_stack.top()
           ->add_element("try")
-            ->append_attribute("flag", flag_str)
             ->append_text(code_str);
       }
 
-      void output_catch(string error) override
-        { test_stack.top()->add_element("catch")->append_text(error); }
+      void output_catch(string exception_type, string error,
+                        bool caught) override {
+        test_stack.top()
+          ->add_element("catch")
+            ->append_text(error)
+            ->append_attribute("exception_type", exception_type)
+            ->append_attribute("success", xml_bool(caught));
+      }
 
       void output_show_value(string expr_str, string value_str) override {
         auto show_value=test_stack.top()->add_element("show_value");
@@ -136,6 +147,21 @@ namespace testudo {
           ->add_element("expression2")
             ->append_attribute("value", val2_str)
             ->append_text(expr2_str);
+      }
+
+      void output_check_verify(std::string expr_str, std::string val_str,
+                               std::string pred_str,
+                               bool verify) override {
+        auto check_verify=test_stack.top()->add_element("check_verify");
+        check_verify
+          ->append_attribute("success", xml_bool(verify));
+        check_verify
+          ->add_element("expression1")
+            ->append_attribute("value", val_str)
+            ->append_text(expr_str);
+        check_verify
+          ->add_element("predicate")
+            ->append_text(pred_str);
       }
 
       void produce_summary(string, TestStats test_stats) override {

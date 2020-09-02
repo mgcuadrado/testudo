@@ -1,3 +1,78 @@
+123 testudo-0.02
+  testudo version 0.02
+122
+  documented new fixture features
+121
+  checked unexpected exceptions in hidden fixtures still report the error
+120
+  implemented the whole "hidden fixture" concept, by having fixture methods
+  behave hidden for hidden fixtures (before that, only fixture constructor
+  and destructor honoured hiddenness)
+119
+  coded fixture member declaration and initialisation, and a simplified
+  version of hidden fixtures
+118
+  coded a very simple filter to show ANSI codes, so that we can compare
+  the output of different test report toolchains precisely (they may differ
+  unobservably, for instance in the colour in place when a space is printed)
+117
+  gave the "check-try-catch" instruction the possibility to specify the
+  specific kind of exception
+116
+  added an idea
+115
+  corrected the summary report to show "[ERR-]" tags when appropriate
+114
+  refactored "xml_to_color" to make it simpler and better documented, to
+  correct format across line breaks, and to have multiline cartouches for
+  long contents
+113
+  removed filling lines that aren't needed anymore
+112
+  added some comments
+111
+  wrote some words about fatal errors, and gave some minimal content to
+  each section, as a reminder of what each one is about
+110
+  some more details about a possible "_relapprox()" check macro
+109
+  made the separator ("print_break()") as wide as the line width
+108
+  simplified the try-check-catch report
+107
+  marked tests with errors as [ERR-] rather than [FAIL]
+106
+  make unexpected exceptions caught by the "try-catch" instruction still
+  be unexpected instructions (with a rethrow)
+105
+  documented step IDs, and wrote some words about declarations vs actions
+104
+  moved the flag name of the "try-check" syntax into a new "step-id" syntax
+  (this syntax can be used for any kind of step, but i first coded it as
+  a way of not losing the flag name information)
+103
+  tiny comment about predetermined predicates
+102
+  documented "check-verify" syntax and predicates
+101
+  coded a simple predicate type and some macros to easily define and operate
+  with predicates
+100
+  coded initial support for predicate-verifying checks
+99
+  cleared some confusion between value and reference
+97
+  added some ideas about predicates
+96
+  added upper-case style
+95
+  small changes to the release procedure
+94
+  renamed generated changelog
+93
+  reorganised release generation
+92
+  added png logo generation
 91
   unburned version
 90

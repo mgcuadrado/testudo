@@ -23,7 +23,14 @@
       <xsl:value-of select="@n_errors"/>
       <xsl:text> err</xsl:text>
     </xsl:if>
-    <xsl:apply-templates select="@success"/>
+    <xsl:choose>
+      <xsl:when test="@n_errors='0'">
+        <xsl:apply-templates select="@success"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="flag_error"/>
+      </xsl:otherwise>
+    </xsl:choose>
     <xsl:text>&#xa;</xsl:text>
 
     <xsl:apply-templates select="
@@ -39,6 +46,11 @@
       <xsl:text>||~failure~|| ||~right~||-||~normal~||</xsl:text>
       <xsl:text> [||~failuretag~||FAIL||~normal~||]</xsl:text>
     </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="flag_error">
+    <xsl:text>||~failure~|| ||~right~||-||~normal~||</xsl:text>
+    <xsl:text> [||~error~||ERR-||~normal~||]</xsl:text>
   </xsl:template>
 
 </xsl:stylesheet>

@@ -23,6 +23,7 @@
     <xsl:apply-templates select="
         test
       | scope
+      | step_id
       | text
       | multiline_text
       | declare
@@ -32,6 +33,7 @@
       | check_true
       | check_equal
       | check_approx
+      | check_verify
       | uncaught_exception
       | show_value
       | show_multiline_value
@@ -48,7 +50,14 @@
       <xsl:text> err</xsl:text>
     </xsl:if>
     <xsl:text>||~normal~||</xsl:text>
-    <xsl:apply-templates select="@success"/>
+    <xsl:choose>
+      <xsl:when test="@n_errors='0'">
+        <xsl:apply-templates select="@success"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="flag_error"/>
+      </xsl:otherwise>
+    </xsl:choose>
     <xsl:text>&#xa;&#xa;</xsl:text>
   </xsl:template>
 
@@ -60,6 +69,7 @@
 
     <xsl:apply-templates select="
         scope
+      | step_id
       | text
       | multiline_text
       | declare
@@ -69,6 +79,7 @@
       | check_true
       | check_equal
       | check_approx
+      | check_verify
       | uncaught_exception
       | show_value
       | show_multiline_value
@@ -79,6 +90,12 @@
     <xsl:text>end scope ||~ident~||"||~normal~|| </xsl:text>
     <xsl:value-of select="@name"/>
     <xsl:text> ||~ident~||"||~normal~||&#xa;</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="step_id">
+    <xsl:text>||~ident~||[||~normal~|| </xsl:text>
+    <xsl:value-of select="@id"/>
+    <xsl:text> ||~ident~||]||~normal~||&#xa;</xsl:text>
   </xsl:template>
 
   <xsl:template match="text">
@@ -108,15 +125,18 @@
   <xsl:template match="try">
     <xsl:text>||~ident~||&amp;||~normal~|| </xsl:text>
     <xsl:value-of select="."/>
-    <xsl:text> ||~ident~||&gt; "||~normal~|| </xsl:text>
-    <xsl:value-of select="@flag"/>
-    <xsl:text> ||~ident~||?||~normal~||&#xa;</xsl:text>
   </xsl:template>
 
   <xsl:template match="catch">
-    <xsl:text>||~ident~||&gt; "||~normal~|| </xsl:text>
+    <xsl:if test="@exception_type!=''">
+      <xsl:text> ||~ident~||&gt;||~normal~|| </xsl:text>
+      <xsl:value-of select="@exception_type"/>
+    </xsl:if>
+    <xsl:text> ||~ident~||&gt; "||~normal~|| </xsl:text>
     <xsl:value-of select="."/>
-    <xsl:text> ||~ident~||"||~normal~||&#xa;</xsl:text>
+    <xsl:text> ||~ident~||"||~normal~||</xsl:text>
+    <xsl:apply-templates select="@success"/>
+    <xsl:text>&#xa;</xsl:text>
   </xsl:template>
 
   <xsl:template match="check_true">
@@ -161,12 +181,25 @@
     <xsl:text>&#xa;</xsl:text>
   </xsl:template>
 
+  <xsl:template match="check_verify">
+    <xsl:text>||~ident~||%||~normal~|| </xsl:text>
+    <xsl:value-of select="expression1"/>
+    <xsl:text> ||~ident~||~||~normal~|| </xsl:text>
+    <xsl:value-of select="predicate"/>
+    <xsl:if test="@success='false'">
+      <xsl:text> ||~ident~||:||~normal~|| </xsl:text>
+      <xsl:value-of select="expression1/@value"/>
+    </xsl:if>
+    <xsl:apply-templates select="@success"/>
+    <xsl:text>&#xa;</xsl:text>
+  </xsl:template>
+
   <xsl:template match="uncaught_exception">
-    <xsl:text>||~ident~||&gt; "||~normal~|| uncaught exception: </xsl:text>
+    <xsl:text>||~ident~||&gt; ||~normal~|| uncaught exception </xsl:text>
+    <xsl:text>||~ident~||"||~normal~|| </xsl:text>
     <xsl:value-of select="."/>
     <xsl:text> ||~ident~||"||~normal~||</xsl:text>
-    <xsl:text>||~failure~|| ||~right~||-||~normal~||</xsl:text>
-    <xsl:text> [||~error~||ERR-||~normal~||]</xsl:text>
+    <xsl:call-template name="flag_error"/>
     <xsl:text>&#xa;</xsl:text>
   </xsl:template>
 
@@ -188,8 +221,7 @@
 
   <xsl:template match="separator">
     <xsl:text>||~lines~||</xsl:text>
-    <xsl:text>----------------------------------------</xsl:text>
-    <xsl:text>---------------</xsl:text>
+    <xsl:text>||~full~||-</xsl:text>
     <xsl:text>||~normal~||&#xa;</xsl:text>
   </xsl:template>
 
@@ -201,6 +233,11 @@
       <xsl:text>||~failure~|| ||~right~||-||~normal~||</xsl:text>
       <xsl:text> [||~failuretag~||FAIL||~normal~||]</xsl:text>
     </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="flag_error">
+    <xsl:text>||~failure~|| ||~right~||-||~normal~||</xsl:text>
+    <xsl:text> [||~error~||ERR-||~normal~||]</xsl:text>
   </xsl:template>
 
 </xsl:stylesheet>

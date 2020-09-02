@@ -39,34 +39,41 @@ namespace testudo {
     string const color_ident="\033[1;34m";
     string const color_error="\033[1;41;33m";
 
-    string const text_ident=color_ident+"\""+color_normal;
-    string const declare_ident=color_ident+":"+color_normal;
-    string const declare_end=color_ident+";"+color_normal;
-    string const perform_ident=color_ident+"#"+color_normal;
-    string const perform_end=color_ident+";"+color_normal;
-    string const begin_scope_ident=color_ident+"{"+color_normal;
-    string const end_scope_ident=color_ident+"}"+color_normal;
-    string const try_ident=color_ident+"&"+color_normal;
-    string const try_end=color_ident+"?"+color_normal;
-    string const catch_ident=color_ident+"> \""+color_normal;
-    string const catch_end=color_ident+"\""+color_normal;
-    string const check_ident=color_ident+"%"+color_normal;
-    string const check_equal=color_ident+"=="+color_normal;
-    string const check_approx=color_ident+"//"+color_normal;
-    string const check_max_error=color_ident+"+/-"+color_normal;
-    string const show_ident=color_ident+"?"+color_normal;
-    string const show_sep=color_ident+":"+color_normal;
-    string const show_tab=color_ident+"|"+color_normal;
-    string const show_cont="\\";
-    string const name_open=color_ident+"{"+color_normal;
-    string const name_close=color_ident+"}"+color_normal;
+    string add_color(string s) { return color_ident+s+color_normal; }
 
-    string const ok_label="["+color_success_tag+" OK "+color_normal+"]";
-    string const fail_label="["+color_failure_tag+"FAIL"+color_normal+"]";
-    string const error_label="["+color_error+"ERR-"+color_normal+"]";
+    string const
+      step_id_begin=add_color("["),
+      step_id_end=add_color("]"),
+      text_ident=add_color("\""),
+      declare_ident=add_color(":"),
+      declare_end=add_color(";"),
+      perform_ident=add_color("#"),
+      perform_end=add_color(";"),
+      begin_scope_ident=add_color("{"),
+      end_scope_ident=add_color("}"),
+      try_ident=add_color("&"),
+      catch_ident=add_color(">"),
+      catch_begin=add_color("\""),
+      catch_end=add_color("\""),
+      check_ident=add_color("%"),
+      check_equal=add_color("=="),
+      check_approx=add_color("//"),
+      check_max_error=add_color("+/-"),
+      check_verify=add_color("~"),
+      show_ident=add_color("?"),
+      show_sep=add_color(":"),
+      show_tab=add_color("|"),
+      show_cont="\\",
+      name_open=add_color("{"),
+      name_close=add_color("}");
 
-    constexpr unsigned separator_width=60;
+    string const
+      ok_label="["+color_success_tag+" OK "+color_normal+"]",
+      fail_label="["+color_failure_tag+"FAIL"+color_normal+"]",
+      error_label="["+color_error+"ERR-"+color_normal+"]";
+
     constexpr unsigned max_line_length=78;
+    constexpr unsigned separator_width=max_line_length;
     constexpr unsigned indent=4;
 
     string::size_type real_length(string s)
@@ -100,7 +107,7 @@ namespace testudo {
 
     void format_text(ostream &stream, string text) {
       auto cut=cut_text(text);
-      stream << cut.first << cut.second << endl;;
+      stream << cut.first << cut.second << endl;
     }
 
     void format_label(ostream &stream, string text, char fill, string label) {
@@ -176,6 +183,9 @@ namespace testudo {
                << color_normal << endl;;
       }
 
+      void output_step_id(string id) override
+        { format_text(ts, step_id_begin+" "+id+" "+step_id_end); }
+
       void output_text(string text) override
         { format_text(ts, text_ident+" "+text+" "+text_ident); }
 
@@ -193,13 +203,25 @@ namespace testudo {
       void output_perform(string code_str) override
         { format_text(ts, perform_ident+" "+code_str+" "+perform_end); }
 
-      void output_try(string code_str, string flag_str) override {
-        format_text(ts, try_ident+" "+code_str+" "
-                    +catch_ident+" " +flag_str+" "+try_end);
+      string try_first_part;
+
+      void output_try(string code_str) override {
+        assert(try_first_part.empty());
+        try_first_part=try_ident+" "+code_str;
       }
 
-      void output_catch(string error) override
-        { format_text(ts, catch_ident+" "+error+" "+catch_end); }
+      void output_catch(string exception_type, string error,
+                        bool caught) override {
+        assert(not try_first_part.empty());
+        format_check(ts,
+                     try_first_part+" "
+                       +(exception_type.empty()
+                         ? string()
+                         : catch_ident+" "+exception_type+" ")
+                       +catch_ident+" "+catch_begin+" "+error+" "+catch_end,
+                     caught);
+        try_first_part="";
+      }
 
       void output_show_value(string expr_str, string value_str) override {
         ostringstream oss;
@@ -258,6 +280,18 @@ namespace testudo {
         format_check(ts, oss.str(), approx);
       }
 
+      void output_check_verify(std::string expr_str, std::string val_str,
+                               std::string pred_str,
+                               bool verify) override {
+        ostringstream oss;
+        oss.copyfmt(ts);
+        oss << check_ident << " " << expr_str << " " << check_verify << " "
+            << pred_str;
+        if (not verify)
+          oss << " " << show_sep << " " << val_str;
+        format_check(ts, oss.str(), verify);
+      }
+
       void produce_summary(string name, TestStats test_stats) override {
         ostringstream oss;
         oss.copyfmt(ts);
@@ -270,15 +304,18 @@ namespace testudo {
         if (test_stats.n_errors)
           oss << ", " << test_stats.n_errors << " err";
         oss << color_normal;
-        format_check(ts, oss.str(),
-                     (test_stats.n_failed==0) and (test_stats.n_errors==0));
+        if (test_stats.n_errors)
+          format_error(ts, oss.str());
+        else
+          format_check(ts, oss.str(),
+                       (test_stats.n_failed==0) and (test_stats.n_errors==0));
         ts << endl;
       }
 
       void uncaught_exception(string exception) override {
-        format_error(
-          ts,
-          catch_ident+" uncaught exception: "+exception+" "+catch_end);
+        format_error(ts,
+                     catch_ident+" uncaught exception "
+                     +catch_begin+" "+exception+" "+catch_end);
       }
 
       void print_test_readout() const { } // already wrote everything
