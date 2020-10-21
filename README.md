@@ -18,6 +18,8 @@ code.  Its key features are:
 
 - natural support for fixtures;
 
+- natural support for testing with mocks;
+
 - you can produce full, detailed test reports that can be understood on their
   own, without checking the source code;
 

@@ -63,9 +63,9 @@ namespace testudo {
       show_ident=add_color("?"),
       show_sep=add_color(":"),
       show_tab=add_color("|"),
-      show_cont="\\",
-      name_open=add_color("{"),
-      name_close=add_color("}");
+      show_cont=color_normal+"\\",
+      name_open=color_ident+"{",
+      name_close="}"+color_normal;
 
     string const
       ok_label="["+color_success_tag+" OK "+color_normal+"]",
@@ -74,19 +74,19 @@ namespace testudo {
 
     constexpr unsigned max_line_length=78;
     constexpr unsigned separator_width=max_line_length;
-    constexpr unsigned indent=4;
+    constexpr unsigned cut_indent=4;
 
     string::size_type real_length(string s)
       { return (regex_replace(s, color_code, "")).length(); }
-    auto real_index(string s, string::size_type i) {
-      if (i==0)
-        return i;
-      if (s.empty())
-        return string::npos;
+    string::size_type real_index(string s, string::size_type i) {
       if (s[0]=='\033') {
         auto end_of_code=s.find('m')+1;
         return real_index(s.substr(end_of_code), i)+end_of_code;
       }
+      else if (i==0)
+        return i;
+      else if (s.empty())
+        return string::npos;
       else
         return real_index(s.substr(1), i-1)+1;
     }
@@ -95,56 +95,9 @@ namespace testudo {
       check_length=real_length(ok_label),
       text_line_length=max_line_length-check_length-1;
 
-    auto cut_text(string text) {
-      string non_last;
-      while (real_length(text)>text_line_length) {
-        auto cut_at=real_index(text, text_line_length);
-        non_last+=text.substr(0, cut_at)+show_cont+'\n';
-        text=string(indent, ' ')+text.substr(cut_at);
-      }
-      return make_pair(non_last, text);
-    }
-
-    void format_text(ostream &stream, string text) {
-      auto cut=cut_text(text);
-      stream << cut.first << cut.second << endl;
-    }
-
-    void format_label(ostream &stream, string text, char fill, string label) {
-      assert(real_length(fail_label)==real_length(ok_label));
-      assert(real_length(fail_label)==real_length(error_label));
-
-      auto cut=cut_text(text);
-      auto last_length=real_length(cut.second);
-      string padding=
-        string(" ")+
-        ((last_length<text_line_length)
-         ? string(text_line_length-last_length-1, fill)
-         : "")
-        +((last_length+1<text_line_length) ? " " : "");
-      stream << cut.first << cut.second
-             << color_failure << padding << color_normal
-             << label << endl;
-    }
-
-    void format_check(ostream &stream, string text, bool check) {
-      format_label(stream, text,
-                   check ? ' ' : '-',
-                   check ? ok_label : fail_label);
-    }
-
-    void format_error(ostream &stream, string text)
-      { format_label(stream, text, '-', error_label); }
-
     template <typename... A>
     void regex_in_place_replace(string &s, A &&...a)
       { s=regex_replace(s, a...); }
-
-    string tabify(string s) {
-      regex_in_place_replace(s, regex("\n$"), "");
-      regex_in_place_replace(s, regex("^|\n"), "$&  "+show_tab+" ");
-      return s;
-    }
 
     class TestFormatColorText
     : public TestFormat {
@@ -152,30 +105,134 @@ namespace testudo {
       ostream &ts;
       TestFormatColorText(ostream &os) : ts(os) { }
 
+    private:
+      unsigned indent=0;
+      void increase_indent() { ++indent; }
+      void decrease_indent() { --indent; }
+
+      string indent_spaces() const { return string(indent*2, ' '); }
+
+      auto cut_line(string text) const {
+        string non_last;
+        string indentation=indent_spaces();
+        text=indentation+text;
+        while (real_length(text)>text_line_length) {
+          auto cut_at=real_index(text, text_line_length);
+          non_last+=text.substr(0, cut_at);
+          auto last_color_pos=non_last.rfind("\033[");
+          // find the last color code in effect, so that it can be restablished
+          // at the beginning of each line:
+          string color=
+            (last_color_pos==string::npos
+             ? string("")
+             : non_last.substr(
+                 last_color_pos,
+                 non_last.find("m", last_color_pos)+1-last_color_pos));
+          if (color==color_normal)
+            color="";
+          non_last+=show_cont+'\n';
+          text=indentation+string(cut_indent, ' ')+color+text.substr(cut_at);
+        }
+        return make_pair(non_last, text);
+      }
+
+      void format_text(ostream &stream, string text) {
+        istringstream text_iss(text);
+        string line;
+        while (getline(text_iss, line)) {
+          auto cut=cut_line(line);
+          stream << cut.first << cut.second << endl;
+        }
+      }
+
+      void format_label(ostream &stream, string text,
+                        char fill, string label,
+                        string pre_color="", string post_color="") const {
+        assert(real_length(fail_label)==real_length(ok_label));
+        assert(real_length(fail_label)==real_length(error_label));
+
+        // if "fill" is not ' ', we want it to be present at least once;
+        // therefore, we append a space to the text
+        string pre_padding=(fill==' ' ? "" : " ");
+        auto cut=cut_line(text+pre_color+pre_padding);
+        auto last_length=real_length(cut.second);
+        string padding=
+          ((last_length<text_line_length)
+           ? string(text_line_length-last_length, fill)
+           : "")
+          +((last_length-1<text_line_length) ? " " : "");
+        stream << cut.first << cut.second
+               << padding << post_color << label << endl;
+      }
+
+      void format_check(ostream &stream, string text, bool check) const {
+        if (check)
+          format_label(stream, text, ' ', ok_label);
+        else
+          format_label(stream, text, '-', fail_label,
+                       color_failure, color_normal);
+      }
+
+      void format_error(ostream &stream, string text) const {
+        format_label(stream, text, '-', error_label,
+                     color_failure, color_normal);
+      }
+
+      string tabify(string s) const {
+        regex_in_place_replace(s, regex("\n$"), "");
+        regex_in_place_replace(s, regex("^|\n"), "$&  "+show_tab+" ");
+        return s;
+      }
+
+
+    public:
+
       void output_title(string name, string title) override {
-        string::size_type total_length=1+name.length()+1+1+title.length();
-        ts << color_lines << " _";
-        for (unsigned int i=0; i<total_length; i++)
-          ts << "_";
-        ts << "_" << color_normal;
-        ts << endl
-               << color_lines << "| " << name_open << name << name_close << " "
-               << color_bold << title << color_lines << " |" << color_normal
-               << endl;
-        ts << color_lines << "`-";
-        for (unsigned int i=0; i<total_length; i++)
-          ts << "-";
-        ts << "-'";
+        ostringstream oss;
+        oss << name_open << name << name_close
+            << " " << color_bold << title << color_normal;
+        auto cut=cut_line(oss.str());
+        auto length=
+          cut.first.empty() ? real_length(cut.second) : text_line_length+1;
+        string text=cut.first+cut.second;
+        ts << color_lines << " " << string(length+2, '_') << color_normal;
+        ts << endl;
+        istringstream cut_first_iss(text);
+        string line;
+        while (getline(cut_first_iss, line))
+          ts << color_lines << "|" << color_normal << " "
+             << line << string(length-real_length(line), ' ')
+             << " " << color_lines << "|" << color_normal << endl;
+        ts << color_lines << "`" << string(length+2, '-') << "'";
         ts << color_normal << endl;
       }
 
       void output_begin_scope(string name) {
-        format_text(ts, perform_ident+" "+begin_scope_ident
-                    +" begin scope "+text_ident+" "+name+" "+text_ident);
+        format_text(ts,
+                    (perform_ident+" "+begin_scope_ident
+                     +(name.empty()
+                       ? ""
+                       : " "+text_ident+" "+name+" "+text_ident)));
+        increase_indent();
       }
       void output_end_scope(string name) {
-        format_text(ts, perform_ident+" "+end_scope_ident
-                    +" end scope "+text_ident+" "+name+" "+text_ident);
+        decrease_indent();
+        format_text(ts,
+                    (perform_ident+" "+end_scope_ident
+                     +(name.empty()
+                       ? ""
+                       : " "+text_ident+" "+name+" "+text_ident)));
+      }
+
+      void output_begin_declare_scope(string code_str) {
+        format_text(ts,
+                    (perform_ident+" "+begin_scope_ident+" "+declare_ident+" "
+                     +code_str));
+        increase_indent();
+      }
+      void output_end_declare_scope() {
+        decrease_indent();
+        format_text(ts, perform_ident+" "+end_scope_ident);
       }
 
       void output_separator() override {
@@ -191,7 +248,6 @@ namespace testudo {
 
       void output_multiline_text(string text) override {
         ostringstream ossml;
-        ossml.copyfmt(ts);
         ossml << text;
         if (not ossml.str().empty())
           ts << tabify(ossml.str()) << endl;
@@ -211,21 +267,25 @@ namespace testudo {
       }
 
       void output_catch(string exception_type, string error,
-                        bool caught) override {
+                        string caught) override {
         assert(not try_first_part.empty());
-        format_check(ts,
-                     try_first_part+" "
-                       +(exception_type.empty()
-                         ? string()
-                         : catch_ident+" "+exception_type+" ")
-                       +catch_ident+" "+catch_begin+" "+error+" "+catch_end,
-                     caught);
+        ostringstream oss;
+        oss << try_first_part << " "
+            << (exception_type.empty()
+                ? string()
+                : catch_ident+" "+exception_type+" ")
+            << catch_ident;
+        if (caught=="with")
+          format_text(ts, oss.str());
+        else {
+          oss << " " << catch_begin << " " << error << " " << catch_end;
+          format_check(ts, oss.str(), to_bool(caught));
+        }
         try_first_part="";
       }
 
       void output_show_value(string expr_str, string value_str) override {
         ostringstream oss;
-        oss.copyfmt(ts);
         oss << show_ident << " " << expr_str << " " << show_sep
             << " " << value_str;
         format_text(ts, oss.str());
@@ -234,81 +294,112 @@ namespace testudo {
       void output_show_multiline_value(
           string expr_str, string value_str) override {
         ostringstream oss;
-        oss.copyfmt(ts);
         oss << show_ident << " " << expr_str << " " << show_sep;
         format_text(ts, oss.str());
         ostringstream ossml;
-        ossml.copyfmt(ts);
-        ossml << value_str;
+        format_text(ossml, value_str);
         if (not ossml.str().empty())
           ts << tabify(ossml.str()) << endl;
       }
 
-      void output_check_true(string expr_str, bool expr) override {
+      void output_begin_with(string var_name, string container) override {
         ostringstream oss;
-        oss.copyfmt(ts);
-        oss << check_ident << " " << expr_str;
-        if (not expr)
-          oss << " " << show_sep << " false";
-        format_check(ts, oss.str(), expr);
+        oss << check_verify << " " << var_name << " in " << container;
+        format_text(ts, oss.str());
+        increase_indent();
+      }
+
+      void output_end_with() override { decrease_indent(); }
+
+      void output_begin_with_results() override { increase_indent(); }
+
+      void output_end_with_results() override { decrease_indent(); }
+
+      void output_summary(string name, TestStats test_stats) {
+        ostringstream oss;
+        oss << name_open << name << name_close << " ";
+        oss << color_ident << test_stats.n_failed() << "/"
+            << (test_stats.n_failed()+test_stats.n_passed())
+            << " fail";
+        if (test_stats.n_errors())
+          oss << ", " << test_stats.n_errors() << " err";
+        oss << color_normal;
+        if (test_stats.n_errors())
+          format_error(ts, oss.str());
+        else
+          format_check(
+            ts, oss.str(),
+            (test_stats.n_failed()==0) and (test_stats.n_errors()==0));
+      }
+
+      void output_with_summary(string name, TestStats test_stats) override
+        { output_summary(name, test_stats); }
+
+      string to_string_delim(list<string> const &ls, string delim) {
+        if (ls.empty())
+          return "";
+        string result="";
+        for (auto const &s: ls)
+          result+=(&s==&ls.front() ? "": delim)+s;
+        return result;
+      }
+
+      void output_check_general(string prefix,
+                                list<string> const &text, string success,
+                                list<string> const &additional_fail_text) {
+        string report=check_ident+" ";
+        if (not prefix.empty())
+          report+=add_color(prefix)+" ";
+        report+=to_string_delim(text, " ");
+        if (success=="with")
+          format_text(ts, report);
+        else {
+          if (not to_bool(success))
+            report+=
+              " "+show_sep+" "+to_string_delim(additional_fail_text, " ");
+          format_check(ts, report, to_bool(success));
+        }
+      }
+
+      void output_check_true(string expr_str, string success,
+                             string prefix) override {
+        output_check_general(prefix, {expr_str}, success, {"false"});
       }
 
       void output_check_equal(string expr1_str, string val1_str,
                               string expr2_str, string val2_str,
-                              bool equal) override {
-        ostringstream oss;
-        oss.copyfmt(ts);
-        oss << check_ident << " " << expr1_str << " " << check_equal << " "
-            << expr2_str;
-        if (not equal)
-          oss << " " << show_sep << " "
-              << val1_str << " " << check_equal << " " << val2_str;
-        format_check(ts, oss.str(), equal);
+                              string success,
+                              string prefix) override {
+        output_check_general(prefix,
+                             {expr1_str, check_equal, expr2_str},
+                             success,
+                             {val1_str, check_equal, val2_str});
       }
 
       void output_check_approx(string expr1_str, string val1_str,
                                string expr2_str, string val2_str,
                                string max_error_str,
-                               bool approx) override {
-        ostringstream oss;
-        oss.copyfmt(ts);
-        oss << check_ident << " " << expr1_str << " " << check_approx << " "
-            << expr2_str << " " << check_max_error << " " << max_error_str;
-        if (not approx)
-          oss << " " << show_sep << " "
-              << val1_str << " " << check_approx << " " << val2_str;
-        format_check(ts, oss.str(), approx);
+                               string success,
+                               string prefix) override {
+        output_check_general(
+          prefix,
+          {expr1_str, check_approx, expr2_str, check_max_error, max_error_str},
+          success,
+          {val1_str, check_approx, val2_str});
       }
 
       void output_check_verify(std::string expr_str, std::string val_str,
                                std::string pred_str,
-                               bool verify) override {
-        ostringstream oss;
-        oss.copyfmt(ts);
-        oss << check_ident << " " << expr_str << " " << check_verify << " "
-            << pred_str;
-        if (not verify)
-          oss << " " << show_sep << " " << val_str;
-        format_check(ts, oss.str(), verify);
+                               string success,
+                               string prefix) override {
+        output_check_general(prefix,
+                             {expr_str, check_verify, pred_str},
+                             success,
+                             {val_str});
       }
 
       void produce_summary(string name, TestStats test_stats) override {
-        ostringstream oss;
-        oss.copyfmt(ts);
-        oss << name_open
-            << color_ident << name << color_normal
-            << name_close << " ";
-        oss << color_ident << test_stats.n_failed << "/"
-            << (test_stats.n_failed+test_stats.n_passed)
-            << " fail";
-        if (test_stats.n_errors)
-          oss << ", " << test_stats.n_errors << " err";
-        oss << color_normal;
-        if (test_stats.n_errors)
-          format_error(ts, oss.str());
-        else
-          format_check(ts, oss.str(),
-                       (test_stats.n_failed==0) and (test_stats.n_errors==0));
+        output_summary(name, test_stats);
         ts << endl;
       }
 

@@ -5,26 +5,89 @@
 
 ---- high priority -----------------------------------------
 
+[ ] Google Mock lays down expectations _before_ the function runs, and i guess
+  this is so the first unmet expectation stops the test; is it better than the
+  approach of "mock-turtle"?
+
+[ ] do something to enable mocks for static methods
+
 ---- easy --------------------------------------------------
 
 ---- in progress -------------------------------------------
 
 [ ] document
 
-------------------------------------------------------------
+---- tasks -------------------------------------------------
 
-[ ] convert the documentation into something browsable in a browser
+[ ] rename "show_scope()" to "with_scope()"?
 
-[ ] correct cartouched titles that are too long for one line in the
-  "color_text" format
+[ ] add source line information to test step reports?
 
-[ ] (tip for this task: use "Boost.DLL") make a main Testudo executable that
+[ ] add a "with_declare()" macro so the following works
+
+    with_declare (auto x=get_x()) { // 'x' is only valid in this new scope
+      check(x)_verify(...);
+      check(x)_not_equal(...);
+    }
+    with_declare (auto x=get_x())
+      check(x)_approx(...); // a different 'x' variable
+
+  if we need several declarations for one scope,
+
+    with_declare (auto [a, b]=tuple(get_a(), get_b())) {
+      ...
+    }
+
+[ ] use the "DuneBuggy" as an example (buggy) module to write a guide
+
+    Mayers Manx'                       [ OK ]
+             -_  .--\o_,\_.     __  _,--.
+    DuneBuggy____`(o)---(o)__,-' ,-'   [FAIL]
+
+[ ] convert the LaTeX documentation into something browsable in a browser
+
+[ ] add an XML-to-HTML filter (or two: one HTML that looks just like the text
+  colour output format, and another one that can be open and closed by sections
+  from a browser)
+
+[ ] we can have several styles of "with()", with different report styles:
+
+    * one that shows each value of "n", with a "[ OK ]" or "[FAIL]" tag
+
+    * one that only shows failed values of "n" (what's already implemented)
+
+[ ] check how "with_data()"-loops behave in the face of unexpected exceptions,
+  and if they behave badly (to be expected), correct it
+
+[ ] i'm afraid nothing can be done to improve diagnostics with "make
+  runsync_test" in case of a fatal error in a "with()"-loop, but check anyway
+
+[ ] (tip for this task: check "Boost.DLL") make a main Testudo executable that
   can dynamically link any number of binary code files (".o", ".so",
   executable; dunno if all these are possible), link the Testudo node tests and
   tests found in the files, and run them, or a specified subset; this will be
   very helpful in TDD, where you want to write tests with very small overhead;
   you would compile as usual, find the place were your compile code ends up,
-  and run the Testudo executable on it
+  and run the Testudo executable on it; some ideas:
+
+    [X] the one that works for sure is ".so"; (done with "dlopen()")
+
+    [ ] for ".o", maybe we could automatically just-in-time turn it into a
+      ".so";
+
+    [ ] for executables, there may be some answers (some of them
+      "gcc"-specific) in https://stackoverflow.com/questions/6617679 (check all
+      answers), but another solution is to have all executables that are linked
+      with Testudo contain a simple server that can listen on a port for test
+      execution commands (like "gimme your test tree", or "run test
+      'blablablah' and send back the report to me")
+
+  "Boost.DLL" (https://www.boost.org/doc/libs/1_74_0/doc/html/boost_dll.html)
+  works with ".so", and can apparently find symbols by type, so we could have
+  specific types for test nodes (including tests) (this is already the case,
+  right?), and look for them; we can also have "sections" (these seem to work
+  like namespaces, but i think they're Boost-specific; maybe they prepend some
+  string to the symbol names, based on the section name)
 
 [ ] make the step ids serve an additional purpose in keeping track of successes
   and failures between versions of the tested software
@@ -42,24 +105,17 @@
     is_multiple_of(n) // ditto
     contains(s) // for strings
     matches(r) // for strings
+    greater_than(x) // generic
+    between(x, y) // generic
 
 [ ] check
 
-    [ ] Google Mock
+    [ ] Google Mock -> if appropriate, implement "mock_turtle", ha, ha, ha!
+
     [ ] SUnit
 
 [ ] add options (like "just report stats", "show tests", "show failed tests",
   "show failed checks", "no color", et cetera)
-
-[ ] add capabilities
-
-    [ ] checking of theorems with prescribed or pseudorandom data series
-
-    [ ] add (and use) a "_false()" macro?
-
-    [ ] add (and use) a "_not_equal()" macro?
-
-    [ ] add (and use) a "_not_approx()" macro?
 
 [ ] add a "_relapprox()", similar to "_approx()", but using the relative
   distance (absolute distance divided by greater magnitude, or by reference
@@ -73,16 +129,17 @@
   "epsilon" and its usage in "numeric_limits<T>::epsilon"; should i rename
   Testudo's "epsilon" to "delta"? probly
 
-[ ] in "ttest.cpp" (and all analogous files in OXYS directories), the call
-  "test_root->test(..., to.subtree)" should be replaced with
-  "test_root->test(..., to)", so that the test node and the option parsing can
-  be extending together without having to change their clients
+[ ] what happens for narrow output with enough indentation?  probly an infinite
+  loop; check and correct
 
-[ ] do something so fixture attributes automatically show their existence and
-  their initialisation (dunno if that's possible somehow)
+---- low priority, some time maybe -------------------------
 
-[ ] is there any risk anyone will ever use the sequence "||~bold~||" in a test?
-  yes; so, do something about it
+[ ] lower as much as possible the C++ version requirement (i'm compiling in
+  C++17 right now; can i have everything with C++14, or even with C++11?); for
+  starters, "named_create.h" uses "std::any", which appeared in C++17; then,
+  inline variables also appeared in C++17; and it's the same for "if
+  constexpr"; so, maybe it could be done with sufficient work, but i'm not
+  going to do it right now
 
 ---- done --------------------------------------------------
 
@@ -220,3 +277,233 @@
 
 [X] document "with_fixture", "visible_fixture", "fixture_member", and
   "fixture_init"
+
+[X] in "ttest.cpp" (and all analogous files in OXYS directories), the call
+  "test_root->test(..., to.subtree)" should be replaced with
+  "test_root->test(..., to)", so that the test node and the option parsing can
+  be extended together without having to change their clients
+
+[X] do something so fixture attributes automatically show their existence and
+  their initialisation (dunno if that's possible somehow)
+
+[X] is there any risk anyone will ever use the sequence "||~bold~||" in a test?
+  yes; so, do something about it
+
+[X] add a new syntax "with(n, l)" that translates into something like "for (n:
+  l)", so that the following instruction or "{"-"}" enclosed scope, is repeated
+  for "n" spanning each value in "l"; the intention is that the repeated part
+  (the following instruction or scope) should be a check using the value of
+  "n", and the result of the "with()" structure should not go into details of
+  each particular check, but report only a tally, and the failed ones if there
+  were any; or maybe just the number of fails and a "[FAIL]" tag, without going
+  into further details; ideally, the repeated part should be reported just
+  once, so that the test is completely specified in the report; tricks that i'm
+  testing or considering:
+
+    * we can replace "test_format" with a special version that doesn't log
+      anything, or chooses to log only when fails happen; same thing for
+      "test_stats" to intercept fails; the following trick has worked for
+      replacing "test_format" with a "NullTestFormatForFixtures":
+
+        #define with(n, ...) \\\
+          if (auto test_format_copy=test_format; true)
+            if (auto test_format=
+                  std::make_shared<testudo::NullTestFormatForFixtures>(
+                    test_format_copy);
+                true)
+              for (auto n: __VA_ARGS__)
+
+    * the replacement "test_format" could be a special one that reports actions
+      and checks only the first time; this would have the side-effect of not
+      reporting anything when "l" is empty; this may be achievable by something
+      like
+
+        template <typename T>
+        struct FirstTimeWrapper {
+          bool first_time;
+          T t;
+        };
+
+        // the following turns a list of "T" into a list of wrapped "T", where
+        // the first element has a true "first_time", and the rest have it
+        // false
+        template <typename T> // extend for all containers, and for generators
+        list<FirstTimeWrapper<T>> first_time_wrap(list<T>);
+
+        #define with(n, ...) \\\
+        for (auto n ## _wrap: first_time_wrap(__VA_ARGS__))
+          if (auto n=n ## _wrap.t; true)
+            ... // use the "if (...; true)" trick above to replace
+                // "test_format" with a special one that either relays or
+                // doesn't relay actions and checks (wich a special syntax and
+                // indentation) to the real "test_format", depending on the
+                // value of "n.first_time", and reports failed values in case
+                // of fails (the failed value can be passed to the special
+                // "test_format" on construction, so that on any fail, it
+                // prints it with a special format)
+
+[X] do the whole "with()"-loop thing and the indentations for the XML output
+
+[X] generalise "with()"-loop implementation into "testudo.h"
+
+[X] clean "with()"-loop (especially "testudo_format.h")
+
+[X] correct cartouched titles that are too long for one line in the
+  "color_text" format (this already works for the conversion from "XML" format
+  to coloured text) (this is making results of "make diff_xml_text_test_bw"
+  hard to interpret)
+
+[X] add capabilities
+
+    [X] checking of theorems with prescribed or pseudorandom data series (done
+      with "with()"-loops)
+
+    [X] these are useful, because you often want to check, for instance, that a
+      constructed value isn't equal to the default one; maybe there's a general
+      way to negate an existing "check()" macro? (ponder: use "check_not()"
+      instead of "check()"; or at least an easy way to code "_false()",
+      "_not_equal()", and "_not_approx()" in a general way):
+
+        [X] add (and use) a "_false()" macro?
+
+        [X] add (and use) a "_not_equal()" macro?
+
+        [X] add (and use) a "_not_approx()" macro?
+
+[-] make "with()"-loop iteration variable "auto const &", so that its address
+  can be used, and mention it in the doc (not done: it's hard to make it so it
+  works with rvalues and with lvalues; dropped)
+
+[x] in the test sequence
+
+    with (x, numbers_2) {
+      check(x)_verify(is_even);
+      with (y, numbers_2)
+        check(x%2)_equal(y%2);
+    }
+
+  make the indentation of only-x checks right (see "testarudo.tdd" and the
+  report)
+
+[x] correct the indentations in chained "with()"-loops; in
+
+    with (x, numbers_1) {
+      with (y, numbers_1)
+        check(x%2)_equal(y%2);
+      check(0)_verify(is_even);
+      with (y, numbers_2)
+        check(x%2)_equal(y%2);
+      check(0)_verify(is_even);
+      with (y, numbers_1)
+        check(x%2)_equal(y%2);
+    }
+
+  we need to keep track of the indentation, and save all outputs to the
+  outermost loop, together with their depth, so that on "recursively_last_time"
+  each one is output at the appropriate moment (like, "ok, guys, we're now at
+  depth 3; who's got sumn to output?", then "now at depth 2; outputs?"); it may
+  be easy to detect outer "WithLoopLog"s, since they always have the same name;
+  we may have a dummy, outer one with depth 0, and then build on this, sending
+  outputs upwards when the depth is greater than 1
+
+[X] add a count of successes for "all successful" (this can be done easily by
+  saving the current "TestStats" before the "with()"-loop, then, at the end of
+  the "with()"-loop, finding the difference between the current value and the
+  saved one)
+
+[X] add many predicates and some macros to help with mock object testing checks
+
+[X] for mocks, add the capability to check the order in which different methods
+  were called; can we also check, in the same go, their arguments and/or return
+  values? i guess we can keep a mock-class-instance-wide log of methods called
+  (by their names), and then we can reference it to the place where the
+  arguments and return value are stored in the procedure-specific log:
+
+      instance ref        method-1         method-2
+     --------------    -------------    -------------
+      method-1  1      "one"   "unu"      1     "un"
+      method-1  2      "two"   "du"
+      method-2  1      "three" "tri"
+      method-1  3
+     --------------    -------------    -------------
+
+  here, the first table keeps a list of "name of method" vs "index in
+  method-specific count", so we can see that the second method call was to
+  "method-1", and it was the second call to "method-1", so its argument was
+  "two" and its return value was "du"; similarly, the third method call was to
+  "method-1", and it was the first call to "method-2", so its argument was 1
+  and its return value was "un"
+
+[X] for mocks, add the capability to check method invocation order even across
+  multiple mocks (checking not only the order in which methods are called, but
+  also the order in which the mocks are called on)
+
+[X] allow functions in mock return value schedules, and use them to test
+  scheduled exceptions
+
+[X] with mock scheduled exception throwing, make it so the argument values and
+  the call are logged before the exception is thrown, so that we can check it
+  later
+
+[X] code and document styled names for "testudo__TEST_PARAMETERS" and
+  "testudo__TEST_ARGUMENTS" (see example in "mock_turtle_soup.ttd"), for
+  declaring functions that are called from tests [this was already done, but i
+  had forgotten]; a better alternative may be to get the parameters together
+  into a single struct "testudo_args_t", and use "testudo_args_t" instead of
+  "testudo__TEST_PARAMETERS", and "testudo_args" instead of
+  "testudo__TEST_ARGUMENTS" [this one i did, but i called it "test_management"
+  rather than "testudo_args"]
+
+[X] rename "with()" to "with_data()"?
+
+[X] document the passing of "test_management" to test-aware functions
+
+[X] style mock macros
+
+[X] the logic for the negated checks is wrong; i have to add a new class to
+  check "_not_equal()", for instance, because it's not the same as the negation
+  of "_equal()"; a clear example is checking for equalness with a
+  "call_record<>" obtained with "get_call()": if we require it to be equal to
+  something, it's fine that "operator==()" returns false if a "call_record<>"
+  is invalid, but then, if we require it to be not-equal to something, then if
+  it's invalid the check will be successful (with the current implementation);
+  we want to be able to code "operator==()" and "operator not_eq()" separately,
+  so that they both return false when a "call_record<>" is invalid, and then,
+  "_not_equal()" will use "operator not_eq()" rather than "not operator==()",
+  and everything will be fine; it may be good to add an indirection, so that
+  "_equal()" calls an overloaded function "check_equal()", which by default
+  calls "operator==()", and "_not_equal()" calls an overloaded function
+  "check_not_equal()", which by default calls "operator not_eq()"; another,
+  maybe complementary approach, is that the "check" macro returns whatever its
+  second part (e.g. "_equal()") says, but ands it with "is_valid(arg)", where
+  "arg" is the argument to "check()"; "is_valid(arg)" is "arg.is_valid()" if it
+  is a valid expression, or true otherwise [i went with the second alternative:
+  defining a separate "operator not_eq()" wasn't an alternative for "_approx()"
+  or "_verify()"]
+
+[X] turn
+
+    { show_scope("blablablah");
+      ...
+    }
+
+  into
+
+    show_scope("blablablah") {
+      ...
+    }
+
+[X] make report text from "show_scope()" terser? think also of
+  "with_declare()", whose report text is much too verbose
+
+[X] make "with_declare()" report text terser?
+
+[X] do something so we can do "it.get_call()" and "it.next()" in one go
+
+[X] define "abs_diff()" for "call_record<>"
+
+[X] test "abs_diff()" for "call_record<>"
+
+[X] document "with-declare" macro
+
+[X] document mock objects

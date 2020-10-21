@@ -1,0 +1,18 @@
+#!/bin/bash
+
+cat <<EOF
+\lstdefinelanguage[testudo]{C++}[ANSI]{C++}%
+  {%deletekeywords={bool,double,float,int,long,char,unsigned,signed},
+    morekeywords={typename},
+    emph={
+EOF
+
+for tst in $@; do
+    for keyword in $(cat $tst | awk '{print $2}'); do
+        echo "      $keyword,"
+    done
+done
+
+cat <<EOF
+    }}
+EOF

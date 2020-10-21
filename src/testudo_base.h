@@ -18,10 +18,13 @@
 #ifndef MGCUADRADO_TESTUDO_BASE_HEADER_
 #define MGCUADRADO_TESTUDO_BASE_HEADER_
 
-// This module gives basic definitions for "absdiff()" and "to_text()".  The
-// "absdiff()" function computes the scalar difference between two values, and
-// is used to check whether a value is close to an expected value.  The
-// "to_text()" function converts a value to a text, and is used by the test
+// This module gives basic definitions for "is_valid()", "absdiff()", and
+// "to_text()".  The "is_valid()" function determines whether an argument to
+// the "check()" macro is valid or not: the "check()" macro will always report
+// a check involving an invalid value as false, even if the comparison yielded
+// true.  The "absdiff()" function computes the scalar difference between two
+// values, and is used to check whether a value is close to an expected value.
+// The "to_text()" function converts a value to a text, and is used by the test
 // commands "show_value()", "check_approx()", and "check_approx_tol()".
 //
 // These functions can be overloaded for new types that are to be used in
@@ -39,7 +42,45 @@
 #include <string>
 #include <sstream>
 
-namespace testudo { // FIXME: rename to "testudo"
+namespace testudo {
+
+  namespace implementation {
+
+    // detect if a type supports "t.is_valid()"
+    template <typename T, typename=void>
+    struct has_is_valid_method_t : std::false_type { };
+    template <typename T>
+    struct has_is_valid_method_t<
+      T, std::void_t<decltype(std::declval<T>().is_valid())>>
+      : std::true_type { };
+    template <typename T>
+    constexpr bool has_is_valid_method_v=
+      has_is_valid_method_t<T>::value;
+
+    // detect if a type supports "is_valid(t)"
+    template <typename T, typename=void>
+    struct has_is_valid_function_t : std::false_type { };
+    template <typename T>
+    struct has_is_valid_function_t<
+      T, std::void_t<decltype(is_valid(std::declval<T>()))>>
+      : std::true_type { };
+    template <typename T>
+    constexpr bool has_is_valid_function_v=
+      has_is_valid_function_t<T>::value;
+
+  }
+
+  template <typename T>
+  inline bool is_valid_testudo(T const &t) {
+    if constexpr (implementation::has_is_valid_method_v<T>) {
+      return t.is_valid();
+    }
+    else if constexpr (implementation::has_is_valid_function_v<T>) {
+      return is_valid(t);
+    }
+    else
+      return true;
+  }
 
   // scalar differences between two values "a" and "b" for testing evaluation
   // are computed using "absdiff(a, b)"; users must overload this function for
@@ -53,6 +94,17 @@ namespace testudo { // FIXME: rename to "testudo"
   namespace implementation {
     template <typename...>
     using void_t=void;
+
+    // detect if a type supports "to_text()"
+    template <typename T, typename=void>
+    struct has_to_text_representation_t : std::false_type { };
+    template <typename T>
+    struct has_to_text_representation_t<
+      T, void_t<decltype(to_text(std::declval<T>()))>>
+      : std::true_type { };
+    template <typename T>
+    constexpr bool has_to_text_representation_v=
+      has_to_text_representation_t<T>::value;
 
     // detect if a type supports "ostream <<"
     template <typename T, typename=void>
@@ -80,14 +132,17 @@ namespace testudo { // FIXME: rename to "testudo"
   // textual representation for a value; if available, use "ostream <<";
   // otherwise, return a placeholder
   template <typename T>
-  std::string to_text(T const &t) {
+  std::string to_text_testudo(T const &t) {
+    if constexpr (implementation::has_to_text_representation_v<T>) {
+      return to_text(t);
+    }
     if constexpr (implementation::has_textual_representation_v<T>) {
       std::ostringstream oss;
       oss << std::boolalpha << t;
       return oss.str();
     }
     else if constexpr (implementation::has_what_representation_v<T>) {
-      return to_text(t.what());
+      return to_text_testudo(t.what());
     }
     else
       return "<...>";

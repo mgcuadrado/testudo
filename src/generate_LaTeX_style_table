@@ -1,0 +1,43 @@
+#!/bin/bash
+
+rule_code="__rule__"
+
+echo -n "\\begin{tabular}{l"
+for tst in $@; do
+    echo -n l
+done
+echo "}"
+echo "\\toprule"
+
+echo -n "  \textit{\\textbf{macro syntax name}}"
+for tst in $@; do
+    echo -n " & \\textbf{\texttt{$tst} style}"
+done | sed 's/_/\\_/g'
+echo " \\\\"
+
+echo "\\toprule"
+
+last_code="$rule_code"
+for code in \
+    $(cat generate_style \
+          | sed -n '
+    s/^ \+print_[a-z_]* \+\([A-Z_]*\) *$/\1/p
+    s/^ \+echo *$/__rule__/p
+'); do
+    if [ "$code" == "$rule_code" ]; then
+        if [ "$last_code" != "$rule_code" ]; then
+            echo "\\midrule"
+        fi
+    else
+        echo -n "  \\textit{$code}" \
+            | tr '[:upper:]' '[:lower:]' | sed 's/_/-/g'
+        for tst in $@; do
+            echo -n " & \texttt{$(cat $tst | sed -n 's/^ *'$code' \+//p')}"
+        done
+        echo " \\\\"
+    fi
+    last_code=$code
+done | sed 's/_/\\_/g' | sed '$s/\\midrule//'
+
+echo "\\bottomrule"
+echo "\\end{tabular}"

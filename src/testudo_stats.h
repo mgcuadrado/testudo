@@ -44,7 +44,9 @@ namespace testudo {
   // "failed" counter, depending on the value of the "CheckResult" object
   class TestStats {
   public:
-    constexpr TestStats() : n_passed_p(0), n_failed_p(0), n_errors_p(0) { }
+    constexpr TestStats(integer n_p, integer n_f, integer n_e)
+      : n_passed_p(n_p), n_failed_p(n_f), n_errors_p(n_e) { }
+    constexpr TestStats() : TestStats(0, 0, 0) { }
     TestStats &operator+=(TestStats const &arg) {
       n_passed_p+=arg.n_passed_p;
       n_failed_p+=arg.n_failed_p;
@@ -57,14 +59,20 @@ namespace testudo {
     }
     void unexpected_error() { ++n_errors_p; }
 
-    integer const &n_passed=n_passed_p;
-    integer const &n_failed=n_failed_p;
-    integer const &n_errors=n_errors_p;
+    integer n_passed() const { return n_passed_p; }
+    integer n_failed() const { return n_failed_p; }
+    integer n_errors() const { return n_errors_p; }
   private:
     integer n_passed_p;
     integer n_failed_p;
     integer n_errors_p;
   };
+
+  inline TestStats operator-(TestStats const &ts1, TestStats const &ts2) {
+    return {ts1.n_passed()-ts2.n_passed(),
+            ts1.n_failed()-ts2.n_failed(),
+            ts1.n_errors()-ts2.n_errors()};
+  }
 
 }
 

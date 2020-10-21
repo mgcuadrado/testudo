@@ -186,6 +186,31 @@ So, in the end, it's something like this:
       DELEGATED_OPERATION(#__VA_ARGS__, __LINE__);                         \
       ...
 
+2.6 Inserting actions and declarations
+
+The following syntax allows us to insert a declaration before an instruction
+while still maintaining the instruction as a single instruction (i.e., whether
+or not ir requires braces or not if it comes after an "if" or a "for" doesn't
+change):
+
+    if (auto thingy=...; true)
+      ... // instruction
+
+In some cases, what we want is to insert a declaration that hides another one.
+The previous syntax is fine, as long as the new declaration doesn't use the old
+one; if it does, this is what's needed:
+
+    if (auto thingy_copy=thingy; true)
+      if (auto thing=new_thing(thingy_copy); true)
+        ... // instruction
+
+If we need an action rather than a declaration, do
+
+    if ((do_action(), true))
+      ...
+
+These can be easily implemented as macros.
+
 
 3. General conventions for code-generating macros in Testudo
 

@@ -98,7 +98,7 @@ fi
 #   ||~failure~|| set failure colour (red)
 #   ||~successtag~|| set success tag colour (green)
 #   ||~failuretag~|| set failure tag colour (red on yellow background)
-#   ||~error~|| set error tag colour (yellow on red background)
+#   ||~errortag~|| set error tag colour (yellow on red background)
 #   ||~ident~|| set Testudo identifier colour (blue)
 #   ||~indent_as_b~|| beginning of test name for indented line; each non-last
 #   ||~indent_as_e~|| ... test name elements is removed and adds to the indent
@@ -109,18 +109,18 @@ fi
 #   ||~full~||c typeset a whole line of 'c'
 
 # TODO
-#   rename ||~error~|| to ||~errortag~||
 #   make ||~...tag~|| stand for the whole tag including the letters, not just
 #     for the colours
 
-# algorithm: (TODO)
+# algorithm:
 #   1. process ||~indent_as_b~|| and ||~indent_as_e~||
-#   2. break lines up until ||~right~||, disregarding other ||~...~|| markers;
+#   2. process ||~inc_indent~|| and ||~dec_indent~||
+#   3. break lines up until ||~right~||, disregarding other ||~...~|| markers;
 #      the line breaks must consist of "||~break~||\n" (for cartouches)
-#   3. process cartouches (using "||~break~||" for multiline detection
-#   4. process ||~right~|| and ||~full~||
-#   5. process ||~multiline_begin~|| and ||~multiline_end~||
-#   5. process the rest of the markers (all colours and remove ||~break~||)
+#   4. process cartouches (using "||~break~||" for multiline detection
+#   5. process ||~right~|| and ||~full~||
+#   6. process ||~multiline_begin~|| and ||~multiline_end~||
+#   7. process the rest of the markers (all colours and remove ||~break~||)
 
 xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
     /||~indent_as_b~||.*||~indent_as_e~||/{
@@ -133,12 +133,18 @@ xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
         # replace hierarchy in test name with "-"
         s/\(||~indent_as_b~||\).*\(\..*||~indent_as_e~||\)/\1-\2/
         s/||~indent_as_[be]~||//g # remove indentation marks
-    }' | awk '
+    }' | sed ' # ||~inc_indent~|| and ||~dec_indent~||
+    /||~inc_indent~||/ {x;s/$/  /;x;d}
+    /||~dec_indent~||/ {x;s/  $//;x;d}
+    G
+    s/\(.*\)\n\(.*\)/\2\1/
+' | awk '
     { # break lines
         # margin a the rigth, so the OK/FAIL/ERR- tags stand out
         margin='$margin'
         break_mark="||~break~||\\\n"
-        indent="    " # indent for broken line continuations
+        initial_indent=substr($0, 0, match($0, /[^ ]/)-1)
+        indent="    " initial_indent # indent for broken line continuations
         line=$0
         # chars left to fill the available space (-1 for the continuation
         # backslash)
@@ -152,7 +158,7 @@ xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
                 # the continuation backslash
                 cleft+=margin+1
                 while (i<=length(line)) {
-                    if (match(substr(line, i), /^\|\|~[a-z]*~\|\|/))
+                    if (match(substr(line, i), /^\|\|~[a-z_]*~\|\|/))
                         i+=RLENGTH # skip markers
                     else { # if no marker...
                         --cleft # ... one char fewer...
@@ -160,7 +166,7 @@ xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
                     }
                 }
             }
-            else if (match(substr(line, i), /^\|\|~[a-z]*~\|\|/)) {
+            else if (match(substr(line, i), /^\|\|~[a-z_]*~\|\|/)) {
                 i=i+RLENGTH # skip markers
                 marker=substr(line, i-RLENGTH, RLENGTH)
                 if (marker=="||~normal~||")
@@ -191,10 +197,11 @@ xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
         s/// # remove the marker
         s/.*/ & / # surround with spaces
         h # keep the original line in hold space
-        s/||~[a-z]*~||//g # remove markers
+        s/||~[a-z_]*~||//g # remove markers
         s/./_/g # upper line
         s/^/ / # upper left corner
         s/^/||~lines~||/ # colour the upper line
+        s/$/||~normal~||/ # colour the upper line
         p # print upper line
         x # swap upper line with original line
         : flank
@@ -207,7 +214,7 @@ xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
             s/\n/ / # remove \n from appending and add the left space
             H # append the line to the hold space
             # now, the hold space contains the bottom line and the current line
-            s/||~[a-z]*~||//g # remove markers
+            s/||~[a-z_]*~||//g # remove markers
             s/././g # replace all characters with a dot
             s/$/ /
             s/\( \)$/'$line_length_times_first'/ # add enough spaces at the end
@@ -223,18 +230,18 @@ xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
             b flank # and go back to flanking with vertical lines
         }
         x # recover upper line; we will transform it into the lower line
-        s/||~[a-z]*~||//g # remove markers
+        s/||~[a-z_]*~||//g # remove markers
         s/_/-/g # raise line
         s/^./||~lines~||`/ # lower left corner
         s/$/'"'"'||~normal~||/ # lower right corner
     }
-' | sed ' # tags at the right
+' | sed ' # ||~right~|| and ||~full~||
     /||~right~||/{
         h # keep the original line in hold space
         # remove alignment marker and its next char, and add a newline
         # followed by line_length times the char that followed the marker:
         s/||~right~||\(.\)\(.*\)/\2\n'$line_length_times_first'/
-        s/||~[a-z]*~||//g # remove markers
+        s/||~[a-z_]*~||//g # remove markers
         s/\(.\{'$line_length'\}\).*/\1/ # keep only first line_length chars...
         /\n/!s/.//g # if we ate the newline, the original line was too long
         s/.*\n// # ... but remove the original contents
@@ -273,9 +280,10 @@ xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
     s/||~failure~||/'"$failure"'/g
     s/||~successtag~||/'"$successtag"'/g
     s/||~failuretag~||/'"$failuretag"'/g
-    s/||~error~||/'"$error"'/g
+    s/||~errortag~||/'"$error"'/g
     s/||~ident~||/'"$ident"'/g
     s/||~break~||/'"$normal"'/g # so that the backslash has normal format
+    s/||~tilde~||//g # 
 ' | sed "$global_cleaning"
 
 if [ -n "$latex" ]; then

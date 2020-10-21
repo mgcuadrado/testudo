@@ -21,6 +21,7 @@
 // Testudo support for some STL objects: "absdiff()" and "to_text()" overloads.
 
 #include "testudo_base.h"
+#include <map>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -32,7 +33,7 @@ namespace testudo::implementation { // FIXME: rename to "testudo"
 
   template <typename A, typename B, std::size_t... i>
   double absdiff_get(A const &a, B const &b, std::index_sequence<i...>)
-    { return (testudo::absdiff(std::get<i>(a), std::get<i>(b))+...); }
+    { return (absdiff(std::get<i>(a), std::get<i>(b))+...); }
 
   template <typename A, typename B>
   double absdiff_sequence(A const &a, B const &b) {
@@ -46,18 +47,49 @@ namespace testudo::implementation { // FIXME: rename to "testudo"
     return result;
   }
 
-  template <typename A, std::size_t... i>
-  std::string to_text_get(A const &a, std::index_sequence<i...>)
-    { return (((i==0 ? "" : ", ")+testudo::to_text(std::get<i>(a)))+...); }
+  template <typename A>
+  std::string to_text_get(A const &, std::index_sequence<>)
+    { return ""; }
+  template <typename A, std::size_t i>
+  std::string to_text_get(A const &a, std::index_sequence<i>)
+    { return testudo::to_text_testudo(std::get<i>(a)); }
+  template <typename A, std::size_t i, std::size_t... j>
+  std::string to_text_get(A const &a, std::index_sequence<i, j...>) {
+    return to_text_get(a, std::index_sequence<i>())
+      +", "+to_text_get(a, std::index_sequence<j...>());
+  }
+  template <typename... A>
+  std::string to_text_get(std::tuple<A...> const &t)
+    { return to_text_get(t, std::index_sequence_for<A...>()); }
 
   template <typename A>
   std::string to_text_sequence(A const &a) {
     if (a.empty())
       return "";
     else {
-      std::string result=to_text(a.front());
-      for (auto i=std::next(a.begin()); i not_eq a.end(); ++i)
-        result+=", "+to_text(*i);
+      bool first=true;
+      std::string result;
+      for (auto const &e: a) {
+        result+=(first ? "": ", ")+to_text_testudo(e);
+        first=false;
+      }
+      return result;
+    }
+  }
+
+  template <typename K, typename T, typename C, typename A>
+  std::string to_text_sequence(std::map<K, T, C, A> const &a) {
+    if (a.empty())
+      return "";
+    else {
+      bool first=true;
+      std::string result;
+      for (auto const &e: a) {
+        result+=
+          std::string(first ? "": ", ")
+          +"{"+to_text_testudo(e.first)+", "+to_text_testudo(e.second)+"}";
+        first=false;
+      }
       return result;
     }
   }
@@ -104,10 +136,10 @@ namespace std {
 
   // tuple
   template <typename... T>
-  std::string to_text(std::tuple<T...> const &t) {
+  std::string to_text(std::tuple<T...> const &t, std::string prefix="tuple") {
     return
-      "tuple{"
-      +testudo::implementation::to_text_get(t, std::index_sequence_for<T...>())
+      prefix+"{"
+      +testudo::implementation::to_text_get(t)
       +"}";
   }
 
@@ -121,7 +153,7 @@ namespace std {
   }
 
   // vector
-  template <typename T, typename A>
+ template <typename T, typename A>
   std::string to_text(std::vector<T, A> const &v)
     { return "vector{"+testudo::implementation::to_text_sequence(v)+"}"; }
 
@@ -134,6 +166,11 @@ namespace std {
   template <typename T, typename A>
   std::string to_text(std::list<T, A> const &v)
     { return "list{"+testudo::implementation::to_text_sequence(v)+"}"; }
+
+  // map
+  template <typename K, typename T, typename C, typename A>
+  std::string to_text(std::map<K, T, C, A> const &v)
+    { return "map{"+testudo::implementation::to_text_sequence(v)+"}"; }
 
 }
 

@@ -1,3 +1,262 @@
+236 testudo-0.3
+  testudo version 0.3
+235
+  added a mention of mock testing to the "README.md"
+234
+  trivial renames in a test
+233
+  just changed the order of tests in "make diff_tests", so that it grows
+  from more lax to more strict
+232
+  corrected coloured text output for cases where the length of a failed
+  check text was such that it could add the tag with no red '-'; it should
+  always add at least one red '-'
+231
+  spelling and misc corrections
+230
+  finished documenting Mock Turtle, by writing about checks with mock-method
+  ledgers
+229
+  wrote a couple of features
+228
+  wrote "how to check mock-method logs"
+227
+  started a rundown of features i don't want to forget about
+226
+  documented the "with-declare" macro
+225
+  checked and corrected "abs_diff()" (with "approx" macro) for "call_record<>"
+224
+  removed wrong namespace mention
+223
+  coded "abs_diff()" for "call_record<>"
+222
+  coded the "pop-call" macro
+221
+  made "with-declare" report text terser
+220
+  made "show-scope" report text terser
+219
+  used "with-declare" to check mock call ledger calls, and exercised some
+  of the unexercised methods of "CallLedger::iterate<>"
+218
+  coded "with-declare" macro
+217
+  put "show_scope(...)" before the opening brace, rather than after
+216
+  wrote some reminders
+215
+  coded validity checking on the argument to the "check" macro
+214
+  wrote about scheduling mock-method behaviour; unfinished
+213
+  generalised "schedule_ret()", improved its syntax, and coded
+  "set_ret_default()"
+212
+  corrected "testudo_doc.ttd" TeX report generation
+211
+  wrote about mocking and wrapping methods
+210
+  another tiny correction to the uppercase style
+209
+  corrected uppercase style (these macros shouldn't start with a "_")
+208
+  wrote a brief list of features, some indications about how to use Testudo,
+  and some words about mock objects (still a lot to write about mock objects)
+207
+  tested non-polymorphic mock classes
+206
+  wrote some words about Testudo installation
+205
+  added a generator for Emacs' "font-lock-add-keywords" command to highlight
+  Testudo macro names
+204
+  added some missing inline specifiers
+203
+  corrected some minor formatting errors
+202
+  styled mock macros
+201
+  automatically generated the list of "cpplisting" keywords from the
+  lowercase and uppercase styles
+200
+  documented test-aware functions et al (passing "test_management")
+199
+  testudo version 0.3rc (forgot to do it earlier)
+198
+  renamed "with()" to "with_data()"
+197
+  some code simplifications
+196
+  put "test_format" and "test_stats" together into a single
+  "test_management_t" class, so that the "test-parameters" and
+  "test-arguments" aren't needed
+195
+  made args logging happen even in the face of exception throwing
+194
+  corrected a difference between the XML-to-colour format and the
+  direct-to-colour format, caused by a extraneous space
+193
+  added exception-throwing scheduling
+192
+  renamed auto-generated macro header
+191
+  auto-generated macros that depend on the max number of macro arguments
+190
+  added the capability to check method invocation order across multiple mocks
+189
+  made some simplifications, and wrote some comments
+188
+  corrected support for wrapping void and no-argument methods, and treated
+  void return types more uniformly
+187
+  improved "call<>" structure and text format, and added the macro to use them
+186
+  basic support for cheking call order across methods
+185
+  tiny edit
+184
+  corrected line-breaking problem with "show_multiline_value()"
+183
+  added a note about Google Mock
+182
+  added useful predicates for "mock-turtle"
+181
+  added the possibility to give a mock method a default value when defining it
+180
+  added some macros to help with mock object checks
+179
+  made it so you can leave out complex type specifications in "equal"
+  and "approx" macros in many cases; had to switch the order of "tol" and
+  "approx" macros
+178
+  added "diff_tests" target
+177
+  coded the possibility to give alternative names to the log and schedule
+  of a mocked or wrapped method
+176
+  small improvements to the mock turtle test
+175
+  coded text representation for maps
+174
+  corrected sequences text format
+173
+  simplified mock method specifier syntax
+172
+  coded support for wrapping mock objects
+171
+  coded initial support for mock objects
+170
+  specialised text output for empty containers
+169
+  added specialisation for comparing integrals for equality, to avoid
+  silly warnings
+168
+  added pun
+167
+  solved syntax error with optimisation
+166
+  added a summary for external "with()"-loops
+165
+  removed dangerous trick
+164
+  added some more tests to show what checks with precoded predicates would
+  look like
+163
+  minor edits
+162
+  simplified "with()" implementation
+161
+  stopped explicitly specifying templates to apply
+160
+  indented step fails within a "with()"-loop
+159
+  corrected "with()"-loop format for complex chained loops
+158
+  showed value and failed check for "with()" fails, instead of just the value
+157
+  added a log object that encompasses all related instances of
+  "WithLoopTestFormat" to correct the indentation of outer failes in
+  "with()"-loop chains
+156
+  renames to avoid name clashes
+155
+  simplified "with()"-loop implementation
+154
+  coded the negated versions of checks for "equal", "approx", and "verify"
+153
+  reworked "check(...)_false" so that it can be generalised to negate
+  other checks
+152
+  added more cases for chained "with()"-loops where the inner loop is just
+  a part of the outer loop's body; some formatting issues appear
+151
+  added a level of indirection to "to_text()" to make it more robust
+150
+  simplified code
+149
+  simplified code
+148
+  added the "check(...)_false" macro
+147
+  added a success line for successful "with()"-loops
+146
+  removed smelling "recursively_first_time()" and "recursively_last_time()"
+  from base "TestFormat"
+145
+  moved code from the header file to the implementation file
+144
+  mentioned page numbers for the example test code and the resulting report
+143
+  cleaning
+142
+  final cleaning touches to "with()"-loops
+141
+  some minute colour code adjustments to make "make diff_xml_text_test_color"
+  succeed
+140
+  corrected long cartouched titles that have to be broken up in "color_text"
+  format
+139
+  minor edits
+138
+  polished and shipped the "with-loop" feature
+136
+  ported the "with()"-loop syntax to XML; still some work to do to clean
+  and generalise (for "lc"-vs-"uc", for instance)
+135
+  solved a bug with broken line indentation in the text color format, and
+  implemented scope indentation for XML format (added a few new makefile
+  targets to check-text color vs XML formats)
+134
+  unfinished: coded a quick-and-dirty implementation for the with-loop
+  concept; for the time being, only for colour text, and only with macros in
+  "testarudo.ttd", and the test that uses it is commented-out; but if you
+  uncomment it, it works
+133
+  turned "TestFormat" bool arguments into strings, so that they can have
+  other values apart from "false" and "true"
+132
+  new idea: with-loops
+131
+  made compiler commands silent (you can see them again with "make --trace")
+130
+  had forgotten to "-include" test (".ttd") dependencies
+129
+  removed the need for the "-d" option (all non-option arguments are
+  libraries to load)
+128
+  removed the need for the "-d" option (all non-option arguments are
+  libraries to load)
+127
+  coded dynamic loading of libraries containing tests
+126
+  added a table of macro names per style to the doc
+125
+  wrote down some ideas about dynamic loading of tests, and a low-priority
+  task to check if Testudo can be done in C++14 or even C++11
+124
+  removed file redundancy when copying
 123 testudo-0.02
   testudo version 0.02
 122

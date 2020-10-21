@@ -41,48 +41,7 @@
 \newcommand*\atsign{@}
 
 \newcommand*{\cpplistingindent}{1.7em}
-\lstdefinelanguage[testudo]{C++}[ANSI]{C++}%
-  {%deletekeywords={bool,double,float,int,long,char,unsigned,signed},
-    morekeywords={typename},
-    emph={
-      TOP_TEST_NODE, top_test_node,
-      DEFINE_TOP_TEST_NODE, define_top_test_node,
-      DEFINE_TEST_NODE, define_test_node,
-      TEST_PARAMETERS, test_parameters,
-      TEST_ARGUMENTS, test_arguments,
-      DEFINE_TOP_TEST, define_top_test,
-      DEFINE_TEST, define_test,
-      WITH_FIXTURE, with_fixture,
-      VISIBLE_FIXTURE, visible_fixture,
-      WITH_DATA_DEFINE_TOP_TEST, with_data_define_top_test,
-      WITH_DATA_DEFINE_TEST, with_data_define_test,
-      STEP_ID, step_id,
-      PRINT_TEXT, print_text,
-      PRINT_MULTILINE_TEXT, print_multiline_text,
-      PRINT_BREAK, print_break,
-      SHOW_SCOPE, show_scope,
-      DECLARE, declare,
-      PERFORM, perform,
-      FAKE_DECLARE, fake_declare,
-      FAKE_PERFORM, fake_perform,
-      FIXTURE_MEMBER, fixture_member,
-      FIXTURE_INIT, fixture_init,
-      CHECK_TRY, check_try,
-      CATCH, _catch,
-      SHOW_VALUE, show_value,
-      SHOW_MULTILINE_VALUE, show_multiline_value,
-      DEFINE_APPROX_EPSILON, define_approx_epsilon,
-      SET_APPROX_EPSILON, set_approx_epsilon,
-      SHOW_APPROX_EPSILON, show_approx_epsilon,
-      CHECK, check,
-      EQUAL, _equal,
-      APPROX, _approx,
-      VERIFY, _verify,
-      TOL, _tol,
-      TRUE, _true,
-      PREDICATE, predicate,
-      PREDICATE_A, predicate_a,
-      PREDICATE_C_A, predicate_c_a}}
+\input{keywords.tex}
 
 \newcommand*\commonlistinglstset{%
   \lstset{numbers=left,numberstyle=\tiny, stepnumber=1, numbersep=1em,
@@ -166,6 +125,8 @@
 \listoffigures*
 \listoftables*
 
+\cleartooddpage
+
 \begin{quote}
   \emph{This manual is in its early stages.  I'm going first for completeness,
     not for clarity.  My plans: finish covering the functionality of Testudo,
@@ -179,6 +140,26 @@
 Automatic testing: unit testing, integrated testing, test-driven
 development\ellipsis{}  You can do all of these with Testudo.
 
+Brief rundown of Testudo's features:
+\begin{itemize}
+\item tree-like organisation of tests (\Sref{cha:tests-test-hierarchies});
+\item execution of selected tests;
+\item easy definition of tests (\Sref{cha:test-steps});
+\item clear, complete, flexible test reports;
+\item straightforward syntax for declarations, actions, showing values, checks
+  on values, predicate checks, and scopes (\Sref{cha:test-steps});
+\item support for exception checks (\Sref{sec:exception-checks}) and unexpected
+  exceptions (\Sref{sec:unexpected-exceptions});
+\item support for complex types (\Sref{cha:testudo-support-stl-types});
+\item easy support for new types (\Sref{cha:adding-testudo-support-your-types});
+\item fixtures (\Sref{cha:fixtures});
+\item repeating steps for many values, like theorem checking
+  (\Sref{cha:with-data-loops});
+\item mock objects (\Sref{cha:mock-objects}).
+\end{itemize}
+
+\vspace{1\baselineskip}
+
 \begin{quote}
   \emph{``Testudo'' means ``turtle'' in Esperanto and Latin.  The name of the
     turtle in the logo is Testarudo, which means ``stubborn'' in Spanish.
@@ -186,47 +167,52 @@ development\ellipsis{}  You can do all of these with Testudo.
     correct them.}
 \end{quote}
 
+\vspace{1\baselineskip}
+
 Testudo runs a suite of tests specified by the user, and produces an
 \textsc{xml} printout of the results.  You can convert the \textsc{xml} file
 into a variety of formats, for immediate perusal, result tracking, statistics,
 publication, et cetera.  The blue question mark and the green \verb|[ OK ]| and
 red \verb|[FAIL]| flags in the logo are a reference to the way instructions,
 passes, and fails are displayed when a test result is converted to a text
-report with colours.
+report with colours\footnote{Colour-blind-friendly, by the way.}.
 
 A \emph{test suite} in Testudo is composed of an ordered series of
 \emph{tests}, each test consisting of a sequence of \emph{steps}.  Tests are
 organised as a tree, with test nodes, and proper tests on some test nodes.
 
-When a test suite is run, all tests are run in order, according to their
+When a test suite is run, all tests are performed in order, according to their
 position in the test tree, and within each test, the test steps are executed in
 order.  Some test steps are \emph{checks}, which can succeed or fail.  Check
 successes and failures are tallied and summarised at the end of their test.
 Accumulated tallies are also kept for each test node, which combine the tallies
-of the subtree rooted at each test node.
+of the sub-tree rooted at each test node.
 
 As a quick, self-paced introduction to Testudo test step syntax, i've laid out
 hereafter the source code for a class, the source code for a test for the
 functionality, and the resulting test report.  If my \LaTeX{} trickery doesn't
 fail me, and you have printed this on physical paper, you'll have the source
-code for the test and the test report on opposite pages, so you can't better
-understand how one relates to the other.
+code for the test and the test report on opposite pages
+(pages~\pageref{pag:example-test-code} and~\pageref{pag:example-test-report}),
+so you can't better understand how one relates to the other.
 
 The code is meant for this showcase, not for production, and shouldn't be
 construed as an example of good coding: you'll see questionably design and
 coding practices; you'll see bugs and unimplemented functionality so they can
 be pointed out in the report as test fails; you'll see weird vertical spacing
-to achieve syncing between the two printed pages; and you'll see too many test
-steps crammed into a single test.
+to achieve syncing between the two printed pages; and you'll see too many
+concerns crammed into a single test.
 
 \cleartooddpage
 
 {%
   \cpplistinglstset{}%
-  \lstinputlisting[language={[testudo]C++}]{testudo_doc.cpp}
+  \lstinputlisting[language={[testudo]C++}]{testudo_doc.ttd}
 }
 
 \newpage
+
+\label{pag:example-test-report}
 
 \input{reports/testudo.use_instructions.tex}
 
@@ -291,6 +277,18 @@ CHECK(a + 2) EQUAL(9); // check for equality
 \end{cpplisting}
 \end{itemize}
 
+See~\tref{tab:style-table} for a list of all macro syntax names, with their
+macro name in the ``\texttt{lc}'' and ``\texttt{uc}'' styles.
+
+\begin{table}
+  \centering
+  \begin{footnotesize}
+    \input{style_table.tex}
+  \end{footnotesize}
+  \caption{Macro names in the default styles}
+  \label{tab:style-table}
+\end{table}
+
 Whatever the style you choose, your editor may help you writing and reading
 test instructions, for instance by giving them a specific colour;
 see~\Sref{cha:editor-configuration} for details.
@@ -301,17 +299,41 @@ given first in the ``\texttt{lc}'', cluttered style, then in the
 ``\texttt{uc}'', open style.
 
 
+\chapter{How to use Testudo}
+\label{cha:how-to-use}
+
+First, choose a macro style
+(see~\Sref{cha:test-definition-test-instruction-styles}).  Then, generate a
+header file for your style using the script ``\texttt{generate\_style}'' (this
+is done automatically if you use ``\texttt{make}'').  Finally, include the
+generated header file in your \Cpp{} test source file.  For instance, if you
+want to use the default upper-case macro style, do
+\begin{cpplisting}
+#include "testudo_uc.h"
+\end{cpplisting}
+
+Additionally, if you require support for \textsc{stl} types, include
+``\texttt{testudo\_ext.h}'':
+\begin{cpplisting}
+#include "testudo_ext.h"
+\end{cpplisting}
+
+You can give your \Cpp{} test source file any extension, but if you give it the
+``\texttt{.ttd}'' extension, ``\texttt{make}'' will detect it as a test file
+and compile it correctly.
+
+
 \chapter{Tests and test hierarchies}
 \label{cha:tests-test-hierarchies}
 
 Tests are organised in a tree where each node, be it leaf or not, may or may
-not have an associated test.  You can choose to execute the tests in a subtree
+not have an associated test.  You can choose to execute the tests in a sub-tree
 rooted at any node.
 
 In this context, \emph{declaring} a test node means mentioning it by full name.
 If a test node with the appropriate full name exists already, the mention
 refers to it.  Otherwise, a new test node is created, with no title, test
-function, or priority.  On the other hande, \emph{defining} a test node or a
+function, or priority.  On the other hand, \emph{defining} a test node or a
 test means giving it full contents, including at least a name and a title, but
 possibly also a test function or a priority.
 
@@ -334,7 +356,7 @@ proper is a string with no periods or spaces in it, and represents the name the
 node has \emph{relative to its parent}.  A test node can't have two children
 with the same name.  The full name of a test node is obtained by chaining all
 the names of its ancestors in order, finishing with its own name, separated by
-periods.  The title of a test node is an arbitrary string.
+periods.  The \emph{title} of a test node is an arbitrary string.
 
 \section{Non-top test nodes}
 \label{sec:non-top-test-nodes}
@@ -364,7 +386,7 @@ function, only with its declarator part (the one where you specify the return
 type, the function name, and the parameters) replaced by a Testudo macro.  If
 you have already defined a test node called ``\texttt{medical}'', here's how to
 define a child test called ``\texttt{switch\_on}'', titled ``switch on after
-creation'', that checks a tricorder medical subunit is off upon creation of the
+creation'', that checks a tricorder medical sub-unit is off upon creation of the
 tricorder, and switches on appropriately:
 \begin{cpplisting}
 define_test(medical, switch_on, "switch on after") {
@@ -537,6 +559,15 @@ the value to check (usually an expression resulting from previous actions); it
 must be followed by at least one continuing macro, stating what the expected
 value of the expression is, and how the comparison is done.
 
+A check where the argument to the ``check'' instruction is \emph{invalid}
+always fails, no matter what the continuing macro says.  Values are considered
+\emph{valid} by default, but you can tailor the definition of validity for a
+type to suit your needs, by defining an ``\texttt{is\_valid()}'' method or
+function (see~\Sref{sec:validity}).  The effect cannot achieved by checking for
+validity in the definition of ``\texttt{operator==()}'', because if you did,
+negated checks (``false'' macro, ``not-equal'' macro, et cetera) on invalid
+values would be successful.
+
 \subsection{Check the expression is true:
   \testudopair{\_true}{TRUE}}
 \label{sec:check-expression-true}
@@ -552,6 +583,25 @@ check(dispersion_rate<(1./accuracy))_true;
 
 \begin{cpplisting}
 CHECK(dispersion_rate < (1. / accuracy)) TRUE;
+\end{cpplisting}
+
+\subsection{Check the expression is false:
+  \testudopair{\_false}{FALSE}}
+\label{sec:check-expression-true}
+
+The opposite of the ``true'' macro is the ``false'' macro.  With the ``false''
+macro, the test output marks this check with the word ``nay''\footnote{I've
+  chosen the word ``nay'' rather than the word ``not'' to avid confusion:
+  imagine seeing a check for ``\texttt{not a and b}'', which should be
+  equivalent to ``\texttt{(not a) and b}'' rather than ``\texttt{not (a and
+    b)}''.  No such confusion with ``\texttt{nay a and b}''.}.
+
+\begin{cpplisting}
+check(dispersion_rate<(1./accuracy))_false;
+\end{cpplisting}
+
+\begin{cpplisting}
+CHECK(dispersion_rate < (1. / accuracy)) FALSE;
 \end{cpplisting}
 
 \subsection{Check the expression is equal to a reference:
@@ -571,6 +621,29 @@ check(captain_age)_equal(26+10);
 \begin{cpplisting}
 CHECK(captain_age) EQUAL(26 + 10);
 \end{cpplisting}
+
+The opposite of the ``equal'' macro is the ``not-equal'' macro:
+\begin{center}
+  \testudopair{\_not\_equal}{NOT\_EQUAL}
+\end{center}
+
+The expression in the ``equal'' and ``not-equal'' macros is prefixed with the
+type of the expression in the ``check'' instruction, so you can leave out the
+type in many cases that would otherwise require more verboseness.  So, for
+instance, if ``\texttt{inventory}'' has type ``\texttt{map<string, int>}'', the
+following two checks are equivalent:
+\begin{cpplisting}
+check(inventory)
+  _equal(map<string, int>{{"apple", 2}, {"banana", 3}});
+check(inventory)_equal({{"apple", 2}, {"banana", 3}});
+\end{cpplisting}
+
+\begin{cpplisting}
+CHECK(inventory)
+  EQUAL(map<string, int>{ { "apple", 2 }, { "banana", 3 } });
+CHECK(inventory) EQUAL({ { "apple", 2 }, { "banana", 3 } });
+\end{cpplisting}
+
 
 \subsection{Check the expression is near a reference:
   \testudopair{\_approx}{APPROX}}
@@ -596,6 +669,11 @@ check(computed_pi)_approx(2.*asin(1.));
 CHECK(computed_pi) APPROX(2. * asin(1.));
 \end{cpplisting}
 
+The opposite of the ``approx'' macro is the ``not-approx'' macro:
+\begin{center}
+  \testudopair{\_not\_approx}{NOT\_APPROX}
+\end{center}
+
 By default, the default tolerance used for nearness checks is taken from a
 variable named ``\texttt{approx\_epsilon}'', but we'll call it
 ``$\varepsilon$'' hereafter.  This variable is accessible in all tests.  When
@@ -604,6 +682,10 @@ test), it must be created for the nearness checks to compile.
 
 The default value for ``\texttt{approx\_epsilon}'' is ``\texttt{1e-6}'' (one
 millionth), but it can be changed and inspected.
+
+Similar to the ``equal'' macro, the expression in the ``approx'' and
+``not-approx'' macros is prefixed with the type of the expression in the
+``check'' instruction.
 
 \subsubsection{Define a value for $\bm{\varepsilon}$:
   \testudopair{define\_approx\_epsilon}{DEFINE\_APPROX\_EPSILON}}
@@ -657,15 +739,15 @@ SHOW_APPROX_EPSILON();
 \label{sec:specify-tolerance-nearness}
 
 You can also choose to override the default tolerance value for a specific
-check, by attaching the ``tol'' macro with the tolerance value after the
+check, by attaching the ``tol'' macro with the tolerance value before the
 ``approx'' macro.
 
 \begin{cpplisting}
-check(area)_approx(3.5)_tol(.1); // use one-tenth tolerance just this once
+check(area)_tol(.1)_approx(3.5); // use one-tenth tolerance just this once
 \end{cpplisting}
 
 \begin{cpplisting}
-CHECK(area) APPROX(3.5) TOL(.1); // use one-tenth tolerance just this once
+CHECK(area) TOL(.1) APPROX(3.5); // use one-tenth tolerance just this once
 \end{cpplisting}
 
 
@@ -674,7 +756,7 @@ CHECK(area) APPROX(3.5) TOL(.1); // use one-tenth tolerance just this once
 
 The checked value can also be tested with a \emph{predicate}.  In Testudo, a
 predicate is a function object that accepts one argument and returns a
-boolean.  A predicate can be constructed using in one of three ways:
+bool.  A predicate can be constructed using in one of three ways:
 \begin{itemize}
 \item from a lambda expression: \testudopair{predicate}{PREDICATE}
 \begin{cpplisting}
@@ -687,7 +769,7 @@ DECLARE(auto is_negative =
         PREDICATE([](int x) { return x < 0; }));
 \end{cpplisting}
 
-\item from a boolean expression:
+\item from a bool expression:
   \testudopair{predicate\_a}{PREDICATE\_A} (the expression must use the
   parameter name ``\texttt{a}'')
 \begin{cpplisting}
@@ -698,7 +780,7 @@ declare(auto is_even=predicate_a((a%2)==0));
 DECLARE(auto is_even = PREDICATE_A((a % 2) == 0));
 \end{cpplisting}
 
-\item from a boolean expression with capture:
+\item from a bool expression with capture:
   \testudopair{predicate\_c\_a}{PREDICATE\_C\_A} (like the previous one, but a
   first parenthesised\footnote{Captures are usually surrounded with square
     brackets, but in this syntax, they must me surrounded by regular brackets.}
@@ -750,6 +832,10 @@ check, is superior to the ``check-true'' syntax because
   names, that improve clarity and raise the level of abstraction of the tests.
 \end{itemize}
 
+The opposite of the ``verify'' macro is the ``not-verify'' macro:
+\begin{center}
+  \testudopair{\_not\_verify}{NOT\_VERIFY}
+\end{center}
 
 \subsection{Exception checks:
   \testudopair{check\_try \_catch}{CHECK\_TRY \_CATCH}}
@@ -762,7 +848,8 @@ throw.  Testudo will run the expression within a try-block; if an exception
 with the expected type (``\texttt{std::exception}'' by default) is thrown, the
 exception is reported, and the test step is successful.  If no exception is
 thrown, the test step is failed. If an exception with an unexpected type is
-thrown, the test step is failed, and an unexpected exception error is reported (see~\Sref{sec:unexpected-exceptions}).
+thrown, the test step is failed, and an unexpected exception error is reported
+(see~\Sref{sec:unexpected-exceptions}).
 
 \begin{cpplisting}
 declare(list<int> numbers);
@@ -836,9 +923,9 @@ SHOW_MULTILINE_VALUE(radio.communication_log());
 
 In some situations, such as when we want to check the effect of the destruction
 of an object that's gone out of scope, it can be useful to show where a scope
-begins and ends.  This is done by using the ``show scope'' macro just after the
-opening brace of the scope, which writes a message to the report about the new
-scope.  You don't have to add anything to the closing brace: Testudo will
+begins and ends.  This is done by using the ``show scope'' macro just before
+the opening brace of the scope, which writes a message to the report about the
+new scope.  You don't have to add anything to the closing brace: Testudo will
 automatically write a message when the scope ends.
 
 Most of the time, with short scopes, you don't need to name the scope.  This is
@@ -850,9 +937,9 @@ scope'' macro.
 \begin{cpplisting}
 declare(LoggedDestruction ld1("1"));
 check(LoggedDestruction::n_destructions())_equal(0);
-{ show_scope("outer scope"); // named scope
+show_scope("outer scope") { // named scope
   declare(LoggedDestruction ld2("2"));
-  { show_scope(); // unnamed scope
+  show_scope() { // unnamed scope
     declare(LoggedDestruction ld3("3"));
   }
   check(LoggedDestruction::n_destructions())_equal(1);
@@ -863,16 +950,63 @@ check(LoggedDestruction::n_destructions())_equal(2);
 \begin{cpplisting}
 DECLARE(LoggedDestruction ld1("1"));
 CHECK(LoggedDestruction::n_destructions()) EQUAL(0);
+SHOW_SCOPE("outer scope") // named scope
 {
-  SHOW_SCOPE("outer scope"); // named scope
   DECLARE(LoggedDestruction ld2("2"));
+  SHOW_SCOPE() // unnamed scope
   {
-    SHOW_SCOPE(); // unnamed scope
     DECLARE(LoggedDestruction ld3("3"));
   }
   CHECK(LoggedDestruction::n_destructions()) EQUAL(1);
 }
 CHECK(LoggedDestruction::n_destructions()) EQUAL(2);
+\end{cpplisting}
+
+\subsection{With-declare scopes: \testudopair{with\_declare}{WITH\_DECLARE}}
+\label{sec:with-declare-scopes}
+
+Sometimes, you want to perform a sequence of steps using a temporary value that
+you want to (or can) compute only once.  This is achieved by creating a scope
+with the ``with-declare'' macro.  It works like the ``show-scope'' macro, but
+instead of a name, its argument is the declaration that will be in place in the
+macro.  The declaration is identical to what you would give the ``declare''
+macro.  You can also use the ``with-declare'' macro with no braces if the scope
+contains only one statement.
+
+\begin{cpplisting}
+with_declare(auto answer=client.request("get license")) {
+  check(answer.valid)_true;
+  check(answer.text)_equal("res://punk_license");
+}
+with_declare(auto answer=client.request("reset"))
+  check(answer.valid)_true;
+\end{cpplisting}
+
+\begin{cpplisting}
+WITH_DECLARE(auto answer=client.request("get license"))
+{
+  CHECK(answer.valid) TRUE;
+  CHECK(answer.text) EQUAL("res://punk_license");
+}
+WITH_DECLARE(auto answer=client.request("reset"))
+  CHECK(answer.valid) TRUE;
+\end{cpplisting}
+
+If you need to use the ``with-declare'' macro with several variable
+declarations, you can always use a ``structured binding declaration'':
+\begin{cpplisting}
+with_declare(auto [action, occurrences]=tuple{"sin", 77*7}) {
+  check(action)_equal("sin");
+  check(occurrences)_equal(539);
+}
+\end{cpplisting}
+
+\begin{cpplisting}
+WITH_DECLARE(auto [action, occurrences]=tuple{"sin", 77*7})
+{
+  CHECK(action) EQUAL("sin");
+  CHECK(occurrences) EQUAL(539);
+}
 \end{cpplisting}
 
 \section{Identifying steps}
@@ -1053,30 +1187,106 @@ marked with the \verb|[FAIL]| flag, but rather with \verb|[ERR-]|.
 Fatal errors (i.e., errors that cause immediate termination of the executable,
 rather than throwing an exception) are something Testudo can't do anything
 about.  They will terminate the whole test suite execution.  There's a couple
-of things you can do to investigate what is going in.  First, you can run the
+of things you can do to investigate what's going on.  First, you can run the
 tests using a synchronous format like ``\texttt{color\_text}''
 (see~\Sref{cha:test-output-formats}), to see where the execution stops (which
 test and which test step).  You can then go investigate and fix the error, or
 run the tests excluding that particular test to know what the current situation
-is, barring the failing test.
+is, barring the failing test.  You can also run the test with a debugger, but
+in that case, be aware that Testudo's macros add management code (classes,
+methods, functions, variables, statements\ellipsis{}) to your instructions to
+achieve the intended results, and their workings may be confusing, so try to
+pay no attention to that man behind the curtain.
+
+
+\chapter{Test-aware functions}
+\label{cha:test-aware-functions}
+
+You may want to perform the same test several times, with only minor
+variations, such as a type or a value\footnote{If what changes is a value,
+  consider first whether ``with-data'' loops (\Sref{cha:with-data-loops}) fit
+  your need.}.  This can be done with \emph{test-aware} functions (or methods,
+or classes).  Test-awareness involves:
+\begin{itemize}
+\item getting an object of type ``\texttt{testudo::test\_management\_t}'';
+\item making it available as a variable called ``\texttt{test\_management}'' in
+  the scope where test macros are used.
+\end{itemize}
+The ``\texttt{test\_management\_t}'' is always available as
+``\texttt{test\_management}'' in a test definition.
+
+Here's an example where we test emptiness of two container-like classes:
+\begin{cpplisting}
+template <typename Container>
+void test_container_emptyness(
+    testudo::test_management_t test_management,
+    Container &container) {
+  check(container.empty())_true;
+}
+
+class Cauldron { ... };
+
+define_test(container, emptyness_c, "Cauldron emptyness") {
+  declare(Cauldron container);
+  test_container_emptyness(test_management, container);
+}
+
+class Marmite { ... };
+
+define_test(container, emptyness_m, "Marmite emptyness") {
+  declare(Marmite container);
+  test_container_emptyness(test_management, container);
+}
+\end{cpplisting}
+
+\begin{cpplisting}
+template <typename Container>
+void test_container_emptyness(
+    testudo::test_management_t test_management,
+    Container &container)
+{
+  CHECK(container.empty()) TRUE;
+}
+
+class Cauldron { ... };
+
+define_test(container, emptyness_c, "Cauldron emptiness")
+{
+  DECLARE(Cauldron container);
+  test_container_emptyness(test_management, container);
+}
+
+class Marmite { ... };
+
+define_test(container, emptyness_m, "Marmite emptiness")
+{
+  DECLARE(Marmite container);
+  test_container_emptyness(test_management, container);
+}
+\end{cpplisting}
 
 
 \chapter{Fixtures}
 \label{cha:fixtures}
 
+Test fixtures gather common functionality needed by several tests, most
+commonly test setup and test teardown.
+
+\section{Definition}
+\label{sec:fixture-definition}
+
 This is how fixtures are implemented in Testudo.  If you want to code a
 fixture, you have to code a class that derives from
-``\texttt{testudo::Fixture}''.  Its constructor must accept a set set of
-parameters (just use the ``test-parameters'' macro), and pass them out to the
-constructor of ``\texttt{testudo::Fixture}'' (use the ``test-arguments''
-macro).  The constructor is the setup procedure; the destructor, if you code
-it, is the teardown procedure.
+``\texttt{testudo::Fixture}''.  Its constructor must accept an object of type
+``\texttt{testudo::test\_management\_t}, and pass it out to the constructor of
+``\texttt{testudo::Fixture}''.  The constructor is the setup procedure; the
+destructor, if you code it, is the teardown procedure.
 
 Here's an example:
 \begin{cpplisting}
 struct OutATimeFixture : testudo::Fixture {
-  OutATimeFixture(test_parameters)
-    : Fixture(test_arguments)
+  OutATimeFixture(testudo::test_management_t test_management)
+    : Fixture(test_management)
     { perform(d=new Delorean); }
   ~OutATimeFixture()
     { perform(delete d); }
@@ -1087,16 +1297,21 @@ struct OutATimeFixture : testudo::Fixture {
 \begin{cpplisting}
 struct OutATimeFixture : testudo::Fixture
 {
-  OutATimeFixture(TEST_PARAMETERS)
-    : Fixture(TEST_ARGUMENTS) {
+  OutATimeFixture(testudo::test_management_t test_management)
+    : Fixture(test_management)
+  {
     PERFORM(d=new Delorean);
   }
-  ~OutATimeFixture() {
+  ~OutATimeFixture()
+  {
     PERFORM(delete d);
   }
   Delorean *d; // dumb pointer, just so we can show a teardown procedure
 };
 \end{cpplisting}
+
+\section{Usage}
+\label{sec:fixture-usage}
 
 In order to have a test use a fixture, you have to add the ``with-fixture''
 macro or the ``visible-fixture'' macro just after the title in the definition
@@ -1105,13 +1320,15 @@ tests.  Like this:
 \begin{cpplisting}
 define_test(delorean,
             engine_starts_off, "engine is off at start",
-            with_fixture(OutATimeFixture)) { // with-fixture
+            with_fixture(OutATimeFixture)) // with-fixture
+{
   check(not d->engine.is_running())_true;
 }
 
 define_test(delorean,
             no_pu_at_start, "there's no Plutonium initially",
-            visible_fixture(OutATimeFixture)) { // visible-fixture
+            visible_fixture(OutATimeFixture)) // visible-fixture
+{
   check(d->pu())_approx(0.);
 }
 \end{cpplisting}
@@ -1142,6 +1359,9 @@ You can code other methods in a fixture, and you can call them from test
 functions.  In fact, the test function ends up being one of the methods of the
 fixture, so that's why and how.
 
+\section{Fixture members and their initialisation}
+\label{sec:fixture-members-and-initialisation}
+
 You should declare fixture attributes (member variables) and their
 initialisation with Testudo macros, so that they're logged if the fixture is
 used with the ``visible-fixture'' macro.  This is done by using the
@@ -1157,8 +1377,8 @@ first argument the name of the attribute, and as its second argument its
 initial value.  Here's an example of usage:
 \begin{cpplisting}
 struct NumbersFixture : testudo::Fixture {
-  NumbersFixture(test_parameters)
-    : Fixture(test_arguments),
+  NumbersFixture(testudo::test_management_t test_management)
+    : Fixture(test_management),
       fixture_init(x, 1.), fixture_init(z, 3.14) { }
   fixture_member(double x);
   fixture_member(double y=-2.5, z);
@@ -1169,8 +1389,8 @@ struct NumbersFixture : testudo::Fixture {
 struct NumbersFixture
     : testudo::Fixture
 {
-  NumbersFixture(TEST_PARAMETERS)
-    : Fixture(TEST_ARGUMENTS),
+  NumbersFixture(testudo::test_management_t test_management)
+    : Fixture(test_management),
       FIXTURE_INIT(x, 1.),
       FIXTURE_INIT(z, 3.14) { }
   FIXTURE_MEMBER(double x);
@@ -1182,6 +1402,577 @@ Other actions in the fixture implementation are enclosed in Testudo macros in
 the usual way (with the ``declare'' macro, the ``perform'' macro, and so on).
 
 
+\chapter[With-data loops]{With-data loops:
+  \testudopair{with\_data}{WITH\_DATA}}
+\label{cha:with-data-loops}
+
+You may need to perform the same checks on many values.  This happens, for
+instance, if you're checking a certain property holds for all possible values
+of a type\footnote{My inner voice calls this feature ``theorem checking''.};
+you would implement this by creating a large list of such values, and applying
+to them the same test steps.  This can be easily done with the ``with-data''
+loop syntax.
+
+This syntax accepts two arguments: the name of the variable that's going to be
+tested, and a container with all values to test.  The container can be stored
+in advance in a variable, or built inline.  The ``with-data'' macro is followed
+by the test to perform on the variable values.  The test can be a single check
+instruction, or a brace-enclosed sequence of instructions and checks.  The
+report output shows the variable name and the container, followed by the
+instructions and checks to be performed (only once), and one fail line per
+failed value; if all values pass the tests, an additional line is output
+with an \textsc{ok} flag for ``all successful''.
+
+You can chain ``with-data'' macros as you would chain ``for'' loops.  Testudo
+is aware of chained ``with-data'' macros and will output parsimonious reports
+for them, grouping failed coordinated values into single-line fail reports, and
+outputting only one success line in case of success.
+
+Here is an example:
+\begin{cpplisting}
+declare(auto is_even=predicate_a((a%2)==0));
+declare(list<int> even_numbers{2, 4, 8}); // even numbers
+with_data(x, even_numbers)
+  check(x)_verify(is_even);
+with_data(x, even_numbers) {
+  declare(int y=x+1);
+  check(y)_verify(not is_even);
+}
+with_data(x, even_numbers)
+  with_data(y, list<int>{2, 4, 9})
+    check(x%2)_equal(y%2); // will fail when \texttt{y==9}
+\end{cpplisting}
+
+\begin{cpplisting}
+DECLARE(auto is_even=PREDICATE_A((a % 2) == 0));
+DECLARE(list<int> even_numbers{ 2, 4, 8 }); // even numbers
+WITH_DATA(x, even_numbers)
+  CHECK(x) VERIFY(is_even);
+WITH_DATA(x, even_numbers)
+{
+  DECLARE(int y = x + 1);
+  CHECK(y) VERIFY(not is_even);
+}
+WITH_DATA(x, even_numbers)
+  WITH_DATA(y, list<int>{ 2, 4, 9 })
+    CHECK(x % 2) EQUAL(y % 2); // will fail when \texttt{y==9}
+\end{cpplisting}
+
+
+\chapter{Mock objects}
+\label{cha:mock-objects}
+
+Testudo supports mock objects through its ``Mock Turtle'' module.  Include
+header file ``\texttt{mock\_turtle.h}'' to use it.
+
+You can build your mock objects in any way you want: with simple method
+overriding, with virtual method overriding, or with no overriding and no
+derivation.  The mock method macros define the methods precisely in accordance
+with your specification, so it's up to you to decide.
+
+Here's Mock Turtle's approach to mock testing:
+\begin{itemize}
+\item define mock classes using the mock-method macros ``mock-method'' and
+  ``wrap-method'' (\Sref{sec:mock-method-macros}); this adds scheduling and
+  logging machinery to the classes automatically;
+\item if necessary, set up across-method ledgers
+  (\Sref{sec:mock-method-ledgers});
+\item in a test definition, create instances of the mock classes;
+\item if necessary, set up across-instances ledgers
+  (\Sref{sec:mock-method-ledgers});
+\item schedule mock object behaviour as needed
+  (\Sref{sec:schedule-mock-method});
+\item use mock objects as if they were the real thing;
+\item check logged behaviour against expected behaviour by accessing call logs
+  and ledgers (\Sref{sec:check-mock-method-logs},
+  \Sref{sec:check-mock-method-ledgers}).
+\end{itemize}
+
+\section{Mock-method macros}
+\label{sec:mock-method-macros}
+
+When you need to test a functionality, you may want to use mock implementations
+for some of the parts that are needed but aren't the focus of the test.
+Typically, these parts are functionality that is external to your code, or
+costly to run, or slow, or having dependencies on unavailable resources.  The
+usual way to achieve this is in \Cpp{} by replacing the affected parts by
+objects that have the same interface as the problematic ones, but ad-hoc
+implementations tailored to the test.
+
+How you implement a mock class depends on how the mocked class is defined, and
+you use it.  It's usually a matter of replicating the interface or deriving
+from the mock class and overriding its virtual methods.  The first approach
+would be appropriate, e.g., if the class is a template argument to function or
+another class.  The second one is good for polymorphic designs.
+
+Testudo mock-method macros will help you deal with the most usual cases for
+mock method implementations.  There are two available macros to mock a method:
+\begin{itemize}
+\item the ``mock-method'' macro, that creates a dumb implementation, where
+  return values for the method can be pre-scheduled, and with automatic
+  logging of arguments and return value;
+\item the ``wrap-method'' macro, that allows you to provide a specific
+  implementation, but still adds to it automatically the logging of arguments
+  and return value.
+\end{itemize}
+Both macros allow you to specify how the method mocks its original version,
+whether by merely defining it, or by overriding a virtual one in the base
+class.
+
+Before you use these macros, you must define the mock class.  The only
+requirement for the mock class is that it publicly must derive from
+``\texttt{testudo::CallLedger}''.  Here are a couple of examples, one for a
+mock class deriving from a virtual class, and one for a non-derived mock class:
+\begin{cpplisting}
+class KettleBase {
+public:
+  virtual ~KettleBase()=default;
+  virtual void fill(float volume)=0;
+  virtual float temperature() const=0;
+};
+
+class KettleMock
+  : public KettleBase,
+    public testudo::CallLedger {
+public:
+  // method mocks and wraps overriding base methods\ellipsis{}
+};
+
+class ContainerMock
+  : public testudo::CallLedger {
+public:
+  // method mocks and wraps defining a cointainer interface\ellipsis{}
+};
+\end{cpplisting}
+
+\subsection{Mocking a method: %
+  \testudopair{mock\_method}{MOCK\_METHOD}}
+\label{sec:mocking-method}
+
+In order to mock a method, use the ``mock-method'' macro where you would
+normally define the method, followed by a semicolon.  This will automatically
+create an implementation for the method that logs all calls (argument values,
+return value, and order across methods and objects) to it
+(\Sref{sec:check-mock-method-logs}, \Sref{sec:check-mock-method-ledgers}), and
+allows you to set up a schedule for return values
+(\Sref{sec:schedule-mock-method}).
+
+The arguments to the ``mock-method'' macro are, in order (see below for an
+explanation of the usage of the word \emph{parenthesised}),
+\begin{itemize}
+\item the \emph{parenthesised} return type;
+\item the name of the method (or a its name and an alternative name; see
+  below);
+\item a \emph{parenthesised} list of \emph{parenthesised} arguments;
+\item optional method specifiers like ``\texttt{const}'',
+  ``\texttt{override}'', or ``\texttt{final}'', separated by spaces; leave this
+  argument out if you don't need it.
+\end{itemize}
+
+The return type macro argument is \emph{parenthesised}, which means it must be
+enclosed between ``\texttt{(}'' and ``\texttt{)}''.  This is done so the macros
+aren't confused by templated types that may contain commas in
+them\footnote{I've seen Google Mock solves this issue in a similar way, but the
+  parentheses are optional, meaning that if your type doesn't contain any
+  macro-fooling comma, you can leave them out.  I prefer to make
+  parenthesisation mandatory, because once you get used to it, you won't be
+  left wondering why your macro doesn't work if you forget to use it for a type
+  that requires it.}, like ``\texttt{map<int, float>}''.  If the return type is
+``\texttt{void}'', you still have to write it in parenthesis.  So, examples of
+return type arguments to the ``mock-method'' macro are
+\begin{itemize}
+\item \texttt{(int)}
+\item \texttt{(void)}
+\item \texttt{(map<pair<int, string>, float>)}
+\end{itemize}
+
+Similarly, the list-of-arguments macro argument is a \emph{parenthesised} list
+of \emph{parenthesised} arguments.  This means that, for the same reasons as
+for the return type argument, not only is the list enclosed in parentheses, but
+each argument is also enclosed in parentheses\footnote{I'm thorry thith hath
+  become tho lithpy; there'th no other way with theepluthpluth macroth.}.  For
+each argument, you have to specify its type, and can optionally include in the
+parentheses for the type an argument name.  The argument name is discarded by
+the ``mock-method'' macro, but will be very important when wrapping (rather
+than mocking) methods with the ``wrap-method'' macro
+(see~\Sref{sec:wrapping-method}).  Here are some examples of list-or-arguments
+arguments to the ``mock-method'':
+\begin{itemize}
+\item \texttt{()}
+\item \texttt{((int))}
+\item \texttt{((int), (unsigned char))}
+\item \texttt{((int quantity))}
+\item \texttt{((string name), (int))}
+\item \texttt{((map<int, float> const \&), (int id))}
+\end{itemize}
+
+The name-of-method macro argument is simply the name of the method, with no
+parentheses.  Its associated scheduler and logger objects will be named after
+the method, and this will cause name clashes if you have overloaded methods in
+the same class.  In that case, you can give your method an alternative name,
+meaning that, although its real name will be used for the method definition,
+everything else (the scheduler, the logger, and references to it in ledgers)
+will use the alternative name.  To specify an alternative name, just replace
+the name-of-method argument with the name of the method and the alternative
+name separated by a comma, in parentheses.  So, for instance, the following
+wouldn't work
+\begin{cpplisting}
+class ImageMock
+  : public CallLedger {
+public:
+  mock_method((void), set, ((float)));
+  mock_method((voud), set, ((int)));
+};
+\end{cpplisting}
+so we'll have to identify one of the ``\texttt{set()}'' methods (or both) with
+an alternative name:
+\begin{cpplisting}
+class ImageMock
+  : public CallLedger {
+public:
+  mock_method((void), set, ((float)));
+  mock_method((voud), (set, set_int), ((int)));
+};
+\end{cpplisting}
+
+Finally, the method-specifiers macro argument consists of what you'd put after
+the method signature if you were defining it directly.  Things like
+``\texttt{const}'' (for method constness), ``\texttt{override}'', or
+``\texttt{final}'' go there, separated by spaces.  If there's nothing to
+specify here, just leave out the macro argument (no need to add the comma after
+the previous argument).  Here's an example with const and non-const overrides:
+\begin{cpplisting}
+class KettleBase {
+public:
+  virtual ~KettleBase()=default;
+  virtual void fill(float volume)=0;
+  virtual float temperature() const=0;
+};
+
+class KettleMock
+  : public KettleBase,
+    public testudo::CallLedger {
+public:
+  mock_method((void), fill, ((float volume)), override);
+  mock_method((float, temperature, (), const override);
+};
+\end{cpplisting}
+
+
+\subsection{Wrapping a method: %
+  \testudopair{wrap\_method}{WRAP\_METHOD}}
+\label{sec:wrapping-method}
+
+Wrapping a method is similar to mocking a method, but instead of having the
+method automatically generated, and its return values scheduled, you get to
+specify exactly what the method does and returns.
+
+In order to wrap a method, use the ``wrap-method'' macro in the same way that
+you'd use the ``macro-method'', but instead of adding a semicolon after it,
+write your method implementation in braces.  The ``wrap-method'' is essentially
+taking the place of the signature of your method.  You still have to add
+``\texttt{const}'' before the method implementation if appropriate (but not
+``\texttt{override}'' or ``\texttt{final}''); this will amount, in most cases
+where you have ``\texttt{const}'' in the macro method-specifier argument, to
+repeat it just after the macro.
+
+What the ``wrap-method'' macro affords you compared to writing your own method
+is automatic log and ledger handling (\Sref{sec:check-mock-method-logs},
+\Sref{sec:check-mock-method-ledgers}), which is identical to that generated by
+the ``mock-method'' macro.  Scheduling is not added to a wrapped macro, since
+you'll be specifying what is returned.
+
+Here's an example with wrapped methods:
+\begin{cpplisting}
+class Tally {
+public:
+  virtual ~Tally()=default;
+  virtual void add_counter(int delta)=0;
+  virtual int total() const=0;
+};
+
+class TallyMock
+  : public Tally, public testudo::CallLedger {
+public:
+  int counter=0;
+  wrap_method((void), add_counter, ((int delta))) {
+    counter+=delta;
+  }
+  wrap_method((int), total, (), const) const { // \texttt{const} twice
+    return counter;
+  }
+};
+\end{cpplisting}
+
+
+\section{How to schedule mock-method behaviour}
+\label{sec:schedule-mock-method}
+
+By default, a mock-method generated by the ``mock-method'' macro always returns
+the default value of its default type.  You can change this by setting
+different default value or by scheduling a set of values to return in sequence.
+You can also set it to return the result of evaluating a function with no
+arguments (given, for instance, as a lambda expression).  The general behaviour
+of the scheduler when asked for a return value is this:
+\begin{itemize}
+\item while the queue of scheduled return values isn't empty, return the next
+  value, and pop it from the queue;
+\item if the queue of scheduled return values is empty, return the default
+  return value, or the result of evaluating the default function.
+\end{itemize}
+
+You can change the default value in one of two ways:
+\begin{itemize}
+\item by assigning a value or function to the ``mock-method'' macro expression
+  in the mock class definition:
+\begin{cpplisting}
+class SoupMock
+  : public Soup, public CallLedger {
+public:
+  ...
+  // by default, return \texttt{true}:
+  mock_method((bool), is_tasty, (), const)=true;
+  ...
+};
+\end{cpplisting}
+\item by using the ``set-ret-default'' macro as a method call on a mock object:
+\begin{cpplisting}
+define_test(mock_turtle, victorian, "Victorian recipe") {
+  declare(auto soup_mock=make_shared<SoupMock>());
+  declare(bool is_tasty_now=true);
+  perform(soup_mock->set_ret_default(
+            is_tasty,
+            [&is_tasty_now]() { return is_tasty_now; });
+  ...
+}
+\end{cpplisting}
+\end{itemize}
+
+In order to schedule a sequence of values,
+
+You can also set the default value or any of the scheduled return values to
+throw an exception, rather than returning a value:
+
+
+\section{How to check mock-method logs}
+\label{sec:check-mock-method-logs}
+
+Each mock method (mocked or wrapped) keeps a log of calls to it, with arguments
+and return values.  After you've run code that uses your mock objects, you can
+perform checks on the logs, with the usual Testudo syntax.
+
+``Invoking'' the ``logged-args'' macro on a mock object will return a vector of
+tuples containing the args for all calls to a mock method.  The syntax for the
+call follows the syntax for a regular method, and has as its argument the name
+(or alternative name) of a mock method.  The vector contains a tuple for each
+call, and each tuple contains all the arguments of the call.  So, for instance,
+in the following example, we're checking that the ``\texttt{add\_ingr}'' method
+was called five times, and we're checking the specific arguments for all calls:
+\begin{cpplisting}
+declare(auto soup_mock=make_shared<SoupMock>());
+...
+// five calls, with specific arguments
+check(soup_mock->logged_args(add_ingr))
+  _equal({{"calf brains", 4},
+          {"pork liver", 3},
+          {"water", 1},
+          {"water", 1},
+          {"water", 1}});
+\end{cpplisting}
+
+Since the value returned by the ``logged-args'' is a plain \textsc{stl} vector,
+you can use it in any vector-like way to check results.  You can, for instance:
+\begin{itemize}
+\item check its size (although a better way is to use the ``log-size'' macro;
+  see below);
+\item check a specific call by its number:
+\begin{cpplisting}
+// check \emph{third} call
+check(soup_mock->logged_args(add_ingr)[2])
+  _equal({"water", 1});
+\end{cpplisting}
+\item check a specific argument of a specific call:
+\begin{cpplisting}
+// check \emph{first} argument of third call:
+check(get<0>(soup_mock->logged_args(add_ingr)[2]))
+  _equal("water");
+\end{cpplisting}
+\item or more complex things like checking totals of numerical arguments.
+\end{itemize}
+
+Similarly, the ``logged-ret'' macro returns a vector of tuples containing the
+return values for all calls to a mock method\footnote{These are tuples rather
+  than naked return values in order to accommodate methods that return
+  \texttt{void}, which have empty tuples.}.
+\begin{cpplisting}
+declare(auto soup_mock=make_shared<SoupMock>());
+...
+// a single call, that returned \texttt{true}
+check(soup_mock->logged_ret(is_tasty))_equal({{true}});
+\end{cpplisting}
+
+The ``logged-ret-args'' macro combines the ``logged-ret'' and ``logged-args''
+macros: it returns a vector of pairs, where each pair contains a tuple with the
+return value and a tuple with the arguments of a call.
+\begin{cpplisting}
+declare(auto soup_mock=make_shared<SoupMock>());
+...
+// five calls, with specific arguments and return values
+check(soup_mock->logged_ret_args(add_ingr))
+  _equal({{{4}, {"calf brains", 4}},
+          {{7}, {"pork liver", 3}},
+          {{8}, {"water", 1}},
+          {{9}, {"water", 1}},
+          {{10}, {"water", 1}}});
+\end{cpplisting}
+
+Finally, the ``log-size'' macro returns the number of calls to a mock method:
+\begin{cpplisting}
+declare(auto soup_mock=make_shared<SoupMock>());
+...
+// a single call
+check(soup_mock->log_size(is_tasty))_equal(1);
+\end{cpplisting}
+
+Checks with mock-method logs lend themselves to ``with-declare'' scopes
+(\Sref{sec:with-declare-scopes}), where the declaration is for instance the
+result of a ``logged-ret-args'' macro, and the contents are checks on that
+value.
+
+\section{How to check mock-method ledgers}
+\label{sec:check-mock-method-ledgers}
+
+In addition to per-mock-method logs (\Sref{sec:check-mock-method-logs}), Mock
+Turtle keeps track of the order in which different methods are invoked.  This
+is what the class ``\texttt{CallLedger}'' (the one mock classes must derive
+from) is about.
+
+You can even keep track of the order in which different methods are invoked
+\emph{on different mock objects}, by having mock objects report to a
+stand-alone ``\texttt{CallLedger}'' object.  This is achieved by using the
+``call-ledger-report-to'' macro, with a first argument representing the mock
+object (by a reference or a pointer), and a second argument which is a pointer
+to the stand-alone ``\texttt{CallLedger}'' object.  For purposes of logging,
+this ``\texttt{CallLedger}'' object will identify the mock object by the first
+argument to the ``call-ledger-report-to'' macro.  Here's an example of setup:
+\begin{cpplisting}
+declare(CallLedger cl);
+declare(MockLevel lev1(12));
+perform(call_ledger_report_to(lev1, &cl)); // identified as ``\texttt{lev1}''
+declare(auto lev2=shared_ptr<MockLevel>(47));
+perform(call_ledger_report_to(lev2, &cl)); // identified as ``\texttt{lev2}''
+\end{cpplisting}
+
+After you've run code that uses your mock objects, you can check the call
+ledgers.  Since a ledger logs calls to methods with different signatures, you
+can't access a ledger in one call.  You have to use a kind of iterator instead,
+that we'll call the \emph{call ledger iterator}.  You obtain the call ledger
+iterator by passing the call ledger to the ``\texttt{testudo::iterate()}''
+function.  Initially, the iterator points to the first ledger entry.  This is
+what you can do with a call ledger ``\texttt{it}'':
+\begin{itemize}
+\item increment it, with ``\texttt{it.next()}'';
+\item check if it's pointing past the end of the ledger, with
+  ``\texttt{it.done()}'';
+\item check if it's \emph{not} pointing past the end, by converting it to bool;
+\item reset it to point to the first ledger entry, with
+  ``\texttt{it.reset()}'';
+\item get the name of the mock object of the call it points to, with
+  ``\texttt{it.mock\_name()}'';
+\item get the name of the method of the call it points to, with
+  ``\texttt{it.method\_name()}'';
+\item get an object containing a tuple with the return value and a tuple with
+  the arguments of the call it points to; this is called a \emph{call record};
+  you must know what the mock object and the method were for the call, and the
+  operation consists of ``invoking'' the ``get-call'' macro on the iterator,
+  passing it a reference to the expected mock object, and the name (or
+  alternative name) of the expected method; if the expected mock object or the
+  method are not the actual ones, the returned object is \emph{invalid}, and
+  all checks performed on it will fail; here's an example of usage of the
+  ``get-call'' macro:
+\begin{cpplisting}
+with_declare(auto call=it.get_call(*soup_mock, add_ingr))
+  check(call)_equal({7}, {"water", 1});
+\end{cpplisting}
+\item \emph{pop} the call record it points to, by using the ``pop-call'' macro
+  on the iterator, rather than the ``get-call'' macro; these macros have the
+  same arguments and return the same value, but ``pop-call'' automatically
+  increments the iterator \emph{if the returned call record is valid:}
+\begin{cpplisting}
+with_declare(auto call=it.pop_call(*soup_mock, add_ingr))
+  check(call)_equal({7}, {"water", 1});
+\end{cpplisting}
+\end{itemize}
+
+You can perform the following operations on a call record ``\texttt{cr}'':
+\begin{itemize}
+\item get the return value (if not \texttt{void}), with ``\texttt{cr.ret()}'';
+\item get a tuple with the arguments, with ``\texttt{cr.args()}'';
+\item get the method name, with ``\texttt{cr.method\_name}'';
+\item get the validity of the call record, with ``\texttt{is\_valid()}''.
+\end{itemize}
+
+You can also get a human-readable string listing of the recorded calls for a
+call ledger ``\texttt{cl}'', with ``\texttt{print\_calls(cl.calls())}''; each
+line shows the names of the mock object and mock method, and a number stating
+the zero-based order the call has on the particular mock-method log; you can
+print this string with
+``\texttt{show\_multiline\_value(print\_calls(cl.calls()))}''.  This can be
+  useful when designing or debugging a test.
+
+Similarly to mock-method logs, checks with mock-method ledgers lend themselves
+to ``with-declare'' scopes (\Sref{sec:with-declare-scopes}).
+
+Here's an example with mock-method ledgers:
+\begin{cpplisting}
+declare(auto soup_mock=make_shared<SoupMock>());
+...
+with_declare(auto it=iterate(soup_mock)) {
+  with_declare(auto call=it.pop_call(*soup_mock, add_ingr)) {
+    check(call.ret())_equal(4);
+    check(call.args())_equal("calf brains", 4);
+  }
+  ...
+  with_declare(auto call=it.pop_call(*soup_mock, temp))
+    check(call.ret())_equal(20);
+  ...
+  with_declare(auto call=it.pop_call(*soup_mock, is_tasty))
+    check(call.ret())_true;
+  // check it was the last call:
+  check(it.done())_true;
+}
+\end{cpplisting}
+
+Here's an example involving the ``call-ledger-report-to'' macro:
+\begin{cpplisting}
+declare(CallLedger cl);
+declare(MockLevel lev1(12));
+perform(call_ledger_report_to(lev1, &cl));
+declare(MockLevel lev2(47));
+perform(call_ledger_report_to(lev2, &cl));
+perform(equalize(lev1, lev2)); // this is the function we're checking
+check(lev1.readout())_equal(52);
+check(lev2.readout())_equal(52);
+declare(auto it=iterate(cl));
+// fast forward to the first invocation to ``\texttt{large\_up()}'':
+perform(while (it.method_name() not_eq "large_up")
+          it.next());
+check(it.mock_name())_equal("lev1");
+check(it.method_name())_equal("large_up");
+perform(it.next());
+check(it.mock_name())_equal("lev1");
+check(it.method_name())_equal("readout");
+\end{cpplisting}
+
+
+\chapter{Testudo support for \textsc{stl} types}
+\label{cha:testudo-support-stl-types}
+
+\begin{cpplisting}
+#include "testudo_ext.h"
+\end{cpplisting}
+
+
 \chapter{Adding Testudo support for your types}
 \label{cha:adding-testudo-support-your-types}
 
@@ -1189,11 +1980,15 @@ the usual way (with the ``declare'' macro, the ``perform'' macro, and so on).
 #include "testudo_base.h"
 \end{cpplisting}
 
+\section{Validity}
+\label{sec:validity}
+
+Implement ``\texttt{t.is\_valid()}'' or ``\texttt{is\_valid(t)}''.
 
 \section{Textual representation}
 \label{sec:textual-representation}
 
-Implement ``\texttt{ostream << t}'', or ``\texttt{to\_text(t)}''.
+Implement ``\texttt{ostream <{}< t}'' or ``\texttt{to\_text(t)}''.
 
 \section{Equality}
 \label{sec:equality}
@@ -1205,15 +2000,34 @@ Implement ``\texttt{t==u}''.
 
 Implement ``\texttt{double absdiff(t, u)}''.
 
-\chapter{Testudo support for \textsc{stl} types}
-\label{cha:testudo-support-stl-types}
 
-\begin{cpplisting}
-#include "testudo_ext.h"
-\end{cpplisting}
-
+\cleartooddpage
 
 \appendices
+
+\chapter{Testudo installation}
+\label{cha:testudo-installation}
+
+Dependencies:
+\begin{itemize}
+\item a \Cpp{}17 compiler (duh);
+\item \textsc{Unix}, \texttt{bash}, \texttt{sed}, \texttt{awk} (used by
+  scripts);
+\item \texttt{m4} (for generation of ``\texttt{mock\_turtle\_macro\_n.h}'');
+\item \texttt{make} (but you can use your own alternative);
+\item \texttt{xsltproc} (for \textsc{xml}-to-coloured-text translation);
+\item \LaTeX{}, \texttt{rubber} (to generate the \textsc{pdf} documentation).
+\end{itemize}
+
+Run:
+\begin{itemize}
+\item ``\texttt{make diff\_test}'' to diff-check the
+  \textsc{xml}-to-coloured-text output against the expected result;
+\item ``\texttt{make diff\_tests}'' to diff-check the
+  \textsc{xml}-to-coloured-text output against the expected result and against
+  direct-to-coloured-text output;
+\item ``\texttt{make}'' to generate the \textsc{pdf} documentation.
+\end{itemize}
 
 \chapter{Editor configuration}
 \label{cha:editor-configuration}
@@ -1227,7 +2041,9 @@ test style file you're using).
 \label{cha:using-your-own-test-definition-test-instruction-names}
 
 Write a test style file, similar to ``\texttt{lc.tst}'' or ``\texttt{cp.tst}''
-(use one of them as a template, and adapt the second half of each line).
+(use one of them as a template, and adapt the second half of each line).  Ĉu
+esparantaj ĉapelitaj literoj funkcias por makronomoj?  Tio estus interesa uzo
+de stilpersonigo.
 
 
 \backmatter

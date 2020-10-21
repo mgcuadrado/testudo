@@ -1,0 +1,21 @@
+#!/bin/bash
+
+keywords="$(cat $1 | sed -n '
+    /^$/!{
+        s/^.* \([^ ]*\) *$/\1/
+        1!s/^/\\\\|/
+        H
+    }
+    ${
+        x
+        s/\n//g
+        p
+    }')"
+
+cat <<EOF
+(font-lock-add-keywords
+ 'c++-mode
+ '(("\\\\(\\\\<\\\\($keywords\\\\)\\\\>\\\\)"
+    (1 testudo-face t))
+   ))
+EOF

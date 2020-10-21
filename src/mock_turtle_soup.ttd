@@ -1,0 +1,317 @@
+#ifndef NAUTOTEST
+
+#include "testudo_lc.h"
+#include "mock_turtle.h"
+#include <iostream>
+
+namespace {
+
+  using namespace std;
+  using namespace testudo;
+
+  class Soup {
+  public:
+    virtual ~Soup()=default;
+    // wait
+    virtual void wait()=0;
+    // set heat level
+    virtual void set_heat(int level)=0;
+    // read temperature
+    virtual int temperature() const=0;
+    // add an ingredient; returns soup volume
+    virtual int add_ingredient(string ingredient, int quantity)=0;
+    // is it tasty?
+    virtual bool is_tasty() const=0;
+
+    // just a test for types with commas:
+    virtual pair<int, int> reverse(pair<int, int> p) const=0;
+    virtual pair<float, float> reverse_float(pair<float, float>) const=0;
+
+    // just a few tests for wrapping functions with no arguments or empty
+    // return type
+    virtual int forty_two() const=0;
+    virtual void add_counter(int delta)=0;
+    virtual void inc_counter()=0;
+    int counter=0;
+  };
+
+  bool queen_of_hearts_mock_turtle_soup(shared_ptr<Soup> soup) {
+    soup->add_ingredient("calf brains", 4);
+    soup->add_ingredient("pork liver", 3);
+    int volume;
+    do {
+      volume=soup->add_ingredient("water", 1);
+    } while (volume<10);
+    soup->set_heat(9);
+    while (soup->temperature()<100)
+      soup->wait();
+    soup->set_heat(5);
+    for (int i=0; i<10; ++i)
+      soup->wait();
+    return soup->is_tasty();
+  }
+
+  define_top_test_node("testudo", mock_turtle, "mock turtle tests", 750);
+
+  class SoupMock
+    : public Soup, public CallLedger {
+  public:
+    mock_method((void), wait, ());
+
+    mock_method((void), set_heat, ((int)), override);
+
+    mock_method((int), (temperature, temp), (), const final);
+
+    wrap_method((int),
+                (add_ingredient, add_ingr),
+                ((string ingredient), (int quantity))) {
+      content[ingredient]+=quantity;
+      return soup_volume+=quantity;
+    }
+    int soup_volume=0;
+    map<string, int> content;
+
+    // give a default value
+    mock_method((bool), is_tasty, (), const)=true;
+
+    wrap_method((pair<int, int>), reverse, ((pair<int, int> p)), const) const
+      { return {p.second, p.first}; }
+    wrap_method((pair<float, float>),
+                reverse_float, ((pair<float, float> p)), const) const
+      { return {p.second, p.first}; }
+
+    mock_method((int), forty_two, (), const);
+    wrap_method((void), add_counter, ((int delta))) { counter+=delta; }
+    wrap_method((void), inc_counter, ()) { ++counter; }
+  };
+
+  define_test(mock_turtle, queen_of_hearts, "Queen of Hearts' recipe") {
+    declare(auto soup_mock=make_shared<SoupMock>());
+    check(soup_mock->reverse({1, 2}))_equal(pair(2, 1));
+    perform(soup_mock->schedule_ret(temp, 20, 40, 60, 80, 100));
+    declare(bool good=queen_of_hearts_mock_turtle_soup(soup_mock));
+    check(good)_true;
+    check(soup_mock->logged_args(add_ingr))
+      _equal({{"calf brains", 4},
+              {"pork liver", 3},
+              {"water", 1},
+              {"water", 1},
+              {"water", 1}});
+    check(soup_mock->logged_ret_args(add_ingr))
+      _equal({{{4}, {"calf brains", 4}},
+              {{7}, {"pork liver", 3}},
+              {{8}, {"water", 1}},
+              {{9}, {"water", 1}},
+              {{10}, {"water", 1}}});
+    check(soup_mock->logged_args(set_heat))_equal({{9}, {5}});
+    check(soup_mock->log_size(wait))_equal(14);
+    check(soup_mock->content)
+      _equal({{"calf brains",  4}, {"pork liver", 3}, {"water", 3}});
+    check(soup_mock->log_size(is_tasty))_equal(1);
+    check(soup_mock->logged_ret(is_tasty))_equal({{true}});
+  }
+
+  define_test(mock_turtle,
+              queen_of_hearts_calls, "Queen of Hearts' recipe calls") {
+    declare(auto soup_mock=make_shared<SoupMock>());
+    perform(soup_mock->set_ret_default(forty_two, 6*9));
+    check(soup_mock->reverse({1, 2}))_equal(pair(2, 1));
+    check(soup_mock->forty_two())_equal(54);
+    check(soup_mock->counter)_equal(0);
+    perform(soup_mock->inc_counter());
+    check(soup_mock->counter)_equal(1);
+    perform(soup_mock->add_counter(3));
+    check(soup_mock->counter)_equal(4);
+    perform(soup_mock->schedule_ret(temp, 20, 40, 60, 80, 100));
+    perform(queen_of_hearts_mock_turtle_soup(soup_mock));
+    show_multiline_value(print_calls(soup_mock->calls()));
+    with_declare(auto it=iterate(soup_mock)) {
+      with_declare(auto call=it.pop_call(*soup_mock, reverse)) {
+        check(call)_equal({{2, 1}}, {{1, 2}});
+        check(call)_equal({{3, 1}}, {{1, 2}});
+        check(call)_not_equal({{2, 1}}, {{1, 2}});
+        check(call)_not_equal({{3, 1}}, {{1, 2}});
+      }
+      check(it.pop_call(*soup_mock, forty_two))_equal({54}, {});
+      with_declare(auto call=it.get_call(*soup_mock, inc_counter))
+        check(call)_equal({}, {});
+      perform(it.next());
+      check(it.pop_call(*soup_mock, add_counter))_equal({}, {3});
+      perform(while (it.method_name() not_eq "set_heat")
+                it.next());
+      with_declare(auto call=it.pop_call(*soup_mock, reverse)) {
+        check(call)_equal({{2, 1}}, {{1, 2}});
+        check(call)_not_equal({{2, 1}}, {{1, 2}});
+      }
+      with_declare(auto call=it.pop_call(*soup_mock, set_heat)) {
+        check(call)_equal({}, {9});
+        check(call)_equal({}, {0});
+      }
+      perform(while (it)
+                show_value(it.method_name()), it.next());
+      check(it.done())_true;
+    }
+  }
+
+  define_test(mock_turtle, approx, "approx") {
+    declare(auto soup_mock=make_shared<SoupMock>());
+    // FIXME: the following check should warn about checking equality of floats
+    check(soup_mock->reverse_float({1., 2.}))_equal(pair(2., 1.));
+    with_declare(auto it=iterate(soup_mock)) {
+      print_text("wrong method:");
+      with_declare(auto call=it.pop_call(*soup_mock, reverse)) {
+        check(call)_approx({{2., 1.}}, {{1., 2.}});
+        check(call)_approx({{3., 1.}}, {{1., 2.}});
+        check(call)_not_approx({{2., 1.}}, {{1., 2.}});
+        check(call)_not_approx({{3., 1.}}, {{1., 2.}});
+      }
+      print_text("right method:");
+      with_declare(auto call=it.pop_call(*soup_mock, reverse_float)) {
+        check(call)_approx({{2., 1.}}, {{1., 2.}});
+        check(call)_approx({{3., 1.}}, {{1., 2.}});
+        check(call)_not_approx({{2., 1.}}, {{1., 2.}});
+        check(call)_not_approx({{3., 1.}}, {{1., 2.}});
+      }
+    }
+  }
+
+  class Level {
+  public:
+    virtual ~Level()=default;
+    virtual int readout() const=0;
+    virtual void large_up()=0;
+    virtual void small_up()=0;
+  };
+
+  void equalize(Level &lev1, Level &lev2) {
+    auto less=
+      [](Level &la, Level &lb) {
+        auto laro=la.readout(), lbro=lb.readout();
+        return laro<lbro;
+      };
+    bool is_lev1_less_than_lev2=less(lev1, lev2);
+    Level
+      *la=(is_lev1_less_than_lev2 ? &lev1 : &lev2),
+      *lb=(is_lev1_less_than_lev2 ? &lev2 : &lev1);
+    while (less(*la, *lb))
+      la->large_up();
+    while (less(*lb, *la))
+      lb->small_up();
+  }
+
+  class MockLevel
+    : public Level, public CallLedger {
+  public:
+    MockLevel(int level) : level(level) { }
+    wrap_method((int), readout, (), const override) const { return level; }
+    wrap_method((void), large_up, (), override) { level+=10; }
+    wrap_method((void), small_up, (), override) { level+=1; }
+  private:
+    int level;
+  };
+
+  define_test(mock_turtle, several_mocks, "calls with several mocks") {
+    declare(CallLedger cl);
+    declare(MockLevel lev1(12));
+    perform(call_ledger_report_to(lev1, &cl));
+    declare(MockLevel lev2(47));
+    perform(call_ledger_report_to(lev2, &cl));
+    perform(equalize(lev1, lev2));
+    check(lev1.readout())_equal(52);
+    check(lev2.readout())_equal(52);
+    show_multiline_value(print_calls(cl.calls()));
+    declare(auto it=iterate(cl));
+    perform(while (it.method_name() not_eq "large_up")
+              it.next());
+    check(it.mock_name())_equal("lev1");
+    check(it.method_name())_equal("large_up");
+    check(it.get_call(lev1, large_up))_equal({}, {});
+    check(it.get_call(lev2, large_up))_equal({}, {});
+    perform(it.next());
+    check(it.mock_name())_equal("lev1");
+    check(it.method_name())_equal("readout");
+  }
+
+  define_test(mock_turtle, predicates, "predicates") {
+    check(list<tuple<int, string>>{{1, "one"}, {1, "one"}})
+      _verify(is_always(1, "one"));
+    check(list<tuple<int, string>>{{1, "one"}, {2, "one"}})
+      _verify(is_always(1, "one"));
+    check(list{2, 2, 2})_verify(is_always(2));
+    check(list<tuple<int>>{{2}, {2}, {2}})_verify(is_always(2));
+    check(list{2, 3, 2})_verify(is_always(2));
+    check(list<tuple<int>>{{2}, {3}, {2}})_verify(is_always(2));
+    check(list{1, 2, 3})_verify(is_never(4));
+    check(list{1, 2, 3})_verify(is_never(1));
+    check(list{1, 1, 4})_verify(is_constant);
+    check(list{1, 1, 1})_verify(is_constant);
+    check(list{1, 2, 3})_verify(all_different);
+    check(list{1, 2, 1})_verify(all_different);
+    check(list{1, 2, 2})_verify(all_different);
+  }
+
+  class Namable {
+  public:
+    virtual ~Namable()=default;
+    virtual void create()=0;
+    virtual bool set_name_is_good(string)=0;
+  };
+
+  template <typename NamableConcrete>
+  void test_namable(test_management_t test_management,
+                    NamableConcrete &namable) {
+    perform(namable.create());
+    perform(namable.set_name_is_good("Prince"));
+    check_try(namable.set_name_is_good("the Artist"))_catch();
+    check_try(namable.create())_catch();
+    check(namable.log_size(set_name_is_good))_equal(2);
+    check(namable.logged_args(set_name_is_good))
+      _equal({{"Prince"}, {"the Artist"}});
+    check(namable.logged_ret(set_name_is_good)[0])_equal({true});
+    check(namable.log_size(create))_equal(2);
+  }
+
+  // "MockNamable" doesn't derive from "Namable"; this is on purpose, to test
+  // non-polymorphic mock classes
+  class MockNamable
+    : public CallLedger {
+  public:
+    mock_method((void), create, ());
+    mock_method((bool), set_name_is_good, ((string)));
+  };
+
+  define_test(mock_turtle, exceptions_with_mock, "exceptions with mock") {
+    declare(MockNamable namable);
+    perform(namable.schedule_ret(set_name_is_good,
+              true, throw_exception(runtime_error("already named"))));
+    perform(namable.schedule_ret(create,
+              void_v, throw_exception(runtime_error("already created"))));
+    test_namable(test_management, namable);
+  }
+
+  class WrapNamable
+    : public Namable, public CallLedger {
+  public:
+    bool created=false;
+    wrap_method((void), create, (), override) {
+      if (created)
+        throw runtime_error("already created");
+      created=true;
+    }
+    bool named=false;
+    wrap_method((bool), set_name_is_good, ((string)), override) {
+      if (named)
+        throw runtime_error("already named");
+      named=true;
+      return true;
+    }
+  };
+
+  define_test(mock_turtle, exceptions_with_wrap, "exceptions with wrap") {
+    declare(WrapNamable namable);
+    test_namable(test_management, namable);
+  }
+
+}
+
+#endif

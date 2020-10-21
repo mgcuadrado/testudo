@@ -1,6 +1,14 @@
 .object/
+.testudo/
 .depend/
 reports/
+
+keywords.tex
+mock_turtle_macro_n.h
+mock_turtle_macro_n_customize.m4
+style_table.tex
+testudo_lc.h
+testudo_uc.h
 
 *.pdf
 *.aux

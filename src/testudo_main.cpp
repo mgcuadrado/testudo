@@ -15,31 +15,24 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Testudo.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "testudo_lc.h"
+#include "testudo.h"
 #include "testudo_opt.h"
 #include "testudo_try_catch.h"
-#include <sstream>
-#include <iostream>
-
-using namespace std;
-
-namespace {
-
-  define_top_test_node("", testudo, "Testudo");
-  define_top_test_node("testudo", main, "main() test");
-  define_test(main, show_tree, "show test tree") {
-    declare(ostringstream trs);
-    perform(testudo::print_tree(trs, testudo::TestNode::root_node()));
-    show_multiline_value(trs.str());
-  }
-
-}
+#include <dlfcn.h>
 
 int main(main_opts_params) {
   begintrycatch;
   testudo::TestOptions to(main_opts_args);
-  top_test_node("testudo")
-    ->test(testudo::test_format_named_creator(to.format_name)(cout),
+  for (std::string library: to.dynamic_libraries) {
+    dlopen(library.c_str(), RTLD_LAZY);
+    if (auto error=dlerror()) {
+      std::cerr << "dlopen() error opening \""+library+"\": "
+                << error << std::endl;
+      return 1;
+    }
+  }
+  testudo::TestNode::root_node()
+    ->test(testudo::test_format_named_creator(to.format_name)(std::cout),
            to.subtree);
   endtrycatch;
 }

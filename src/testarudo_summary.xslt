@@ -50,7 +50,7 @@
 
   <xsl:template name="flag_error">
     <xsl:text>||~failure~|| ||~right~||-||~normal~||</xsl:text>
-    <xsl:text> [||~error~||ERR-||~normal~||]</xsl:text>
+    <xsl:text> [||~errortag~||ERR-||~normal~||]</xsl:text>
   </xsl:template>
 
 </xsl:stylesheet>

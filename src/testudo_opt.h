@@ -34,7 +34,7 @@ namespace testudo {
 
   inline opts_t to_list(main_opts_params) {
     opts_t result;
-    for (int i=0; i<argc; ++i)
+    for (int i=1; i<argc; ++i)
       result.push_back(argv[i]);
     assert(not argv[argc]);
     return result;
@@ -49,6 +49,8 @@ namespace testudo {
           format_name=*i;
         else if (*i=="-s" and ++i not_eq opts.end())
           subtree=*i;
+        else
+          dynamic_libraries.push_back(*i);
       }
 
       if (format_name=="") {
@@ -60,6 +62,7 @@ namespace testudo {
     TestOptions(main_opts_params)
       : TestOptions(to_list(main_opts_args)) { }
     std::string format_name;
+    std::list<std::string> dynamic_libraries;
     std::string subtree;
   };
 

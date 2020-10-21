@@ -65,10 +65,6 @@ print_macro_v_string() {
     print_macro $1 "(v, ...)" "@_S(#__VA_ARGS__, v, __VA_ARGS__)"
 }
 
-print_macro_ctc() { # FIXME: remove?
-    print_macro $1 "(flag, ...)" "@_S(flag, #__VA_ARGS__, __VA_ARGS__)"
-}
-
 (
     echo "#ifndef MGCUADRADO_TESTUDO_${STYLE}_STYLE_HEADER_"
     echo "#define MGCUADRADO_TESTUDO_${STYLE}_STYLE_HEADER_"
@@ -78,9 +74,6 @@ print_macro_ctc() { # FIXME: remove?
     print_macro_forward TOP_TEST_NODE
     print_macro_forward DEFINE_TOP_TEST_NODE
     print_macro_forward DEFINE_TEST_NODE
-    echo
-    print_macro_no_f TEST_PARAMETERS
-    print_macro_no_f TEST_ARGUMENTS
     echo
     print_macro_forward DEFINE_TOP_TEST
     print_macro_forward DEFINE_TEST
@@ -95,17 +88,19 @@ print_macro_ctc() { # FIXME: remove?
     print_macro_forward PRINT_MULTILINE_TEXT
     print_macro_forward PRINT_BREAK
     echo
-    print_macro_forward   SHOW_SCOPE
     print_macro_string    DECLARE
     print_macro_string    PERFORM
     print_macro_string    FAKE_DECLARE
     print_macro_string    FAKE_PERFORM
     print_macro_string    FIXTURE_MEMBER
     print_macro_v_string  FIXTURE_INIT
+    print_macro_v_string  WITH_DATA
     print_macro_string    CHECK_TRY
     print_macro_string    CATCH
     print_macro_string    SHOW_VALUE
     print_macro_string    SHOW_MULTILINE_VALUE
+    print_macro_forward   SHOW_SCOPE
+    print_macro_string    WITH_DECLARE
     echo
     print_macro_forward DEFINE_APPROX_EPSILON
     print_macro_forward SET_APPROX_EPSILON
@@ -113,15 +108,30 @@ print_macro_ctc() { # FIXME: remove?
     echo
     print_macro_string CHECK
     print_macro_string EQUAL
+    print_macro_string NOT_EQUAL
     print_macro_string APPROX
+    print_macro_string NOT_APPROX
     print_macro_string TOL
     print_macro_string VERIFY
+    print_macro_string NOT_VERIFY
     print_macro_no_f   TRUE
+    print_macro_no_f   FALSE
     echo
     print_macro_no_f    PREDICATE
     print_macro_forward PREDICATE_A
     print_macro_forward PREDICATE_C_A
     echo
+    print_macro_forward MOCK_METHOD
+    print_macro_forward WRAP_METHOD
+    print_macro_forward LOGGED_ARGS
+    print_macro_forward LOGGED_RET
+    print_macro_forward LOGGED_RET_ARGS
+    print_macro_forward LOG_SIZE
+    print_macro_forward SCHEDULE_RET
+    print_macro_forward SET_RET_DEFAULT
+    print_macro_forward GET_CALL
+    print_macro_forward POP_CALL
+    print_macro_forward CALL_LEDGER_REPORT_TO
     echo "#endif"
 
     if [ ${#macros[@]} -ne 0 ]; then
@@ -131,4 +141,3 @@ print_macro_ctc() { # FIXME: remove?
         exit 1
     fi
 ) > "$HEADERFILE"
-

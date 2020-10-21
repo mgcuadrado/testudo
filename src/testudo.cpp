@@ -91,7 +91,7 @@ namespace testudo {
       if (this_is_root and children.size()==1)
         return children.begin()->second->test(test_format);
       TestStats test_stats;
-      run_tests(test_format, test_stats);
+      run_tests({test_format, test_stats});
       test_format->print_test_readout();
       return test_stats;
     }
@@ -140,37 +140,37 @@ namespace testudo {
     return ordered_children;
   }
 
-  void TestNode::run_tests(testudo::test_format_p test_format,
-                           testudo::TestStats &test_stats) const {
-    test_format->output_title(full_name, title);
+  void TestNode::run_tests(testudo::test_management_t test_management) const {
+    test_management.format->output_title(full_name, title);
 
     // run the children's tests in order
     for (auto const &child: ordered_children()) {
       testudo::TestStats child_test_stats;
-      child->run_tests(test_format, child_test_stats);
-      test_stats+=child_test_stats;
+      child->run_tests({test_management.format, child_test_stats});
+      test_management.stats+=child_test_stats;
     }
 
     // run own test function if set
     if (test_f) {
       try {
-        test_f(test_format, test_stats);
+        test_f(test_management);
       }
       catch (exception const &excp) {
-        test_format->uncaught_exception(excp.what());
-        test_stats.unexpected_error();
+        test_management.format->uncaught_exception(excp.what());
+        test_management.stats.unexpected_error();
       }
       catch (char const *mess) {
-        test_format->uncaught_exception(mess);
-        test_stats.unexpected_error();
+        test_management.format->uncaught_exception(mess);
+        test_management.stats.unexpected_error();
       }
       catch (...) {
-        test_format->uncaught_exception("<unknown error type>");
-        test_stats.unexpected_error();
+        test_management.format->uncaught_exception("<unknown error type>");
+        test_management.stats.unexpected_error();
       }
     }
 
-    test_format->produce_summary(full_name, test_stats);
+    test_management.format
+      ->produce_summary(full_name, test_management.stats);
   }
 
   namespace {
