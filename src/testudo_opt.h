@@ -18,13 +18,14 @@
 #ifndef TESTIT_TEST_OPT_HEADER_
 #define TESTIT_TEST_OPT_HEADER_
 
+#include "testudo_macros.h"
 #include <list>
 #include <string>
 #include <iostream>
 #include <algorithm>
 #include <cassert>
 
-namespace testudo {
+namespace testudo___implementation {
 
 #define main_opts_params                                                \
   [[maybe_unused]] int argc, [[maybe_unused]] char *argv[]
@@ -67,5 +68,7 @@ namespace testudo {
   };
 
 }
+
+  testudo___BRING(TestOptions)
 
 #endif

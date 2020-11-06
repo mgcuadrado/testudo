@@ -1,0 +1,17 @@
+#include "testudo_eo.h"
+#include "testudo_ext.h"
+
+namespace {
+
+  using namespace std;
+
+  map<string, int> const vortaro={{"unu", 1}, {"du", 2}, {"tri", 3}};
+
+  difini_ĉefa_testo_nodon("testudo", esperanto_test, "Esperanto test", 75);
+
+  difini_teston(esperanto_test, numbers, "numbers") {
+    deklari(auto const dictionary=vortaro);
+    certigi(dictionary.at("unu"))_egalas(1);
+  }
+
+}

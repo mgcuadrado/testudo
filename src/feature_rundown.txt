@@ -18,3 +18,9 @@ only the ones that aren't obvious, so i don't forget about them later.
 * a check with an invalid "call_record<>" as the argument to the "check" macro
   is always failed, even if the check is one of the negated ones ("_not_...()"
   or "_false")
+
+* a "get_call()" or "pop_call()" on a "done()" call ledger iterator always
+  returns an invalid call record (with the wrongly expected method name)
+
+* Testudo support of custom types, as described in section "Adding Testudo
+  support for your types"

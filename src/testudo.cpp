@@ -19,7 +19,7 @@
 #include <list>
 #include <cassert>
 
-namespace testudo {
+namespace testudo___implementation {
 
   using namespace std;
 
@@ -31,13 +31,14 @@ namespace testudo {
     }
   }
 
-  TestNode::TestNode(pptr parent, name_t name)
-    : parent(parent),
+  TestNode::TestNode(TestFormat::location_t location, pptr parent, name_t name)
+    : location(location), parent(parent),
       name(name), full_name(build_full_name(parent, name)) { }
 
-  TestNode::sptr TestNode::get_child(name_t name) {
+  TestNode::sptr TestNode::get_child(TestFormat::location_t location,
+                                     name_t name) {
     if (auto it=children.find(name); it==children.end()) {
-      sptr child(new TestNode(pptr(this), name));
+      sptr child(new TestNode(location, pptr(this), name));
       children[name]=child;
       return child;
     }
@@ -65,7 +66,7 @@ namespace testudo {
   }
 
   TestNode::sptr TestNode::root_node() {
-    static sptr result(new TestNode(nullptr, "/"));
+    static sptr result(new TestNode({}, nullptr, "/"));
     return result;
   }
 
@@ -75,17 +76,17 @@ namespace testudo {
     else {
       auto last_dot=full_name.find_last_of('.');
       if (last_dot==std::string::npos)
-        return make_node("", full_name);
+        return make_node({}, "", full_name);
       else {
         auto name=full_name.substr(last_dot+1);
         auto ancestors=full_name.substr(0, last_dot);
-        return make_node(ancestors, name);
+        return make_node({}, ancestors, name);
       }
     }
   }
 
-  testudo::TestStats
-  TestNode::test(testudo::test_format_p test_format, string subtree) const {
+  TestStats
+  TestNode::test(test_format_p test_format, string subtree) const {
     bool this_is_root=this==root_node().get();
     if (subtree.empty()) {
       if (this_is_root and children.size()==1)
@@ -103,7 +104,7 @@ namespace testudo {
         if (subtree==name) // terminal self
           return test(test_format, "");
         else
-          return testudo::TestStats();
+          return TestStats();
       }
 
       string rest=subtree.substr(dot+1);
@@ -111,7 +112,7 @@ namespace testudo {
       if (auto it=children.find(child_name); it not_eq children.end())
         return it->second->test(test_format, rest);
       else
-        return testudo::TestStats();
+        return TestStats();
     }
   }
 
@@ -140,12 +141,12 @@ namespace testudo {
     return ordered_children;
   }
 
-  void TestNode::run_tests(testudo::test_management_t test_management) const {
-    test_management.format->output_title(full_name, title);
+  void TestNode::run_tests(test_management_t test_management) const {
+    test_management.format->output_location_title(location, full_name, title);
 
     // run the children's tests in order
     for (auto const &child: ordered_children()) {
-      testudo::TestStats child_test_stats;
+      TestStats child_test_stats;
       child->run_tests({test_management.format, child_test_stats});
       test_management.stats+=child_test_stats;
     }
@@ -175,10 +176,10 @@ namespace testudo {
 
   namespace {
 
-    void print_tree_r(ostream &os, testudo::TestNode::csptr node,
+    void print_tree_r(ostream &os, TestNode::csptr node,
                       string prefix="", string last_prefix="",
-                      testudo::TestNode::csptr parent={},
-                      testudo::TestNode::csptr last_sibling={}) {
+                      TestNode::csptr parent={},
+                      TestNode::csptr last_sibling={}) {
       auto ordered_children=node->ordered_children();
       if (node==TestNode::root_node() and ordered_children.size()==1)
         return print_tree_r(os, ordered_children.front());
@@ -196,7 +197,7 @@ namespace testudo {
 
   }
 
-  void print_tree(ostream &os, testudo::TestNode::csptr node)
+  void print_tree(ostream &os, TestNode::csptr node)
     { print_tree_r(os, node); }
 
 }

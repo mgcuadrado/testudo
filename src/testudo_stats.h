@@ -22,9 +22,10 @@
 // processed by formatters to keep track of the number of passed and failed
 // test cases
 
+#include "testudo_macros.h"
 #include <cstdint>
 
-namespace testudo {
+namespace testudo___implementation {
 
   using integer=int_fast64_t;
 
@@ -75,5 +76,7 @@ namespace testudo {
   }
 
 }
+
+testudo___BRING(TestStats)
 
 #endif

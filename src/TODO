@@ -3,15 +3,21 @@
           | || _|\_  \| || | | | | | |  ,/___\/    [FAIL]
     ------|_||___|___/|_|-\__|__/|__/-----U-U----------------mgc--
 
+---- big but important things ------------------------------
+
+[ ] add options (like "just report stats", "show tests", "show failed tests",
+  "show failed checks", "no color", et cetera)
+
 ---- high priority -----------------------------------------
 
 [ ] Google Mock lays down expectations _before_ the function runs, and i guess
   this is so the first unmet expectation stops the test; is it better than the
   approach of "mock-turtle"?
 
-[ ] do something to enable mocks for static methods
-
 ---- easy --------------------------------------------------
+
+[ ] make last argument of "define_test_node()" and similar macros optional?  or
+  rather, remove the need for an identifier, and use the title as the key
 
 ---- in progress -------------------------------------------
 
@@ -19,24 +25,30 @@
 
 ---- tasks -------------------------------------------------
 
-[ ] rename "show_scope()" to "with_scope()"?
+[ ] solve the comment in "TestFormatColorText::output_location()"
 
-[ ] add source line information to test step reports?
+[ ] check how "with_data()"-loops behave in the face of unexpected exceptions,
+  and if they behave badly (to be expected), correct it
 
-[ ] add a "with_declare()" macro so the following works
+[ ] more work on source line info:
 
-    with_declare (auto x=get_x()) { // 'x' is only valid in this new scope
-      check(x)_verify(...);
-      check(x)_not_equal(...);
-    }
-    with_declare (auto x=get_x())
-      check(x)_approx(...); // a different 'x' variable
+    [ ] adding the feature to the XML output
 
-  if we need several declarations for one scope,
+    [ ] ways to control wether we want no lines, lines only for failed steps,
+      or lines for all steps
 
-    with_declare (auto [a, b]=tuple(get_a(), get_b())) {
-      ...
-    }
+[ ] support "iomanip" on the report output?
+
+[ ] do something to mock static methods; i've started (shelve "attempt at
+  mocking static methods"), and it seems feasible, but it may be too much work
+  compared to its expected use: who uses static methods that may need to me
+  mocked?; if someone does, it's easy to just delegate a static method to a
+  mocked method of a mocked singleton, so you get all the benefits of logs and
+  ledgers; maybe it'd would be better to explain this in the doc, with an
+  example
+
+[ ] improve clarity of compiler errors (this is a big one; i'll have to put
+  "static_assert" all over the place, and possibly use other tricks too)
 
 [ ] use the "DuneBuggy" as an example (buggy) module to write a guide
 
@@ -50,14 +62,11 @@
   colour output format, and another one that can be open and closed by sections
   from a browser)
 
-[ ] we can have several styles of "with()", with different report styles:
+[ ] we can have several styles of "with_data()", with different report styles:
 
     * one that shows each value of "n", with a "[ OK ]" or "[FAIL]" tag
 
     * one that only shows failed values of "n" (what's already implemented)
-
-[ ] check how "with_data()"-loops behave in the face of unexpected exceptions,
-  and if they behave badly (to be expected), correct it
 
 [ ] i'm afraid nothing can be done to improve diagnostics with "make
   runsync_test" in case of a fatal error in a "with()"-loop, but check anyway
@@ -113,9 +122,6 @@
     [ ] Google Mock -> if appropriate, implement "mock_turtle", ha, ha, ha!
 
     [ ] SUnit
-
-[ ] add options (like "just report stats", "show tests", "show failed tests",
-  "show failed checks", "no color", et cetera)
 
 [ ] add a "_relapprox()", similar to "_approx()", but using the relative
   distance (absolute distance divided by greater magnitude, or by reference
@@ -374,7 +380,7 @@
   can be used, and mention it in the doc (not done: it's hard to make it so it
   works with rvalues and with lvalues; dropped)
 
-[x] in the test sequence
+[X] in the test sequence
 
     with (x, numbers_2) {
       check(x)_verify(is_even);
@@ -385,7 +391,7 @@
   make the indentation of only-x checks right (see "testarudo.tdd" and the
   report)
 
-[x] correct the indentations in chained "with()"-loops; in
+[X] correct the indentations in chained "with()"-loops; in
 
     with (x, numbers_1) {
       with (y, numbers_1)
@@ -507,3 +513,139 @@
 [X] document "with-declare" macro
 
 [X] document mock objects
+
+[X] remove the space after the version number in the document title
+
+[X] add a "with_declare()" macro so the following works
+
+    with_declare (auto x=get_x()) { // 'x' is only valid in this new scope
+      check(x)_verify(...);
+      check(x)_not_equal(...);
+    }
+    with_declare (auto x=get_x())
+      check(x)_approx(...); // a different 'x' variable
+
+  if we need several declarations for one scope,
+
+    with_declare (auto [a, b]=tuple(get_a(), get_b())) {
+      ...
+    }
+
+[X] protect all names (classes, methods and attributes, generated names,
+  namespaces...) with "testudo___", to avoid name clashes
+
+[X] in the doc, remove "testudo::" and explain at the beginning that all
+  non-macro names are in the "testudo" namespace
+
+[X] finish unfinished section "How to schedule mock-related behaviour"
+
+[X] document "void_v"
+
+[X] remove "with-data-define-top-test" and "with-data-define-test"
+
+[X] simplify "with_data(x, list{1, 2, 3})" to "with_data(x, {1, 2, 3})"?
+
+[X] write section "Testudo support for STL types"
+
+[X] add validity support for STL containers (a container is valid iff all its
+  elements are)
+
+[-] not done, because there are too many options (like skipping all methods
+  named "blablablah" for a given object, or irrespective of the object, or
+  skipping all methods on the same object...)
+
+  maybe code "it.skip_to(my_method)", equivalent to
+
+    while (it.method_name() not_eq "my_method") it.next()
+
+  maybe also "it.skip_all(my_method)", equivalent to
+
+    while (it.method_name()=="my_method") it.next()
+
+[X] write section "Adding Testudo support for your types"
+
+    [X] intro
+
+    [X] section "Validity"
+
+    [X] section "Textual representation"
+
+    [X] section "Equality"
+
+    [X] section "Difference between two values"
+
+[X] describe how to use random-generated data sets for with-data loops (look
+  for "random_generator" in OXYS)
+
+[X] write "Editor configuration"
+
+[X] write "Using your own test definition and test instruction names"
+
+[X] shoud i rename "is_valid()" to "is_valid_testudo()", "absdiff()" to
+  "absdiff_testudo()", and so on, to avoid name clashes in client code?
+  probly; the full rename scheme would be
+
+      is_valid                 -> is_valid_testudo
+                               -> testudo::is_valid
+      absdiff                  -> absdiff_testudo
+                               -> testudo::absdiff
+      to_text                  -> to_text_testudo
+      testudo::to_text_testudo -> testudo::to_text
+
+  and possibly
+
+                               -> are_equal_testudo
+                               -> testudo::are_equal
+
+  where "testudo::..." functions are called for general types (also when
+  defining your specific version based on definitions for types you contain),
+  and "..._testudo" functions are what you define in your namespace or in the
+  "testudo" namespace (at your discretion); if you need the function for a
+  specific type rather than a general type, you can use "..._testudo" if you
+  know it exists (and thus avoid including "testudo_base.h"); the way
+  "testudo::..." finds "..._testudo" names for all types is
+
+      * for basic types (including STL), they're defined in the same "testudo"
+        namespace
+
+      * for user types, by argument-dependent lookup
+        (https://en.cppreference.com/w/cpp/language/adl)
+
+  don't forget to update the documentation; at the same time, i can remove the
+  possibility to have "is_valid()" as a method, since it isn't necessary; the
+  sequence of lookups would be here (alternatives are listed in order of
+  consideration):
+
+      testudo::is_valid -----> type_namespace::is_valid_testudo
+                          `--> testudo::is_valid_testudo -----> true
+
+      testudo::absdiff -----> type_namespace::absdiff_testudo
+                         `--> testudo::absdiff_testudo
+
+      testudo::to_text -----> type_namespace::to_text_testudo
+                         `--> testudo::to_text_testudo -----> os << t
+                                                         `--> "<...>"
+
+      testudo::are_equal -----> type_namespace::are_equal_testudo
+                           `--> testudo::are_equal -----> t==u
+
+[X] add the possibility to use a type's "to_text()" method for textual
+  representation?
+
+[X] document Mock Turtle's "is_always()", "is_never()", "is_constant()", and
+  "all_different()"
+
+[X] add source line information to test step reports?  musings:
+
+    * the test title cartouche can include the file and line number as this (in
+      the same colour as the line):
+         ________________________________________________
+        | {testudo.testarudo.blablablah} blablablah test |
+        `-----testarudo.ttd:40---------------------------'
+
+    * failed checks can include the file (if not the same as that of the latest
+      title) and line number as this (in the same colour as the line):
+
+        % 2*1+1 ~ is_even : 9 -------------------------47- [FAIL]
+
+[X] rename "show_scope()" to "in_scope()"?

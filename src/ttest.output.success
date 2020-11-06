@@ -1,11 +1,11 @@
 <testudo>
-  <test name="testudo" title="Testudo" n_failed="79" n_total="310" n_errors="4" success="false">
+  <test name="testudo" title="Testudo" n_failed="78" n_total="309" n_errors="4" success="false">
     <test name="testudo.main" title="main() test" n_failed="0" n_total="0" n_errors="0" success="true">
       <test name="testudo.main.show_tree" title="show test tree" n_failed="0" n_total="0" n_errors="0" success="true">
         <declare>ostringstream trs</declare>
         <perform>testudo::print_tree(trs, testudo::TestNode::root_node())</perform>
         <show_multiline_value>
-          <expression1 value="--testudo&#xa;|-main&#xa;|  `-show_tree&#xa;|-use_instructions&#xa;|-testarudo&#xa;|  |-simple&#xa;|  |-complex&#xa;|  |  |-difficult&#xa;|  |  |-complicated&#xa;|  |  |-with_error&#xa;|  |  |-penultimate&#xa;|  |  |-verify_syntax&#xa;|  |  |-try_catch&#xa;|  |  |-test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches&#xa;|  |  `-with&#xa;|  `-disorder&#xa;|     |-du&#xa;|     |-unu&#xa;|     |-absdiff&#xa;|     |-testarudo_ext&#xa;|     `-no_representation&#xa;|-all_even&#xa;|-fixture&#xa;|  |-addition_commutativity&#xa;|  |-multiplication_commutativity&#xa;|  `-associativity&#xa;|-scope&#xa;|-testudo_syntax&#xa;`-mock_turtle&#xa;   |-queen_of_hearts&#xa;   |-queen_of_hearts_calls&#xa;   |-approx&#xa;   |-several_mocks&#xa;   |-predicates&#xa;   |-exceptions_with_mock&#xa;   `-exceptions_with_wrap&#xa;">trs.str()</expression1>
+          <expression1 value="--testudo&#xa;|-main&#xa;|  `-show_tree&#xa;|-use_instructions&#xa;|-testarudo&#xa;|  |-simple&#xa;|  |-complex&#xa;|  |  |-difficult&#xa;|  |  |-complicated&#xa;|  |  |-with_error&#xa;|  |  |-penultimate&#xa;|  |  |-verify_syntax&#xa;|  |  |-try_catch&#xa;|  |  |-test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches&#xa;|  |  `-with&#xa;|  `-disorder&#xa;|     |-du&#xa;|     |-unu&#xa;|     |-absdiff&#xa;|     |-testarudo_ext&#xa;|     `-no_representation&#xa;|-esperanto_test&#xa;|  `-numbers&#xa;|-fixture&#xa;|  |-addition_commutativity&#xa;|  |-multiplication_commutativity&#xa;|  `-associativity&#xa;|-scope&#xa;|-testudo_syntax&#xa;|-mock_turtle&#xa;|  |-queen_of_hearts&#xa;|  |-queen_of_hearts_calls&#xa;|  |-approx&#xa;|  |-several_mocks&#xa;|  |-predicates&#xa;|  |-exceptions_with_mock&#xa;|  `-exceptions_with_wrap&#xa;`-sh&#xa;">trs.str()</expression1>
         </show_multiline_value>
       </test>
     </test>
@@ -418,7 +418,7 @@
             </with>
           </with>
           <with var="x" container="numbers_1" n_failed="0" n_total="9" n_errors="0" success="true">
-            <with var="y" container="list&lt;int&gt;{2, 4, 10}">
+            <with var="y" container="{2, 4, 10}">
               <check_equal success="with" prefix="">
                 <expression1 value="">x%2</expression1>
                 <expression2 value="">y%2</expression2>
@@ -714,7 +714,7 @@
             <expression2 value="tuple{4.14, 7, 6}">tb</expression2>
           </check_approx>
           <show_value>
-            <expression1 value="3.5">absdiff(ta, tb)</expression1>
+            <expression1 value="3.5">testudo::absdiff(ta, tb)</expression1>
           </show_value>
           <declare>tuple&lt;float, int, double&gt; tc={3.14, 8, 7.5}</declare>
           <check_approx success="true" prefix="" max_error="eps">
@@ -729,7 +729,7 @@
             <expression2 value="list{4.14, 7, 6}">lb</expression2>
           </check_approx>
           <show_value>
-            <expression1 value="3.5">absdiff(la, lb)</expression1>
+            <expression1 value="3.5">testudo::absdiff(la, lb)</expression1>
           </show_value>
           <declare>list&lt;float&gt; lc={3.14, 8, 7.5}</declare>
           <check_approx success="true" prefix="" max_error="eps">
@@ -775,51 +775,14 @@
         </test>
       </test>
     </test>
-    <test name="testudo.all_even" title="all_even" n_failed="1" n_total="4" n_errors="0" success="false">
-      <show_value>
-        <expression1 value="1">datum_number</expression1>
-      </show_value>
-      <show_value>
-        <expression1 value="2">datum</expression1>
-      </show_value>
-      <check_equal success="true" prefix="">
-        <expression1 value="0">datum%2</expression1>
-        <expression2 value="0">0</expression2>
-      </check_equal>
-      <separator/>
-      <show_value>
-        <expression1 value="2">datum_number</expression1>
-      </show_value>
-      <show_value>
-        <expression1 value="4">datum</expression1>
-      </show_value>
-      <check_equal success="true" prefix="">
-        <expression1 value="0">datum%2</expression1>
-        <expression2 value="0">0</expression2>
-      </check_equal>
-      <separator/>
-      <show_value>
-        <expression1 value="3">datum_number</expression1>
-      </show_value>
-      <show_value>
-        <expression1 value="5">datum</expression1>
-      </show_value>
-      <check_equal success="false" prefix="">
-        <expression1 value="1">datum%2</expression1>
-        <expression2 value="0">0</expression2>
-      </check_equal>
-      <separator/>
-      <show_value>
-        <expression1 value="4">datum_number</expression1>
-      </show_value>
-      <show_value>
-        <expression1 value="6">datum</expression1>
-      </show_value>
-      <check_equal success="true" prefix="">
-        <expression1 value="0">datum%2</expression1>
-        <expression2 value="0">0</expression2>
-      </check_equal>
-      <separator/>
+    <test name="testudo.esperanto_test" title="Esperanto test" n_failed="0" n_total="1" n_errors="0" success="true">
+      <test name="testudo.esperanto_test.numbers" title="numbers" n_failed="0" n_total="1" n_errors="0" success="true">
+        <declare>auto const dictionary=vortaro</declare>
+        <check_equal success="true" prefix="">
+          <expression1 value="1">dictionary.at(&quot;unu&quot;)</expression1>
+          <expression2 value="1">1</expression2>
+        </check_equal>
+      </test>
     </test>
     <test name="testudo.fixture" title="fixture tests" n_failed="0" n_total="9" n_errors="1" success="false">
       <test name="testudo.fixture.addition_commutativity" title="+ commutativity" n_failed="0" n_total="4" n_errors="0" success="true">
@@ -908,7 +871,7 @@
         <expression2 value="||~tilde~||~pre||~tilde~||~ ||||~tilde~||~bold||~tilde~||~|| ||~tilde~||~post||~tilde~||~">&quot;||~tilde~||~pre||~tilde~||~ ||||~tilde~||~bold||~tilde~||~|| ||~tilde~||~post||~tilde~||~&quot;</expression2>
       </check_equal>
     </test>
-    <test name="testudo.mock_turtle" title="mock turtle tests" n_failed="19" n_total="68" n_errors="0" success="false">
+    <test name="testudo.mock_turtle" title="mock turtle tests" n_failed="19" n_total="69" n_errors="0" success="false">
       <test name="testudo.mock_turtle.queen_of_hearts" title="Queen of Hearts&apos; recipe" n_failed="0" n_total="9" n_errors="0" success="true">
         <declare>auto soup_mock=make_shared&lt;SoupMock&gt;()</declare>
         <check_equal success="true" prefix="">
@@ -1150,11 +1113,15 @@
           </declare_scope>
         </declare_scope>
       </test>
-      <test name="testudo.mock_turtle.several_mocks" title="calls with several mocks" n_failed="1" n_total="8" n_errors="0" success="false">
-        <declare>CallLedger cl</declare>
+      <test name="testudo.mock_turtle.several_mocks" title="calls with several mocks" n_failed="1" n_total="9" n_errors="0" success="false">
+        <declare>testudo::CallLedger cl</declare>
         <declare>MockLevel lev1(12)</declare>
         <perform>call_ledger_report_to(lev1, &amp;cl)</perform>
-        <declare>MockLevel lev2(47)</declare>
+        <declare>bool created=false</declare>
+        <declare>MockLevel lev2(47, [&amp;created]() { created=true; })</declare>
+        <check_true success="true" prefix="">
+          <expression1>created</expression1>
+        </check_true>
         <perform>call_ledger_report_to(lev2, &amp;cl)</perform>
         <perform>equalize(lev1, lev2)</perform>
         <check_equal success="true" prefix="">
@@ -1197,6 +1164,7 @@
         </check_equal>
       </test>
       <test name="testudo.mock_turtle.predicates" title="predicates" n_failed="7" n_total="13" n_errors="0" success="false">
+        <declare>using namespace testudo</declare>
         <check_verify success="true" prefix="">
           <expression1 value="list{tuple{1, one}, tuple{1, one}}">list&lt;tuple&lt;int, string&gt;&gt;{{1, &quot;one&quot;}, {1, &quot;one&quot;}}</expression1>
           <predicate>is_always(1, &quot;one&quot;)</predicate>
@@ -1251,6 +1219,7 @@
         </check_verify>
       </test>
       <test name="testudo.mock_turtle.exceptions_with_mock" title="exceptions with mock" n_failed="0" n_total="6" n_errors="0" success="true">
+        <declare>using namespace testudo</declare>
         <declare>MockNamable namable</declare>
         <perform>namable.schedule_ret(set_name_is_good, true, throw_exception(runtime_error(&quot;already named&quot;)))</perform>
         <perform>namable.schedule_ret(create, void_v, throw_exception(runtime_error(&quot;already created&quot;)))</perform>
@@ -1302,6 +1271,11 @@
           <expression2 value="2">2</expression2>
         </check_equal>
       </test>
+    </test>
+    <test name="testudo.sh" title="sh" n_failed="0" n_total="1" n_errors="0" success="true">
+      <check_true success="true" prefix="">
+        <expression1>true</expression1>
+      </check_true>
     </test>
   </test>
 </testudo>

@@ -73,10 +73,10 @@ namespace {
     print_text("the forgotten doubles list is still empty");
     check(Hold::is_forgotten_empty())_true;
     check(Hold::get_forgotten().size())_equal(0u);
-    show_scope("scope 1") {
+    in_scope("scope 1") {
       declare(Hold hf1(1.1)); // hold-on-construction syntax
       declare(Hold hf2(2.2));
-      show_scope() { // unnamed scope
+      in_scope() { // unnamed scope
         declare(Hold hf3(3.3)); // will add to the list on scope closing
       }
       check(Hold::get_forgotten())_tol(.5)_approx({3.});

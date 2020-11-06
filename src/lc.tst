@@ -7,9 +7,6 @@ DEFINE_TEST     define_test
 WITH_FIXTURE    with_fixture
 VISIBLE_FIXTURE visible_fixture
 
-WITH_DATA_DEFINE_TOP_TEST with_data_define_top_test
-WITH_DATA_DEFINE_TEST     with_data_define_test
-
 STEP_ID              step_id
 PRINT_TEXT           print_text
 PRINT_MULTILINE_TEXT print_multiline_text
@@ -26,7 +23,7 @@ CHECK_TRY            check_try
 CATCH                _catch
 SHOW_VALUE           show_value
 SHOW_MULTILINE_VALUE show_multiline_value
-SHOW_SCOPE           show_scope
+IN_SCOPE             in_scope
 WITH_DECLARE         with_declare
 
 DEFINE_APPROX_EPSILON define_approx_epsilon

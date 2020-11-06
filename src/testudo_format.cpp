@@ -18,7 +18,7 @@
 #include "testudo_format.h"
 #include <sstream>
 
-namespace testudo {
+namespace testudo___implementation {
 
   using namespace std;
 
@@ -175,6 +175,11 @@ namespace testudo {
         non_with_ancestor
           ->output_with_summary(loop_name, log->test_stats_diff());
       output_end_with();
+    }
+
+    void set_location(location_t location) {
+      if (recursively_last_time)
+        non_with_ancestor->set_location(location);
     }
 
     auto child_log() { return log->child(); }

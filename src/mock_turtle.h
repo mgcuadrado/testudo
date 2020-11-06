@@ -18,6 +18,7 @@
 #ifndef MGCUADRADO_TESTUDO_MOCK_TURTLE_HEADER_
 #define MGCUADRADO_TESTUDO_MOCK_TURTLE_HEADER_
 
+#include "testudo_macros.h"
 #include "testudo_ext.h"
 #include "testudo.h"
 #include <tuple>
@@ -26,7 +27,7 @@
 // include auto-generated macros; matching defines here are commented-out
 #include "mock_turtle_macro_n.h"
 
-namespace testudo {
+namespace testudo___implementation {
 
   // return values are encoded as a tuple of 0 (for void return types) or 1
   // (for non-void return types) elements
@@ -51,7 +52,7 @@ namespace testudo {
 
   template <typename T>
   std::string ret_to_text(std::tuple<T> const &r)
-    { return to_text_testudo(get_ret(r)); }
+    { return to_text(get_ret(r)); }
   inline std::string ret_to_text(std::tuple<> const &) { return "void"; }
 
 
@@ -115,7 +116,7 @@ namespace testudo {
     std::string content_to_text() const {
       return
         "{"+ret_to_text(content->first)
-        +" (" +implementation::to_text_get(content->second)+")}";
+        +" (" +testudo___implementation::to_text_get(content->second)+")}";
     }
     std::string const method_name;
     bool is_valid() const { return is_valid_p; }
@@ -130,11 +131,14 @@ namespace testudo {
   };
 
   template <typename S>
+  bool is_valid_testudo(call_record<S> const &cr) { return cr.is_valid(); }
+
+  template <typename S>
   bool operator==(call_record<S> const &c1, call_record<S> const &c2)
     { return c1.is_valid() and c2.is_valid() and (*c1.content==*c2.content); }
 
   template <typename S>
-  double absdiff(call_record<S> const &c1, call_record<S> const &c2) {
+  double absdiff_testudo(call_record<S> const &c1, call_record<S> const &c2) {
     if (c1.is_valid() and c2.is_valid())
       return absdiff(*c1.content, *c2.content);
     else
@@ -235,102 +239,115 @@ namespace testudo {
     r=s.return_value();
     return get_ret(r);
   }
+  template <typename T=void>
+  class MockClass;
 
-  class CallLedger;
-
-  struct CallLedgerEntry {
-    CallLedger const *call_ledger;
+  struct MockClassEntry {
+    MockClass<> const *call_ledger;
     std::string mock_name;
     std::string method_name;
     std::size_t method_call_n;
   };
-  inline std::string to_text(CallLedgerEntry const &cle) {
+  inline std::string to_text(MockClassEntry const &cle) {
     return
       "{"+cle.mock_name+(cle.mock_name.empty() ? "" : ".")
-      +cle.method_name+" @ "+to_text_testudo(cle.method_call_n)+"}";
+      +cle.method_name+" @ "+to_text(cle.method_call_n)+"}";
   }
 
-  class CallLedger {
+  template <>
+  class MockClass<void> {
   public:
-    void report_to(CallLedger *parent, std::string as)
-      { parents.emplace_back(parent, as); }
+    void report_to(MockClass<> *parent, std::string as)
+      { testudo___parents.emplace_back(parent, as); }
     void log_call(std::string method_name, std::size_t method_call_n) const
-      { log_call(this, "", method_name, method_call_n); }
-    auto const &calls() const { return calls_p; }
+      { testudo___log_call(this, "", method_name, method_call_n); }
+    auto const &calls() const { return testudo___calls_p; }
     template <typename M>
     struct iterate_t {
       iterate_t(M const *mock) : mock(mock) { }
       M const *mock;
-      bool done() const { return (index==mock->calls().size()); }
+      bool done() const { return (testudo___index>=mock->calls().size()); }
       operator bool() const { return not done(); }
-      void reset() { index=0; }
-      void next(std::size_t steps=1) { index+=steps; }
+      void reset() { testudo___index=0; }
+      void next(std::size_t steps=1) { testudo___index+=steps; }
 
       std::string mock_name() const
-        { return mock->calls()[index].mock_name; }
+        { return done() ? "" : mock->calls()[testudo___index].mock_name; }
       std::string method_name() const
-        { return mock->calls()[index].method_name; }
+        { return done() ? "" : mock->calls()[testudo___index].method_name; }
       template <typename S>
-      call_record<S>
-      logged_call_implementation(CallLedger const *call_ledger,
-                                 std::string method_name,
-                                 RetArgsLog<S> &log) const {
-        auto const &call=mock->calls()[index];
+      call_record<S> get_call_implementation(MockClass<> const *call_ledger,
+                                             std::string exp_method_name,
+                                             RetArgsLog<S> &log) const {
+        if (done())
+          return {exp_method_name};
+        auto const &call=mock->calls()[testudo___index];
         if ((call.call_ledger==call_ledger)
-            and (call.method_name==method_name))
-          return {method_name,
+            and (call.method_name==exp_method_name))
+          return {exp_method_name,
                   log.ret_args_values()[call.method_call_n],
                   true};
         else
-          return {method_name};
+          return {exp_method_name};
       }
       template <typename S>
-      call_record<S>
-      pop_logged_call_implementation(CallLedger const *call_ledger,
-                                     std::string method_name,
-                                     RetArgsLog<S> &log) {
-        auto result=logged_call_implementation(call_ledger, method_name, log);
+      call_record<S> pop_call_implementation(MockClass<> const *call_ledger,
+                                             std::string exp_method_name,
+                                             RetArgsLog<S> &log) {
+        auto result=get_call_implementation(call_ledger, exp_method_name, log);
         if (result.is_valid())
           next();
         return result;
       }
     private:
-      std::size_t index=0;
+      std::size_t testudo___index=0;
     };
   private:
-    void log_call(CallLedger const *call_ledger, std::string mock_name,
-                  std::string method_name, std::size_t method_call_n) const {
-      calls_p.push_back({call_ledger, mock_name, method_name, method_call_n});
-      for (auto const &parent: parents)
-        parent.first->log_call(this, parent.second,
-                               method_name, method_call_n);
+    void testudo___log_call(MockClass<> const *call_ledger,
+                            std::string mock_name,
+                            std::string method_name,
+                            std::size_t method_call_n) const {
+      testudo___calls_p.push_back(
+        {call_ledger, mock_name, method_name, method_call_n});
+      for (auto const &parent: testudo___parents)
+        parent.first->testudo___log_call(this, parent.second,
+                                         method_name, method_call_n);
     }
-    mutable std::vector<CallLedgerEntry> calls_p;
-    std::list<std::pair<CallLedger *, std::string>> parents;
+    mutable std::vector<MockClassEntry> testudo___calls_p;
+    std::list<std::pair<MockClass<> *, std::string>> testudo___parents;
+  };
+
+  using CallLedger=MockClass<>;
+
+  template <class Base>
+  class MockClass
+    : public Base, public MockClass<> {
+  public:
+    using Base::Base;
   };
 
   inline void call_ledger_report_to_implementation(
-      CallLedger &child, CallLedger *parent, std::string as)
+      MockClass<> &child, MockClass<> *parent, std::string as)
     { child.report_to(parent, as); }
   template <typename CLP, typename=decltype(&*std::declval<CLP>())>
   void call_ledger_report_to_implementation(
-      CLP child, CallLedger *parent, std::string as)
+      CLP child, MockClass<> *parent, std::string as)
     { call_ledger_report_to_implementation(*child, parent, as); }
 
   template <typename C>
   std::string print_calls(C const &c) {
     if (c.empty())
       return {};
-    CallLedgerEntry const *strike_first=&c.front(), *strike_last=strike_first;
+    MockClassEntry const *strike_first=&c.front(), *strike_last=strike_first;
     bool first=true;
-    std::string result=to_text_testudo(*strike_last);
+    std::string result=to_text(*strike_last);
     for (auto const &e: c) {
       if (not first) {
         if (not ((e.call_ledger==strike_last->call_ledger)
                  and (e.method_name==strike_last->method_name))) {
           if (strike_first not_eq strike_last)
-            result+=" -- "+to_text_testudo(*strike_last);
-          result+="\n"+to_text_testudo(e);
+            result+=" -- "+to_text(*strike_last);
+          result+="\n"+to_text(e);
           strike_first=&e;
         }
         strike_last=&e;
@@ -338,15 +355,15 @@ namespace testudo {
       first=false;
     }
     if (strike_first not_eq strike_last)
-      result+=" -- "+to_text_testudo(*strike_last);
+      result+=" -- "+to_text(*strike_last);
     result+="\n";
     return result;
   }
 
   // you can call "iterate()" with a reference to a call ledger, or a pointer,
   // or a smart pointer
-  inline auto iterate(CallLedger const &cl)
-    { return CallLedger::iterate_t{&cl}; }
+  inline auto iterate(MockClass<> const &cl)
+    { return MockClass<>::iterate_t{&cl}; }
   template <typename CLP, typename=decltype(&*std::declval<CLP>())>
   auto iterate(CLP clp) { return iterate(*clp); }
 
@@ -449,7 +466,7 @@ namespace testudo {
 
   // ARGS_TYPE_NAME((int), ((char c), (float f))) -> char arg_2, float arg_1
 #define testudo___TYPE_FROM_TYPE_NAME(...)                              \
-  testudo::arg_t<void (__VA_ARGS__), 1>
+  testudo___implementation::arg_t<void (__VA_ARGS__), 1>
 #define testudo___PRODUCE_ARG_TYPE_NAME_N(n, ...)                       \
   testudo___TYPE_FROM_TYPE_NAME __VA_ARGS__ arg_##n
 #define testudo___ARGS_TYPE_NAME(b_args)                                \
@@ -477,7 +494,7 @@ namespace testudo {
   testudo___REMOVE_BRACKETS b_ret                                       \
   testudo___SINGLE_OR_1ST(name)(testudo___ARGS_TYPE_NAME(b_args))       \
   testudo___REMOVE_BRACKETS b_spec {                                    \
-    log_call(                                                           \
+    this->log_call(                                                     \
       testudo___STRING(testudo___SINGLE_OR_2ND(name)),                  \
       testudo___CAT(testudo___SINGLE_OR_2ND(name), _log).size());       \
     return get_return_value_and_log(                                    \
@@ -485,9 +502,11 @@ namespace testudo {
              testudo___CAT(testudo___SINGLE_OR_2ND(name), _log),        \
              {testudo___ARGS_NAME(b_args)});                            \
   }                                                                     \
-  mutable testudo::RetArgsLog<testudo___SIGNATURE(b_ret, b_args)>       \
+  mutable testudo___implementation::RetArgsLog<                         \
+      testudo___SIGNATURE(b_ret, b_args)>                               \
     testudo___CAT(testudo___SINGLE_OR_2ND(name), _log);                 \
-  mutable testudo::Schedule<testudo___SIGNATURE(b_ret, b_args)>         \
+  mutable testudo___implementation::Schedule<                           \
+      testudo___SIGNATURE(b_ret, b_args)>                               \
     testudo___CAT(testudo___SINGLE_OR_2ND(name), _schedule)
 
 
@@ -513,7 +532,8 @@ namespace testudo {
 #define testudo___WRAP_METHOD_IMPL(b_ret, name, b_args, b_spec)         \
   testudo___WRAP_METHOD_IMPL_SPEC(b_ret, name, b_args, (b_spec))
 #define testudo___WRAP_METHOD_IMPL_SPEC(b_ret, name, b_args, b_spec)    \
-  mutable testudo::RetArgsLog<testudo___SIGNATURE(b_ret, b_args)>       \
+  mutable testudo___implementation::RetArgsLog<                         \
+      testudo___SIGNATURE(b_ret, b_args)>                               \
     testudo___CAT(testudo___SINGLE_OR_2ND(name), _log);                 \
   testudo___REMOVE_BRACKETS b_ret                                       \
   testudo___SINGLE_OR_1ST(name)(testudo___ARGS_TYPE_NAME(b_args))       \
@@ -524,17 +544,19 @@ namespace testudo {
     auto &r=                                                            \
       testudo___CAT(testudo___SINGLE_OR_2ND(name), _log).log_values(    \
         {testudo___ARGS_NAME(b_args)});                                 \
-    r=testudo::evaluate_to_tuple<testudo___SIGNATURE(b_ret, b_args)>(   \
+    r=testudo___implementation::evaluate_to_tuple<                      \
+          testudo___SIGNATURE(b_ret, b_args)>(                          \
         [this](testudo___ARGS_TYPE_NAME(b_args)) {                      \
           return testudo___CAT(                                         \
             testudo___SINGLE_OR_2ND(name),                              \
-            _implementation)(testudo___ARGS_NAME(b_args));              \
+            _testudo___implementation)(testudo___ARGS_NAME(b_args));    \
         },                                                              \
         {testudo___ARGS_NAME(b_args)});                                 \
-    return testudo::get_ret(r);                                         \
+    return testudo___implementation::get_ret(r);                        \
   }                                                                     \
   testudo___REMOVE_BRACKETS b_ret                                       \
-  testudo___CAT(testudo___SINGLE_OR_2ND(name), _implementation)         \
+  testudo___CAT(testudo___SINGLE_OR_2ND(name),                          \
+                _testudo___implementation)                              \
     (testudo___ARGS(b_args))
 
 
@@ -547,11 +569,11 @@ namespace testudo {
 #define testudo__SET_RET_DEFAULT(name, ...) \
   name##_schedule.set_default(__VA_ARGS__)
 #define testudo__GET_CALL(mock, name)                                   \
-  logged_call_implementation(&(mock), #name, (mock).name##_log)
+  get_call_implementation(&(mock), #name, (mock).name##_log)
 #define testudo__POP_CALL(mock, name)                                   \
-  pop_logged_call_implementation(&(mock), #name, (mock).name##_log)
+  pop_call_implementation(&(mock), #name, (mock).name##_log)
 #define testudo__CALL_LEDGER_REPORT_TO(child, parent)                   \
-  testudo::call_ledger_report_to_implementation(                        \
+  testudo___implementation::call_ledger_report_to_implementation(       \
     child, parent, std::string(#child))
 
 
@@ -622,5 +644,14 @@ namespace testudo {
     testudo__PREDICATE_A(implementation::all_different(a));
 
 }
+
+testudo___BRING(MockClass,
+                CallLedger,
+                void_v,
+                throw_exception,
+                is_always,
+                is_never,
+                is_constant,
+                all_different)
 
 #endif

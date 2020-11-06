@@ -105,7 +105,7 @@ macro is defined).
 
 The macro "renaming" could be done like this:
 
-    #define show_scope(...) testudo__SHOW_SCOPE(__VA_ARGS__)
+    #define in_scope(...) testudo__IN_SCOPE(__VA_ARGS__)
 
 Here, "__VA_ARGS__" will undergo macro expansion, and it doesn't matter.  But
 consider "testudo__SHOW_VALUE()", whose naïve definition would be
@@ -210,6 +210,33 @@ If we need an action rather than a declaration, do
       ...
 
 These can be easily implemented as macros.
+
+2.7 How to run several instructions and still appear as a single instruction
+
+The classical approach is
+
+    #define do_several_things(...)                                         \
+    do {                                                                   \
+      first_thing(...);                                                    \
+      second_thing(...);                                                   \
+    } while (0)
+
+but this doesn't always show as a single intruction.  Consider, for instance,
+
+    while (condition)
+      do_several_things(...), do_other_things(...);
+
+I think the following is better (and i use it when needed in Testudo):
+
+    #define do_several_things(...)                                         \
+    [&]() {                                                                \
+      first_thing(...);                                                    \
+      second_thing(...);                                                   \
+    }()
+
+Of course, this isn't as efficient as the "do { ... } while (0)" approach,
+since it creates a function object that, i reckon, is hard to optimise away,
+but it's ok for Testudo.
 
 
 3. General conventions for code-generating macros in Testudo
@@ -399,14 +426,14 @@ report.
 7. Test instruction macros
 
 Most test instruction macros are easy to understand: they take their arguments
-and generate code in a transparent way.  Sometimes, the "do { ... } while (0)"
+and generate code in a transparent way.  Sometimes, the "[&]() { ... }()"
 pattern is used.  The following subsections get into more detail for the macros
 that aren't so obvious.
 
-7.1 "testudo__SHOW_SCOPE()"
+7.1 "testudo__IN_SCOPE()"
 
 This macro creates an object of type "ScopeMarker" named "testudo_scope_marker"
-(there can be only one "testudo__SHOW_SCOPE()" in a given scope, so no problem
+(there can be only one "testudo__IN_SCOPE()" in a given scope, so no problem
 there).  The "ScopeMarker" gets a copy of "test_format" and uses it to write an
 opening message on construction, and a closing message on destruction, so no
 additional instruction is needed to mark the end of the scope.

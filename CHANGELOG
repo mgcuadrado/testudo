@@ -1,3 +1,87 @@
+271 testudo-0.4
+  corrected wrong cross references
+270
+  testudo version 0.4
+269
+  put a generated struct in an anonymous namespace to avoid potential
+  name clashes
+268
+  renamed "show_scope()" to "in_scope()"
+267
+  identified all test steps with their location; only for
+  "color_text_with_lines" format fttb
+266
+  first step towards identifying each test and step with its location in
+  the source code: a format "color_text_with_lines" that identifies just
+  tests, fttb
+265
+  documented log-checking utility functions
+264
+  implemented the plan to improve the customisation needed to make a type
+  Testudo-supported
+263
+  added a plan to improve the customisation needed to make a type
+  Testudo-supported
+262
+  forgotten files for Esperanto-style tests
+261
+  extracted "exception_to_text()" from "to_text_testudo()"
+260
+  wrote "Using your own test macro names"
+259
+  wrote "Editor configuration"
+258
+  coded and documented "generate\_data()" using theorem verification with
+  random data as an example
+257
+  finished the section about adding Testudo support for your types, by
+  writing about difference between two values
+256
+  wrote the section about having Testudo checks for equality support
+  your types
+255
+  wrote about "Adding Testudo support for your types" (not finished yet)
+254
+  added some security checks to call ledger iterators
+253
+  reordered with-data loops and fixtures
+252
+  mentioned STL container validity
+251
+  added validity support for STL containers
+250
+  wrote section "Testudo support for STL containers"
+249
+  made it possible to specify the container for a with-data loop with just
+  a braced list of values
+248
+  removed "with_data_define_top_test()" and "with_data_define_test()"
+247
+  finished unfinished section "How to schedule mock-related behaviour"
+246
+  removed "testudo::" from the documentation (but explained it)
+245
+  (hope i) protected all names to avoid name clashes
+244
+  wrote some tasks, and some task progress
+243
+  wrote some words about potentially macro-fooling arguments (macro arguments
+  with non-parenthesised commas)
+242
+  wrote some words about potentially macro-fooling arguments (macro arguments
+  with non-parenthesised commas)
+241
+  wrote a few words about Testudo macros, and added an additional level to
+  the TOC
+240
+  improved "CallLedger" by having it derive from the mocked class, and
+  renamed it "MockClass<Base>" in this context
+239
+  minor correction, and TODO cleaning
+238
+  removed the space after the version number in the document title
+237
+  testudo version 0.4rc
 236 testudo-0.3
   testudo version 0.3
 235

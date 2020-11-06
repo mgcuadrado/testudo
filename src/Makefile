@@ -26,7 +26,7 @@ testudo.pdf: testudo.tex ascii_logo_colour_cropped.pdf version \
 style_table.tex: generate_LaTeX_style_table lc.tst uc.tst
 	./$^ > $@
 
-keywords.tex: generate_keywords lc.tst uc.tst
+keywords.tex: generate_keywords lc.tst uc.tst eo.tst
 	./$^ > $@
 
 emacs_add_keywords_%.txt: generate_emacs_add_keywords %.tst
@@ -147,12 +147,15 @@ UNCOLOR := ./uncolor
 XML_TO_TEXT := ./xml_to_color -b
 XML_FORMAT := -f xml
 SYNC_COLOR_TEXT_FORMAT := -f color_text
+SYNC_COLOR_TEXT_WITH_LINES_FORMAT := -f color_text_with_lines
 SUCCESS_FILE := ttest.output.success
 
 run_test: $(TEST) $(ALLTESTUDOBINS)
 	$< $(XML_FORMAT) $(ALLTESTUDOOPTS) | $(XML_TO_COLOR)
 runsync_test: $(TEST) $(ALLTESTUDOBINS)
 	$< $(SYNC_COLOR_TEXT_FORMAT) $(ALLTESTUDOOPTS)
+runsync_test_with_lines: $(TEST) $(ALLTESTUDOBINS)
+	$< $(SYNC_COLOR_TEXT_WITH_LINES_FORMAT) $(ALLTESTUDOOPTS)
 summary_test: $(TEST) $(ALLTESTUDOBINS)
 	$< $(XML_FORMAT) $(ALLTESTUDOOPTS) | $(XML_TO_COLOR_SUMMARY)
 view_test: $(TEST) $(ALLTESTUDOBINS)

@@ -20,8 +20,9 @@
 #include <regex>
 #include <cassert>
 
-namespace testudo {
+namespace {
 
+  using namespace testudo;
   using namespace std;
 
   namespace {
@@ -65,7 +66,9 @@ namespace testudo {
       show_tab=add_color("|"),
       show_cont=color_normal+"\\",
       name_open=color_ident+"{",
-      name_close="}"+color_normal;
+      name_close="}"+color_normal,
+      loc_begin=color_lines+"<",
+      loc_end=">"+color_normal;
 
     string const
       ok_label="["+color_success_tag+" OK "+color_normal+"]",
@@ -103,7 +106,9 @@ namespace testudo {
     : public TestFormat {
     public:
       ostream &ts;
-      TestFormatColorText(ostream &os) : ts(os) { }
+      bool const show_location;
+      TestFormatColorText(ostream &os, bool show_location=false)
+        : ts(os), show_location(show_location) { }
 
     private:
       unsigned indent=0;
@@ -184,30 +189,51 @@ namespace testudo {
         return s;
       }
 
-
     public:
 
       void output_title(string name, string title) override {
+        string title_location=show_location ? get_title_location() : "";
         ostringstream oss;
         oss << name_open << name << name_close
             << " " << color_bold << title << color_normal;
         auto cut=cut_line(oss.str());
         auto length=
-          cut.first.empty() ? real_length(cut.second) : text_line_length+1;
+          max(
+            (cut.first.empty() ? real_length(cut.second) : text_line_length+1),
+            title_location.length()+2);
         string text=cut.first+cut.second;
-        ts << color_lines << " " << string(length+2, '_') << color_normal;
-        ts << endl;
+        ts << color_lines << " " << string(length+2, '_') << color_normal
+           << endl;
+        if (not title_location.empty())
+          ts << color_lines << "| "
+             << loc_begin << title_location << loc_end
+             << string(length-title_location.length()-2, ' ')
+             << color_lines << " |" << color_normal << endl;
         istringstream cut_first_iss(text);
         string line;
         while (getline(cut_first_iss, line))
           ts << color_lines << "|" << color_normal << " "
              << line << string(length-real_length(line), ' ')
              << " " << color_lines << "|" << color_normal << endl;
-        ts << color_lines << "`" << string(length+2, '-') << "'";
-        ts << color_normal << endl;
+        ts << color_lines << "`" << string(length+2, '-') << "'"
+           << color_normal << endl;
+      }
+
+      void output_location() {
+        // it'd be great to be able to flag the "location.empty()" situation as
+        // a Testudo error, but fttb i'm using it to avoid outputting location
+        // info in cases where we know we don't have to; i should be more
+        // precise here, so i should "assert(not get_location())", and enforce
+        // the fact that in those situations we are explicitly /not/ outputting
+        // location info
+        if (show_location)
+          if (string location=get_location(); not location.empty())
+            format_text(ts, loc_begin+get_location()+loc_end);
+        set_location({});
       }
 
       void output_begin_scope(string name) {
+        output_location();
         format_text(ts,
                     (perform_ident+" "+begin_scope_ident
                      +(name.empty()
@@ -225,6 +251,7 @@ namespace testudo {
       }
 
       void output_begin_declare_scope(string code_str) {
+        output_location();
         format_text(ts,
                     (perform_ident+" "+begin_scope_ident+" "+declare_ident+" "
                      +code_str));
@@ -236,6 +263,7 @@ namespace testudo {
       }
 
       void output_separator() override {
+        output_location();
         ts << color_lines << string(separator_width, '-')
                << color_normal << endl;;
       }
@@ -243,25 +271,33 @@ namespace testudo {
       void output_step_id(string id) override
         { format_text(ts, step_id_begin+" "+id+" "+step_id_end); }
 
-      void output_text(string text) override
-        { format_text(ts, text_ident+" "+text+" "+text_ident); }
+      void output_text(string text) override {
+        output_location();
+        format_text(ts, text_ident+" "+text+" "+text_ident);
+      }
 
       void output_multiline_text(string text) override {
+        output_location();
         ostringstream ossml;
         ossml << text;
         if (not ossml.str().empty())
           ts << tabify(ossml.str()) << endl;
       }
 
-      void output_declare(string code_str) override
-        { format_text(ts, declare_ident+" "+code_str+" "+declare_end); }
+      void output_declare(string code_str) override {
+        output_location();
+        format_text(ts, declare_ident+" "+code_str+" "+declare_end);
+      }
 
-      void output_perform(string code_str) override
-        { format_text(ts, perform_ident+" "+code_str+" "+perform_end); }
+      void output_perform(string code_str) override {
+        output_location();
+        format_text(ts, perform_ident+" "+code_str+" "+perform_end);
+      }
 
       string try_first_part;
 
       void output_try(string code_str) override {
+        output_location();
         assert(try_first_part.empty());
         try_first_part=try_ident+" "+code_str;
       }
@@ -285,6 +321,7 @@ namespace testudo {
       }
 
       void output_show_value(string expr_str, string value_str) override {
+        output_location();
         ostringstream oss;
         oss << show_ident << " " << expr_str << " " << show_sep
             << " " << value_str;
@@ -293,6 +330,7 @@ namespace testudo {
 
       void output_show_multiline_value(
           string expr_str, string value_str) override {
+        output_location();
         ostringstream oss;
         oss << show_ident << " " << expr_str << " " << show_sep;
         format_text(ts, oss.str());
@@ -303,6 +341,7 @@ namespace testudo {
       }
 
       void output_begin_with(string var_name, string container) override {
+        output_location();
         ostringstream oss;
         oss << check_verify << " " << var_name << " in " << container;
         format_text(ts, oss.str());
@@ -347,6 +386,7 @@ namespace testudo {
       void output_check_general(string prefix,
                                 list<string> const &text, string success,
                                 list<string> const &additional_fail_text) {
+        output_location();
         string report=check_ident+" ";
         if (not prefix.empty())
           report+=add_color(prefix)+" ";
@@ -414,6 +454,16 @@ namespace testudo {
     private:
       inline static pattern::register_creator<TestFormatColorText>
         rc{test_format_named_creator(), "color_text"};
+    };
+
+    class TestFormatColorTextWithLines
+      : public TestFormatColorText {
+    public:
+      TestFormatColorTextWithLines(ostream &os)
+        : TestFormatColorText(os, true) { }
+    private:
+      inline static pattern::register_creator<TestFormatColorTextWithLines>
+        rc{test_format_named_creator(), "color_text_with_lines"};
     };
 
   }

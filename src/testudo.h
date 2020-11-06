@@ -31,6 +31,7 @@
 //     additionally, "testudo_try_catch.h" to use "begintrycatch" and
 //       "endtrycatch"
 
+#include "testudo_macros.h"
 #include "testudo_format.h"
 #include "testudo_base.h"
 #include <string>
@@ -39,7 +40,7 @@
 #include <memory>
 #include <functional>
 
-namespace testudo {
+namespace testudo___implementation {
 
   constexpr double approx_epsilon_default=1e-6;
 
@@ -113,8 +114,9 @@ namespace testudo {
 
     // make a new node, child to the specified parent
     template <typename... A>
-    static sptr make_node(sptr parent, name_t name, A &&...a) {
-      sptr child=parent->get_child(name);
+    static sptr make_node(TestFormat::location_t location,
+                          sptr parent, name_t name, A &&...a) {
+      sptr child=parent->get_child(location, name);
       // whether the child is newly created, or retrieved, if there are
       // additional arguments, use them to set it:
       child->set(a...);
@@ -124,18 +126,19 @@ namespace testudo {
     // make a new node, child to the parent specified by its full name
     // ("ancestors")
     template <typename... A>
-    static sptr make_node(std::string const &ancestors,
+    static sptr make_node(TestFormat::location_t location,
+                          std::string const &ancestors,
                           name_t name, A &&...a)
-      { return make_node(get_node(ancestors), name, a...); }
+      { return make_node(location, get_node(ancestors), name, a...); }
 
+    TestFormat::location_t const location;
     pptr const parent;
     name_t const name, full_name;
 
     // recursively run tests, depth-first, children first, and print the
     // readout to the supplied stream; if "subtree" isn't empty, run only
     // that subtree
-    testudo::TestStats test(testudo::test_format_p,
-                            std::string subtree="") const;
+    TestStats test(test_format_p, std::string subtree="") const;
     // the ordered list of children is constructed thus: first, the
     // declaration-ordered children, in the order they were declared, then
     // prioritised children, according to their priority (smaller first); if
@@ -143,14 +146,14 @@ namespace testudo {
     std::list<sptr> ordered_children() const;
   private:
     // untitled, unprioritised node
-    TestNode(pptr parent, name_t name);
+    TestNode(TestFormat::location_t, pptr parent, name_t name);
 
     // get a child by name
-    sptr get_child(name_t name);
+    sptr get_child(TestFormat::location_t, name_t name);
 
     // recursively run tests: run the children's tests in order, depth-first,
     // then own test function if set
-    void run_tests(testudo::test_management_t test_management) const;
+    void run_tests(test_management_t test_management) const;
 
     // null setting
     void set() { }
@@ -185,6 +188,11 @@ namespace testudo {
 #define testudo___DECL_EAT_A_SEMICOLON                                  \
   struct never_define_this_struct_68e47e1831e0eebbe5994ad57527f71b
 
+#define testudo___LOCATION(file, line)                                  \
+  {file, #line}
+#define testudo___SET_LOCATION(file, line)                              \
+  test_management.format->set_location({file, #line})
+
 #define testudo___TEST_NAME(n) testudo____TEST_##n
 #define testudo___TEST_FUNCTION_NAME(n) testudo____TEST_FUNCTION_##n
 
@@ -209,11 +217,11 @@ namespace testudo {
 #define testudo__DEFINE_TEST_NODE(parent, name, title)                  \
   testudo___DEFINE_TEST_NODE_IMPL(                                      \
     testudo___TEST_NAME(parent), name,                                  \
-    title, testudo::declaration_order)
+    title, testudo___implementation::declaration_order)
 
 #define testudo___DEFINE_TEST_NODE_IMPL(l_a_or_p, name, ...)            \
   static inline auto testudo___TEST_NAME(name)=                         \
-    testudo::TestNode::make_node(l_a_or_p, #name, __VA_ARGS__)          \
+    testudo::TestNode::make_node({}, l_a_or_p, #name, __VA_ARGS__)       \
 
   struct Fixture {
     Fixture(test_management_t test_management)
@@ -249,12 +257,15 @@ namespace testudo {
     { return b; }
 
 #define testudo___FIXTURE_TYPE(...)                                     \
-  decltype(testudo::select_fixture_spec(__VA_ARGS__))::fixture_type
+  decltype(testudo___implementation::select_fixture_spec(__VA_ARGS__))  \
+    ::fixture_type
 
 #define testudo__WITH_FIXTURE(...)                                      \
-  testudo::FixtureSpec<__VA_ARGS__>{#__VA_ARGS__, false}
+  testudo___implementation::FixtureSpec<__VA_ARGS__>{                   \
+    #__VA_ARGS__, false}
 #define testudo__VISIBLE_FIXTURE(...)                                   \
-  testudo::FixtureSpec<__VA_ARGS__>{#__VA_ARGS__, true}
+  testudo___implementation::FixtureSpec<__VA_ARGS__>{                   \
+    #__VA_ARGS__, true}
 
   // a test (i.e., a test node with a test function) is defined with
   //
@@ -271,47 +282,54 @@ namespace testudo {
   // "test_name"; a top test is defined with "define_top_test()" instead; the
   // bucket priority specification is analogous to "define_test_node()" and
   // "define_top_test_node()"
-#define testudo__DEFINE_TOP_TEST(ancestors, name, ...)                  \
-  testudo___DEFINE_TEST_IMPL(ancestors, name, __VA_ARGS__)
-#define testudo__DEFINE_TEST(parent, name, ...)                         \
+#define testudo__DEFINE_TOP_TEST_L(loc, ancestors, name, ...)           \
+  testudo___DEFINE_TEST_IMPL(loc, ancestors, name, __VA_ARGS__)
+#define testudo__DEFINE_TEST_L(loc, parent, name, ...)                  \
   testudo___DEFINE_TEST_IMPL(                                           \
-    testudo___TEST_NAME(parent), name,                                  \
-    __VA_ARGS__, testudo::declaration_order)
+    loc, testudo___TEST_NAME(parent), name,                             \
+    __VA_ARGS__, testudo___implementation::declaration_order)
 
 #define testudo___DEFINE_TEST_IMPL(...)                                 \
-  testudo___DEFINE_TEST_IMPL_IMPL(__VA_ARGS__, testudo::end_mark)
-#define testudo___DEFINE_TEST_IMPL_IMPL(l_a_or_p, name, title, ...)     \
+  testudo___DEFINE_TEST_IMPL_IMPL(__VA_ARGS__,                          \
+                                  testudo___implementation::end_mark)
+#define testudo___DEFINE_TEST_IMPL_IMPL(loc,                            \
+                                        l_a_or_p, name, title, ...)     \
   /* define a class for the test: */                                    \
-  struct testudo___TEST_FUNCTION_NAME(name)                             \
-    : testudo___FIXTURE_TYPE(__VA_ARGS__) {                             \
-    testudo___TEST_FUNCTION_NAME(name)(                                 \
-        testudo::test_management_t test_management, bool visible)       \
-      : testudo___FIXTURE_TYPE(__VA_ARGS__)(                            \
-          {(visible                                                     \
-            ? test_management.format                                    \
-            : testudo::make_null_test_format_for_fixtures(              \
-                test_management.format)),                               \
-           test_management.stats}),                                     \
-        test_management(test_management),                               \
-        visible(visible) { }                                            \
-    /* the following hides fixture's version: */                        \
-    testudo::test_management_t test_management;                         \
-    bool const visible;                                                 \
-    void perform_test() {                                               \
-      if (visible)                                                      \
-        test_management.format                                          \
-          ->output_text("fixture constructor done");                    \
-      do_this_test();                                                   \
-      if (visible)                                                      \
-        test_management.format                                          \
-          ->output_text("fixture destructor");                          \
-    }                                                                   \
-    void do_this_test(); /* this will contain the test body */          \
-  };                                                                    \
+  namespace {                                                           \
+    struct testudo___TEST_FUNCTION_NAME(name)                           \
+      : testudo___FIXTURE_TYPE(__VA_ARGS__) {                           \
+      testudo___TEST_FUNCTION_NAME(name)(                               \
+          testudo___implementation::test_management_t test_management,  \
+          bool visible)                                                 \
+        : testudo___FIXTURE_TYPE(__VA_ARGS__)(                          \
+            {(visible                                                   \
+              ? test_management.format                                  \
+              : testudo___implementation                                \
+                    ::make_null_test_format_for_fixtures(               \
+                  test_management.format)),                             \
+             test_management.stats}),                                   \
+          test_management(test_management),                             \
+          visible(visible) { }                                          \
+      /* the following hides fixture's version: */                      \
+      testudo::test_management_t test_management;                       \
+      bool const visible;                                               \
+      void perform_test() {                                             \
+        if (visible)                                                    \
+          test_management.format                                        \
+            ->output_text("fixture constructor done");                  \
+        do_this_test();                                                 \
+        if (visible)                                                    \
+          test_management.format                                        \
+            ->output_text("fixture destructor");                        \
+      }                                                                 \
+      void do_this_test(); /* this will contain the test body */        \
+    };                                                                  \
+  }                                                                     \
   /* define a test node that instantiates the class and calls */        \
   /* "do_this_test()" on it: */                                         \
   static inline auto testudo___TEST_NAME(name)=                         \
     testudo::TestNode::make_node(                                       \
+      testudo___LOCATION loc,                                           \
       l_a_or_p, #name,                                                  \
       testudo::TestNode::test_f_t(                                      \
         [](testudo::test_management_t test_management) {                \
@@ -326,54 +344,13 @@ namespace testudo {
             test_management, fixture_spec.visible);                     \
           fixture.perform_test();                                       \
         }),                                                             \
-      title, testudo::select_priority(__VA_ARGS__));                    \
+      title, testudo___implementation::select_priority(__VA_ARGS__));   \
   /* start the definition of "do_this_test()", but stop just before */  \
   /* the opening "{", so that the user takes it from there */           \
   void testudo___TEST_FUNCTION_NAME(name)::do_this_test()
 
-  template <typename DataT, typename DoTestDatum>
-  void do_test_data(DoTestDatum &&do_test_datum, DataT const &data) {
-    unsigned long int datum_number=0;
-    for (auto const &datum: data) {
-      ++datum_number;
-      do_test_datum.test_management.format
-        ->output_show_value("datum_number", std::to_string(datum_number));
-      do_test_datum.do_this_test(datum);
-      do_test_datum.test_management.format->output_separator();
-    }
-  }
 
-#define testudo__WITH_DATA_DEFINE_TOP_TEST(data, ancestors, name, ...)  \
-  testudo___WITH_DATA_DEFINE_TEST_IMPL(                                 \
-    data, ancestors, name, __VA_ARGS__)
-#define testudo__WITH_DATA_DEFINE_TEST(data, parent, name, ...)         \
-  testudo___WITH_DATA_DEFINE_TEST_IMPL(                                 \
-    data, testudo___TEST_NAME(parent), name,                            \
-    __VA_ARGS__, testudo::declaration_order)
-#define testudo___WITH_DATA_DEFINE_TEST_IMPL(data, parent, name, ...)   \
-  template <typename T>                                                 \
-  struct testudo___TEST_FUNCTION_NAME(name) : testudo::Fixture {        \
-    testudo___TEST_FUNCTION_NAME(name)(                                 \
-        testudo::test_management_t test_management)                     \
-      : Fixture(test_management), test_management(test_management) { }  \
-    void do_this_test(T const &);                                       \
-    testudo::test_management_t const test_management;                   \
-  };                                                                    \
-  static inline auto testudo___TEST_NAME(name)=                         \
-    testudo::TestNode::make_node(                                       \
-      parent, #name,                                                    \
-      testudo::TestNode::test_f_t([](                                   \
-          testudo::test_management_t test_management) {                 \
-        using T=std::decay_t<decltype(*data.begin())>;                  \
-        using Test=testudo___TEST_FUNCTION_NAME(name)<T>;               \
-        do_test_data(Test(test_management), data);                      \
-      }),                                                               \
-      __VA_ARGS__);                                                     \
-  template <typename T>                                                 \
-  void testudo___TEST_FUNCTION_NAME(name)<T>                            \
-    ::do_this_test(T const &datum)
-
-  void print_tree(std::ostream &, testudo::TestNode::csptr node);
+  void print_tree(std::ostream &, TestNode::csptr node);
 
   /// test commands
 
@@ -382,12 +359,12 @@ namespace testudo {
   template <typename ValT, typename RefT>
   bool to_text_equal(ValT const &val, std::string &sval,
                      RefT const &ref, std::string &sref) {
-    sval=to_text_testudo(val);
+    sval=to_text(val);
     if constexpr (std::is_constructible_v<ValT, RefT>)
-      sref=to_text_testudo(ValT(ref));
+      sref=to_text(ValT(ref));
     else
-      sref=to_text_testudo(ref);
-    return val==ref;
+      sref=to_text(ref);
+    return are_equal(val, ref);
   }
 
   // check whether two values are closer than a tolerance
@@ -399,7 +376,7 @@ namespace testudo {
   template <typename ValT, typename P>
   bool to_text_verify(ValT const &val, std::string &sval,
                       P const &p) {
-    sval=to_text_testudo(val);
+    sval=to_text(val);
     return p(val);
   }
 
@@ -409,10 +386,20 @@ namespace testudo {
   bool to_text_approx(ValT const &val, std::string &sval,
                       RefT const &ref, std::string &sref,
                       double max_error) {
-    sval=to_text_testudo(val);
-    sref=to_text_testudo(ref);
+    sval=to_text(val);
+    sref=to_text(ref);
     return approx(val, ref, max_error);
   }
+
+  // the following is a way to run several instructions while making them
+  // appear as a single one, which can be used braceless in a while-loop or
+  // if-statement; just surround the instructions in a pair of
+  // "testudo___BEGIN_GROUP" and "testudo___END_GROUP"; this generates an
+  // anonymous function that is immediately invoked, by grouping the
+  // instructions inside "[&]() { ... }()"; this is a better alternative than
+  // the classical "do { ... } while (0)"
+#define testudo___BEGIN_GROUP [&]() {
+#define testudo___END_GROUP           }()
 
   /// test instruction macros
 
@@ -438,14 +425,23 @@ namespace testudo {
   test_management.format->output_step_id(#id)
 
   // print string as is
-#define testudo__PRINT_TEXT(...)                                        \
-  test_management.format->output_text(__VA_ARGS__)
+#define testudo__PRINT_TEXT_L(loc, ...)                                 \
+  testudo___BEGIN_GROUP                                                 \
+    testudo___SET_LOCATION loc;                                         \
+    test_management.format->output_text(__VA_ARGS__);                   \
+  testudo___END_GROUP
   // print possibly multiline string as is
-#define testudo__PRINT_MULTILINE_TEXT(...)                              \
-  test_management.format->output_multiline_text(__VA_ARGS__)
+#define testudo__PRINT_MULTILINE_TEXT_L(loc, ...)                       \
+  testudo___BEGIN_GROUP                                                 \
+    testudo___SET_LOCATION loc;                                         \
+    test_management.format->output_multiline_text(__VA_ARGS__);         \
+  testudo___END_GROUP
   // print a break line
-#define testudo__PRINT_BREAK()                                          \
-  test_management.format->output_separator()
+#define testudo__PRINT_BREAK_L(loc)                                     \
+  testudo___BEGIN_GROUP                                                 \
+    testudo___SET_LOCATION loc;                                         \
+    test_management.format->output_separator();                         \
+  testudo___END_GROUP
 
   struct ScopeMarker {
     ScopeMarker(test_format_p test_format, std::string name_="")
@@ -469,44 +465,54 @@ namespace testudo {
   };
 
   // record a declaration (the argument to "declare()" cannot be enclosed in a
-  // "do { ... } while (0)" construct, since the declaration would be done in a
+  // "[&]() { ... }()" construct, since the declaration would be done in a
   // deeper scope)
-#define testudo__DECLARE_S(s, ...)                                      \
+#define testudo__DECLARE_L_S(loc, s, ...)                               \
+  testudo___SET_LOCATION loc;                                           \
   test_management.format->output_declare(s); __VA_ARGS__
 
   // record a performed action
-#define testudo__PERFORM_S(s, ...)                                      \
-  do {                                                                  \
+#define testudo__PERFORM_L_S(loc, s, ...)                               \
+  testudo___BEGIN_GROUP                                                 \
+    testudo___SET_LOCATION loc;                                         \
     test_management.format->output_perform(s);                          \
     __VA_ARGS__;                                                        \
-  } while (0)
+  testudo___END_GROUP
   // record a declaration, but don't do it (useful in some cases where, for
   // some compilation options, the usual action must be replaced with something
   // else)
-#define testudo__FAKE_DECLARE_S(s, ...)                                 \
+#define testudo__FAKE_DECLARE_L_S(loc, s, ...)                          \
+  testudo___SET_LOCATION loc;                                           \
   test_management.format->output_declare(s)
   // record an action, but don't do it (useful in some cases where, for some
   // compilation options, the usual action must be replaced with something
   // else)
 #define testudo__FAKE_PERFORM(s, ...)                                   \
-  test_management.format->output_perform(s)
+  testudo___BEGIN_GROUP                                                 \
+    testudo___SET_LOCATION loc;                                         \
+    test_management.format->output_perform(s);                          \
+  testudo___END_GROUP
 
   // record a fixture member
-#define testudo__FIXTURE_MEMBER_S(s, ...)                               \
-  testudo___FIXTURE_MEMBER_OUTPUT_S(s, __LINE__);                       \
+#define testudo__FIXTURE_MEMBER_L_S(loc, s, ...)                        \
+  testudo___FIXTURE_MEMBER_OUTPUT_L_S(loc, s, __LINE__);                \
   __VA_ARGS__
-#define testudo___FIXTURE_MEMBER_OUTPUT_S(s, line)                      \
+#define testudo___FIXTURE_MEMBER_OUTPUT_L_S(loc, s, line)               \
   bool testudo___STICK(testudo___done_, line)=                          \
     [this]() {                                                          \
+      testudo___SET_LOCATION loc;                                       \
       test_management.format->output_declare("(fixture) " s);           \
       return true;                                                      \
     }()
 #define testudo___STICK(a, b) a ## b
 
   // record a fixture member initialisation
-#define testudo__FIXTURE_INIT_S(s, v, ...)                              \
-  v((test_management.format                                             \
-       ->output_perform("(fixture) init " #v "(" s ")"),                \
+#define testudo__FIXTURE_INIT_L_S(loc, s, v, ...)                       \
+  v((testudo___BEGIN_GROUP                                              \
+       testudo___SET_LOCATION loc;                                      \
+       test_management.format                                           \
+         ->output_perform("(fixture) init " #v "(" s ")");              \
+     testudo___END_GROUP,                                               \
      __VA_ARGS__))
 
 
@@ -514,20 +520,30 @@ namespace testudo {
 #define testudo___INSERT_ACTION(...) if ((__VA_ARGS__, true))
 
 
-#define testudo__WITH_DATA_S(S, n, ...)                                  \
-  testudo___INSERT_DECLARATION(auto testudo___container=__VA_ARGS__)    \
+  template <typename T>
+  auto to_testudo_container(std::initializer_list<T> const &il)
+    { return std::list<T>(il); }
+  template <typename T>
+  auto to_testudo_container(T const &t) { return t; }
+
+#define testudo__WITH_DATA_L_S(loc, S, n, ...)                          \
+  testudo___INSERT_ACTION(testudo___SET_LOCATION loc)                   \
+  testudo___INSERT_DECLARATION(                                         \
+    auto testudo___container=                                           \
+      testudo___implementation::to_testudo_container(__VA_ARGS__))      \
   testudo___INSERT_DECLARATION(                                         \
     auto testudo___with_log=                                            \
-      testudo::get_with_loop_log(test_management))                      \
+      testudo___implementation::get_with_loop_log(test_management))     \
   for (auto const &n: testudo___container)                              \
     testudo___INSERT_DECLARATION(                                       \
-      testudo::push_test_format_t push_test_format{                     \
+      testudo___implementation::push_test_format_t push_test_format{    \
         &test_management.format,                                        \
-        testudo::make_with_loop_test_format(                            \
+        testudo___implementation::make_with_loop_test_format(           \
           test_management.format,                                       \
           testudo___with_log,                                           \
           &n==&testudo___container.back(),                              \
-          #n, testudo::to_text_testudo(n), #__VA_ARGS__)})
+          #n, testudo::to_text(n),                                      \
+          #__VA_ARGS__)})
 
 
   template <typename T=std::exception>
@@ -535,67 +551,83 @@ namespace testudo {
   // perform an action that is expected to throw; the thrown exception is
   // recorded; a bool flag tracks whether the exception was thrown, and is
   // checked for trueness with "check()_true()"
-#define testudo__CHECK_TRY_S(s, ...)                                    \
-  do {                                                                  \
-  test_management.format->output_try(s);                                \
+#define testudo__CHECK_TRY_L_S(loc, s, ...)                             \
+  testudo___BEGIN_GROUP                                                 \
+    testudo___SET_LOCATION loc;                                         \
+    test_management.format->output_try(s);                              \
     try {                                                               \
       __VA_ARGS__;                                                      \
       test_management.format->output_catch(                             \
         "", "<no exception>", "false");                                 \
-      test_management.stats+=testudo::CheckResult(false);               \
+      test_management.stats+=                                           \
+        testudo___implementation::CheckResult(false);                   \
     }
 #define testudo__CATCH_S(s, ...)                                        \
-    catch (testudo::default_to_exception_t<__VA_ARGS__> const &e) {     \
+    catch (testudo___implementation                                     \
+           ::default_to_exception_t<__VA_ARGS__> const &e) {            \
       test_management.format->output_catch(                             \
-        s, testudo::to_text_testudo(e), "true");                        \
-      test_management.stats+=testudo::CheckResult(true);                \
+        s, testudo___implementation::exception_to_text(e), "true");     \
+      test_management.stats+=                                           \
+        testudo___implementation::CheckResult(true);                    \
     }                                                                   \
     catch (...) {                                                       \
       test_management.format->output_catch(                             \
         s, "<unexpected exception>", "false");                          \
-      test_management.stats+=testudo::CheckResult(false);               \
+      test_management.stats+=                                           \
+        testudo___implementation::CheckResult(false);                   \
       throw;                                                            \
     }                                                                   \
-  } while (0)
+  testudo___END_GROUP
 
   // show the value of an expression
-#define testudo__SHOW_VALUE_S(s, ...)                                   \
-  test_management.format->output_show_value(                            \
-    s, testudo::to_text_testudo(__VA_ARGS__))
+#define testudo__SHOW_VALUE_L_S(loc, s, ...)                            \
+  testudo___BEGIN_GROUP                                                 \
+    testudo___SET_LOCATION loc;                                         \
+    test_management.format->output_show_value(                          \
+      s, testudo::to_text(__VA_ARGS__));                                \
+  testudo___END_GROUP
 
   // the the possibly multiline value of an expression
-#define testudo__SHOW_MULTILINE_VALUE_S(s, ...)                         \
-  test_management.format->output_show_multiline_value(                  \
-    s, testudo::to_text_testudo(__VA_ARGS__))
+#define testudo__SHOW_MULTILINE_VALUE_L_S(loc, s, ...)                  \
+  testudo___BEGIN_GROUP                                                 \
+    testudo___SET_LOCATION loc;                                         \
+    test_management.format->output_show_multiline_value(                \
+      s, testudo::to_text(__VA_ARGS__));                                \
+  testudo___END_GROUP
 
   // print "begin scope", and automatically print "end scope" at the end of the
   // current scope; if an argument is given, it's used as a tag in the "begin
   // scope" and "end scope" messages
-#define testudo__SHOW_SCOPE(...)                                        \
+#define testudo__IN_SCOPE_L(loc, ...)                                   \
+  testudo___INSERT_ACTION(testudo___SET_LOCATION loc)                   \
   testudo___INSERT_DECLARATION(                                         \
-    testudo::ScopeMarker testudo_scope_marker(                          \
+    testudo___implementation::ScopeMarker testudo_scope_marker(         \
       test_management.format, std::string(__VA_ARGS__)))
 
   // record a scoped declaration
-#define testudo__WITH_DECLARE_S(s, ...)                                 \
+#define testudo__WITH_DECLARE_L_S(loc, s, ...)                          \
+  testudo___INSERT_ACTION(testudo___SET_LOCATION loc)                   \
   testudo___INSERT_DECLARATION(                                         \
-    testudo::DeclareScopeMarker testudo_declare_scope_marker(           \
-      test_management.format, s))                                       \
+    testudo___implementation::DeclareScopeMarker                        \
+      testudo_declare_scope_marker(                                     \
+        test_management.format, s))                                     \
   testudo___INSERT_DECLARATION(__VA_ARGS__)
 
 
   // define the tolerance for "check()_approx()" (to be used only in functions
   // not declared with "define_test()" and similar macros; for instance, in an
   // external function that is called from a "define_test()" function)
-#define testudo__DEFINE_APPROX_EPSILON(...)                             \
-  testudo__DECLARE_S("double approx_epsilon="#__VA_ARGS__,              \
+#define testudo__DEFINE_APPROX_EPSILON_L(loc, ...)                      \
+  testudo__DECLARE_L_S(loc,                                             \
+                       "double approx_epsilon="#__VA_ARGS__,            \
                      double approx_epsilon=__VA_ARGS__)
   // set the tolerance for "check()_approx()"
-#define testudo__SET_APPROX_EPSILON(...)                                \
-  testudo__PERFORM_S("approx_epsilon="#__VA_ARGS__,                     \
-                     approx_epsilon=__VA_ARGS__)
+#define testudo__SET_APPROX_EPSILON_L(loc, ...)                         \
+  testudo__PERFORM_L_S(loc,                                             \
+                       "approx_epsilon="#__VA_ARGS__,                   \
+                       approx_epsilon=__VA_ARGS__)
   // show the tolerance for "check()_approx()"
-#define testudo__SHOW_APPROX_EPSILON()                                  \
+#define testudo__SHOW_APPROX_EPSILON_L(loc)                             \
   testudo__SHOW_VALUE_S("approx_epsilon", approx_epsilon)
 
   /// multi-macro checking instructions
@@ -652,20 +684,21 @@ namespace testudo {
   struct Check {
     test_management_t const test_management;
     HoldValue<A> const a;
-    bool const is_valid;
+    bool const is_a_valid;
     std::string const sa;
 
     template <typename AA>
     Check(test_management_t test_management, AA &&a, std::string sa)
       : test_management(test_management),
-        a(std::forward<AA>(a)), is_valid(is_valid_testudo(a)), sa(sa) { }
+        a(std::forward<AA>(a)), is_a_valid(is_valid(a)), sa(sa) { }
 
     template <typename Cont>
     auto check_cont(Cont &&cont) const
-      { return cont.check(*this, is_valid ? truth : always_false, ""); }
+      { return cont.check(*this, is_a_valid ? truth : always_false, ""); }
     template <typename Cont>
-    auto check_cont_inverse(Cont &&cont) const
-      { return cont.check(*this, is_valid ? falsehood : always_false, "nay"); }
+    auto check_cont_inverse(Cont &&cont) const {
+      return cont.check(*this, is_a_valid ? falsehood : always_false, "nay");
+    }
 
     template <typename P>
     Check &set(std::string name, P const &p) {
@@ -700,8 +733,8 @@ namespace testudo {
     void check(Check<A> const &c, truth_f tf, std::string prefix) {
       bool check_result=tf(c.a.value);
       c.test_management.format
-        ->output_check_true(c.sa, to_text_testudo(check_result), prefix);
-      c.test_management.stats+=testudo::CheckResult(check_result);
+        ->output_check_true(c.sa, to_text(check_result), prefix);
+      c.test_management.stats+=CheckResult(check_result);
     }
   };
   // the reason to have a function to construct "CheckTrue()" is for
@@ -722,10 +755,10 @@ namespace testudo {
     void check(Check<A> const &c, truth_f tf, std::string prefix) {
       std::string vala, valb;
       bool check_result=
-        tf(testudo::to_text_equal(c.a.value, vala, b.value, valb));
+        tf(to_text_equal(c.a.value, vala, b.value, valb));
       c.test_management.format->output_check_equal(
-        c.sa, vala, sb, valb, to_text_testudo(check_result), prefix);
-      c.test_management.stats+=testudo::CheckResult(check_result);
+        c.sa, vala, sb, valb, to_text(check_result), prefix);
+      c.test_management.stats+=CheckResult(check_result);
     }
   };
   // see "Check" for the reason to have a function to construct this templated
@@ -757,10 +790,10 @@ namespace testudo {
       double tol=c.get("tol", default_tol);
       std::string stol=c.get("stol", default_stol);
       bool check_result=
-        tf(testudo::to_text_approx(c.a.value, vala, b.value, valb, tol));
+        tf(to_text_approx(c.a.value, vala, b.value, valb, tol));
       c.test_management.format->output_check_approx(
-        c.sa, vala, sb, valb, stol, to_text_testudo(check_result), prefix);
-      c.test_management.stats+=testudo::CheckResult(check_result);
+        c.sa, vala, sb, valb, stol, to_text(check_result), prefix);
+      c.test_management.stats+=CheckResult(check_result);
     }
   };
   // see "Check" for the reason to have a function to construct this templated
@@ -782,10 +815,10 @@ namespace testudo {
     template <typename A>
     void check(Check<A> const &c, truth_f tf, std::string prefix) {
       std::string vala;
-      bool check_result=tf(testudo::to_text_verify(c.a.value, vala, b.value));
+      bool check_result=tf(to_text_verify(c.a.value, vala, b.value));
       c.test_management.format->output_check_verify(
-        c.sa, vala, sb, to_text_testudo(check_result), prefix);
-      c.test_management.stats+=testudo::CheckResult(check_result);
+        c.sa, vala, sb, to_text(check_result), prefix);
+      c.test_management.stats+=CheckResult(check_result);
     }
   };
   // see "Check" for the reason to have a function to construct this templated
@@ -805,48 +838,53 @@ namespace testudo {
   template <typename T>
   using testarudo_decay_t=typename testarudo_decay<std::decay_t<T>>::type;
 
-#define testudo__CHECK_S(s, ...)                                        \
+#define testudo__CHECK_L_S(loc, s, ...)                                 \
   {                                                                     \
+    testudo___SET_LOCATION loc;                                         \
     auto testudo___check_value=(__VA_ARGS__);                           \
     using testudo___check_type [[maybe_unused]]=                        \
-      testudo::testarudo_decay_t<decltype(testudo___check_value)>;      \
-    testudo::make_check(test_management, testudo___check_value, s).
+      testudo___implementation::testarudo_decay_t<                      \
+        decltype(testudo___check_value)>;                               \
+    testudo___implementation::make_check(                               \
+      test_management, testudo___check_value, s).
 
 
 #define testudo__EQUAL_S(s, ...)                                        \
-    check_cont(testudo::make_check_equal(                               \
+    check_cont(testudo___implementation::make_check_equal(              \
                  testudo___check_type(__VA_ARGS__), s));                \
   } testudo___DECL_EAT_A_SEMICOLON
 #define testudo__NOT_EQUAL_S(s, ...)                                    \
-    check_cont_inverse(testudo::make_check_equal(                       \
+    check_cont_inverse(testudo___implementation::make_check_equal(      \
                          testudo___check_type(__VA_ARGS__), s));        \
   } testudo___DECL_EAT_A_SEMICOLON
 
 #define testudo__TOL_S(s, ...)                                          \
   set("tol", double(__VA_ARGS__)).set("stol", std::string(s)).
 #define testudo__APPROX_S(s, ...)                                       \
-    check_cont(testudo::make_check_approx(                              \
+    check_cont(testudo___implementation::make_check_approx(             \
                  testudo___check_type(__VA_ARGS__), s,                  \
                  approx_epsilon, "eps"));                               \
   } testudo___DECL_EAT_A_SEMICOLON
 #define testudo__NOT_APPROX_S(s, ...)                                   \
-    check_cont_inverse(testudo::make_check_approx(                      \
+    check_cont_inverse(testudo___implementation::make_check_approx(     \
                          testudo___check_type(__VA_ARGS__), s,          \
                          approx_epsilon, "eps"));                       \
   } testudo___DECL_EAT_A_SEMICOLON
 
 #define testudo__TRUE                                                   \
-    check_cont(testudo::make_check_true());                             \
+    check_cont(testudo___implementation::make_check_true());            \
   } testudo___DECL_EAT_A_SEMICOLON
 #define testudo__FALSE                                                  \
-    check_cont_inverse(testudo::make_check_true());                     \
+    check_cont_inverse(testudo___implementation::make_check_true());    \
   } testudo___DECL_EAT_A_SEMICOLON
 
 #define testudo__VERIFY_S(s, ...)                                       \
-    check_cont(testudo::make_check_verify((__VA_ARGS__), s));           \
+    check_cont(testudo___implementation::make_check_verify(             \
+                 (__VA_ARGS__), s));                                    \
   } testudo___DECL_EAT_A_SEMICOLON
 #define testudo__NOT_VERIFY_S(s, ...)                                   \
-    check_cont_inverse(testudo::make_check_verify((__VA_ARGS__), s));   \
+    check_cont_inverse(testudo___implementation::make_check_verify(     \
+                         (__VA_ARGS__), s));                            \
   } testudo___DECL_EAT_A_SEMICOLON
 
   /// predicates
@@ -880,12 +918,27 @@ namespace testudo {
 
 #define testudo___REMOVE_BRACKETS(...) __VA_ARGS__
 
-#define testudo__PREDICATE testudo::predicate_t
+#define testudo__PREDICATE testudo___implementation::predicate_t
 #define testudo__PREDICATE_A(...)                                       \
   testudo__PREDICATE_C_A((), __VA_ARGS__)
 #define testudo__PREDICATE_C_A(b_c, ...)                                \
   testudo__PREDICATE([testudo___REMOVE_BRACKETS b_c](auto const &a)     \
                        { return (__VA_ARGS__); })
+
+  template <typename F>
+  auto generate_data(std::size_t size, F const &f) {
+    std::list<decltype(f())> result;
+    for (std::size_t i=0; i<size; ++i)
+      result.emplace_back(f());
+    return result;
+  }
+
 }
+
+
+testudo___BRING(TestNode,
+                print_tree,
+                Fixture,
+                generate_data)
 
 #endif

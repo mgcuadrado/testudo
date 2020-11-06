@@ -7,7 +7,6 @@
 namespace {
 
   using namespace std;
-  using namespace testudo;
 
   class Soup {
   public:
@@ -54,7 +53,7 @@ namespace {
   define_top_test_node("testudo", mock_turtle, "mock turtle tests", 750);
 
   class SoupMock
-    : public Soup, public CallLedger {
+    : public testudo::MockClass<Soup> {
   public:
     mock_method((void), wait, ());
 
@@ -177,6 +176,8 @@ namespace {
 
   class Level {
   public:
+    Level(function<void ()> call_back_creation) { call_back_creation(); }
+    Level()=default;
     virtual ~Level()=default;
     virtual int readout() const=0;
     virtual void large_up()=0;
@@ -200,9 +201,11 @@ namespace {
   }
 
   class MockLevel
-    : public Level, public CallLedger {
+    : public testudo::MockClass<Level> {
   public:
     MockLevel(int level) : level(level) { }
+    MockLevel(int level, function<void ()> call_back_creation)
+      : MockClass(call_back_creation), level(level) { }
     wrap_method((int), readout, (), const override) const { return level; }
     wrap_method((void), large_up, (), override) { level+=10; }
     wrap_method((void), small_up, (), override) { level+=1; }
@@ -211,10 +214,12 @@ namespace {
   };
 
   define_test(mock_turtle, several_mocks, "calls with several mocks") {
-    declare(CallLedger cl);
+    declare(testudo::CallLedger cl);
     declare(MockLevel lev1(12));
     perform(call_ledger_report_to(lev1, &cl));
-    declare(MockLevel lev2(47));
+    declare(bool created=false);
+    declare(MockLevel lev2(47, [&created]() { created=true; }));
+    check(created)_true;
     perform(call_ledger_report_to(lev2, &cl));
     perform(equalize(lev1, lev2));
     check(lev1.readout())_equal(52);
@@ -233,6 +238,7 @@ namespace {
   }
 
   define_test(mock_turtle, predicates, "predicates") {
+    declare(using namespace testudo);
     check(list<tuple<int, string>>{{1, "one"}, {1, "one"}})
       _verify(is_always(1, "one"));
     check(list<tuple<int, string>>{{1, "one"}, {2, "one"}})
@@ -258,7 +264,7 @@ namespace {
   };
 
   template <typename NamableConcrete>
-  void test_namable(test_management_t test_management,
+  void test_namable(testudo::test_management_t test_management,
                     NamableConcrete &namable) {
     perform(namable.create());
     perform(namable.set_name_is_good("Prince"));
@@ -274,13 +280,14 @@ namespace {
   // "MockNamable" doesn't derive from "Namable"; this is on purpose, to test
   // non-polymorphic mock classes
   class MockNamable
-    : public CallLedger {
+    : public testudo::MockClass<> {
   public:
     mock_method((void), create, ());
     mock_method((bool), set_name_is_good, ((string)));
   };
 
   define_test(mock_turtle, exceptions_with_mock, "exceptions with mock") {
+    declare(using namespace testudo);
     declare(MockNamable namable);
     perform(namable.schedule_ret(set_name_is_good,
               true, throw_exception(runtime_error("already named"))));
@@ -290,7 +297,7 @@ namespace {
   }
 
   class WrapNamable
-    : public Namable, public CallLedger {
+    : public testudo::MockClass<Namable> {
   public:
     bool created=false;
     wrap_method((void), create, (), override) {

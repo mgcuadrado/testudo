@@ -18,13 +18,14 @@
 #ifndef TESTIT_TESTFORMAT_HEADER_
 #define TESTIT_TESTFORMAT_HEADER_
 
+#include "testudo_macros.h"
 #include "testudo_stats.h"
 #include "named_create.h"
 #include <string>
 #include <list>
 #include <cassert>
 
-namespace testudo {
+namespace testudo___implementation {
 
   // a test format is used by a running test to record the actions and checks
   // it performs; this abstract class declares the interface; each method
@@ -43,10 +44,29 @@ namespace testudo {
   class TestFormat {
   public:
     using string=std::string;
+    struct location_t {
+      string file, line;
+      string to_string(string sep="") const {
+        if (file.empty())
+          return "";
+        else
+          return file+":"+line+sep;
+      }
+    };
     using var_values_t=std::list<std::pair<string, string>>;
 
     virtual ~TestFormat() { };
 
+    virtual void set_location(location_t location) { location_p=location; }
+    virtual string get_location(string sep="") const
+      { return location_p.to_string(sep); }
+    virtual string get_title_location(string sep="") const
+      { return title_location_p.to_string(sep); }
+    virtual void output_location_title(location_t location,
+                                       string name, string title) {
+      title_location_p=location;
+      output_title(name, title);
+    }
     virtual void output_title(string name, string title)=0;
     virtual void output_begin_scope(string name)=0;
     virtual void output_end_scope(string name)=0;
@@ -103,6 +123,7 @@ namespace testudo {
       }
     }
   protected:
+    location_t title_location_p, location_p;
     std::pair<string, string> var_and_values_format(var_values_t);
   };
 
@@ -144,5 +165,9 @@ namespace testudo {
     std::string var_name, std::string val, std::string container);
 
 }
+
+testudo___BRING(test_management_t,
+                TestFormat,
+                test_format_named_creator)
 
 #endif

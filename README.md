@@ -98,10 +98,10 @@ and didn't get zeir jigawatts right):
 As you can see, all details of the source code are transferred to the full
 report, but results are added in the form of `[ OK ]` and `[FAIL]` tags, and
 accumulated counts, and each line is coded with various characters to mark what
-kind of a line is (a declaration, an action, a check…).  When a value doesn't
-match its expected value, both the actual value and the expected value are
-printed, as in the check for `fc.missing_jw()`: you see the actual value `2.21`
-and the expected value `1.21`.  In that same line, `+/- eps` means the
+kind of a line it is (a declaration, an action, a check…).  When a value
+doesn't match its expected value, both the actual value and the expected value
+are printed, as in the check for `fc.missing_jw()`: you see the actual value
+`2.21` and the expected value `1.21`.  In that same line, `+/- eps` means the
 comparison used the current value for the tolerance; you can also change the
 tolerance, or specify a tolerance for a specific check.
 

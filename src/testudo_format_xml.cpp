@@ -20,8 +20,9 @@
 #include <ostream>
 #include <regex>
 
-namespace testudo {
+namespace {
 
+  using namespace testudo;
   using namespace std;
 
   namespace {
@@ -39,7 +40,7 @@ namespace testudo {
     string xml_bool(string b) { return b; }
 
     class TestFormatXML
-    : public TestFormat {
+      : public TestFormat {
     public:
       element_t::root_t root{element_t::make_root("testudo")};
       stack<element_t::node_t<>> test_stack;

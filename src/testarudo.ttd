@@ -7,6 +7,12 @@ namespace {
 
   using namespace std;
 
+  // a very short test to check the cartouche tag being longer than the
+  // cartouched info
+  define_top_test("testudo", sh, "sh", 9999) {
+    check(true)_true;
+  }
+
   define_top_test_node("testudo", testarudo, "testarudo tests", 10);
 
   define_test(testarudo, simple, "simple testarudo tests") {
@@ -137,7 +143,7 @@ namespace {
       with_data(y, numbers_2)
         check(x%2)_equal(y%2);
     with_data(x, numbers_1)
-      with_data(y, list<int>{2, 4, 10})
+      with_data(y, {2, 4, 10})
         check(x%2)_equal(y%2);
 
     print_break();
@@ -199,12 +205,6 @@ namespace {
     check(string("unu")<string("du"))_true;
   }
 
-  with_data_define_top_test(list({2, 4, 5, 6}),
-                            "testudo", all_even, "all_even", 20) {
-    show_value(datum);
-    check(datum%2)_equal(0);
-  }
-
   struct ClassWithNoRepresentation { };
   bool operator==(ClassWithNoRepresentation, ClassWithNoRepresentation)
     { return false; }
@@ -228,14 +228,14 @@ namespace {
     declare(tuple<float, int, double> ta={3.14, 8, 7.5});
     declare(tuple<double, float, int> tb={4.14, 7., 6});
     check(ta)_approx(tb);
-    show_value(absdiff(ta, tb));
+    show_value(testudo::absdiff(ta, tb));
     declare(tuple<float, int, double> tc={3.14, 8, 7.5});
     check(ta)_approx(tc);
     print_break();
     declare(list<float> la={3.14, 8, 7.5});
     declare(list<float> lb={4.14, 7., 6});
     check(la)_approx(lb);
-    show_value(absdiff(la, lb));
+    show_value(testudo::absdiff(la, lb));
     declare(list<float> lc={3.14, 8, 7.5});
     check(la)_approx(lc);
     with_declare(auto x=string("hey")) {
@@ -300,9 +300,9 @@ namespace {
   };
   define_top_test("testudo", scope, "scope begin and end", 375) {
     declare(int flag=10);
-    show_scope("at_destruction_flag_20") {
+    in_scope("at_destruction_flag_20") {
       declare(AtDestruction at_destruction_flag_20([&flag]() { flag=20; }));
-      show_scope() {
+      in_scope() {
         declare(AtDestruction at_destruction_flag_30([&flag]() { flag=30; }));
         check(flag)_equal(10);
         print_text("now, a long text to check line breaking within scopes"

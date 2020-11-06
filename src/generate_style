@@ -49,6 +49,10 @@ print_macro() {
     unset macros[$name]
 }
 
+print_macro_loc() {
+    print_macro $1 "()" "@_L((__FILE__, __LINE__))"
+}
+
 print_macro_no_f() {
     print_macro $1 "" "@"
 }
@@ -57,12 +61,26 @@ print_macro_forward() {
     print_macro $1 "(...)" "@(__VA_ARGS__)"
 }
 
+print_macro_loc_forward() {
+    print_macro $1 "(...)" "@_L((__FILE__, __LINE__), __VA_ARGS__)"
+}
+
 print_macro_string() {
     print_macro $1 "(...)" "@_S(#__VA_ARGS__, __VA_ARGS__)"
 }
 
+print_macro_loc_string() {
+    print_macro $1 "(...)" \
+                "@_L_S((__FILE__, __LINE__), #__VA_ARGS__, __VA_ARGS__)"
+}
+
 print_macro_v_string() {
     print_macro $1 "(v, ...)" "@_S(#__VA_ARGS__, v, __VA_ARGS__)"
+}
+
+print_macro_loc_v_string() {
+    print_macro $1 "(v, ...)" \
+                "@_L_S((__FILE__, __LINE__), #__VA_ARGS__, v, __VA_ARGS__)"
 }
 
 (
@@ -75,38 +93,35 @@ print_macro_v_string() {
     print_macro_forward DEFINE_TOP_TEST_NODE
     print_macro_forward DEFINE_TEST_NODE
     echo
-    print_macro_forward DEFINE_TOP_TEST
-    print_macro_forward DEFINE_TEST
+    print_macro_loc_forward DEFINE_TOP_TEST
+    print_macro_loc_forward DEFINE_TEST
     print_macro_forward WITH_FIXTURE
     print_macro_forward VISIBLE_FIXTURE
     echo
-    print_macro_forward WITH_DATA_DEFINE_TOP_TEST
-    print_macro_forward WITH_DATA_DEFINE_TEST
-    echo
     print_macro_forward STEP_ID
-    print_macro_forward PRINT_TEXT
-    print_macro_forward PRINT_MULTILINE_TEXT
-    print_macro_forward PRINT_BREAK
+    print_macro_loc_forward PRINT_TEXT
+    print_macro_loc_forward PRINT_MULTILINE_TEXT
+    print_macro_loc         PRINT_BREAK
     echo
-    print_macro_string    DECLARE
-    print_macro_string    PERFORM
-    print_macro_string    FAKE_DECLARE
-    print_macro_string    FAKE_PERFORM
-    print_macro_string    FIXTURE_MEMBER
-    print_macro_v_string  FIXTURE_INIT
-    print_macro_v_string  WITH_DATA
-    print_macro_string    CHECK_TRY
-    print_macro_string    CATCH
-    print_macro_string    SHOW_VALUE
-    print_macro_string    SHOW_MULTILINE_VALUE
-    print_macro_forward   SHOW_SCOPE
-    print_macro_string    WITH_DECLARE
+    print_macro_loc_string   DECLARE
+    print_macro_loc_string   PERFORM
+    print_macro_loc_string   FAKE_DECLARE
+    print_macro_loc_string   FAKE_PERFORM
+    print_macro_loc_string   FIXTURE_MEMBER
+    print_macro_loc_v_string FIXTURE_INIT
+    print_macro_loc_v_string WITH_DATA
+    print_macro_loc_string   CHECK_TRY
+    print_macro_string       CATCH
+    print_macro_loc_string   SHOW_VALUE
+    print_macro_loc_string   SHOW_MULTILINE_VALUE
+    print_macro_loc_forward  IN_SCOPE
+    print_macro_loc_string   WITH_DECLARE
     echo
-    print_macro_forward DEFINE_APPROX_EPSILON
-    print_macro_forward SET_APPROX_EPSILON
-    print_macro_forward SHOW_APPROX_EPSILON
+    print_macro_loc_forward DEFINE_APPROX_EPSILON
+    print_macro_loc_forward SET_APPROX_EPSILON
+    print_macro_loc_forward SHOW_APPROX_EPSILON
     echo
-    print_macro_string CHECK
+    print_macro_loc_string CHECK
     print_macro_string EQUAL
     print_macro_string NOT_EQUAL
     print_macro_string APPROX

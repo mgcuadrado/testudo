@@ -21,7 +21,7 @@
 #include <iostream>
 #include <exception>
 
-namespace testudo {
+namespace testudo___implementation {
 
 #define oxys_testudo_eat_a_semicolon static_cast<void>(0)
 #define oxys_testudo_decl_eat_a_semicolon                                \
