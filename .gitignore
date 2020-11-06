@@ -9,6 +9,7 @@ mock_turtle_macro_n_customize.m4
 style_table.tex
 testudo_lc.h
 testudo_uc.h
+testudo_eo.h
 
 *.pdf
 *.aux
