@@ -400,11 +400,6 @@ namespace testudo___implementation {
 #define testudo___WITH_IS_EMPTY(base, ...)                              \
   testudo___CAT(base, testudo___ISEMPTY(__VA_ARGS__))
 
-#define testudo___CAT(a, b) testudo___CAT_IMPL(a, b)
-#define testudo___CAT_IMPL(a, b) a ## b
-#define testudo___STRING(a) testudo___STRING_IMPL(a)
-#define testudo___STRING_IMPL(a) #a
-
 
 // for-each with numeric argument in reverse order; separate all invocations
 // with commas; the action is the first argument:
@@ -419,41 +414,6 @@ namespace testudo___implementation {
   testudo___CAT(testudo___FOR_EACH_N_REV_BRACKETS_IS_EMPTY_,            \
                 testudo___ISEMPTY(testudo___REMOVE_BRACKETS b_args))    \
     (action, testudo___REMOVE_BRACKETS b_args)
-
-
-#define testudo___TAKE_SINGLE(_1) _1
-#define testudo___TAKE_1ST(_1, _2) _1
-#define testudo___TAKE_2ND(_1, _2) _2
-  // SELECT_1((first, second)) -> first
-#define testudo___SELECT_1(...) \
-  testudo___SELECT_1_IMPL(testudo___REMOVE_BRACKETS __VA_ARGS__)
-#define testudo___SELECT_1_IMPL(...) \
-  testudo___TAKE_1ST(__VA_ARGS__)
-  // SELECT_1((first, second)) -> second
-#define testudo___SELECT_2(...) \
-  testudo___SELECT_2_IMPL(testudo___REMOVE_BRACKETS __VA_ARGS__)
-#define testudo___SELECT_2_IMPL(...) \
-  testudo___TAKE_2ND(__VA_ARGS__)
-
-#define testudo___IF_BRACKETS_1(...) 1
-#define testudo___IF_BRACKETS_2(...) 2
-#define testudo___SELECT_testudo___IF_BRACKETS_1 testudo___TAKE_SINGLE,
-#define testudo___SELECT_testudo___IF_BRACKETS_2 testudo___TAKE_SINGLE,
-
-#define testudo___ARG1(_1, ...) _1
-#define testudo___EXPAND_ARG1(...) testudo___ARG1(__VA_ARGS__, )
-  // SINGLE_OR_1ST(single) -> single
-  // SINGLE_OR_1ST((first, second)) -> first
-#define testudo___SINGLE_OR_1ST(a)                                      \
-  testudo___EXPAND_ARG1(                                                \
-    testudo___CAT(testudo___SELECT_,                                    \
-                  testudo___IF_BRACKETS_1 a))(a)
-  // SINGLE_OR_1ST(single) -> single
-  // SINGLE_OR_1ST((first, second)) -> second
-#define testudo___SINGLE_OR_2ND(a)                                      \
-  testudo___EXPAND_ARG1(                                                \
-    testudo___CAT(testudo___SELECT_,                                    \
-                  testudo___IF_BRACKETS_2 a))(a)
 
 
 #define testudo___PRODUCE_FULL_ARG(_, ...)                              \

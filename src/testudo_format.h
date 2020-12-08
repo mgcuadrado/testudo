@@ -15,8 +15,8 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Testudo.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef TESTIT_TESTFORMAT_HEADER_
-#define TESTIT_TESTFORMAT_HEADER_
+#ifndef MGCUADRADO_TESTUDO_TESTFORMAT_HEADER_
+#define MGCUADRADO_TESTUDO_TESTFORMAT_HEADER_
 
 #include "testudo_macros.h"
 #include "testudo_stats.h"
@@ -45,12 +45,24 @@ namespace testudo___implementation {
   public:
     using string=std::string;
     struct location_t {
+      inline static string common_directory="";
       string file, line;
-      string to_string(string sep="") const {
-        if (file.empty())
-          return "";
+      string to_string() const {
+        string sfile=short_file();
+        return (sfile.empty() ? "" : sfile+":")+line;
+      }
+      string to_string_brief(location_t title_location) const {
+        return
+          location_t{(file==title_location.file ? "" : file), line}
+          .to_string();
+      }
+      string short_file() const {
+        if ((not common_directory.empty())
+            and (file.substr(0, common_directory.length()+1)
+                 ==common_directory+"/"))
+          return ".../"+file.substr(common_directory.length()+1);
         else
-          return file+":"+line+sep;
+          return file;
       }
     };
     using var_values_t=std::list<std::pair<string, string>>;
@@ -58,15 +70,15 @@ namespace testudo___implementation {
     virtual ~TestFormat() { };
 
     virtual void set_location(location_t location) { location_p=location; }
-    virtual string get_location(string sep="") const
-      { return location_p.to_string(sep); }
-    virtual string get_title_location(string sep="") const
-      { return title_location_p.to_string(sep); }
-    virtual void output_location_title(location_t location,
-                                       string name, string title) {
-      title_location_p=location;
-      output_title(name, title);
-    }
+    virtual string get_location() const
+      { return location_p.to_string(); }
+    virtual string get_title_location() const
+      { return title_location_p.to_string(); }
+    virtual void set_title_location(location_t location)
+      { title_location_p=location; }
+    virtual string get_brief_location() const
+      { return location_p.to_string_brief(title_location_p); }
+
     virtual void output_title(string name, string title)=0;
     virtual void output_begin_scope(string name)=0;
     virtual void output_end_scope(string name)=0;
@@ -78,35 +90,52 @@ namespace testudo___implementation {
     virtual void output_multiline_text(string text)=0;
     virtual void output_declare(string code_str)=0;
     virtual void output_perform(string code_str)=0;
-    virtual void output_try(string code_str)=0;
+    virtual void output_try(string code_str, bool informative)=0;
     virtual void output_catch(string exception_type, string error,
-                              string caught)=0;
+                              string caught, bool informative)=0;
     virtual void output_show_value(
       string expr_str, string value_str)=0;
     virtual void output_show_multiline_value(
       string expr_str, string value_str)=0;
-    virtual void output_begin_with(string var_name, string container)=0;
+    virtual void output_begin_with(string var_name,
+                                   string container_first,
+                                   string container_rest,
+                                   string summary)=0;
     virtual void output_end_with()=0;
     virtual void output_begin_with_results()=0;
     virtual void output_end_with_results()=0;
     virtual void output_with_summary(string name, TestStats test_stats)=0;
-    void output_check_true(string expr_str, string success)
-      { output_check_true(expr_str, success, ""); }
+    // in the following methods, "informative" means that the check has already
+    // been tallied by a "with-data" structure, and it's being shown only to
+    // show the actual values that caused the result; in most cases, this won't
+    // make a difference in the resulting report, but e.g. in the "track"
+    // format, this is used to mark the check as information rather than
+    // trackable check result, both when listing the checks performed and when
+    // reporting their results
     virtual void output_check_true(string expr_str, string success,
-                                   string prefix)=0;
+                                   string prefix,
+                                   bool informative)=0;
+    virtual void output_check_true_for(string expr_str,
+                                       string exprv_str, string valv_str,
+                                       string success,
+                                       string prefix,
+                                       bool informative)=0;
     virtual void output_check_equal(string expr1_str, string val1_str,
                                     string expr2_str, string val2_str,
                                     string success,
-                                    string prefix)=0;
+                                    string prefix,
+                                    bool informative)=0;
     virtual void output_check_approx(string expr1_str, string val1_str,
                                      string expr2_str, string val2_str,
                                      string max_error_str,
                                      string success,
-                                     string prefix)=0;
+                                     string prefix,
+                                     bool informative)=0;
     virtual void output_check_verify(string expr_str, string val_str,
                                      string pred_str,
                                      string success,
-                                     string prefix)=0;
+                                     string prefix,
+                                     bool informative)=0;
     virtual void uncaught_exception(string exception)=0;
     virtual void produce_summary(string name, TestStats test_stats)=0;
 
@@ -148,6 +177,10 @@ namespace testudo___implementation {
   std::shared_ptr<TestFormat>
   make_null_test_format_for_fixtures(test_format_p parent_test_format);
 
+  struct MultilineData { std::string first_line, rest_lines, summary; };
+  MultilineData break_multiline_data(std::string d);
+  MultilineData break_data(std::string d);
+
   class WithLoopLog;
   std::shared_ptr<WithLoopLog> get_with_loop_log(test_management_t parent);
   // the following implementation is used for "with()"-loops; it calls
@@ -159,10 +192,10 @@ namespace testudo___implementation {
   // iteration, "output_end_with()" is passed down), and reports a failed
   // iteration on destruction
   std::shared_ptr<TestFormat>
-  make_with_loop_test_format(
-    test_format_p parent_test_format,
-    std::shared_ptr<WithLoopLog> log, bool last_time,
-    std::string var_name, std::string val, std::string container);
+  make_with_loop_test_format(test_format_p parent_test_format,
+                             std::shared_ptr<WithLoopLog> log, bool last_time,
+                             std::string var_name, std::string val,
+                             MultilineData container);
 
 }
 

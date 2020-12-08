@@ -14,8 +14,22 @@
 
   <xsl:template match="test">
     <xsl:text>||~cartouche~||</xsl:text>
+    <xsl:value-of select="@location"/>
+    <xsl:text>&#xa;</xsl:text>
     <xsl:text>||~ident~||{</xsl:text>
-    <xsl:value-of select="@name"/>
+    <xsl:choose>
+      <xsl:when test="
+          substring(@name,
+                    (string-length(@name) - string-length(@title)) + 1)
+          =@title">
+        <xsl:value-of select="
+            substring(@name,
+                      1, (string-length(@name) - string-length(@title)))"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="@name"/>
+      </xsl:otherwise>
+    </xsl:choose>
     <xsl:text>}||~normal~|| </xsl:text>
     <xsl:text>||~bold~||</xsl:text>
     <xsl:value-of select="@title"/>
@@ -33,6 +47,7 @@
   </xsl:template>
 
   <xsl:template match="scope">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~ident~||#||~normal~|| ||~ident~||{||~normal~||</xsl:text>
     <xsl:if test="@name!=''">
       <xsl:text> ||~ident~||"||~normal~|| </xsl:text>
@@ -55,6 +70,7 @@
   </xsl:template>
 
   <xsl:template match="declare_scope">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~ident~||#||~normal~|| ||~ident~||{||~normal~||</xsl:text>
     <xsl:text> ||~ident~||:||~normal~|| </xsl:text>
     <xsl:value-of select="@declare"/>
@@ -69,10 +85,17 @@
   </xsl:template>
 
   <xsl:template match="with">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~ident~||~||~normal~|| </xsl:text>
     <xsl:value-of select="@var"/>
     <xsl:text> in </xsl:text>
-    <xsl:value-of select="@container"/>
+    <xsl:value-of select="@container_first"/>
+    <xsl:if test="@container_rest!=''">
+      <xsl:text>&#xa;</xsl:text>
+      <xsl:text>||~multiline_begin~||</xsl:text>
+      <xsl:value-of select="@container_rest"/>
+      <xsl:text>||~multiline_end~||</xsl:text>
+    </xsl:if>
     <xsl:text>&#xa;</xsl:text>
     <xsl:text>||~inc_indent~||&#xa;</xsl:text>
 
@@ -80,7 +103,7 @@
 
     <xsl:if test="@n_total!=''">
       <xsl:text>||~ident~||{</xsl:text>
-      <xsl:value-of select="@var"/> in <xsl:value-of select="@container"/>
+      <xsl:value-of select="@summary"/>
       <xsl:text>}</xsl:text>
       <xsl:text>||~normal~|| </xsl:text>
       <xsl:call-template name="summary"/>
@@ -103,6 +126,7 @@
   </xsl:template>
 
   <xsl:template match="text">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~ident~||"||~normal~|| </xsl:text>
     <xsl:value-of select="."/>
     <xsl:text> ||~ident~||"||~normal~||&#xa;</xsl:text>
@@ -115,18 +139,21 @@
   </xsl:template>
 
   <xsl:template match="declare">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~ident~||:||~normal~|| </xsl:text>
     <xsl:value-of select="."/>
     <xsl:text> ||~ident~||;||~normal~||&#xa;</xsl:text>
   </xsl:template>
 
   <xsl:template match="perform">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~ident~||#||~normal~|| </xsl:text>
     <xsl:value-of select="."/>
     <xsl:text> ||~ident~||;||~normal~||&#xa;</xsl:text>
   </xsl:template>
 
   <xsl:template match="try">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~ident~||&amp;||~normal~|| </xsl:text>
     <xsl:value-of select="."/>
   </xsl:template>
@@ -144,6 +171,7 @@
   </xsl:template>
 
   <xsl:template match="check_true">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~ident~||%||~normal~|| </xsl:text>
     <xsl:apply-templates select="@prefix"/>
     <xsl:value-of select="expression1"/>
@@ -154,7 +182,26 @@
     <xsl:text>&#xa;</xsl:text>
   </xsl:template>
 
+  <xsl:template match="check_true_for">
+    <xsl:call-template name="brief_location"/>
+    <xsl:text>||~ident~||%||~normal~|| </xsl:text>
+    <xsl:apply-templates select="@prefix"/>
+    <xsl:value-of select="expression1"/>
+    <xsl:if test="@success='false'">
+      <xsl:text> ||~ident~||:||~normal~|| false</xsl:text>
+    </xsl:if>
+    <xsl:if test="@success='false'">
+      <xsl:text> ||~ident~||?||~normal~|| </xsl:text>
+      <xsl:value-of select="expressionv"/>
+      <xsl:text> ||~ident~||:||~normal~|| </xsl:text>
+      <xsl:value-of select="expressionv/@value"/>
+    </xsl:if>
+    <xsl:apply-templates select="@success"/>
+    <xsl:text>&#xa;</xsl:text>
+  </xsl:template>
+
   <xsl:template match="check_equal">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~ident~||%||~normal~|| </xsl:text>
     <xsl:apply-templates select="@prefix"/>
     <xsl:value-of select="expression1"/>
@@ -171,6 +218,7 @@
   </xsl:template>
 
   <xsl:template match="check_approx">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~ident~||%||~normal~|| </xsl:text>
     <xsl:apply-templates select="@prefix"/>
     <xsl:value-of select="expression1"/>
@@ -189,6 +237,7 @@
   </xsl:template>
 
   <xsl:template match="check_verify">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~ident~||%||~normal~|| </xsl:text>
     <xsl:apply-templates select="@prefix"/>
     <xsl:value-of select="expression1"/>
@@ -212,6 +261,7 @@
   </xsl:template>
 
   <xsl:template match="show_value">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~ident~||?||~normal~|| </xsl:text>
     <xsl:value-of select="expression1"/>
     <xsl:text> ||~ident~||:||~normal~|| </xsl:text>
@@ -220,6 +270,7 @@
   </xsl:template>
 
   <xsl:template match="show_multiline_value">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~ident~||?||~normal~|| </xsl:text>
     <xsl:value-of select="expression1"/>
     <xsl:text> ||~ident~||:||~normal~||&#xa;||~multiline_begin~||</xsl:text>
@@ -228,8 +279,9 @@
   </xsl:template>
 
   <xsl:template match="separator">
+    <xsl:call-template name="brief_location"/>
     <xsl:text>||~lines~||</xsl:text>
-    <xsl:text>||~full~||-</xsl:text>
+    <xsl:text>||~right~||-</xsl:text>
     <xsl:text>||~normal~||&#xa;</xsl:text>
   </xsl:template>
 
@@ -246,6 +298,14 @@
   <xsl:template name="flag_error">
     <xsl:text>||~failure~|| ||~right~||- ||~normal~||</xsl:text>
     <xsl:text>[||~errortag~||ERR-||~normal~||]</xsl:text>
+  </xsl:template>
+
+  <xsl:template name="brief_location">
+    <xsl:if test="@brief_location!=''">
+      <xsl:text>||~lines~||</xsl:text>
+      <xsl:value-of select="@brief_location"/>
+      <xsl:text>||~normal~|| </xsl:text>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="@prefix">

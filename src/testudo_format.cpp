@@ -61,22 +61,25 @@ namespace testudo___implementation {
     void output_multiline_text(string) override { }
     void output_declare(string) override { }
     void output_perform(string) override { }
-    void output_try(string) override { }
-    void output_catch(string, string, string) override { }
+    void output_try(string, bool) override { }
+    void output_catch(string, string, string, bool) override { }
     void output_show_value(string, string) override { }
     void output_show_multiline_value(string, string) override { }
-    void output_begin_with(string, string) override { }
+    void output_begin_with(string, string, string, string) override { }
     void output_end_with() override { }
     void output_begin_with_results() override { }
     void output_end_with_results() override { }
     void output_with_summary(string, TestStats) override { }
-    void output_check_true(string, string, string) override { }
+    void output_check_true(string, string, string, bool) override { }
+    void output_check_true_for(string, string, string,
+                               string, string, bool) override { }
     void output_check_equal(
-      string, string, string, string, string, string) override { }
+      string, string, string, string, string, string, bool) override { }
     void output_check_approx(
-      string, string, string, string, string, string, string) override { }
+      string, string, string, string, string, string,
+      string, bool) override { }
     void output_check_verify(
-      string, string, string, string, string) override { }
+      string, string, string, string, string, bool) override { }
 
     void uncaught_exception(string exception) override
       { parent_test_format->uncaught_exception(exception); }
@@ -158,16 +161,19 @@ namespace testudo___implementation {
   public:
     WithLoopTestFormat(test_format_p parent_test_format,
                        shared_ptr<WithLoopLog> log, bool last_time,
-                       string var_name, string val, string container)
+                       string var_name, string val,
+                       MultilineData container)
       : parent_test_format(parent_test_format),
         non_with_ancestor(find_non_with_ancestor(parent_test_format)),
         log(log),
         recursively_last_time(
           last_time and parent_recursively_last_time(parent_test_format)),
         full_var_values(compute_full_var_values(var_name, val)),
-        loop_name(var_name+" in "+container) {
+        loop_name(var_name+" in "+container.summary) {
       log->reset_counter();
-      output_begin_with(var_name, container);
+      output_begin_with(var_name,
+                        container.first_line, container.rest_lines,
+                        loop_name);
     }
     ~WithLoopTestFormat() {
       if (recursively_last_time
@@ -245,28 +251,32 @@ namespace testudo___implementation {
       if (recursively_last_time)
         non_with_ancestor->output_perform(code_str);
     }
-    void output_try(string code_str) override {
+    void output_try(string code_str, bool) override {
       if (recursively_last_time)
-        non_with_ancestor->output_try(code_str);
+        non_with_ancestor->output_try(code_str, true);
     }
     void output_catch(string exception_type, string error,
-                      string caught) override {
+                      string caught, bool) override {
       log->incr_counter();
       if_false_output_with_failed(
         caught,
         [=, nwa=non_with_ancestor]()
-          { nwa->output_catch(exception_type, error, caught); });
+          { nwa->output_catch(exception_type, error, caught, false); });
       if (recursively_last_time) {
-        non_with_ancestor->output_catch(exception_type, "", "with");
+        non_with_ancestor->output_catch(exception_type, "", "with", true);
         log->output();
       }
     }
     void output_show_value(string, string) override { }
     void output_show_multiline_value(string, string) override { }
-    void output_begin_with(string var_name, string container) override {
+    void output_begin_with(string var_name, string
+                           container_first, string container_rest,
+                           string summary) override {
       log->incr_counter();
       if (recursively_last_time)
-        non_with_ancestor->output_begin_with(var_name, container);
+        non_with_ancestor->output_begin_with(var_name,
+                                             container_first, container_rest,
+                                             summary);
     }
     void output_end_with() override {
       if (recursively_last_time)
@@ -277,32 +287,49 @@ namespace testudo___implementation {
     void output_with_summary(string, TestStats) override { assert(false); }
 
     void output_check_true(string expr_str, string success,
-                           string prefix) override {
+                           string prefix, bool) override {
       log->incr_counter();
       if_false_output_with_failed(
         success,
         [=, nwa=non_with_ancestor]() {
-          nwa->output_check_true(expr_str, success, prefix);
+          nwa->output_check_true(expr_str, success, prefix, false);
         });
       if (recursively_last_time) {
-        non_with_ancestor->output_check_true(expr_str, "with", prefix);
+        non_with_ancestor->output_check_true(expr_str, "with", prefix, true);
+        log->output();
+      }
+    }
+    void output_check_true_for(string expr_str,
+                               string exprv_str, string valv_str,
+                               string success,
+                               string prefix, bool) override {
+      log->incr_counter();
+      if_false_output_with_failed(
+        success,
+        [=, nwa=non_with_ancestor]() {
+          nwa->output_check_true_for(expr_str, exprv_str, valv_str,
+                                     success, prefix, false);
+        });
+      if (recursively_last_time) {
+        non_with_ancestor->output_check_true_for(
+          expr_str, exprv_str, "", "with", prefix, true);
         log->output();
       }
     }
     void output_check_equal(string expr1_str, string val1_str,
                             string expr2_str, string val2_str,
                             string success,
-                            string prefix) override {
+                            string prefix, bool) override {
       log->incr_counter();
       if_false_output_with_failed(
         success,
         [=, nwa=non_with_ancestor]() {
           nwa->output_check_equal(expr1_str, val1_str, expr2_str, val2_str,
-                                  success, prefix);
+                                  success, prefix, false);
         });
       if (recursively_last_time) {
         non_with_ancestor->output_check_equal(
-          expr1_str, "", expr2_str, "", "with", prefix);
+          expr1_str, "", expr2_str, "", "with", prefix, true);
         log->output();
       }
     }
@@ -310,34 +337,34 @@ namespace testudo___implementation {
                              string expr2_str, string val2_str,
                              string max_error_str,
                              string success,
-                             string prefix) override {
+                             string prefix, bool) override {
       log->incr_counter();
       if_false_output_with_failed(
         success,
         [=, nwa=non_with_ancestor]() {
           nwa->output_check_approx(expr1_str, val1_str, expr2_str, val2_str,
-                                   max_error_str, success, prefix);
+                                   max_error_str, success, prefix, false);
         });
       if (recursively_last_time) {
         non_with_ancestor->output_check_approx(
-          expr1_str, "", expr2_str, "", max_error_str, "with", prefix);
+          expr1_str, "", expr2_str, "", max_error_str, "with", prefix, true);
         log->output();
       }
     }
     void output_check_verify(string expr_str, string val_str,
                              string pred_str,
                              string success,
-                             string prefix) override {
+                             string prefix, bool) override {
       log->incr_counter();
       if_false_output_with_failed(
         success,
         [=, nwa=non_with_ancestor]() {
           nwa->output_check_verify(expr_str, val_str, pred_str,
-                                   success, prefix);
+                                   success, prefix, false);
         });
       if (recursively_last_time) {
         non_with_ancestor->output_check_verify(
-          expr_str, "", pred_str, "with", prefix);
+          expr_str, "", pred_str, "with", prefix, true);
         log->output();
       }
     }
@@ -365,11 +392,63 @@ namespace testudo___implementation {
   shared_ptr<TestFormat>
   make_with_loop_test_format(test_format_p parent_test_format,
                              shared_ptr<WithLoopLog> log, bool last_time,
-                             string var_name, string val, string container) {
+                             string var_name, string val,
+                             MultilineData container) {
     return make_shared<WithLoopTestFormat>(parent_test_format,
                                            log,
                                            last_time,
                                            var_name, val, container);
+  }
+
+  MultilineData break_multiline_data(string d) {
+    size_t i=d.find('{');
+    if (i==string::npos)
+      return {d, "", d};
+    ++i;
+    size_t level=0;
+    string first_line=d.substr(0, i);
+    string rest_lines;
+    auto skip_spaces=
+      [&d, &i]() {
+        while ((i<d.size()) and ((d[i]==' ') or (d[i]=='\t') or (d[i]=='\n')))
+          ++i;
+      };
+    skip_spaces();
+    auto skip_until=
+      [&d, &rest_lines, &i](char e) {
+        rest_lines+=d[i++];
+        while ((i<d.size()) and (d[i] not_eq e)) {
+          if ((d[i]=='\\') and (i+1<d.size()))
+            rest_lines+=d[i++];
+          else if (d[i]==e)
+            return;
+          rest_lines+=d[i++];
+        }
+      };
+    while (i<d.size()) {
+      bool comma=false;
+      switch (d[i]) {
+      case '{': ++level; break;
+      case '}': --level; break;
+      case ',': comma=(level==0); break;
+      case '\'': skip_until('\''); break;
+      case '"': skip_until('"'); break;
+      default: break;
+      }
+      rest_lines+=d[i++];
+      if (comma) {
+        rest_lines+="\n";
+        skip_spaces();
+      }
+    }
+    return {first_line, rest_lines, first_line+"...}"};
+  }
+
+  MultilineData break_data(string d) {
+    size_t i=d.find('{');
+    if (i==string::npos)
+      return {d, "", d};
+    return {d, "", d.substr(0, i+1)+"..."+d.substr(d.rfind('}'))};
   }
 
 }

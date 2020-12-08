@@ -19,7 +19,8 @@ FAKE_PERFORM         false_fari
 FIXTURE_MEMBER       fiksaĵo_membro
 FIXTURE_INIT         fixture_init
 WITH_DATA            kun_datumoj
-CHECK_TRY            certigy_try
+WITH_MULTILINE_DATA  kun_multliniaj_datumoj
+CHECK_TRY            certigi_try
 CATCH                _catch
 SHOW_VALUE           montri_valoron
 SHOW_MULTILINE_VALUE montri_multlinian_valoron
@@ -33,6 +34,8 @@ SHOW_APPROX_EPSILON   montri_proksimo_epsilonon
 CHECK      certigi
 TRUE       _vera
 FALSE      _malvera
+TRUE_FOR   _vera_por
+FALSE_FOR  _malvera_por
 EQUAL      _egalas
 NOT_EQUAL  _ne_egalas
 APPROX     _proksimas

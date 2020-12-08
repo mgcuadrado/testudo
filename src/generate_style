@@ -89,9 +89,9 @@ print_macro_loc_v_string() {
     echo
     echo "#include \"testudo.h\""
     echo
-    print_macro_forward TOP_TEST_NODE
-    print_macro_forward DEFINE_TOP_TEST_NODE
-    print_macro_forward DEFINE_TEST_NODE
+    print_macro_forward     TOP_TEST_NODE
+    print_macro_loc_forward DEFINE_TOP_TEST_NODE
+    print_macro_loc_forward DEFINE_TEST_NODE
     echo
     print_macro_loc_forward DEFINE_TOP_TEST
     print_macro_loc_forward DEFINE_TEST
@@ -110,6 +110,7 @@ print_macro_loc_v_string() {
     print_macro_loc_string   FIXTURE_MEMBER
     print_macro_loc_v_string FIXTURE_INIT
     print_macro_loc_v_string WITH_DATA
+    print_macro_loc_v_string WITH_MULTILINE_DATA
     print_macro_loc_string   CHECK_TRY
     print_macro_string       CATCH
     print_macro_loc_string   SHOW_VALUE
@@ -131,6 +132,8 @@ print_macro_loc_v_string() {
     print_macro_string NOT_VERIFY
     print_macro_no_f   TRUE
     print_macro_no_f   FALSE
+    print_macro_string TRUE_FOR
+    print_macro_string FALSE_FOR
     echo
     print_macro_no_f    PREDICATE
     print_macro_forward PREDICATE_A

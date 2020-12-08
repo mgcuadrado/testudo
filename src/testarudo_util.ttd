@@ -1,0 +1,17 @@
+#ifndef NAUTOTEST
+
+#include <testudo/testudo_lc.h>
+
+namespace testarudo_util {
+
+  void test_commutativity(testudo::test_management_t test_management,
+                          int a, int b) {
+    show_value(a);
+    show_value(b);
+    check(a+b)_equal(b+a);
+    check(a*b)_equal(b*a);
+  }
+
+}
+
+#endif

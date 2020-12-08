@@ -1,0 +1,74 @@
+#include "crc.h"
+#include <testudo/testudo_lc.h>
+
+namespace {
+
+  using namespace std;
+
+  define_top_test_node("testudo", (crc, "CRC"), 7000);
+
+  define_test_node(crc, (crc32, "CRC-32"));
+
+  define_test(crc32, "table") {
+    declare(using namespace cyclic_redundancy_check);
+    declare(list<tuple<size_t, string>> table_examples
+            {{0, "00000000"},
+             {1, "77073096"},
+             {2, "ee0e612c"},
+             {3, "990951ba"},
+             {128, "edb88320"},
+             {255, "2d02ef8d"}});
+    declare(auto table=crc32_table());
+    with_data((i, v), table_examples)
+      check(to_hex(table.data[i]))_equal(v);
+  }
+
+  define_test(crc32, "examples") {
+    declare(using namespace cyclic_redundancy_check);
+    // toolkitbay.com/tkb/tool/CRC-32
+    declare(list<tuple<string, string>> crc32_examples
+            {{"", "00000000"},
+             {"Bob", "cd86f7a0"},
+             {"bob", "f5cbb140"},
+             {"BOB", "636cf3ca"},
+             {"123", "884863d2"},
+             {"123456789", "cbf43926"},
+             {"Supercalifragilisticexpialidocious", "4b2eb685"}});
+    with_data((s, c), crc32_examples)
+      check(to_hex(crc32(s)))_equal(c);
+  }
+
+  define_test_node(crc, (crc64, "CRC-64"));
+
+  define_test(crc64, "table") {
+    declare(using namespace cyclic_redundancy_check);
+    declare(list<tuple<size_t, string>> table_examples
+            {{0, "0000000000000000"},
+             {1, "b32e4cbe03a75f6f"},
+             {2, "f4843657a840a05b"},
+             {3, "47aa7ae9abe7ff34"},
+             {128, "c96c5795d7870f42"},
+             {255, "e0ada17364673f59"}});
+    declare(auto table=crc64_table());
+    with_data((i, v), table_examples)
+      check(to_hex(table.data[i]))_equal(v);
+  }
+
+  define_test(crc64, "examples") {
+    declare(using namespace cyclic_redundancy_check);
+    // toolkitbay.com/tkb/tool/CRC-64 (select "Table Type" -> "ECMA")
+    declare(list<tuple<string, string>> crc64_examples
+            {{"", "0000000000000000"},
+             {"123456789", "995dc9bbdf1939fa"},
+             {"Supercalifragilisticexpialidocious", "6a78d9cb83813b6d"}});
+    with_data((s, c), crc64_examples)
+      check(to_hex(crc64(s)))_equal(c);
+  }
+
+  define_test(crc64, "sanity checks") {
+    declare(using namespace cyclic_redundancy_check);
+    check(to_hex(hex_to<crc64_t>("deadbeef01234567")))
+      _equal("deadbeef01234567");
+  }
+
+}

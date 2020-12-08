@@ -1,0 +1,16 @@
+#include <testudo/testudo_lc.h> // default lower-case style
+#include "flux_capacitor.h"
+#include "delorean_test.h" // defines DeloreanFixture
+
+define_top_test_node("bttf1.outatime", // parent full name
+                     (flux_capacitor, // text name
+                      "FC features")); // title
+
+define_test(flux_capacitor, // parent
+            "FC after construction", // title
+            with_fixture(DeloreanFixture)) { // use a fixture
+  declare(FluxCapacitor fc);
+  perform(fc.connect_to(delorean)); // "delorean" is created by the fixture
+  check(not fc.is_on())_true; // check bool is true
+  check(fc.missing_jw())_approx(1.21); // check approximate value
+}

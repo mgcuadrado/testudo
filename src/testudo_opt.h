@@ -15,60 +15,42 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Testudo.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef TESTIT_TEST_OPT_HEADER_
-#define TESTIT_TEST_OPT_HEADER_
+#ifndef MGCUADRADO_TESTUDO_TEST_OPT_HEADER_
+#define MGCUADRADO_TESTUDO_TEST_OPT_HEADER_
 
 #include "testudo_macros.h"
 #include <list>
 #include <string>
-#include <iostream>
-#include <algorithm>
-#include <cassert>
 
 namespace testudo___implementation {
 
-#define main_opts_params                                                \
+#define main_params                                                \
   [[maybe_unused]] int argc, [[maybe_unused]] char *argv[]
-#define main_opts_args argc, argv
+#define main_args argc, argv
 
-  using opts_t=std::list<std::string>;
+  struct opts_t
+  : std::list<std::string> {
+    opts_t(std::string executable) : executable(executable) { }
+    std::string const executable;
+  };
 
-  inline opts_t to_list(main_opts_params) {
-    opts_t result;
-    for (int i=1; i<argc; ++i)
-      result.push_back(argv[i]);
-    assert(not argv[argc]);
-    return result;
-  }
+  opts_t args_to_opts(main_params);
+  std::string front_and_shift(opts_t &);
 
   struct TestOptions {
-    TestOptions(opts_t opts) {
-      // this is really the simplest implementation that will do to dectect
-      // options; i should probably use a full-fledged option parser
-      for (auto i=opts.begin(); i not_eq opts.end(); ++i) {
-        if (*i=="-f" and ++i not_eq opts.end())
-          format_name=*i;
-        else if (*i=="-s" and ++i not_eq opts.end())
-          subtree=*i;
-        else
-          dynamic_libraries.push_back(*i);
-      }
-
-      if (format_name=="") {
-        std::cerr << "error; format: " << opts.front()
-                  << " -f <test_output_format>" << std::endl;
-        exit(1);
-      }
-    }
-    TestOptions(main_opts_params)
-      : TestOptions(to_list(main_opts_args)) { }
+    TestOptions(opts_t opts);
     std::string format_name;
     std::list<std::string> dynamic_libraries;
     std::string subtree;
+    std::list<std::string> include, glob;
   };
+
+  int testudo_main(std::string subtree, main_params);
+  inline int testudo_main(main_params) { return testudo_main("", main_args); }
 
 }
 
-  testudo___BRING(TestOptions)
+testudo___BRING(opts_t, args_to_opts, front_and_shift, TestOptions,
+                testudo_main)
 
 #endif

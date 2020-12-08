@@ -20,8 +20,9 @@
 line_length=78
 margin=6
 
-while getopts "blsw:" option; do
+while getopts "rblsw:" option; do
     case $option in
+        r) raw=true ;;
         b) black=true ;;
         l) latex=true ;;
         s) summary=true ;;
@@ -102,10 +103,10 @@ fi
 #   ||~ident~|| set Testudo identifier colour (blue)
 #   ||~indent_as_b~|| beginning of test name for indented line; each non-last
 #   ||~indent_as_e~|| ... test name elements is removed and adds to the indent
-#   ||~cartouche~|| typeset the whole line in an orange cartouche
+#   ||~cartouche~||l\nt typeset "l" and "t" in an orange cartouche
 #   ||~multiline_begin~|| beginning of multiline text
 #   ||~multiline_end~|| end of multiline text
-#   ||~right~||c typeset the rest of the line flish right, filling with 'c'
+#   ||~right~||c typeset the rest of the line flush right, filling with 'c'
 #   ||~full~||c typeset a whole line of 'c'
 
 # TODO
@@ -122,6 +123,11 @@ fi
 #   6. process ||~multiline_begin~|| and ||~multiline_end~||
 #   7. process the rest of the markers (all colours and remove ||~break~||)
 
+if [ -n "$raw" ]; then
+    xsltproc "$(dirname "$0")"/$xml_format -
+    exit
+fi
+
 xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
     /||~indent_as_b~||.*||~indent_as_e~||/{
         h # keep the original line in hold space
@@ -134,8 +140,8 @@ xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
         s/\(||~indent_as_b~||\).*\(\..*||~indent_as_e~||\)/\1-\2/
         s/||~indent_as_[be]~||//g # remove indentation marks
     }' | sed ' # ||~inc_indent~|| and ||~dec_indent~||
-    /||~inc_indent~||/ {x;s/$/  /;x;d}
-    /||~dec_indent~||/ {x;s/  $//;x;d}
+    /||~inc_indent~||/ {x;s/$/||~space_b~||  ||~space_e~||/;x;d}
+    /||~dec_indent~||/ {x;s/||~space_b~||  ||~space_e~||$//;x;d}
     G
     s/\(.*\)\n\(.*\)/\2\1/
 ' | awk '
@@ -144,6 +150,9 @@ xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
         margin='$margin'
         break_mark="||~break~||\\\n"
         initial_indent=substr($0, 0, match($0, /[^ ]/)-1)
+        match($0, /^.*\|\|~space_e~\|\|/)
+        initial_indent=substr($0, 0, RLENGTH)
+        gsub(/\|\|~space_[be]~\|\|/, "", initial_indent)
         indent="    " initial_indent # indent for broken line continuations
         line=$0
         # chars left to fill the available space (-1 for the continuation
@@ -192,48 +201,66 @@ xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
         }
         print line
     }
-' | sed ' # cartouches
-    /||~cartouche~||/{
-        s/// # remove the marker
-        s/.*/ & / # surround with spaces
-        h # keep the original line in hold space
-        s/||~[a-z_]*~||//g # remove markers
-        s/./_/g # upper line
-        s/^/ / # upper left corner
-        s/^/||~lines~||/ # colour the upper line
-        s/$/||~normal~||/ # colour the upper line
-        p # print upper line
-        x # swap upper line with original line
-        : flank
-        s/^/||~lines~|||||~normal~||/ # left vertical line
-        s/$/||~lines~|||||~normal~||/ # right vertical line
-        p # print text (original line flanked with vertical lines)
-        /||~break~||/{ # if this line was broken
-            s/.//g # clean the pattern space
-            N # read next line
-            s/\n/ / # remove \n from appending and add the left space
-            H # append the line to the hold space
-            # now, the hold space contains the bottom line and the current line
-            s/||~[a-z_]*~||//g # remove markers
-            s/././g # replace all characters with a dot
-            s/$/ /
-            s/\( \)$/'$line_length_times_first'/ # add enough spaces at the end
-            s/^\('$cartouche_length_periods'\).*$/\1/ # and trim for length
-            s/^\.*// # remove the dots so we are left with the filler spaces
-            G # append the hold space, witn a \n separator
-            s/^\(.*\)\n\(.*\)\n\(.*\)$/\3\1/ # reorder: current line, fillers
-            { # clean the hold space so that it contains the bottom line only
-                x
-                s/\n.*//
-                x
-            }
-            b flank # and go back to flanking with vertical lines
-        }
-        x # recover upper line; we will transform it into the lower line
-        s/||~[a-z_]*~||//g # remove markers
-        s/_/-/g # raise line
-        s/^./||~lines~||`/ # lower left corner
-        s/$/'"'"'||~normal~||/ # lower right corner
+' | awk '
+    /^\|\|~cartouche~\|\|/ {
+         gsub(/^\|\|~cartouche~\|\|/, "") # remove cartouche mark
+         location=$0 # the rest of the line is the location
+         text=location # temporary to measure location length
+         gsub(/\|\|~[a-z_]*~\|\|/, "", text) # remove all marks
+         location_width=length(text) # location length
+         getline # the next line is the first (or only) line for the text title
+         title=$0
+         text=title # temporary to measure the length of this title line
+         gsub(/\|\|~[a-z_]*~\|\|/, "", text)
+         title_width=length(text) # title line length
+         # "width" will be the inner width of the cartouche; if the title spans
+         # several lines, the first one is already the maximum width
+         width=location_width
+         if (title_width>width)
+             width=title_width # "width" is "max(location_width, title_width)"
+         # print cartouche top border:
+         line="||~lines~|| _"
+         for (i=0; i<width; i++)
+             line=line "_"
+         line=line "_||~normal~||"
+         print line
+         # if non-empty, add a line for the location info:
+         if (location!="") {
+             line="||~lines~||| " location
+             for (i=0; i<width-location_width; i++)
+                 line=line " "
+             line=line " |||~normal~||"
+             print line
+         }
+         while (1) {
+             # write the title line
+             line="||~lines~|||||~normal~|| " title
+             for (i=0; i<width-title_width; i++)
+                 line=line " "
+             line=line " ||~lines~|||||~normal~||"
+             print line
+             # if it is not the last line of the title, iterate:
+             if (match(title, /\|\|~break~\|\|/)) {
+                 getline
+                 title=$0
+                 text=title
+                 gsub(/\|\|~[a-z_]*~\|\|/, "", text)
+                 title_width=length(text)
+             }
+             else
+                 break
+         }
+         # print cartouche bottom border:
+         line="||~lines~||`-"
+         for (i=0; i<width; i++)
+             line=line "-"
+         line=line "-'"'"'||~normal~||"
+         print line
+
+         next # avoid the general "print" below
+    }
+    {
+        print
     }
 ' | sed ' # ||~right~|| and ||~full~||
     /||~right~||/{
@@ -283,7 +310,8 @@ xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
     s/||~errortag~||/'"$error"'/g
     s/||~ident~||/'"$ident"'/g
     s/||~break~||/'"$normal"'/g # so that the backslash has normal format
-    s/||~tilde~||//g # 
+    s/||~space_[be]~||//g
+    s/||~tilde~||//g
 ' | sed "$global_cleaning"
 
 if [ -n "$latex" ]; then

@@ -1,0 +1,233 @@
+#include "testudo_diff.h"
+#include <testudo/testudo_lc.h>
+#include <testudo/testudo_ext.h>
+
+#include <iostream> // FIXME: rmme
+
+namespace {
+
+  using namespace std;
+
+  define_top_test_node("testudo", (diff, "diff"), 8000);
+
+  define_test(diff, "longest common subsequence") {
+    declare(using namespace testudo___implementation::diff_implementation);
+    with_multiline_data((a, b, d), list<tuple<string, string, lcs_t>>{
+        {"", "", "a"},
+        {"", "", "b"},
+        {"", "", "c"},
+        {"", "2", "c"},
+        {"1", "", "c"},
+        {"1", "2", "c"},
+        {"0", "1", "ba"},
+        {"881", "882", "ccc"},
+        {"881", "882", "c"},
+        {"88", "88", "cca"},
+        {"88", "88", "ccb"},
+        {"88", "88", "ccc"}
+      })
+      check(check_common_subsequence(a, b, d))_false;
+    with_multiline_data((a, b, d), list<tuple<string, string, lcs_t>>{
+        {"", "", ""},
+        {"0", "0", "c"},
+        {"0", "", "a"},
+        {"", "0", "b"},
+        {"0", "1", "ab"},
+        {"01234", "0134", "ccacc"},
+        {"0134", "01234", "ccbcc"},
+        {"01234", "01934", "ccabcc"},
+        {"01234567", "10243576", "acbcacbcacb"},
+        {"0129345967", "1029435976", "acbccacbccacb"},
+        {"00000123", "00123", "ccaaaccc"},
+        {"1234500067", "9800032", "aaaaabbcccaabb"},
+        {"234500067111189", "21110001117", "caaabbbcccaacccaaab"}
+      }) {
+      check(check_common_subsequence(a, b, d))_true;
+      declare(auto diff_computed=longest_common_subsequence_debug(a, b));
+      check(diff_computed)_equal(d);
+    }
+    declare(testudo___implementation::random::random_generator<size_t> rgs);
+    perform(rgs.engine.seed(15));
+    declare(string chars_prob="AAABCDEEEFGHIIIJKLMNOOOPQRSTUUUVWXYZ      ");
+    with_multiline_data((length, times, a_chars, b_new_chars, diff_chars),
+              list<tuple<size_t, size_t, string, string, string>>{
+                {5, 100, "000112", "011222", "abc"},
+                {5, 100, "000112", "011222", "aaaabbc"},
+                {5, 100, "000112", "011222", "abbcccc"},
+                {5, 100, "000112", "011222", "abbbbc"},
+                {15, 50, chars_prob, chars_prob, "abcccccc"},
+                {50, 20, chars_prob, chars_prob, "abcccccccc"},
+                {100, 10, chars_prob, chars_prob, "abcccccccc"},
+                {1000, 5, chars_prob, chars_prob, "abcccccccc"}
+              }) {
+      declare(auto diff_data=
+              testudo::generate_data(
+                times,
+                [&rgs, length, a_chars]()
+                  { return random_string(rgs, length, a_chars); }));
+      with_data(a, diff_data) {
+        declare(auto diff=random_diff(rgs, a, diff_chars));
+        declare(auto b=random_patch(rgs, a, diff, b_new_chars));
+        declare(auto diff_computed=longest_common_subsequence(a, b));
+        check(check_common_subsequence(a, b, diff_computed))_true;
+        check(diff_computed.length()<=diff.length())_true;
+      }
+    }
+  }
+
+  define_test(diff, "shortest_edit") {
+    declare(using namespace testudo___implementation::diff_implementation);
+    with_multiline_data((s, t, e), list<tuple<string, string, lcs_t>>{
+        {"", "", "e"},
+        {"", "", "w0."},
+        {"", "", "m"},
+        {"", "", "w"},
+        {"0", "0", "m1."},
+        {"", "", "c"},
+        {"", "2", "m2:0."},
+        {"1", "", "w1."},
+        {"1", "2", "m1:0."},
+        {"0", "1", "w2."},
+        {"881", "882", "m3:0."},
+        {"881", "882", "m2:0."},
+        {"881", "882", "m2:0.w:1.m1:0."},
+        {"88", "88", "m2:0.w1."},
+        {"88", "88", "m2:0.m1:0"},
+        {"8", "88", "m1:0.m1:0."}
+      })
+      check(check_edit(s, t, e))_false;
+    with_multiline_data((s, t, e), list<tuple<string, string, edit_t>>{
+        {"", "", ""},
+        {"0", "0", "m1:0."},
+        {"0", "", ""},
+        {"", "0", "w1."},
+        {"01234", "0134", "m2:0.m2:3."},
+        {"0134", "01234", "m2:0.w1.m2:2."},
+        {"00000123", "00123", "m5:3."},
+        {"THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
+          "QUICK BROWN THE DOG JUMPS UNDER THE LAZY FOX",
+          "m12:4.m4:0.m3:40.m7:19.w3.m12:28.m3:16."}
+        // , // prefer "close" matches:
+        // {"OH THE BIG MAN NEEDED THE BANANA",
+        //  "OH A BIG MAN SAW THE FOXY BANANA",
+        //  "m2:0.m1:2.w1.m9:6.w3.m4:21.w5.m7:25."}
+      }) {
+      check(check_edit(s, t, e))_true;
+      declare(auto edit_computed=shortest_edit_debug(s, t));
+      check(edit_computed)_equal(e);
+    }
+    declare(testudo___implementation::random::random_generator<size_t> rgs);
+    perform(rgs.engine.seed(15));
+    declare(string chars_prob="AAABCDEEEFGHIIIJKLMNOOOPQRSTUUUVWXYZ      ");
+    with_multiline_data((length, times, s_chars, t_new_chars, diff_chars),
+              list<tuple<size_t, size_t, string, string, string>>{
+                {5, 100, "000112", "011222", "abc"},
+                {5, 100, "000112", "011222", "aaaabbc"},
+                {5, 100, "000112", "011222", "abbcccc"},
+                {5, 100, "000112", "011222", "abbbbc"},
+                {15, 50, chars_prob, chars_prob, "abcccccc"},
+                {50, 10, chars_prob, chars_prob, "abcccccccc"},
+                {300, 2, chars_prob, chars_prob, "abcccccccc"}
+              }) {
+      declare(auto diff_data=
+              testudo::generate_data(
+                times,
+                [&rgs, length, s_chars]()
+                  { return random_string(rgs, length, s_chars); }));
+      with_data(s, diff_data) {
+        declare(auto diff=random_diff(rgs, s, diff_chars));
+        declare(auto t=random_patch(rgs, s, diff, t_new_chars));
+        declare(auto edit=shortest_edit_debug(s, t));
+        check(check_edit(s, t, edit))_true;
+      }
+    }
+
+    // SET_TRACE(shortest_edit);
+    // for (int i=0; i<100; ++i) {
+    //   auto s=random_string(rgs, 1000, chars_prob);
+    //   auto diff=random_diff(rgs, s, "abcccccccccccccccc");
+    //   auto t=random_patch(rgs, s, diff, chars_prob);
+    //   show_value(s);
+    //   show_value(t);
+    //   auto e=shortest_edit_debug(s, t, 3);
+    //   show_value(e);
+    //   check(check_edit(s, t, e))_true;
+    // }
+
+    declare(string source="0123456");
+    declare(string target="4531278");
+    declare(auto edit=shortest_edit(source, target, 2));
+    show_value(edit);
+    declare(auto et=edit_to_table(edit, source.size(), target.size()));
+    check(et.source_disappeared)_equal({0, 3, 6});
+    check(et.target_new)_equal({2, 5, 6});
+    check(et.source_matches)_equal({{1, 3}, {2, 4}, {4, 0}, {5, 1}});
+    check(et.target_matches)_equal({{0, 4}, {1, 5}, {3, 1}, {4, 2}});
+  }
+
+  string tts1() {
+    string tts;
+    tts+="t-title [0123456789abcdef]\n";
+    tts+="[phi.ttd:22] i-declare [e89ca44261d5c240]\n";
+    tts+="[phi.ttd:23] c-check_equal [585280a21523ffff] r-0-1-0\n";
+    tts+="[phi.ttd:23] c-check_equal [585280a21523d973] r-1-0-0\n";
+    tts+="[phi.ttd:25] c-with_summary [a45be715e8bd0bb1] r-12-3-45\n";
+    return tts;
+  }
+
+  string tts1_different_addresses() {
+    string tts;
+    tts+="t-title [0123456789abcdef]\n";
+    tts+="[psi.ttd:23] i-declare [e89ca44261d5c240]\n";
+    tts+="[psi.ttd:24] c-check_equal [585280a215230000] r-1-0-0\n";
+    tts+="[psi.ttd:24] c-check_equal [585280a215232222] r-0-1-0\n";
+    tts+="[psi.ttd:24] c-check_equal [585280a21523d973] r-0-1-0\n";
+    tts+="[psi.ttd:28] c-with_summary [a45be715e8bd0bb1] r-1-23-45\n";
+    tts+="[psi.ttd:24] c-check_equal [585280a215231111] r-1-0-0\n";
+    return tts;
+  }
+
+  define_test(diff, "track parsing") {
+    declare(using namespace testudo___implementation::diff_implementation);
+    declare(string tts=tts1());
+    show_multiline_value(tts);
+    declare(istringstream isstts(tts));
+    declare(auto tt=parse_track(isstts));
+    check(tt.size())_equal(5);
+    declare(ostringstream oss);
+    perform(oss << tt);
+    check(oss.str())_equal(tts);
+    declare(auto seq=
+            [](size_t n) {
+              vector<size_t> result;
+              for (size_t i=0; i<n; ++i)
+                result.push_back(i);
+              return result; });
+    with_data(i, seq(tt.size()))
+      with_data(j, seq(tt.size())) {
+        check((i==j)
+              ? ((not (i<j)) and (not (j<i)))
+              : ((i<j) not_eq (j<i)))
+          _true;
+        check((i==j)
+              ? ((not (tt[i]<tt[j])) and (not (tt[j]<tt[i])))
+              : ((tt[i]<tt[j]) not_eq (tt[j]<tt[i])))
+          _true;
+    }
+    declare(string ttsd=tts1_different_addresses());
+    show_multiline_value(ttsd);
+    declare(istringstream issttsd(ttsd));
+    declare(auto ttd=parse_track(issttsd));
+    declare(auto tt_edit=shortest_edit(tt, ttd, 2));
+    check(tt_edit)_equal("m2:0.w2.m2:3.w1.");
+    declare(auto tt_table=edit_to_table(tt_edit, tt.size(), ttd.size()));
+    check(tt_table.source_disappeared.size())_equal(1);
+    check(tt_table.source_disappeared)_equal({2});
+    check(tt_table.target_new)_equal({2, 3, 6});
+    check(tt_table.source_matches)_equal({{0, 0}, {1, 1}, {3, 4}, {4, 5}});
+    check(tt_table.target_matches)_equal({{0, 0}, {1, 1}, {4, 3}, {5, 4}});
+    declare(auto ts=track_table_to_summary(tt, ttd, tt_table));
+    show_multiline_value(ts);
+  }
+
+}

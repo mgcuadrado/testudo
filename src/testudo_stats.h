@@ -15,8 +15,8 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Testudo.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef OXYS_TESTIT_TESTSTATS_HEADER_
-#define OXYS_TESTIT_TESTSTATS_HEADER_
+#ifndef MGCUADRADO_TESTUDO_TESTSTATS_HEADER_
+#define MGCUADRADO_TESTUDO_TESTSTATS_HEADER_
 
 // test statistics; a "TestStats" object is passed to test functions and later
 // processed by formatters to keep track of the number of passed and failed
@@ -73,6 +73,13 @@ namespace testudo___implementation {
     return {ts1.n_passed()-ts2.n_passed(),
             ts1.n_failed()-ts2.n_failed(),
             ts1.n_errors()-ts2.n_errors()};
+  }
+
+  inline bool operator==(TestStats const &ts1, TestStats const &ts2) {
+    return
+      ts1.n_passed()==ts2.n_passed()
+      and ts1.n_failed()==ts2.n_failed()
+      and ts1.n_errors()==ts2.n_errors();
   }
 
 }

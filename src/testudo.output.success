@@ -1,0 +1,1829 @@
+<testudo>
+  <test location="" name="/" title="" n_failed="86" n_total="1987" n_errors="4" success="false">
+    <test location="" name="bttf1" title="" n_failed="1" n_total="2" n_errors="0" success="false">
+      <test location="" name="bttf1.outatime" title="" n_failed="1" n_total="2" n_errors="0" success="false">
+        <test location="" name="bttf1.outatime.flux_capacitor" title="FC features" n_failed="1" n_total="2" n_errors="0" success="false">
+          <test location="" name="bttf1.outatime.flux_capacitor.FC after construction" title="FC after construction" n_failed="1" n_total="2" n_errors="0" success="false">
+            <text location="" brief_location="">with fixture DeloreanFixture</text>
+            <declare location="" brief_location="">FluxCapacitor fc</declare>
+            <perform location="" brief_location="">fc.connect_to(delorean)</perform>
+            <check_true location="" brief_location="" success="true" prefix="">
+              <expression1>not fc.is_on()</expression1>
+            </check_true>
+            <check_approx location="" brief_location="" success="false" prefix="" max_error="eps">
+              <expression1 value="2.21">fc.missing_jw()</expression1>
+              <expression2 value="1.21">1.21</expression2>
+            </check_approx>
+          </test>
+        </test>
+      </test>
+    </test>
+    <test location="" name="bttf2" title="" n_failed="1" n_total="2" n_errors="0" success="false">
+      <test location="" name="bttf2.outatime" title="" n_failed="1" n_total="2" n_errors="0" success="false">
+        <test location="" name="bttf2.outatime.flux_capacitor" title="FC features" n_failed="1" n_total="2" n_errors="0" success="false">
+          <test location="" name="bttf2.outatime.flux_capacitor.FC after construction" title="FC after construction" n_failed="1" n_total="2" n_errors="0" success="false">
+            <text location="" brief_location="">with fixture DeloreanFixture</text>
+            <declare location="" brief_location="">FluxCapacitor fc</declare>
+            <perform location="" brief_location="">fc.connect_to(delorean)</perform>
+            <check_true location="" brief_location="" success="true" prefix="">
+              <expression1>not fc.is_on()</expression1>
+            </check_true>
+            <check_approx location="" brief_location="" success="false" prefix="" max_error="eps">
+              <expression1 value="2.21">fc.missing_jw()</expression1>
+              <expression2 value="1.21">1.21</expression2>
+            </check_approx>
+          </test>
+        </test>
+      </test>
+    </test>
+    <test location="" name="testudo" title="Testudo" n_failed="84" n_total="1983" n_errors="4" success="false">
+      <test location="" name="testudo.main" title="main() test" n_failed="0" n_total="0" n_errors="0" success="true">
+        <test location="" name="testudo.main.show test tree" title="show test tree" n_failed="0" n_total="0" n_errors="0" success="true">
+          <declare location="" brief_location="">ostringstream trs</declare>
+          <perform location="" brief_location="">testudo::print_tree(trs, testudo::TestNode::root_node())</perform>
+          <show_multiline_value location="" brief_location="">
+            <expression1 value="-- /&#xa;|- bttf1&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;|- bttf2&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;`- testudo&#xa;   |- main&#xa;   |  `- show test tree&#xa;   |- use_instructions&#xa;   |- testarudo&#xa;   |  |- simple testarudo tests&#xa;   |  |- complex&#xa;   |  |  |- difficult test&#xa;   |  |  |- complicated test&#xa;   |  |  |- test_with_error&#xa;   |  |  |- penultimate test&#xa;   |  |  |- &quot;verify&quot; syntax&#xa;   |  |  |- &quot;true_for&quot; syntax&#xa;   |  |  |- try_catch&#xa;   |  |  |- test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches&#xa;   |  |  `- &quot;with&quot; checks&#xa;   |  |- disorder&#xa;   |  |  |- du&#xa;   |  |  |- unu&#xa;   |  |  |- absdiff&#xa;   |  |  |- testarudo_ext&#xa;   |  |  `- no_representation&#xa;   |  `- external function&#xa;   |- esperanto_test&#xa;   |  `- numbers&#xa;   |- fixture&#xa;   |  |- + commutativity&#xa;   |  |- * commutativity&#xa;   |  `- associativity&#xa;   |- scope&#xa;   |- Testudo syntax&#xa;   |- mock_turtle&#xa;   |  |- Queen of Hearts&apos; recipe&#xa;   |  |- Queen of Hearts&apos; recipe calls&#xa;   |  |- approx&#xa;   |  |- calls with several mocks&#xa;   |  |- predicates&#xa;   |  |- exceptions with mock&#xa;   |  `- exceptions with wrap&#xa;   |- crc&#xa;   |  |- crc32&#xa;   |  |  |- table&#xa;   |  |  `- examples&#xa;   |  `- crc64&#xa;   |     |- table&#xa;   |     |- examples&#xa;   |     `- sanity checks&#xa;   |- glob_test&#xa;   |  |- no special character&#xa;   |  |- question mark&#xa;   |  |- asterisk&#xa;   |  |- escape&#xa;   |  `- complex&#xa;   |- diff&#xa;   |  |- longest common subsequence&#xa;   |  |- shortest_edit&#xa;   |  `- track parsing&#xa;   `- sh&#xa;">trs.str()</expression1>
+          </show_multiline_value>
+        </test>
+      </test>
+      <test location="" name="testudo.use_instructions" title="use instructions" n_failed="2" n_total="12" n_errors="1" success="false">
+        <multiline_text location="" brief_location="">index:&#xa;  1. holding functionality&#xa;  2. exceptions&#xa;  3. list of forgotten doubles</multiline_text>
+        <separator location="" brief_location=""/>
+        <declare location="" brief_location="">Hold hf</declare>
+        <check_true location="" brief_location="" success="true" prefix="">
+          <expression1>not hf.is_holding()</expression1>
+        </check_true>
+        <perform location="" brief_location="">hf.hold(3.14)</perform>
+        <check_true location="" brief_location="" success="true" prefix="">
+          <expression1>hf.is_holding()</expression1>
+        </check_true>
+        <check_approx location="" brief_location="" success="true" prefix="" max_error="eps">
+          <expression1 value="3.14">hf.pop()</expression1>
+          <expression2 value="3.14">3.14</expression2>
+        </check_approx>
+        <check_true location="" brief_location="" success="true" prefix="">
+          <expression1>not hf.is_holding()</expression1>
+        </check_true>
+        <separator location="" brief_location=""/>
+        <text location="" brief_location="">hf is empty now</text>
+        <step_id location="" brief_location="" id="popping_empty"/>
+        <try location="" brief_location="">hf.pop()</try>
+        <catch location="" brief_location="" exception_type="" success="true">not holding any double</catch>
+        <perform location="" brief_location="">hf.hold(2.72)</perform>
+        <step_id location="" brief_location="" id="adding_to_already_holding"/>
+        <try location="" brief_location="">hf.hold(7.)</try>
+        <catch location="" brief_location="" exception_type="" success="true">already holding a double</catch>
+        <separator location="" brief_location=""/>
+        <text location="" brief_location="">the forgotten doubles list is still empty</text>
+        <check_true location="" brief_location="" success="false" prefix="">
+          <expression1>Hold::is_forgotten_empty()</expression1>
+        </check_true>
+        <check_equal location="" brief_location="" success="true" prefix="">
+          <expression1 value="0">Hold::get_forgotten().size()</expression1>
+          <expression2 value="0">0u</expression2>
+        </check_equal>
+        <scope location="" brief_location="" name="scope 1">
+          <declare location="" brief_location="">Hold hf1(1.1)</declare>
+          <declare location="" brief_location="">Hold hf2(2.2)</declare>
+          <scope location="" brief_location="" name="">
+            <declare location="" brief_location="">Hold hf3(3.3)</declare>
+          </scope>
+          <check_approx location="" brief_location="" success="true" prefix="" max_error=".5">
+            <expression1 value="list{3.3}">Hold::get_forgotten()</expression1>
+            <expression2 value="list{3}">{3.}</expression2>
+          </check_approx>
+          <show_value location="" brief_location="">
+            <expression1 value="2.2">hf2.pop()</expression1>
+          </show_value>
+          <text location="" brief_location="">hf2 now empty; it won&apos;t add to the list</text>
+        </scope>
+        <check_true location="" brief_location="" success="true" prefix="">
+          <expression1>not Hold::is_forgotten_empty()</expression1>
+        </check_true>
+        <check_approx location="" brief_location="" success="false" prefix="" max_error="eps">
+          <expression1 value="list{1.1, 3.3}">Hold::get_forgotten()</expression1>
+          <expression2 value="list{3.3, 1.1}">{3.3, 1.1}</expression2>
+        </check_approx>
+        <perform location="" brief_location="">Hold::clear_forgotten()</perform>
+        <check_equal location="" brief_location="" success="true" prefix="">
+          <expression1 value="0">Hold::get_forgotten().size()</expression1>
+          <expression2 value="0">0u</expression2>
+        </check_equal>
+        <text location="" brief_location="">the following will raise an error</text>
+        <perform location="" brief_location="">hf.hold(9.9)</perform>
+        <uncaught_exception>already holding a double</uncaught_exception>
+      </test>
+      <test location="" name="testudo.testarudo" title="testarudo tests" n_failed="62" n_total="238" n_errors="2" success="false">
+        <test location="" name="testudo.testarudo.simple testarudo tests" title="simple testarudo tests" n_failed="2" n_total="5" n_errors="0" success="false">
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>true</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="false" prefix="">
+            <expression1>false</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="false" prefix="nay">
+            <expression1>true</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>false</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>2+2==5</expression1>
+          </check_true>
+        </test>
+        <test location="" name="testudo.testarudo.complex" title="complex testarudo tests" n_failed="55" n_total="212" n_errors="2" success="false">
+          <test location="" name="testudo.testarudo.complex.difficult test" title="difficult test" n_failed="1" n_total="3" n_errors="0" success="false">
+            <check_equal location="" brief_location="" success="false" prefix="">
+              <expression1 value="7">7</expression1>
+              <expression2 value="8">8</expression2>
+            </check_equal>
+            <check_equal location="" brief_location="" success="true" prefix="nay">
+              <expression1 value="7">7</expression1>
+              <expression2 value="8">8</expression2>
+            </check_equal>
+            <check_equal location="" brief_location="" success="true" prefix="">
+              <expression1 value="un chat">&quot;un chat&quot;</expression1>
+              <expression2 value="un chat">string(&quot;un chat&quot;)</expression2>
+            </check_equal>
+          </test>
+          <test location="" name="testudo.testarudo.complex.complicated test" title="complicated test" n_failed="2" n_total="2" n_errors="0" success="false">
+            <check_equal location="" brief_location="" success="false" prefix="">
+              <expression1 value="it&apos;s">&quot;it&apos;s&quot;</expression1>
+              <expression2 value="complicated">&quot;complicated&quot;</expression2>
+            </check_equal>
+            <check_equal location="" brief_location="" success="false" prefix="">
+              <expression1 value="54">6*9</expression1>
+              <expression2 value="42">42</expression2>
+            </check_equal>
+          </test>
+          <test location="" name="testudo.testarudo.complex.test_with_error" title="test_with_error" n_failed="0" n_total="1" n_errors="1" success="false">
+            <check_equal location="" brief_location="" success="true" prefix="">
+              <expression1 value="44">22+22</expression1>
+              <expression2 value="44">44</expression2>
+            </check_equal>
+            <perform location="" brief_location="">throw runtime_error(&quot;see if you can catch me!&quot;)</perform>
+            <uncaught_exception>see if you can catch me!</uncaught_exception>
+          </test>
+          <test location="" name="testudo.testarudo.complex.penultimate test" title="penultimate test" n_failed="1" n_total="1" n_errors="0" success="false">
+            <check_equal location="" brief_location="" success="false" prefix="">
+              <expression1 value="there&apos;s nothing">&quot;there&apos;s nothing&quot;</expression1>
+              <expression2 value="penultimate">&quot;penultimate&quot;</expression2>
+            </check_equal>
+          </test>
+          <test location="" name="testudo.testarudo.complex.&quot;verify&quot; syntax" title="&quot;verify&quot; syntax" n_failed="13" n_total="25" n_errors="0" success="false">
+            <declare location="" brief_location="">auto is_even=predicate_a((a%2)==0)</declare>
+            <declare location="" brief_location="">auto is_multiple_of= [](auto n) { return predicate_c_a((n), (a%n)==0); }</declare>
+            <check_verify location="" brief_location="" success="true" prefix="">
+              <expression1 value="8">2*4</expression1>
+              <predicate>is_even</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="false" prefix="">
+              <expression1 value="9">2*4+1</expression1>
+              <predicate>is_even</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="false" prefix="">
+              <expression1 value="8">2*4</expression1>
+              <predicate>not is_even</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="true" prefix="">
+              <expression1 value="9">2*4+1</expression1>
+              <predicate>not is_even</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="false" prefix="">
+              <expression1 value="8">2*4</expression1>
+              <predicate>is_even and is_multiple_of(3)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="true" prefix="">
+              <expression1 value="30">6*5</expression1>
+              <predicate>is_even and is_multiple_of(3)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="false" prefix="">
+              <expression1 value="77">7*11</expression1>
+              <predicate>is_even and is_multiple_of(3)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="true" prefix="">
+              <expression1 value="8">2*4</expression1>
+              <predicate>is_even and not is_multiple_of(3)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="false" prefix="">
+              <expression1 value="30">6*5</expression1>
+              <predicate>is_even and not is_multiple_of(3)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="false" prefix="">
+              <expression1 value="77">7*11</expression1>
+              <predicate>is_even and not is_multiple_of(3)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="true" prefix="">
+              <expression1 value="8">2*4</expression1>
+              <predicate>is_even or is_multiple_of(3)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="true" prefix="">
+              <expression1 value="30">6*5</expression1>
+              <predicate>is_even or is_multiple_of(3)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="false" prefix="">
+              <expression1 value="77">7*11</expression1>
+              <predicate>is_even or is_multiple_of(3)</predicate>
+            </check_verify>
+            <text location="" brief_location="">the check syntax works with pure lambdas too:</text>
+            <declare location="" brief_location="">auto is_positive=predicate([](int n) { return n&gt;0; })</declare>
+            <check_verify location="" brief_location="" success="true" prefix="">
+              <expression1 value="8">2*4</expression1>
+              <predicate>is_positive</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="false" prefix="">
+              <expression1 value="-8">-2*4</expression1>
+              <predicate>is_positive</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="false" prefix="nay">
+              <expression1 value="8">2*4</expression1>
+              <predicate>is_even</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="true" prefix="nay">
+              <expression1 value="9">2*4+1</expression1>
+              <predicate>is_even</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="true" prefix="">
+              <expression1 value="8">8</expression1>
+              <predicate>predicate_a(a&gt;6)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="false" prefix="">
+              <expression1 value="5">5</expression1>
+              <predicate>predicate_a(a&gt;6)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="true" prefix="">
+              <expression1 value="8">8</expression1>
+              <predicate>gt(6)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="false" prefix="">
+              <expression1 value="5">5</expression1>
+              <predicate>gt(6)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="true" prefix="">
+              <expression1 value="8">8</expression1>
+              <predicate>ne(6)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="false" prefix="">
+              <expression1 value="6">6</expression1>
+              <predicate>ne(6)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="true" prefix="">
+              <expression1 value="8">8</expression1>
+              <predicate>gt(6) and lt(10)</predicate>
+            </check_verify>
+            <check_verify location="" brief_location="" success="false" prefix="">
+              <expression1 value="4">4</expression1>
+              <predicate>gt(6) and lt(10)</predicate>
+            </check_verify>
+          </test>
+          <test location="" name="testudo.testarudo.complex.&quot;true_for&quot; syntax" title="&quot;true_for&quot; syntax" n_failed="4" n_total="8" n_errors="0" success="false">
+            <declare location="" brief_location="">int a=7</declare>
+            <declare location="" brief_location="">int b=8</declare>
+            <check_true location="" brief_location="" success="true" prefix="">
+              <expression1>a&lt;b</expression1>
+            </check_true>
+            <check_true location="" brief_location="" success="false" prefix="">
+              <expression1>a&gt;b</expression1>
+            </check_true>
+            <check_true_for location="" brief_location="" success="true" prefix="">
+              <expression1>a&lt;b</expression1>
+              <expressionv value="7, 8">a, b</expressionv>
+            </check_true_for>
+            <check_true_for location="" brief_location="" success="false" prefix="">
+              <expression1>a&gt;b</expression1>
+              <expressionv value="7, 8">a, b</expressionv>
+            </check_true_for>
+            <check_true location="" brief_location="" success="false" prefix="nay">
+              <expression1>a&lt;b</expression1>
+            </check_true>
+            <check_true location="" brief_location="" success="true" prefix="nay">
+              <expression1>a&gt;b</expression1>
+            </check_true>
+            <check_true_for location="" brief_location="" success="false" prefix="nay">
+              <expression1>a&lt;b</expression1>
+              <expressionv value="7, 8">a, b</expressionv>
+            </check_true_for>
+            <check_true_for location="" brief_location="" success="true" prefix="nay">
+              <expression1>a&gt;b</expression1>
+              <expressionv value="7, 8">a, b</expressionv>
+            </check_true_for>
+          </test>
+          <test location="" name="testudo.testarudo.complex.try_catch" title="try-catch checks" n_failed="2" n_total="4" n_errors="1" success="false">
+            <try location="" brief_location="">[]() { }()</try>
+            <catch location="" brief_location="" exception_type="" success="false">&lt;no exception&gt;</catch>
+            <try location="" brief_location="">throw runtime_error(&quot;this&apos;ll be caught&quot;)</try>
+            <catch location="" brief_location="" exception_type="" success="true">this&apos;ll be caught</catch>
+            <try location="" brief_location="">throw &quot;this&apos;ll be too&quot;</try>
+            <catch location="" brief_location="" exception_type="char const *" success="true">this&apos;ll be too</catch>
+            <try location="" brief_location="">throw &quot;but this shouldn&apos;t&quot;</try>
+            <catch location="" brief_location="" exception_type="" success="false">&lt;unexpected exception&gt;</catch>
+            <uncaught_exception>but this shouldn&apos;t</uncaught_exception>
+          </test>
+          <test location="" name="testudo.testarudo.complex.test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches" title="a test with so many characters in the name and in the title that it&apos;ll have to be broken across several lines in the cartouche" n_failed="0" n_total="0" n_errors="0" success="true"/>
+          <test location="" name="testudo.testarudo.complex.&quot;with&quot; checks" title="&quot;with&quot; checks" n_failed="32" n_total="168" n_errors="0" success="false">
+            <declare location="" brief_location="">list&lt;int&gt; numbers_1{2, 4, 8}</declare>
+            <declare location="" brief_location="">list&lt;int&gt; numbers_2{2, 5, 8}</declare>
+            <with location="" brief_location="" var="x" container_first="numbers_1" container_rest="" summary="x in numbers_1" n_failed="0" n_total="3" n_errors="0" success="true">
+              <check_true location="" brief_location="" success="with" prefix="">
+                <expression1>(x%2)==0</expression1>
+              </check_true>
+            </with>
+            <with location="" brief_location="" var="x" container_first="numbers_2" container_rest="" summary="x in numbers_2" n_failed="1" n_total="3" n_errors="0" success="false">
+              <check_true location="" brief_location="" success="with" prefix="">
+                <expression1>(x%2)==0</expression1>
+              </check_true>
+              <with_results>
+                <show_value location="" brief_location="">
+                  <expression1 value="5">x</expression1>
+                </show_value>
+                <check_true location="" brief_location="" success="false" prefix="">
+                  <expression1>(x%2)==0</expression1>
+                </check_true>
+              </with_results>
+            </with>
+            <with location="" brief_location="" var="x" container_first="list&lt;int&gt;{3, 4, 8}" container_rest="" summary="x in list&lt;int&gt;{...}" n_failed="1" n_total="3" n_errors="0" success="false">
+              <check_true location="" brief_location="" success="with" prefix="">
+                <expression1>(x%2)==0</expression1>
+              </check_true>
+              <with_results>
+                <show_value location="" brief_location="">
+                  <expression1 value="3">x</expression1>
+                </show_value>
+                <check_true location="" brief_location="" success="false" prefix="">
+                  <expression1>(x%2)==0</expression1>
+                </check_true>
+              </with_results>
+            </with>
+            <with location="" brief_location="" var="x" container_first="list&lt;int&gt;{2, 4, 7}" container_rest="" summary="x in list&lt;int&gt;{...}" n_failed="1" n_total="3" n_errors="0" success="false">
+              <check_true location="" brief_location="" success="with" prefix="">
+                <expression1>(x%2)==0</expression1>
+              </check_true>
+              <with_results>
+                <show_value location="" brief_location="">
+                  <expression1 value="7">x</expression1>
+                </show_value>
+                <check_true location="" brief_location="" success="false" prefix="">
+                  <expression1>(x%2)==0</expression1>
+                </check_true>
+              </with_results>
+            </with>
+            <with location="" brief_location="" var="x" container_first="numbers_1" container_rest="" summary="x in numbers_1" n_failed="0" n_total="3" n_errors="0" success="true">
+              <check_equal location="" brief_location="" success="with" prefix="">
+                <expression1 value="">0</expression1>
+                <expression2 value="">x%2</expression2>
+              </check_equal>
+            </with>
+            <with location="" brief_location="" var="x" container_first="numbers_2" container_rest="" summary="x in numbers_2" n_failed="1" n_total="3" n_errors="0" success="false">
+              <check_equal location="" brief_location="" success="with" prefix="">
+                <expression1 value="">0</expression1>
+                <expression2 value="">x%2</expression2>
+              </check_equal>
+              <with_results>
+                <show_value location="" brief_location="">
+                  <expression1 value="5">x</expression1>
+                </show_value>
+                <check_equal location="" brief_location="" success="false" prefix="">
+                  <expression1 value="0">0</expression1>
+                  <expression2 value="1">x%2</expression2>
+                </check_equal>
+              </with_results>
+            </with>
+            <separator location="" brief_location=""/>
+            <with location="" brief_location="" var="x" container_first="numbers_1" container_rest="" summary="x in numbers_1" n_failed="0" n_total="3" n_errors="0" success="true">
+              <declare location="" brief_location="">auto is_even=predicate_a((a%2)==0)</declare>
+              <check_verify location="" brief_location="" success="with" prefix="">
+                <expression1 value="">x</expression1>
+                <predicate>is_even</predicate>
+              </check_verify>
+              <text location="" brief_location="">let&apos;s do something, just to see how it&apos;s shown</text>
+              <declare location="" brief_location="">auto y=x+1</declare>
+            </with>
+            <with location="" brief_location="" var="x" container_first="numbers_2" container_rest="" summary="x in numbers_2" n_failed="1" n_total="3" n_errors="0" success="false">
+              <declare location="" brief_location="">auto is_even=predicate_a((a%2)==0)</declare>
+              <check_verify location="" brief_location="" success="with" prefix="">
+                <expression1 value="">x</expression1>
+                <predicate>is_even</predicate>
+              </check_verify>
+              <with_results>
+                <show_value location="" brief_location="">
+                  <expression1 value="5">x</expression1>
+                </show_value>
+                <check_verify location="" brief_location="" success="false" prefix="">
+                  <expression1 value="5">x</expression1>
+                  <predicate>is_even</predicate>
+                </check_verify>
+              </with_results>
+              <text location="" brief_location="">let&apos;s do something, just to see how it&apos;s shown</text>
+              <declare location="" brief_location="">auto y=x+1</declare>
+            </with>
+            <separator location="" brief_location=""/>
+            <with location="" brief_location="" var="x" container_first="numbers_1" container_rest="" summary="x in numbers_1" n_failed="3" n_total="9" n_errors="0" success="false">
+              <with location="" brief_location="" var="y" container_first="numbers_2" container_rest="" summary="y in numbers_2">
+                <check_equal location="" brief_location="" success="with" prefix="">
+                  <expression1 value="">x%2</expression1>
+                  <expression2 value="">y%2</expression2>
+                </check_equal>
+                <with_results>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(2, 5)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(4, 5)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(8, 5)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                </with_results>
+              </with>
+            </with>
+            <with location="" brief_location="" var="x" container_first="list&lt;int&gt;{2, 4, 9}" container_rest="" summary="x in list&lt;int&gt;{...}" n_failed="4" n_total="9" n_errors="0" success="false">
+              <with location="" brief_location="" var="y" container_first="numbers_2" container_rest="" summary="y in numbers_2">
+                <check_equal location="" brief_location="" success="with" prefix="">
+                  <expression1 value="">x%2</expression1>
+                  <expression2 value="">y%2</expression2>
+                </check_equal>
+                <with_results>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(2, 5)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(4, 5)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(9, 2)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="1">x%2</expression1>
+                    <expression2 value="0">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(9, 8)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="1">x%2</expression1>
+                    <expression2 value="0">y%2</expression2>
+                  </check_equal>
+                </with_results>
+              </with>
+            </with>
+            <with location="" brief_location="" var="x" container_first="numbers_1" container_rest="" summary="x in numbers_1" n_failed="0" n_total="9" n_errors="0" success="true">
+              <with location="" brief_location="" var="y" container_first="{2, 4, 10}" container_rest="" summary="y in {...}">
+                <check_equal location="" brief_location="" success="with" prefix="">
+                  <expression1 value="">x%2</expression1>
+                  <expression2 value="">y%2</expression2>
+                </check_equal>
+              </with>
+            </with>
+            <separator location="" brief_location=""/>
+            <declare location="" brief_location="">auto is_even=predicate_a((a%2)==0)</declare>
+            <with location="" brief_location="" var="x" container_first="numbers_1" container_rest="" summary="x in numbers_1" n_failed="0" n_total="3" n_errors="0" success="true">
+              <check_verify location="" brief_location="" success="with" prefix="">
+                <expression1 value="">x</expression1>
+                <predicate>is_even</predicate>
+              </check_verify>
+            </with>
+            <with location="" brief_location="" var="x" container_first="numbers_1" container_rest="" summary="x in numbers_1" n_failed="0" n_total="3" n_errors="0" success="true">
+              <declare location="" brief_location="">int y=x+1</declare>
+              <check_verify location="" brief_location="" success="with" prefix="">
+                <expression1 value="">y</expression1>
+                <predicate>not is_even</predicate>
+              </check_verify>
+            </with>
+            <with location="" brief_location="" var="x" container_first="numbers_1" container_rest="" summary="x in numbers_1" n_failed="0" n_total="12" n_errors="0" success="true">
+              <check_verify location="" brief_location="" success="with" prefix="">
+                <expression1 value="">x</expression1>
+                <predicate>is_even</predicate>
+              </check_verify>
+              <with location="" brief_location="" var="y" container_first="numbers_1" container_rest="" summary="y in numbers_1">
+                <check_equal location="" brief_location="" success="with" prefix="">
+                  <expression1 value="">x%2</expression1>
+                  <expression2 value="">y%2</expression2>
+                </check_equal>
+              </with>
+            </with>
+            <with location="" brief_location="" var="x" container_first="numbers_1" container_rest="" summary="x in numbers_1" n_failed="3" n_total="12" n_errors="0" success="false">
+              <check_verify location="" brief_location="" success="with" prefix="">
+                <expression1 value="">x</expression1>
+                <predicate>is_even</predicate>
+              </check_verify>
+              <with location="" brief_location="" var="y" container_first="numbers_2" container_rest="" summary="y in numbers_2">
+                <check_equal location="" brief_location="" success="with" prefix="">
+                  <expression1 value="">x%2</expression1>
+                  <expression2 value="">y%2</expression2>
+                </check_equal>
+                <with_results>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(2, 5)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(4, 5)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(8, 5)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                </with_results>
+              </with>
+            </with>
+            <with location="" brief_location="" var="x" container_first="numbers_2" container_rest="" summary="x in numbers_2" n_failed="4" n_total="12" n_errors="0" success="false">
+              <check_verify location="" brief_location="" success="with" prefix="">
+                <expression1 value="">x</expression1>
+                <predicate>is_even</predicate>
+              </check_verify>
+              <with_results>
+                <show_value location="" brief_location="">
+                  <expression1 value="5">x</expression1>
+                </show_value>
+                <check_verify location="" brief_location="" success="false" prefix="">
+                  <expression1 value="5">x</expression1>
+                  <predicate>is_even</predicate>
+                </check_verify>
+              </with_results>
+              <with location="" brief_location="" var="y" container_first="numbers_1" container_rest="" summary="y in numbers_1">
+                <check_equal location="" brief_location="" success="with" prefix="">
+                  <expression1 value="">x%2</expression1>
+                  <expression2 value="">y%2</expression2>
+                </check_equal>
+                <with_results>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(5, 2)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="1">x%2</expression1>
+                    <expression2 value="0">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(5, 4)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="1">x%2</expression1>
+                    <expression2 value="0">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(5, 8)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="1">x%2</expression1>
+                    <expression2 value="0">y%2</expression2>
+                  </check_equal>
+                </with_results>
+              </with>
+            </with>
+            <with location="" brief_location="" var="x" container_first="numbers_2" container_rest="" summary="x in numbers_2" n_failed="5" n_total="12" n_errors="0" success="false">
+              <check_verify location="" brief_location="" success="with" prefix="">
+                <expression1 value="">x</expression1>
+                <predicate>is_even</predicate>
+              </check_verify>
+              <with_results>
+                <show_value location="" brief_location="">
+                  <expression1 value="5">x</expression1>
+                </show_value>
+                <check_verify location="" brief_location="" success="false" prefix="">
+                  <expression1 value="5">x</expression1>
+                  <predicate>is_even</predicate>
+                </check_verify>
+              </with_results>
+              <with location="" brief_location="" var="y" container_first="numbers_2" container_rest="" summary="y in numbers_2">
+                <check_equal location="" brief_location="" success="with" prefix="">
+                  <expression1 value="">x%2</expression1>
+                  <expression2 value="">y%2</expression2>
+                </check_equal>
+                <with_results>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(2, 5)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(5, 2)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="1">x%2</expression1>
+                    <expression2 value="0">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(5, 8)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="1">x%2</expression1>
+                    <expression2 value="0">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(8, 5)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                </with_results>
+              </with>
+            </with>
+            <separator location="" brief_location=""/>
+            <with location="" brief_location="" var="x" container_first="numbers_1" container_rest="" summary="x in numbers_1" n_failed="6" n_total="45" n_errors="0" success="false">
+              <with location="" brief_location="" var="y" container_first="numbers_1" container_rest="" summary="y in numbers_1">
+                <check_equal location="" brief_location="" success="with" prefix="">
+                  <expression1 value="">x%2</expression1>
+                  <expression2 value="">y%2</expression2>
+                </check_equal>
+              </with>
+              <check_verify location="" brief_location="" success="with" prefix="">
+                <expression1 value="">x</expression1>
+                <predicate>is_even</predicate>
+              </check_verify>
+              <with location="" brief_location="" var="y" container_first="numbers_2" container_rest="" summary="y in numbers_2">
+                <check_equal location="" brief_location="" success="with" prefix="">
+                  <expression1 value="">x%2</expression1>
+                  <expression2 value="">y%2</expression2>
+                </check_equal>
+                <with_results>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(2, 5)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(4, 5)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(8, 5)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                </with_results>
+              </with>
+              <check_verify location="" brief_location="" success="with" prefix="">
+                <expression1 value="">x</expression1>
+                <predicate>is_even</predicate>
+              </check_verify>
+              <with location="" brief_location="" var="y" container_first="numbers_1" container_rest="" summary="y in numbers_1">
+                <check_equal location="" brief_location="" success="with" prefix="">
+                  <expression1 value="">x%2</expression1>
+                  <expression2 value="">y%2</expression2>
+                </check_equal>
+              </with>
+              <check_verify location="" brief_location="" success="with" prefix="">
+                <expression1 value="">x</expression1>
+                <predicate>is_even</predicate>
+              </check_verify>
+              <with location="" brief_location="" var="y" container_first="list&lt;int&gt;{2, 4, 9}" container_rest="" summary="y in list&lt;int&gt;{...}">
+                <check_equal location="" brief_location="" success="with" prefix="">
+                  <expression1 value="">x%2</expression1>
+                  <expression2 value="">y%2</expression2>
+                </check_equal>
+                <with_results>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(2, 9)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(4, 9)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                  <show_value location="" brief_location="">
+                    <expression1 value="(8, 9)">(x, y)</expression1>
+                  </show_value>
+                  <check_equal location="" brief_location="" success="false" prefix="">
+                    <expression1 value="0">x%2</expression1>
+                    <expression2 value="1">y%2</expression2>
+                  </check_equal>
+                </with_results>
+              </with>
+            </with>
+            <with location="" brief_location="" var="x" container_first="numbers_1" container_rest="" summary="x in numbers_1" n_failed="0" n_total="3" n_errors="0" success="true">
+              <check_verify location="" brief_location="" success="with" prefix="">
+                <expression1 value="">0</expression1>
+                <predicate>is_even</predicate>
+              </check_verify>
+            </with>
+            <with location="" brief_location="" var="x" container_first="{1, 2, 3}" container_rest="" summary="x in {...}" n_failed="0" n_total="3" n_errors="0" success="true">
+              <check_equal location="" brief_location="" success="with" prefix="">
+                <expression1 value="">x</expression1>
+                <expression2 value="">x</expression2>
+              </check_equal>
+            </with>
+            <with location="" brief_location="" var="(x)" container_first="list&lt;tuple&lt;int&gt;&gt;{{3}, {4}, {8}}" container_rest="" summary="(x) in list&lt;tuple&lt;int&gt;&gt;{...}" n_failed="1" n_total="3" n_errors="0" success="false">
+              <check_true location="" brief_location="" success="with" prefix="">
+                <expression1>(x%2)==0</expression1>
+              </check_true>
+              <with_results>
+                <show_value location="" brief_location="">
+                  <expression1 value="(3)">(x)</expression1>
+                </show_value>
+                <check_true location="" brief_location="" success="false" prefix="">
+                  <expression1>(x%2)==0</expression1>
+                </check_true>
+              </with_results>
+            </with>
+            <declare location="" brief_location="">list&lt;tuple&lt;int, int, int&gt;&gt; list_of_sums{{1, 3, 4}, {3, 7, 11}, {10, 15, 25}}</declare>
+            <with location="" brief_location="" var="(a, b, sum)" container_first="list_of_sums" container_rest="" summary="(a, b, sum) in list_of_sums" n_failed="1" n_total="3" n_errors="0" success="false">
+              <check_equal location="" brief_location="" success="with" prefix="">
+                <expression1 value="">sum</expression1>
+                <expression2 value="">a+b</expression2>
+              </check_equal>
+              <with_results>
+                <show_value location="" brief_location="">
+                  <expression1 value="(3, 7, 11)">(a, b, sum)</expression1>
+                </show_value>
+                <check_equal location="" brief_location="" success="false" prefix="">
+                  <expression1 value="11">sum</expression1>
+                  <expression2 value="10">a+b</expression2>
+                </check_equal>
+              </with_results>
+            </with>
+            <with location="" brief_location="" var="(x)" container_first="list&lt;tuple&lt;int&gt;&gt;{{2}, {4}, {8}}" container_rest="" summary="(x) in list&lt;tuple&lt;int&gt;&gt;{...}" n_failed="0" n_total="3" n_errors="0" success="true">
+              <check_true location="" brief_location="" success="with" prefix="">
+                <expression1>(x%2)==0</expression1>
+              </check_true>
+            </with>
+            <declare location="" brief_location="">list&lt;tuple&lt;int, int, int&gt;&gt; list_of_sums_2{{1, 3, 4}, {3, 7, 10}, {10, 15, 25}}</declare>
+            <with location="" brief_location="" var="(a, b, sum)" container_first="list_of_sums_2" container_rest="" summary="(a, b, sum) in list_of_sums_2" n_failed="0" n_total="3" n_errors="0" success="true">
+              <check_equal location="" brief_location="" success="with" prefix="">
+                <expression1 value="">sum</expression1>
+                <expression2 value="">a+b</expression2>
+              </check_equal>
+            </with>
+          </test>
+        </test>
+        <test location="" name="testudo.testarudo.disorder" title="disordered tests" n_failed="5" n_total="17" n_errors="0" success="false">
+          <test location="" name="testudo.testarudo.disorder.du" title="du, but comes first" n_failed="1" n_total="1" n_errors="0" success="false">
+            <check_true location="" brief_location="" success="false" prefix="">
+              <expression1>string(&quot;unu&quot;)&lt;string(&quot;du&quot;)</expression1>
+            </check_true>
+          </test>
+          <test location="" name="testudo.testarudo.disorder.unu" title="unu, but comes last" n_failed="0" n_total="1" n_errors="0" success="true">
+            <check_true location="" brief_location="" success="true" prefix="">
+              <expression1>string(&quot;unu&quot;)&gt;string(&quot;du&quot;)</expression1>
+            </check_true>
+          </test>
+          <test location="" name="testudo.testarudo.disorder.absdiff" title="absdiff()" n_failed="0" n_total="4" n_errors="0" success="true">
+            <perform location="" brief_location="">approx_epsilon=1e-10</perform>
+            <check_approx location="" brief_location="" success="true" prefix="" max_error="eps">
+              <expression1 value="2">testudo::absdiff(5., 7.)</expression1>
+              <expression2 value="2">2.</expression2>
+            </check_approx>
+            <check_approx location="" brief_location="" success="true" prefix="" max_error="eps">
+              <expression1 value="2">testudo::absdiff(7., 5.)</expression1>
+              <expression2 value="2">2.</expression2>
+            </check_approx>
+            <check_approx location="" brief_location="" success="true" prefix="" max_error="eps">
+              <expression1 value="4">2.+2.</expression1>
+              <expression2 value="4">4.</expression2>
+            </check_approx>
+            <check_approx location="" brief_location="" success="true" prefix="nay" max_error="eps">
+              <expression1 value="4">2.+2.</expression1>
+              <expression2 value="5">5.</expression2>
+            </check_approx>
+          </test>
+          <test location="" name="testudo.testarudo.disorder.testarudo_ext" title="Testarudo support for STL objects" n_failed="3" n_total="10" n_errors="0" success="false">
+            <perform location="" brief_location="">approx_epsilon=1e-6</perform>
+            <declare location="" brief_location="">tuple&lt;float, int, double&gt; ta={3.14, 8, 7.5}</declare>
+            <declare location="" brief_location="">tuple&lt;double, float, int&gt; tb={4.14, 7., 6}</declare>
+            <check_approx location="" brief_location="" success="false" prefix="" max_error="eps">
+              <expression1 value="tuple{3.14, 8, 7.5}">ta</expression1>
+              <expression2 value="tuple{4.14, 7, 6}">tb</expression2>
+            </check_approx>
+            <show_value location="" brief_location="">
+              <expression1 value="3.5">testudo::absdiff(ta, tb)</expression1>
+            </show_value>
+            <declare location="" brief_location="">tuple&lt;float, int, double&gt; tc={3.14, 8, 7.5}</declare>
+            <check_approx location="" brief_location="" success="true" prefix="" max_error="eps">
+              <expression1 value="tuple{3.14, 8, 7.5}">ta</expression1>
+              <expression2 value="tuple{3.14, 8, 7.5}">tc</expression2>
+            </check_approx>
+            <separator location="" brief_location=""/>
+            <declare location="" brief_location="">list&lt;float&gt; la={3.14, 8, 7.5}</declare>
+            <declare location="" brief_location="">list&lt;float&gt; lb={4.14, 7., 6}</declare>
+            <check_approx location="" brief_location="" success="false" prefix="" max_error="eps">
+              <expression1 value="list{3.14, 8, 7.5}">la</expression1>
+              <expression2 value="list{4.14, 7, 6}">lb</expression2>
+            </check_approx>
+            <show_value location="" brief_location="">
+              <expression1 value="3.5">testudo::absdiff(la, lb)</expression1>
+            </show_value>
+            <declare location="" brief_location="">list&lt;float&gt; lc={3.14, 8, 7.5}</declare>
+            <check_approx location="" brief_location="" success="true" prefix="" max_error="eps">
+              <expression1 value="list{3.14, 8, 7.5}">la</expression1>
+              <expression2 value="list{3.14, 8, 7.5}">lc</expression2>
+            </check_approx>
+            <declare_scope location="" brief_location="" declare="auto x=string(&quot;hey&quot;)">
+              <check_equal location="" brief_location="" success="true" prefix="">
+                <expression1 value="hey">x</expression1>
+                <expression2 value="hey">&quot;hey&quot;</expression2>
+              </check_equal>
+              <check_equal location="" brief_location="" success="true" prefix="nay">
+                <expression1 value="hey">x</expression1>
+                <expression2 value="hi">&quot;hi&quot;</expression2>
+              </check_equal>
+            </declare_scope>
+            <declare_scope location="" brief_location="" declare="auto x=-12">
+              <check_equal location="" brief_location="" success="false" prefix="">
+                <expression1 value="-12">x</expression1>
+                <expression2 value="77">77</expression2>
+              </check_equal>
+              <check_equal location="" brief_location="" success="true" prefix="nay">
+                <expression1 value="-12">x</expression1>
+                <expression2 value="3">3</expression2>
+              </check_equal>
+            </declare_scope>
+            <declare_scope location="" brief_location="" declare="auto [action, occurrences]=tuple{&quot;sin&quot;, 77*7}">
+              <check_equal location="" brief_location="" success="true" prefix="">
+                <expression1 value="sin">action</expression1>
+                <expression2 value="sin">&quot;sin&quot;</expression2>
+              </check_equal>
+              <check_equal location="" brief_location="" success="true" prefix="">
+                <expression1 value="539">occurrences</expression1>
+                <expression2 value="539">539</expression2>
+              </check_equal>
+            </declare_scope>
+          </test>
+          <test location="" name="testudo.testarudo.disorder.no_representation" title="class with no representation" n_failed="1" n_total="1" n_errors="0" success="false">
+            <check_equal location="" brief_location="" success="false" prefix="">
+              <expression1 value="&lt;...&gt;">ClassWithNoRepresentation()</expression1>
+              <expression2 value="&lt;...&gt;">ClassWithNoRepresentation()</expression2>
+            </check_equal>
+          </test>
+        </test>
+        <test location="" name="testudo.testarudo.external function" title="external function" n_failed="0" n_total="4" n_errors="0" success="true">
+          <perform location="" brief_location="">testarudo_util::test_commutativity(test_management, 2, 3)</perform>
+          <show_value location="" brief_location="">
+            <expression1 value="2">a</expression1>
+          </show_value>
+          <show_value location="" brief_location="">
+            <expression1 value="3">b</expression1>
+          </show_value>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="5">a+b</expression1>
+            <expression2 value="5">b+a</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="6">a*b</expression1>
+            <expression2 value="6">b*a</expression2>
+          </check_equal>
+          <perform location="" brief_location="">testarudo_util::test_commutativity(test_management, -10, 7)</perform>
+          <show_value location="" brief_location="">
+            <expression1 value="-10">a</expression1>
+          </show_value>
+          <show_value location="" brief_location="">
+            <expression1 value="7">b</expression1>
+          </show_value>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="-3">a+b</expression1>
+            <expression2 value="-3">b+a</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="-70">a*b</expression1>
+            <expression2 value="-70">b*a</expression2>
+          </check_equal>
+        </test>
+      </test>
+      <test location="" name="testudo.esperanto_test" title="Esperanto test" n_failed="0" n_total="1" n_errors="0" success="true">
+        <test location="" name="testudo.esperanto_test.numbers" title="numbers" n_failed="0" n_total="1" n_errors="0" success="true">
+          <declare location="" brief_location="">auto const dictionary=vortaro</declare>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="1">dictionary.at(&quot;unu&quot;)</expression1>
+            <expression2 value="1">1</expression2>
+          </check_equal>
+        </test>
+      </test>
+      <test location="" name="testudo.fixture" title="fixture tests" n_failed="0" n_total="9" n_errors="1" success="false">
+        <test location="" name="testudo.fixture.+ commutativity" title="+ commutativity" n_failed="0" n_total="4" n_errors="0" success="true">
+          <text location="" brief_location="">visible fixture NumbersFixture</text>
+          <declare location="" brief_location="">(fixture) double x</declare>
+          <perform location="" brief_location="">(fixture) init x(1.)</perform>
+          <declare location="" brief_location="">(fixture) double y=-2.5, z</declare>
+          <perform location="" brief_location="">(fixture) init z(3.14)</perform>
+          <text location="" brief_location="">fixture constructor done</text>
+          <perform location="" brief_location="">check_initial_values()</perform>
+          <check_approx location="" brief_location="" success="true" prefix="" max_error="eps">
+            <expression1 value="1">x</expression1>
+            <expression2 value="1">1.</expression2>
+          </check_approx>
+          <check_approx location="" brief_location="" success="true" prefix="" max_error="eps">
+            <expression1 value="-2.5">y</expression1>
+            <expression2 value="-2.5">-2.5</expression2>
+          </check_approx>
+          <check_approx location="" brief_location="" success="true" prefix="" max_error="eps">
+            <expression1 value="3.14">z</expression1>
+            <expression2 value="3.14">3.14</expression2>
+          </check_approx>
+          <check_approx location="" brief_location="" success="true" prefix="" max_error="eps">
+            <expression1 value="-1.5">x+y</expression1>
+            <expression2 value="-1.5">y+x</expression2>
+          </check_approx>
+          <text location="" brief_location="">fixture destructor</text>
+        </test>
+        <test location="" name="testudo.fixture.* commutativity" title="* commutativity" n_failed="0" n_total="4" n_errors="0" success="true">
+          <text location="" brief_location="">with fixture NumbersFixture</text>
+          <perform location="" brief_location="">check_initial_values()</perform>
+          <check_approx location="" brief_location="" success="true" prefix="" max_error="eps">
+            <expression1 value="-2.5">x*y</expression1>
+            <expression2 value="-2.5">y*x</expression2>
+          </check_approx>
+        </test>
+        <test location="" name="testudo.fixture.associativity" title="associativity" n_failed="0" n_total="1" n_errors="1" success="false">
+          <text location="" brief_location="">with fixture NumbersFixture</text>
+          <check_approx location="" brief_location="" success="true" prefix="" max_error="eps">
+            <expression1 value="0.64">x*(y+z)</expression1>
+            <expression2 value="0.64">x*y+x*z</expression2>
+          </check_approx>
+          <perform location="" brief_location="">throw_something_unexpected()</perform>
+          <uncaught_exception>hey, here&apos;s something unexpected</uncaught_exception>
+        </test>
+      </test>
+      <test location="" name="testudo.scope" title="scope begin and end" n_failed="1" n_total="5" n_errors="0" success="false">
+        <declare location="" brief_location="">int flag=10</declare>
+        <scope location="" brief_location="" name="at_destruction_flag_20">
+          <declare location="" brief_location="">AtDestruction at_destruction_flag_20([&amp;flag]() { flag=20; })</declare>
+          <scope location="" brief_location="" name="">
+            <declare location="" brief_location="">AtDestruction at_destruction_flag_30([&amp;flag]() { flag=30; })</declare>
+            <check_equal location="" brief_location="" success="true" prefix="">
+              <expression1 value="10">flag</expression1>
+              <expression2 value="10">10</expression2>
+            </check_equal>
+            <text location="" brief_location="">now, a long text to check line breaking within scopes (the following two tests have the same purpose)</text>
+            <check_equal location="" brief_location="" success="true" prefix="">
+              <expression1 value="1 2 3 4 5 6 7 8 9">string(&quot;1 2 3 4 5 6 7 8 9&quot;)</expression1>
+              <expression2 value="1 2 3 4 5 6 7 8 9">&quot;1 2 3 4 5 6 7 8 9&quot;</expression2>
+            </check_equal>
+            <check_equal location="" brief_location="" success="false" prefix="">
+              <expression1 value="1 2 3 4 5 6 7 8 9">string(&quot;1 2 3 4 5 6 7 8 9&quot;)</expression1>
+              <expression2 value="1 2 3 4 5 6 7 8 8">&quot;1 2 3 4 5 6 7 8 8&quot;</expression2>
+            </check_equal>
+          </scope>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="30">flag</expression1>
+            <expression2 value="30">30</expression2>
+          </check_equal>
+        </scope>
+        <check_equal location="" brief_location="" success="true" prefix="">
+          <expression1 value="20">flag</expression1>
+          <expression2 value="20">20</expression2>
+        </check_equal>
+      </test>
+      <test location="" name="testudo.Testudo syntax" title="Testudo syntax" n_failed="0" n_total="1" n_errors="0" success="true">
+        <text location="" brief_location="">tags in &quot;||||~tilde~||~&quot;...&quot;||~tilde~||~||&quot; are used internally</text>
+        <text location="" brief_location="">but they should still appear here</text>
+        <declare location="" brief_location="">string code=&quot;||~tilde~||~pre||~tilde~||~ ||||~tilde~||~bold||~tilde~||~|| ||~tilde~||~post||~tilde~||~&quot;</declare>
+        <show_value location="" brief_location="">
+          <expression1 value="||~tilde~||~pre||~tilde~||~ ||||~tilde~||~bold||~tilde~||~|| ||~tilde~||~post||~tilde~||~">code</expression1>
+        </show_value>
+        <check_equal location="" brief_location="" success="true" prefix="">
+          <expression1 value="||~tilde~||~pre||~tilde~||~ ||||~tilde~||~bold||~tilde~||~|| ||~tilde~||~post||~tilde~||~">code</expression1>
+          <expression2 value="||~tilde~||~pre||~tilde~||~ ||||~tilde~||~bold||~tilde~||~|| ||~tilde~||~post||~tilde~||~">&quot;||~tilde~||~pre||~tilde~||~ ||||~tilde~||~bold||~tilde~||~|| ||~tilde~||~post||~tilde~||~&quot;</expression2>
+        </check_equal>
+      </test>
+      <test location="" name="testudo.mock_turtle" title="mock turtle tests" n_failed="19" n_total="69" n_errors="0" success="false">
+        <test location="" name="testudo.mock_turtle.Queen of Hearts&apos; recipe" title="Queen of Hearts&apos; recipe" n_failed="0" n_total="9" n_errors="0" success="true">
+          <declare location="" brief_location="">auto soup_mock=make_shared&lt;SoupMock&gt;()</declare>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="pair{2, 1}">soup_mock-&gt;reverse({1, 2})</expression1>
+            <expression2 value="pair{2, 1}">pair(2, 1)</expression2>
+          </check_equal>
+          <perform location="" brief_location="">soup_mock-&gt;schedule_ret(temp, 20, 40, 60, 80, 100)</perform>
+          <declare location="" brief_location="">bool good=queen_of_hearts_mock_turtle_soup(soup_mock)</declare>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>good</expression1>
+          </check_true>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{tuple{calf brains, 4}, tuple{pork liver, 3}, tuple{water, 1}, tuple{water, 1}, tuple{water, 1}}">soup_mock-&gt;logged_args(add_ingr)</expression1>
+            <expression2 value="vector{tuple{calf brains, 4}, tuple{pork liver, 3}, tuple{water, 1}, tuple{water, 1}, tuple{water, 1}}">{{&quot;calf brains&quot;, 4}, {&quot;pork liver&quot;, 3}, {&quot;water&quot;, 1}, {&quot;water&quot;, 1}, {&quot;water&quot;, 1}}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{pair{tuple{4}, tuple{calf brains, 4}}, pair{tuple{7}, tuple{pork liver, 3}}, pair{tuple{8}, tuple{water, 1}}, pair{tuple{9}, tuple{water, 1}}, pair{tuple{10}, tuple{water, 1}}}">soup_mock-&gt;logged_ret_args(add_ingr)</expression1>
+            <expression2 value="vector{pair{tuple{4}, tuple{calf brains, 4}}, pair{tuple{7}, tuple{pork liver, 3}}, pair{tuple{8}, tuple{water, 1}}, pair{tuple{9}, tuple{water, 1}}, pair{tuple{10}, tuple{water, 1}}}">{{{4}, {&quot;calf brains&quot;, 4}}, {{7}, {&quot;pork liver&quot;, 3}}, {{8}, {&quot;water&quot;, 1}}, {{9}, {&quot;water&quot;, 1}}, {{10}, {&quot;water&quot;, 1}}}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{tuple{9}, tuple{5}}">soup_mock-&gt;logged_args(set_heat)</expression1>
+            <expression2 value="vector{tuple{9}, tuple{5}}">{{9}, {5}}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="14">soup_mock-&gt;log_size(wait)</expression1>
+            <expression2 value="14">14</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="map{{calf brains, 4}, {pork liver, 3}, {water, 3}}">soup_mock-&gt;content</expression1>
+            <expression2 value="map{{calf brains, 4}, {pork liver, 3}, {water, 3}}">{{&quot;calf brains&quot;, 4}, {&quot;pork liver&quot;, 3}, {&quot;water&quot;, 3}}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="1">soup_mock-&gt;log_size(is_tasty)</expression1>
+            <expression2 value="1">1</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{tuple{true}}">soup_mock-&gt;logged_ret(is_tasty)</expression1>
+            <expression2 value="vector{tuple{true}}">{{true}}</expression2>
+          </check_equal>
+        </test>
+        <test location="" name="testudo.mock_turtle.Queen of Hearts&apos; recipe calls" title="Queen of Hearts&apos; recipe calls" n_failed="5" n_total="17" n_errors="0" success="false">
+          <declare location="" brief_location="">auto soup_mock=make_shared&lt;SoupMock&gt;()</declare>
+          <perform location="" brief_location="">soup_mock-&gt;set_ret_default(forty_two, 6*9)</perform>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="pair{2, 1}">soup_mock-&gt;reverse({1, 2})</expression1>
+            <expression2 value="pair{2, 1}">pair(2, 1)</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="54">soup_mock-&gt;forty_two()</expression1>
+            <expression2 value="54">54</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="0">soup_mock-&gt;counter</expression1>
+            <expression2 value="0">0</expression2>
+          </check_equal>
+          <perform location="" brief_location="">soup_mock-&gt;inc_counter()</perform>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="1">soup_mock-&gt;counter</expression1>
+            <expression2 value="1">1</expression2>
+          </check_equal>
+          <perform location="" brief_location="">soup_mock-&gt;add_counter(3)</perform>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="4">soup_mock-&gt;counter</expression1>
+            <expression2 value="4">4</expression2>
+          </check_equal>
+          <perform location="" brief_location="">soup_mock-&gt;schedule_ret(temp, 20, 40, 60, 80, 100)</perform>
+          <perform location="" brief_location="">queen_of_hearts_mock_turtle_soup(soup_mock)</perform>
+          <show_multiline_value location="" brief_location="">
+            <expression1 value="{reverse @ 0}&#xa;{forty_two @ 0}&#xa;{inc_counter @ 0}&#xa;{add_counter @ 0}&#xa;{add_ingr @ 0} -- {add_ingr @ 4}&#xa;{set_heat @ 0}&#xa;{temp @ 0}&#xa;{wait @ 0}&#xa;{temp @ 1}&#xa;{wait @ 1}&#xa;{temp @ 2}&#xa;{wait @ 2}&#xa;{temp @ 3}&#xa;{wait @ 3}&#xa;{temp @ 4}&#xa;{set_heat @ 1}&#xa;{wait @ 4} -- {wait @ 13}&#xa;{is_tasty @ 0}&#xa;">print_calls(soup_mock-&gt;calls())</expression1>
+          </show_multiline_value>
+          <declare_scope location="" brief_location="" declare="auto it=iterate(soup_mock)">
+            <declare_scope location="" brief_location="" declare="auto call=it.pop_call(*soup_mock, reverse)">
+              <check_equal location="" brief_location="" success="true" prefix="">
+                <expression1 value="reverse:{pair{2, 1} (pair{1, 2})}">call</expression1>
+                <expression2 value="{pair{2, 1} (pair{1, 2})}">{{2, 1}}, {{1, 2}}</expression2>
+              </check_equal>
+              <check_equal location="" brief_location="" success="false" prefix="">
+                <expression1 value="reverse:{pair{2, 1} (pair{1, 2})}">call</expression1>
+                <expression2 value="{pair{3, 1} (pair{1, 2})}">{{3, 1}}, {{1, 2}}</expression2>
+              </check_equal>
+              <check_equal location="" brief_location="" success="false" prefix="nay">
+                <expression1 value="reverse:{pair{2, 1} (pair{1, 2})}">call</expression1>
+                <expression2 value="{pair{2, 1} (pair{1, 2})}">{{2, 1}}, {{1, 2}}</expression2>
+              </check_equal>
+              <check_equal location="" brief_location="" success="true" prefix="nay">
+                <expression1 value="reverse:{pair{2, 1} (pair{1, 2})}">call</expression1>
+                <expression2 value="{pair{3, 1} (pair{1, 2})}">{{3, 1}}, {{1, 2}}</expression2>
+              </check_equal>
+            </declare_scope>
+            <check_equal location="" brief_location="" success="true" prefix="">
+              <expression1 value="forty_two:{54 ()}">it.pop_call(*soup_mock, forty_two)</expression1>
+              <expression2 value="{54 ()}">{54}, {}</expression2>
+            </check_equal>
+            <declare_scope location="" brief_location="" declare="auto call=it.get_call(*soup_mock, inc_counter)">
+              <check_equal location="" brief_location="" success="true" prefix="">
+                <expression1 value="inc_counter:{void ()}">call</expression1>
+                <expression2 value="{void ()}">{}, {}</expression2>
+              </check_equal>
+            </declare_scope>
+            <perform location="" brief_location="">it.next()</perform>
+            <check_equal location="" brief_location="" success="true" prefix="">
+              <expression1 value="add_counter:{void (3)}">it.pop_call(*soup_mock, add_counter)</expression1>
+              <expression2 value="{void (3)}">{}, {3}</expression2>
+            </check_equal>
+            <perform location="" brief_location="">while (it.method_name() not_eq &quot;set_heat&quot;) it.next()</perform>
+            <declare_scope location="" brief_location="" declare="auto call=it.pop_call(*soup_mock, reverse)">
+              <check_equal location="" brief_location="" success="false" prefix="">
+                <expression1 value="reverse:invalid">call</expression1>
+                <expression2 value="{pair{2, 1} (pair{1, 2})}">{{2, 1}}, {{1, 2}}</expression2>
+              </check_equal>
+              <check_equal location="" brief_location="" success="false" prefix="nay">
+                <expression1 value="reverse:invalid">call</expression1>
+                <expression2 value="{pair{2, 1} (pair{1, 2})}">{{2, 1}}, {{1, 2}}</expression2>
+              </check_equal>
+            </declare_scope>
+            <declare_scope location="" brief_location="" declare="auto call=it.pop_call(*soup_mock, set_heat)">
+              <check_equal location="" brief_location="" success="true" prefix="">
+                <expression1 value="set_heat:{void (9)}">call</expression1>
+                <expression2 value="{void (9)}">{}, {9}</expression2>
+              </check_equal>
+              <check_equal location="" brief_location="" success="false" prefix="">
+                <expression1 value="set_heat:{void (9)}">call</expression1>
+                <expression2 value="{void (0)}">{}, {0}</expression2>
+              </check_equal>
+            </declare_scope>
+            <perform location="" brief_location="">while (it) show_value(it.method_name()), it.next()</perform>
+            <show_value location="" brief_location="">
+              <expression1 value="temp">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="temp">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="temp">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="temp">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="temp">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="set_heat">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="wait">it.method_name()</expression1>
+            </show_value>
+            <show_value location="" brief_location="">
+              <expression1 value="is_tasty">it.method_name()</expression1>
+            </show_value>
+            <check_true location="" brief_location="" success="true" prefix="">
+              <expression1>it.done()</expression1>
+            </check_true>
+          </declare_scope>
+        </test>
+        <test location="" name="testudo.mock_turtle.approx" title="approx" n_failed="6" n_total="9" n_errors="0" success="false">
+          <declare location="" brief_location="">auto soup_mock=make_shared&lt;SoupMock&gt;()</declare>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="pair{2, 1}">soup_mock-&gt;reverse_float({1., 2.})</expression1>
+            <expression2 value="pair{2, 1}">pair(2., 1.)</expression2>
+          </check_equal>
+          <declare_scope location="" brief_location="" declare="auto it=iterate(soup_mock)">
+            <text location="" brief_location="">wrong method:</text>
+            <declare_scope location="" brief_location="" declare="auto call=it.pop_call(*soup_mock, reverse)">
+              <check_approx location="" brief_location="" success="false" prefix="" max_error="eps">
+                <expression1 value="reverse:invalid">call</expression1>
+                <expression2 value="{pair{2, 1} (pair{1, 2})}">{{2., 1.}}, {{1., 2.}}</expression2>
+              </check_approx>
+              <check_approx location="" brief_location="" success="false" prefix="" max_error="eps">
+                <expression1 value="reverse:invalid">call</expression1>
+                <expression2 value="{pair{3, 1} (pair{1, 2})}">{{3., 1.}}, {{1., 2.}}</expression2>
+              </check_approx>
+              <check_approx location="" brief_location="" success="false" prefix="nay" max_error="eps">
+                <expression1 value="reverse:invalid">call</expression1>
+                <expression2 value="{pair{2, 1} (pair{1, 2})}">{{2., 1.}}, {{1., 2.}}</expression2>
+              </check_approx>
+              <check_approx location="" brief_location="" success="false" prefix="nay" max_error="eps">
+                <expression1 value="reverse:invalid">call</expression1>
+                <expression2 value="{pair{3, 1} (pair{1, 2})}">{{3., 1.}}, {{1., 2.}}</expression2>
+              </check_approx>
+            </declare_scope>
+            <text location="" brief_location="">right method:</text>
+            <declare_scope location="" brief_location="" declare="auto call=it.pop_call(*soup_mock, reverse_float)">
+              <check_approx location="" brief_location="" success="true" prefix="" max_error="eps">
+                <expression1 value="reverse_float:{pair{2, 1} (pair{1, 2})}">call</expression1>
+                <expression2 value="{pair{2, 1} (pair{1, 2})}">{{2., 1.}}, {{1., 2.}}</expression2>
+              </check_approx>
+              <check_approx location="" brief_location="" success="false" prefix="" max_error="eps">
+                <expression1 value="reverse_float:{pair{2, 1} (pair{1, 2})}">call</expression1>
+                <expression2 value="{pair{3, 1} (pair{1, 2})}">{{3., 1.}}, {{1., 2.}}</expression2>
+              </check_approx>
+              <check_approx location="" brief_location="" success="false" prefix="nay" max_error="eps">
+                <expression1 value="reverse_float:{pair{2, 1} (pair{1, 2})}">call</expression1>
+                <expression2 value="{pair{2, 1} (pair{1, 2})}">{{2., 1.}}, {{1., 2.}}</expression2>
+              </check_approx>
+              <check_approx location="" brief_location="" success="true" prefix="nay" max_error="eps">
+                <expression1 value="reverse_float:{pair{2, 1} (pair{1, 2})}">call</expression1>
+                <expression2 value="{pair{3, 1} (pair{1, 2})}">{{3., 1.}}, {{1., 2.}}</expression2>
+              </check_approx>
+            </declare_scope>
+          </declare_scope>
+        </test>
+        <test location="" name="testudo.mock_turtle.calls with several mocks" title="calls with several mocks" n_failed="1" n_total="9" n_errors="0" success="false">
+          <declare location="" brief_location="">testudo::CallLedger cl</declare>
+          <declare location="" brief_location="">MockLevel lev1(12)</declare>
+          <perform location="" brief_location="">call_ledger_report_to(lev1, &amp;cl)</perform>
+          <declare location="" brief_location="">bool created=false</declare>
+          <declare location="" brief_location="">MockLevel lev2(47, [&amp;created]() { created=true; })</declare>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>created</expression1>
+          </check_true>
+          <perform location="" brief_location="">call_ledger_report_to(lev2, &amp;cl)</perform>
+          <perform location="" brief_location="">equalize(lev1, lev2)</perform>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="52">lev1.readout()</expression1>
+            <expression2 value="52">52</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="52">lev2.readout()</expression1>
+            <expression2 value="52">52</expression2>
+          </check_equal>
+          <show_multiline_value location="" brief_location="">
+            <expression1 value="{lev1.readout @ 0}&#xa;{lev2.readout @ 0}&#xa;{lev1.readout @ 1}&#xa;{lev2.readout @ 1}&#xa;{lev1.large_up @ 0}&#xa;{lev1.readout @ 2}&#xa;{lev2.readout @ 2}&#xa;{lev1.large_up @ 1}&#xa;{lev1.readout @ 3}&#xa;{lev2.readout @ 3}&#xa;{lev1.large_up @ 2}&#xa;{lev1.readout @ 4}&#xa;{lev2.readout @ 4}&#xa;{lev1.large_up @ 3}&#xa;{lev1.readout @ 5}&#xa;{lev2.readout @ 5} -- {lev2.readout @ 6}&#xa;{lev1.readout @ 6}&#xa;{lev2.small_up @ 0}&#xa;{lev2.readout @ 7}&#xa;{lev1.readout @ 7}&#xa;{lev2.small_up @ 1}&#xa;{lev2.readout @ 8}&#xa;{lev1.readout @ 8}&#xa;{lev2.small_up @ 2}&#xa;{lev2.readout @ 9}&#xa;{lev1.readout @ 9}&#xa;{lev2.small_up @ 3}&#xa;{lev2.readout @ 10}&#xa;{lev1.readout @ 10}&#xa;{lev2.small_up @ 4}&#xa;{lev2.readout @ 11}&#xa;{lev1.readout @ 11} -- {lev1.readout @ 12}&#xa;{lev2.readout @ 12}&#xa;">print_calls(cl.calls())</expression1>
+          </show_multiline_value>
+          <declare location="" brief_location="">auto it=iterate(cl)</declare>
+          <perform location="" brief_location="">while (it.method_name() not_eq &quot;large_up&quot;) it.next()</perform>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="lev1">it.mock_name()</expression1>
+            <expression2 value="lev1">&quot;lev1&quot;</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="large_up">it.method_name()</expression1>
+            <expression2 value="large_up">&quot;large_up&quot;</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="large_up:{void ()}">it.get_call(lev1, large_up)</expression1>
+            <expression2 value="{void ()}">{}, {}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="false" prefix="">
+            <expression1 value="large_up:invalid">it.get_call(lev2, large_up)</expression1>
+            <expression2 value="{void ()}">{}, {}</expression2>
+          </check_equal>
+          <perform location="" brief_location="">it.next()</perform>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="lev1">it.mock_name()</expression1>
+            <expression2 value="lev1">&quot;lev1&quot;</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="readout">it.method_name()</expression1>
+            <expression2 value="readout">&quot;readout&quot;</expression2>
+          </check_equal>
+        </test>
+        <test location="" name="testudo.mock_turtle.predicates" title="predicates" n_failed="7" n_total="13" n_errors="0" success="false">
+          <declare location="" brief_location="">using namespace testudo</declare>
+          <check_verify location="" brief_location="" success="true" prefix="">
+            <expression1 value="list{tuple{1, one}, tuple{1, one}}">list&lt;tuple&lt;int, string&gt;&gt;{{1, &quot;one&quot;}, {1, &quot;one&quot;}}</expression1>
+            <predicate>is_always(1, &quot;one&quot;)</predicate>
+          </check_verify>
+          <check_verify location="" brief_location="" success="false" prefix="">
+            <expression1 value="list{tuple{1, one}, tuple{2, one}}">list&lt;tuple&lt;int, string&gt;&gt;{{1, &quot;one&quot;}, {2, &quot;one&quot;}}</expression1>
+            <predicate>is_always(1, &quot;one&quot;)</predicate>
+          </check_verify>
+          <check_verify location="" brief_location="" success="true" prefix="">
+            <expression1 value="list{2, 2, 2}">list{2, 2, 2}</expression1>
+            <predicate>is_always(2)</predicate>
+          </check_verify>
+          <check_verify location="" brief_location="" success="true" prefix="">
+            <expression1 value="list{tuple{2}, tuple{2}, tuple{2}}">list&lt;tuple&lt;int&gt;&gt;{{2}, {2}, {2}}</expression1>
+            <predicate>is_always(2)</predicate>
+          </check_verify>
+          <check_verify location="" brief_location="" success="false" prefix="">
+            <expression1 value="list{2, 3, 2}">list{2, 3, 2}</expression1>
+            <predicate>is_always(2)</predicate>
+          </check_verify>
+          <check_verify location="" brief_location="" success="false" prefix="">
+            <expression1 value="list{tuple{2}, tuple{3}, tuple{2}}">list&lt;tuple&lt;int&gt;&gt;{{2}, {3}, {2}}</expression1>
+            <predicate>is_always(2)</predicate>
+          </check_verify>
+          <check_verify location="" brief_location="" success="true" prefix="">
+            <expression1 value="list{1, 2, 3}">list{1, 2, 3}</expression1>
+            <predicate>is_never(4)</predicate>
+          </check_verify>
+          <check_verify location="" brief_location="" success="false" prefix="">
+            <expression1 value="list{1, 2, 3}">list{1, 2, 3}</expression1>
+            <predicate>is_never(1)</predicate>
+          </check_verify>
+          <check_verify location="" brief_location="" success="false" prefix="">
+            <expression1 value="list{1, 1, 4}">list{1, 1, 4}</expression1>
+            <predicate>is_constant</predicate>
+          </check_verify>
+          <check_verify location="" brief_location="" success="true" prefix="">
+            <expression1 value="list{1, 1, 1}">list{1, 1, 1}</expression1>
+            <predicate>is_constant</predicate>
+          </check_verify>
+          <check_verify location="" brief_location="" success="true" prefix="">
+            <expression1 value="list{1, 2, 3}">list{1, 2, 3}</expression1>
+            <predicate>all_different</predicate>
+          </check_verify>
+          <check_verify location="" brief_location="" success="false" prefix="">
+            <expression1 value="list{1, 2, 1}">list{1, 2, 1}</expression1>
+            <predicate>all_different</predicate>
+          </check_verify>
+          <check_verify location="" brief_location="" success="false" prefix="">
+            <expression1 value="list{1, 2, 2}">list{1, 2, 2}</expression1>
+            <predicate>all_different</predicate>
+          </check_verify>
+        </test>
+        <test location="" name="testudo.mock_turtle.exceptions with mock" title="exceptions with mock" n_failed="0" n_total="6" n_errors="0" success="true">
+          <declare location="" brief_location="">using namespace testudo</declare>
+          <declare location="" brief_location="">MockNamable namable</declare>
+          <perform location="" brief_location="">namable.schedule_ret(set_name_is_good, true, throw_exception(runtime_error(&quot;already named&quot;)))</perform>
+          <perform location="" brief_location="">namable.schedule_ret(create, void_v, throw_exception(runtime_error(&quot;already created&quot;)))</perform>
+          <perform location="" brief_location="">namable.create()</perform>
+          <perform location="" brief_location="">namable.set_name_is_good(&quot;Prince&quot;)</perform>
+          <try location="" brief_location="">namable.set_name_is_good(&quot;the Artist&quot;)</try>
+          <catch location="" brief_location="" exception_type="" success="true">already named</catch>
+          <try location="" brief_location="">namable.create()</try>
+          <catch location="" brief_location="" exception_type="" success="true">already created</catch>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="2">namable.log_size(set_name_is_good)</expression1>
+            <expression2 value="2">2</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{tuple{Prince}, tuple{the Artist}}">namable.logged_args(set_name_is_good)</expression1>
+            <expression2 value="vector{tuple{Prince}, tuple{the Artist}}">{{&quot;Prince&quot;}, {&quot;the Artist&quot;}}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="tuple{true}">namable.logged_ret(set_name_is_good)[0]</expression1>
+            <expression2 value="tuple{true}">{true}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="2">namable.log_size(create)</expression1>
+            <expression2 value="2">2</expression2>
+          </check_equal>
+        </test>
+        <test location="" name="testudo.mock_turtle.exceptions with wrap" title="exceptions with wrap" n_failed="0" n_total="6" n_errors="0" success="true">
+          <declare location="" brief_location="">WrapNamable namable</declare>
+          <perform location="" brief_location="">namable.create()</perform>
+          <perform location="" brief_location="">namable.set_name_is_good(&quot;Prince&quot;)</perform>
+          <try location="" brief_location="">namable.set_name_is_good(&quot;the Artist&quot;)</try>
+          <catch location="" brief_location="" exception_type="" success="true">already named</catch>
+          <try location="" brief_location="">namable.create()</try>
+          <catch location="" brief_location="" exception_type="" success="true">already created</catch>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="2">namable.log_size(set_name_is_good)</expression1>
+            <expression2 value="2">2</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{tuple{Prince}, tuple{the Artist}}">namable.logged_args(set_name_is_good)</expression1>
+            <expression2 value="vector{tuple{Prince}, tuple{the Artist}}">{{&quot;Prince&quot;}, {&quot;the Artist&quot;}}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="tuple{true}">namable.logged_ret(set_name_is_good)[0]</expression1>
+            <expression2 value="tuple{true}">{true}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="2">namable.log_size(create)</expression1>
+            <expression2 value="2">2</expression2>
+          </check_equal>
+        </test>
+      </test>
+      <test location="" name="testudo.crc" title="CRC" n_failed="0" n_total="23" n_errors="0" success="true">
+        <test location="" name="testudo.crc.crc32" title="CRC-32" n_failed="0" n_total="13" n_errors="0" success="true">
+          <test location="" name="testudo.crc.crc32.table" title="table" n_failed="0" n_total="6" n_errors="0" success="true">
+            <declare location="" brief_location="">using namespace cyclic_redundancy_check</declare>
+            <declare location="" brief_location="">list&lt;tuple&lt;size_t, string&gt;&gt; table_examples {{0, &quot;00000000&quot;}, {1, &quot;77073096&quot;}, {2, &quot;ee0e612c&quot;}, {3, &quot;990951ba&quot;}, {128, &quot;edb88320&quot;}, {255, &quot;2d02ef8d&quot;}}</declare>
+            <declare location="" brief_location="">auto table=crc32_table()</declare>
+            <with location="" brief_location="" var="(i, v)" container_first="table_examples" container_rest="" summary="(i, v) in table_examples" n_failed="0" n_total="6" n_errors="0" success="true">
+              <check_equal location="" brief_location="" success="with" prefix="">
+                <expression1 value="">to_hex(table.data[i])</expression1>
+                <expression2 value="">v</expression2>
+              </check_equal>
+            </with>
+          </test>
+          <test location="" name="testudo.crc.crc32.examples" title="examples" n_failed="0" n_total="7" n_errors="0" success="true">
+            <declare location="" brief_location="">using namespace cyclic_redundancy_check</declare>
+            <declare location="" brief_location="">list&lt;tuple&lt;string, string&gt;&gt; crc32_examples {{&quot;&quot;, &quot;00000000&quot;}, {&quot;Bob&quot;, &quot;cd86f7a0&quot;}, {&quot;bob&quot;, &quot;f5cbb140&quot;}, {&quot;BOB&quot;, &quot;636cf3ca&quot;}, {&quot;123&quot;, &quot;884863d2&quot;}, {&quot;123456789&quot;, &quot;cbf43926&quot;}, {&quot;Supercalifragilisticexpialidocious&quot;, &quot;4b2eb685&quot;}}</declare>
+            <with location="" brief_location="" var="(s, c)" container_first="crc32_examples" container_rest="" summary="(s, c) in crc32_examples" n_failed="0" n_total="7" n_errors="0" success="true">
+              <check_equal location="" brief_location="" success="with" prefix="">
+                <expression1 value="">to_hex(crc32(s))</expression1>
+                <expression2 value="">c</expression2>
+              </check_equal>
+            </with>
+          </test>
+        </test>
+        <test location="" name="testudo.crc.crc64" title="CRC-64" n_failed="0" n_total="10" n_errors="0" success="true">
+          <test location="" name="testudo.crc.crc64.table" title="table" n_failed="0" n_total="6" n_errors="0" success="true">
+            <declare location="" brief_location="">using namespace cyclic_redundancy_check</declare>
+            <declare location="" brief_location="">list&lt;tuple&lt;size_t, string&gt;&gt; table_examples {{0, &quot;0000000000000000&quot;}, {1, &quot;b32e4cbe03a75f6f&quot;}, {2, &quot;f4843657a840a05b&quot;}, {3, &quot;47aa7ae9abe7ff34&quot;}, {128, &quot;c96c5795d7870f42&quot;}, {255, &quot;e0ada17364673f59&quot;}}</declare>
+            <declare location="" brief_location="">auto table=crc64_table()</declare>
+            <with location="" brief_location="" var="(i, v)" container_first="table_examples" container_rest="" summary="(i, v) in table_examples" n_failed="0" n_total="6" n_errors="0" success="true">
+              <check_equal location="" brief_location="" success="with" prefix="">
+                <expression1 value="">to_hex(table.data[i])</expression1>
+                <expression2 value="">v</expression2>
+              </check_equal>
+            </with>
+          </test>
+          <test location="" name="testudo.crc.crc64.examples" title="examples" n_failed="0" n_total="3" n_errors="0" success="true">
+            <declare location="" brief_location="">using namespace cyclic_redundancy_check</declare>
+            <declare location="" brief_location="">list&lt;tuple&lt;string, string&gt;&gt; crc64_examples {{&quot;&quot;, &quot;0000000000000000&quot;}, {&quot;123456789&quot;, &quot;995dc9bbdf1939fa&quot;}, {&quot;Supercalifragilisticexpialidocious&quot;, &quot;6a78d9cb83813b6d&quot;}}</declare>
+            <with location="" brief_location="" var="(s, c)" container_first="crc64_examples" container_rest="" summary="(s, c) in crc64_examples" n_failed="0" n_total="3" n_errors="0" success="true">
+              <check_equal location="" brief_location="" success="with" prefix="">
+                <expression1 value="">to_hex(crc64(s))</expression1>
+                <expression2 value="">c</expression2>
+              </check_equal>
+            </with>
+          </test>
+          <test location="" name="testudo.crc.crc64.sanity checks" title="sanity checks" n_failed="0" n_total="1" n_errors="0" success="true">
+            <declare location="" brief_location="">using namespace cyclic_redundancy_check</declare>
+            <check_equal location="" brief_location="" success="true" prefix="">
+              <expression1 value="deadbeef01234567">to_hex(hex_to&lt;crc64_t&gt;(&quot;deadbeef01234567&quot;))</expression1>
+              <expression2 value="deadbeef01234567">&quot;deadbeef01234567&quot;</expression2>
+            </check_equal>
+          </test>
+        </test>
+      </test>
+      <test location="" name="testudo.glob_test" title="glob patterns" n_failed="0" n_total="60" n_errors="0" success="true">
+        <test location="" name="testudo.glob_test.no special character" title="no special character" n_failed="0" n_total="7" n_errors="0" success="true">
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;&quot;, &quot;&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;&quot;, &quot;a&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;a&quot;, &quot;&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;a&quot;, &quot;a&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;abcd&quot;, &quot;abcd&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;abc&quot;, &quot;abcd&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;abcd&quot;, &quot;abc&quot;)</expression1>
+          </check_true>
+        </test>
+        <test location="" name="testudo.glob_test.question mark" title="question mark" n_failed="0" n_total="15" n_errors="0" success="true">
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;&quot;, &quot;?&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;?&quot;, &quot;&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;?&quot;, &quot;?&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;a&quot;, &quot;?&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;.&quot;, &quot;?&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;ab&quot;, &quot;?&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;ab&quot;, &quot;??&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;abc&quot;, &quot;??&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;ab&quot;, &quot;???&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;abc&quot;, &quot;???&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;abc&quot;, &quot;?b?&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;abc&quot;, &quot;?e?&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;abc&quot;, &quot;a?c&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;abc&quot;, &quot;a?e&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;abc&quot;, &quot;e?c&quot;)</expression1>
+          </check_true>
+        </test>
+        <test location="" name="testudo.glob_test.asterisk" title="asterisk" n_failed="0" n_total="19" n_errors="0" success="true">
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;&quot;, &quot;*&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;*&quot;, &quot;&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;*&quot;, &quot;?&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;?&quot;, &quot;*&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;*&quot;, &quot;*&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;a&quot;, &quot;*&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;ab&quot;, &quot;*&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;ab&quot;, &quot;a*&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;ab&quot;, &quot;e*&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;ab&quot;, &quot;*b&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;ab&quot;, &quot;*e&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;ab&quot;, &quot;a*b&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;abcd&quot;, &quot;ab**cd&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;abcd&quot;, &quot;*ab**cd*&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;abcd&quot;, &quot;*ab*c*d*&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;abcd&quot;, &quot;*a*b*cd*&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;abecd&quot;, &quot;ab*cd&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;abeeecd&quot;, &quot;ab*cd&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;abc&quot;, &quot;ab*bc&quot;)</expression1>
+          </check_true>
+        </test>
+        <test location="" name="testudo.glob_test.escape" title="escape" n_failed="0" n_total="11" n_errors="0" success="true">
+          <try location="" brief_location="">matches(&quot;&quot;, &quot;\\n&quot;)</try>
+          <catch location="" brief_location="" exception_type="" success="true">wrong wildcard at char 2</catch>
+          <try location="" brief_location="">matches(&quot;&quot;, &quot;\\.&quot;)</try>
+          <catch location="" brief_location="" exception_type="" success="true">wrong wildcard at char 2</catch>
+          <try location="" brief_location="">matches(&quot;abcd&quot;, &quot;\\n&quot;)</try>
+          <catch location="" brief_location="" exception_type="" success="true">wrong wildcard at char 2</catch>
+          <try location="" brief_location="">matches(&quot;abcd&quot;, &quot;\\.&quot;)</try>
+          <catch location="" brief_location="" exception_type="" success="true">wrong wildcard at char 2</catch>
+          <try location="" brief_location="">matches(&quot;&quot;, &quot;\\&quot;)</try>
+          <catch location="" brief_location="" exception_type="" success="true">wrong wildcard at char 1</catch>
+          <try location="" brief_location="">matches(&quot;abcd&quot;, &quot;\\&quot;)</try>
+          <catch location="" brief_location="" exception_type="" success="true">wrong wildcard at char 1</catch>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;a\\b&quot;, &quot;a\\\\b&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;a*b&quot;, &quot;a\\*b&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;ab&quot;, &quot;a\\*b&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;a?b&quot;, &quot;a\\?b&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;aeb&quot;, &quot;a\\?b&quot;)</expression1>
+          </check_true>
+        </test>
+        <test location="" name="testudo.glob_test.complex" title="complex" n_failed="0" n_total="8" n_errors="0" success="true">
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;bae\\an\\on&quot;, &quot;ba*a*\\\\?n&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;bae\\n\\on&quot;, &quot;ba*a*\\\\?n&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;bae\\an\\one&quot;, &quot;ba*a*\\\\?n&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;bae\\an\\n&quot;, &quot;ba*a*\\\\?n&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;bae\\anon&quot;, &quot;ba*a*\\\\?n&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="nay">
+            <expression1>matches(&quot;bae\\an\\on&quot;, &quot;ba*a*\\?n&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;bae\\an\\?n&quot;, &quot;ba*a*\\?n&quot;)</expression1>
+          </check_true>
+          <check_true location="" brief_location="" success="true" prefix="">
+            <expression1>matches(&quot;bae\\aeee?n&quot;, &quot;ba*a*\\?n&quot;)</expression1>
+          </check_true>
+        </test>
+      </test>
+      <test location="" name="testudo.diff" title="diff" n_failed="0" n_total="1564" n_errors="0" success="true">
+        <test location="" name="testudo.diff.longest common subsequence" title="longest common subsequence" n_failed="0" n_total="1008" n_errors="0" success="true">
+          <declare location="" brief_location="">using namespace testudo___implementation::diff_implementation</declare>
+          <with location="" brief_location="" var="(a, b, d)" container_first="list&lt;tuple&lt;string, string, lcs_t&gt;&gt;{" container_rest="{&quot;&quot;, &quot;&quot;, &quot;a&quot;},&#xa;{&quot;&quot;, &quot;&quot;, &quot;b&quot;},&#xa;{&quot;&quot;, &quot;&quot;, &quot;c&quot;},&#xa;{&quot;&quot;, &quot;2&quot;, &quot;c&quot;},&#xa;{&quot;1&quot;, &quot;&quot;, &quot;c&quot;},&#xa;{&quot;1&quot;, &quot;2&quot;, &quot;c&quot;},&#xa;{&quot;0&quot;, &quot;1&quot;, &quot;ba&quot;},&#xa;{&quot;881&quot;, &quot;882&quot;, &quot;ccc&quot;},&#xa;{&quot;881&quot;, &quot;882&quot;, &quot;c&quot;},&#xa;{&quot;88&quot;, &quot;88&quot;, &quot;cca&quot;},&#xa;{&quot;88&quot;, &quot;88&quot;, &quot;ccb&quot;},&#xa;{&quot;88&quot;, &quot;88&quot;, &quot;ccc&quot;} }" summary="(a, b, d) in list&lt;tuple&lt;string, string, lcs_t&gt;&gt;{...}" n_failed="0" n_total="12" n_errors="0" success="true">
+            <check_true location="" brief_location="" success="with" prefix="nay">
+              <expression1>check_common_subsequence(a, b, d)</expression1>
+            </check_true>
+          </with>
+          <with location="" brief_location="" var="(a, b, d)" container_first="list&lt;tuple&lt;string, string, lcs_t&gt;&gt;{" container_rest="{&quot;&quot;, &quot;&quot;, &quot;&quot;},&#xa;{&quot;0&quot;, &quot;0&quot;, &quot;c&quot;},&#xa;{&quot;0&quot;, &quot;&quot;, &quot;a&quot;},&#xa;{&quot;&quot;, &quot;0&quot;, &quot;b&quot;},&#xa;{&quot;0&quot;, &quot;1&quot;, &quot;ab&quot;},&#xa;{&quot;01234&quot;, &quot;0134&quot;, &quot;ccacc&quot;},&#xa;{&quot;0134&quot;, &quot;01234&quot;, &quot;ccbcc&quot;},&#xa;{&quot;01234&quot;, &quot;01934&quot;, &quot;ccabcc&quot;},&#xa;{&quot;01234567&quot;, &quot;10243576&quot;, &quot;acbcacbcacb&quot;},&#xa;{&quot;0129345967&quot;, &quot;1029435976&quot;, &quot;acbccacbccacb&quot;},&#xa;{&quot;00000123&quot;, &quot;00123&quot;, &quot;ccaaaccc&quot;},&#xa;{&quot;1234500067&quot;, &quot;9800032&quot;, &quot;aaaaabbcccaabb&quot;},&#xa;{&quot;234500067111189&quot;, &quot;21110001117&quot;, &quot;caaabbbcccaacccaaab&quot;} }" summary="(a, b, d) in list&lt;tuple&lt;string, string, lcs_t&gt;&gt;{...}" n_failed="0" n_total="26" n_errors="0" success="true">
+            <check_true location="" brief_location="" success="with" prefix="">
+              <expression1>check_common_subsequence(a, b, d)</expression1>
+            </check_true>
+            <declare location="" brief_location="">auto diff_computed=longest_common_subsequence_debug(a, b)</declare>
+            <check_equal location="" brief_location="" success="with" prefix="">
+              <expression1 value="">diff_computed</expression1>
+              <expression2 value="">d</expression2>
+            </check_equal>
+          </with>
+          <declare location="" brief_location="">testudo___implementation::random::random_generator&lt;size_t&gt; rgs</declare>
+          <perform location="" brief_location="">rgs.engine.seed(15)</perform>
+          <declare location="" brief_location="">string chars_prob=&quot;AAABCDEEEFGHIIIJKLMNOOOPQRSTUUUVWXYZ      &quot;</declare>
+          <with location="" brief_location="" var="(length, times, a_chars, b_new_chars, diff_chars)" container_first="list&lt;tuple&lt;size_t, size_t, string, string, string&gt;&gt;{" container_rest="{5, 100, &quot;000112&quot;, &quot;011222&quot;, &quot;abc&quot;},&#xa;{5, 100, &quot;000112&quot;, &quot;011222&quot;, &quot;aaaabbc&quot;},&#xa;{5, 100, &quot;000112&quot;, &quot;011222&quot;, &quot;abbcccc&quot;},&#xa;{5, 100, &quot;000112&quot;, &quot;011222&quot;, &quot;abbbbc&quot;},&#xa;{15, 50, chars_prob, chars_prob, &quot;abcccccc&quot;},&#xa;{50, 20, chars_prob, chars_prob, &quot;abcccccccc&quot;},&#xa;{100, 10, chars_prob, chars_prob, &quot;abcccccccc&quot;},&#xa;{1000, 5, chars_prob, chars_prob, &quot;abcccccccc&quot;} }" summary="(length, times, a_chars, b_new_chars, diff_chars) in list&lt;tuple&lt;size_t, size_t, string, string, string&gt;&gt;{...}" n_failed="0" n_total="970" n_errors="0" success="true">
+            <declare location="" brief_location="">auto diff_data= testudo::generate_data( times, [&amp;rgs, length, a_chars]() { return random_string(rgs, length, a_chars); })</declare>
+            <with location="" brief_location="" var="a" container_first="diff_data" container_rest="" summary="a in diff_data">
+              <declare location="" brief_location="">auto diff=random_diff(rgs, a, diff_chars)</declare>
+              <declare location="" brief_location="">auto b=random_patch(rgs, a, diff, b_new_chars)</declare>
+              <declare location="" brief_location="">auto diff_computed=longest_common_subsequence(a, b)</declare>
+              <check_true location="" brief_location="" success="with" prefix="">
+                <expression1>check_common_subsequence(a, b, diff_computed)</expression1>
+              </check_true>
+              <check_true location="" brief_location="" success="with" prefix="">
+                <expression1>diff_computed.length()&lt;=diff.length()</expression1>
+              </check_true>
+            </with>
+          </with>
+        </test>
+        <test location="" name="testudo.diff.shortest_edit" title="shortest_edit" n_failed="0" n_total="498" n_errors="0" success="true">
+          <declare location="" brief_location="">using namespace testudo___implementation::diff_implementation</declare>
+          <with location="" brief_location="" var="(s, t, e)" container_first="list&lt;tuple&lt;string, string, lcs_t&gt;&gt;{" container_rest="{&quot;&quot;, &quot;&quot;, &quot;e&quot;},&#xa;{&quot;&quot;, &quot;&quot;, &quot;w0.&quot;},&#xa;{&quot;&quot;, &quot;&quot;, &quot;m&quot;},&#xa;{&quot;&quot;, &quot;&quot;, &quot;w&quot;},&#xa;{&quot;0&quot;, &quot;0&quot;, &quot;m1.&quot;},&#xa;{&quot;&quot;, &quot;&quot;, &quot;c&quot;},&#xa;{&quot;&quot;, &quot;2&quot;, &quot;m2:0.&quot;},&#xa;{&quot;1&quot;, &quot;&quot;, &quot;w1.&quot;},&#xa;{&quot;1&quot;, &quot;2&quot;, &quot;m1:0.&quot;},&#xa;{&quot;0&quot;, &quot;1&quot;, &quot;w2.&quot;},&#xa;{&quot;881&quot;, &quot;882&quot;, &quot;m3:0.&quot;},&#xa;{&quot;881&quot;, &quot;882&quot;, &quot;m2:0.&quot;},&#xa;{&quot;881&quot;, &quot;882&quot;, &quot;m2:0.w:1.m1:0.&quot;},&#xa;{&quot;88&quot;, &quot;88&quot;, &quot;m2:0.w1.&quot;},&#xa;{&quot;88&quot;, &quot;88&quot;, &quot;m2:0.m1:0&quot;},&#xa;{&quot;8&quot;, &quot;88&quot;, &quot;m1:0.m1:0.&quot;} }" summary="(s, t, e) in list&lt;tuple&lt;string, string, lcs_t&gt;&gt;{...}" n_failed="0" n_total="16" n_errors="0" success="true">
+            <check_true location="" brief_location="" success="with" prefix="nay">
+              <expression1>check_edit(s, t, e)</expression1>
+            </check_true>
+          </with>
+          <with location="" brief_location="" var="(s, t, e)" container_first="list&lt;tuple&lt;string, string, edit_t&gt;&gt;{" container_rest="{&quot;&quot;, &quot;&quot;, &quot;&quot;},&#xa;{&quot;0&quot;, &quot;0&quot;, &quot;m1:0.&quot;},&#xa;{&quot;0&quot;, &quot;&quot;, &quot;&quot;},&#xa;{&quot;&quot;, &quot;0&quot;, &quot;w1.&quot;},&#xa;{&quot;01234&quot;, &quot;0134&quot;, &quot;m2:0.m2:3.&quot;},&#xa;{&quot;0134&quot;, &quot;01234&quot;, &quot;m2:0.w1.m2:2.&quot;},&#xa;{&quot;00000123&quot;, &quot;00123&quot;, &quot;m5:3.&quot;},&#xa;{&quot;THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG&quot;, &quot;QUICK BROWN THE DOG JUMPS UNDER THE LAZY FOX&quot;, &quot;m12:4.m4:0.m3:40.m7:19.w3.m12:28.m3:16.&quot;} }" summary="(s, t, e) in list&lt;tuple&lt;string, string, edit_t&gt;&gt;{...}" n_failed="0" n_total="16" n_errors="0" success="true">
+            <check_true location="" brief_location="" success="with" prefix="">
+              <expression1>check_edit(s, t, e)</expression1>
+            </check_true>
+            <declare location="" brief_location="">auto edit_computed=shortest_edit_debug(s, t)</declare>
+            <check_equal location="" brief_location="" success="with" prefix="">
+              <expression1 value="">edit_computed</expression1>
+              <expression2 value="">e</expression2>
+            </check_equal>
+          </with>
+          <declare location="" brief_location="">testudo___implementation::random::random_generator&lt;size_t&gt; rgs</declare>
+          <perform location="" brief_location="">rgs.engine.seed(15)</perform>
+          <declare location="" brief_location="">string chars_prob=&quot;AAABCDEEEFGHIIIJKLMNOOOPQRSTUUUVWXYZ      &quot;</declare>
+          <with location="" brief_location="" var="(length, times, s_chars, t_new_chars, diff_chars)" container_first="list&lt;tuple&lt;size_t, size_t, string, string, string&gt;&gt;{" container_rest="{5, 100, &quot;000112&quot;, &quot;011222&quot;, &quot;abc&quot;},&#xa;{5, 100, &quot;000112&quot;, &quot;011222&quot;, &quot;aaaabbc&quot;},&#xa;{5, 100, &quot;000112&quot;, &quot;011222&quot;, &quot;abbcccc&quot;},&#xa;{5, 100, &quot;000112&quot;, &quot;011222&quot;, &quot;abbbbc&quot;},&#xa;{15, 50, chars_prob, chars_prob, &quot;abcccccc&quot;},&#xa;{50, 10, chars_prob, chars_prob, &quot;abcccccccc&quot;},&#xa;{300, 2, chars_prob, chars_prob, &quot;abcccccccc&quot;} }" summary="(length, times, s_chars, t_new_chars, diff_chars) in list&lt;tuple&lt;size_t, size_t, string, string, string&gt;&gt;{...}" n_failed="0" n_total="462" n_errors="0" success="true">
+            <declare location="" brief_location="">auto diff_data= testudo::generate_data( times, [&amp;rgs, length, s_chars]() { return random_string(rgs, length, s_chars); })</declare>
+            <with location="" brief_location="" var="s" container_first="diff_data" container_rest="" summary="s in diff_data">
+              <declare location="" brief_location="">auto diff=random_diff(rgs, s, diff_chars)</declare>
+              <declare location="" brief_location="">auto t=random_patch(rgs, s, diff, t_new_chars)</declare>
+              <declare location="" brief_location="">auto edit=shortest_edit_debug(s, t)</declare>
+              <check_true location="" brief_location="" success="with" prefix="">
+                <expression1>check_edit(s, t, edit)</expression1>
+              </check_true>
+            </with>
+          </with>
+          <declare location="" brief_location="">string source=&quot;0123456&quot;</declare>
+          <declare location="" brief_location="">string target=&quot;4531278&quot;</declare>
+          <declare location="" brief_location="">auto edit=shortest_edit(source, target, 2)</declare>
+          <show_value location="" brief_location="">
+            <expression1 value="m2:4.w1.m2:1.w2.">edit</expression1>
+          </show_value>
+          <declare location="" brief_location="">auto et=edit_to_table(edit, source.size(), target.size())</declare>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{0, 3, 6}">et.source_disappeared</expression1>
+            <expression2 value="vector{0, 3, 6}">{0, 3, 6}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{2, 5, 6}">et.target_new</expression1>
+            <expression2 value="vector{2, 5, 6}">{2, 5, 6}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{pair{1, 3}, pair{2, 4}, pair{4, 0}, pair{5, 1}}">et.source_matches</expression1>
+            <expression2 value="vector{pair{1, 3}, pair{2, 4}, pair{4, 0}, pair{5, 1}}">{{1, 3}, {2, 4}, {4, 0}, {5, 1}}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{pair{0, 4}, pair{1, 5}, pair{3, 1}, pair{4, 2}}">et.target_matches</expression1>
+            <expression2 value="vector{pair{0, 4}, pair{1, 5}, pair{3, 1}, pair{4, 2}}">{{0, 4}, {1, 5}, {3, 1}, {4, 2}}</expression2>
+          </check_equal>
+        </test>
+        <test location="" name="testudo.diff.track parsing" title="track parsing" n_failed="0" n_total="58" n_errors="0" success="true">
+          <declare location="" brief_location="">using namespace testudo___implementation::diff_implementation</declare>
+          <declare location="" brief_location="">string tts=tts1()</declare>
+          <show_multiline_value location="" brief_location="">
+            <expression1 value="t-title [0123456789abcdef]&#xa;[phi.ttd:22] i-declare [e89ca44261d5c240]&#xa;[phi.ttd:23] c-check_equal [585280a21523ffff] r-0-1-0&#xa;[phi.ttd:23] c-check_equal [585280a21523d973] r-1-0-0&#xa;[phi.ttd:25] c-with_summary [a45be715e8bd0bb1] r-12-3-45&#xa;">tts</expression1>
+          </show_multiline_value>
+          <declare location="" brief_location="">istringstream isstts(tts)</declare>
+          <declare location="" brief_location="">auto tt=parse_track(isstts)</declare>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="5">tt.size()</expression1>
+            <expression2 value="5">5</expression2>
+          </check_equal>
+          <declare location="" brief_location="">ostringstream oss</declare>
+          <perform location="" brief_location="">oss &lt;&lt; tt</perform>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="t-title [0123456789abcdef]&#xa;[phi.ttd:22] i-declare [e89ca44261d5c240]&#xa;[phi.ttd:23] c-check_equal [585280a21523ffff] r-0-1-0&#xa;[phi.ttd:23] c-check_equal [585280a21523d973] r-1-0-0&#xa;[phi.ttd:25] c-with_summary [a45be715e8bd0bb1] r-12-3-45&#xa;">oss.str()</expression1>
+            <expression2 value="t-title [0123456789abcdef]&#xa;[phi.ttd:22] i-declare [e89ca44261d5c240]&#xa;[phi.ttd:23] c-check_equal [585280a21523ffff] r-0-1-0&#xa;[phi.ttd:23] c-check_equal [585280a21523d973] r-1-0-0&#xa;[phi.ttd:25] c-with_summary [a45be715e8bd0bb1] r-12-3-45&#xa;">tts</expression2>
+          </check_equal>
+          <declare location="" brief_location="">auto seq= [](size_t n) { vector&lt;size_t&gt; result; for (size_t i=0; i&lt;n; ++i) result.push_back(i); return result; }</declare>
+          <with location="" brief_location="" var="i" container_first="seq(tt.size())" container_rest="" summary="i in seq(tt.size())" n_failed="0" n_total="50" n_errors="0" success="true">
+            <with location="" brief_location="" var="j" container_first="seq(tt.size())" container_rest="" summary="j in seq(tt.size())">
+              <check_true location="" brief_location="" success="with" prefix="">
+                <expression1>(i==j) ? ((not (i&lt;j)) and (not (j&lt;i))) : ((i&lt;j) not_eq (j&lt;i))</expression1>
+              </check_true>
+              <check_true location="" brief_location="" success="with" prefix="">
+                <expression1>(i==j) ? ((not (tt[i]&lt;tt[j])) and (not (tt[j]&lt;tt[i]))) : ((tt[i]&lt;tt[j]) not_eq (tt[j]&lt;tt[i]))</expression1>
+              </check_true>
+            </with>
+          </with>
+          <declare location="" brief_location="">string ttsd=tts1_different_addresses()</declare>
+          <show_multiline_value location="" brief_location="">
+            <expression1 value="t-title [0123456789abcdef]&#xa;[psi.ttd:23] i-declare [e89ca44261d5c240]&#xa;[psi.ttd:24] c-check_equal [585280a215230000] r-1-0-0&#xa;[psi.ttd:24] c-check_equal [585280a215232222] r-0-1-0&#xa;[psi.ttd:24] c-check_equal [585280a21523d973] r-0-1-0&#xa;[psi.ttd:28] c-with_summary [a45be715e8bd0bb1] r-1-23-45&#xa;[psi.ttd:24] c-check_equal [585280a215231111] r-1-0-0&#xa;">ttsd</expression1>
+          </show_multiline_value>
+          <declare location="" brief_location="">istringstream issttsd(ttsd)</declare>
+          <declare location="" brief_location="">auto ttd=parse_track(issttsd)</declare>
+          <declare location="" brief_location="">auto tt_edit=shortest_edit(tt, ttd, 2)</declare>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="m2:0.w2.m2:3.w1.">tt_edit</expression1>
+            <expression2 value="m2:0.w2.m2:3.w1.">&quot;m2:0.w2.m2:3.w1.&quot;</expression2>
+          </check_equal>
+          <declare location="" brief_location="">auto tt_table=edit_to_table(tt_edit, tt.size(), ttd.size())</declare>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="1">tt_table.source_disappeared.size()</expression1>
+            <expression2 value="1">1</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{2}">tt_table.source_disappeared</expression1>
+            <expression2 value="vector{2}">{2}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{2, 3, 6}">tt_table.target_new</expression1>
+            <expression2 value="vector{2, 3, 6}">{2, 3, 6}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{pair{0, 0}, pair{1, 1}, pair{3, 4}, pair{4, 5}}">tt_table.source_matches</expression1>
+            <expression2 value="vector{pair{0, 0}, pair{1, 1}, pair{3, 4}, pair{4, 5}}">{{0, 0}, {1, 1}, {3, 4}, {4, 5}}</expression2>
+          </check_equal>
+          <check_equal location="" brief_location="" success="true" prefix="">
+            <expression1 value="vector{pair{0, 0}, pair{1, 1}, pair{4, 3}, pair{5, 4}}">tt_table.target_matches</expression1>
+            <expression2 value="vector{pair{0, 0}, pair{1, 1}, pair{4, 3}, pair{5, 4}}">{{0, 0}, {1, 1}, {4, 3}, {5, 4}}</expression2>
+          </check_equal>
+          <declare location="" brief_location="">auto ts=track_table_to_summary(tt, ttd, tt_table)</declare>
+          <show_multiline_value location="" brief_location="">
+            <expression1 value="deleted&#xa;  wrong (1: 0/1 f)&#xa;    [phi.ttd:23] c-check_equal (0/1 f)&#xa;new&#xa;  good (2: 2/2 f)&#xa;    [psi.ttd:24] c-check_equal (1/1 f)&#xa;    [psi.ttd:24] c-check_equal (1/1 f)&#xa;  wrong (1: 0/1 f)&#xa;    [psi.ttd:24] c-check_equal (0/1 f)&#xa;good to wrong (1: 1/1 f -&gt; 0/1 f)&#xa;  [phi.ttd:23 -&gt; 24] c-check_equal (1/1 f -&gt; 0/1 f)&#xa;with_data changed (1: 12/15 f, 45 e -&gt; 1/24 f, 45 e)&#xa;  [phi.ttd:25 -&gt; 28] c-with_summary (12/15 f, 45 e -&gt; 1/24 f, 45 e)&#xa;">ts</expression1>
+          </show_multiline_value>
+        </test>
+      </test>
+      <test location="" name="testudo.sh" title="sh" n_failed="0" n_total="1" n_errors="0" success="true">
+        <check_true location="" brief_location="" success="true" prefix="">
+          <expression1>true</expression1>
+        </check_true>
+      </test>
+    </test>
+  </test>
+</testudo>

@@ -248,6 +248,20 @@ be pointed out in the report as test fails; you'll see weird vertical spacing
 to achieve syncing between the two printed pages; and you'll see too many
 concerns crammed into a single test.
 
+In the report, you'll see different colours for different elements:
+\begin{itemize}
+\item \lines{orange} is for separation, test header cartouches, and line number
+  info; in test headers, the full file and line number info is given; for
+  individual steps, only the line number is given, unless the step isn't in the
+  same file as the test header it's a part of, in which case the full file and
+  line number info is written;
+\item step type codes, test punctuation, and test summaries are written in
+  \blue{blue};
+\item \textsc{ok}, fail, and error tags have their own, obvious colour schemes;
+\item \fail{red} strings of dashes make it easy to match non-\textsc{ok} tags
+  to their steps.
+\end{itemize}
+
 \cleartooddpage
 
 {%
@@ -291,6 +305,10 @@ the whole output until just before the error, whereas the ``\texttt{xml}''
 won't output anything\footnote{This is so because the ``\texttt{xml}'' format
   first builds the whole \textsc{xml} object for the printout before printing
   it.}.
+
+The ``\texttt{color\_text\_with\_lines}'' format is similar to
+``\texttt{color\_text}'', but it also prints source code line information for
+each test step.
 
 
 \chapter{Test definition and test instruction styles}
@@ -367,6 +385,42 @@ You can give your \Cpp{} test source file any extension, but if you give it the
 ``\texttt{.ttd}'' extension, ``\texttt{make}'' will detect it as a test file
 and compile it correctly.
 
+Your \Cpp{} must be compiled into a shared object file (this is automatically
+done by ``\texttt{make}'', using \textsc{gnu} \texttt{g++} flags
+``\texttt{-fPIC -shared}'').
+
+The main executable for Testudo is called ``\texttt{testudo}''.  It needs the
+following arguments to execute tests:
+\begin{itemize}
+\item first, ``\texttt{run}'' (this is the subcommand; there are other
+  subcommands; run ``\texttt{testudo help}'' to get a list);
+\item ``\texttt{-f <format>}'' to specify the report format, where
+  ``\texttt{<format>}'' is the format name (the ones available by default are
+  ``\texttt{xml}'', ``\texttt{color\_text}'', and
+  ``\texttt{color\_text\_with\_lines}''; see~\Sref{cha:test-output-formats} for
+  details);
+\item the shared object files containing the tests to perform; these files are
+  dynamically loaded by ``\texttt{testudo}'' before the test execution is
+  started.
+\end{itemize}
+
+You can instruct Testudo to start the test execution from a specific node by
+passing ``\texttt{-s <test-root>}'' to the executable, where
+``\texttt{<test-root>}'' is the full name for the node.  The execution will be
+restritced to the subtree rooted at the node, and all test names and test node
+names will be relative to it.
+
+Additionally, you can restrict the test execution to a list of nodes (and the
+subtrees rooted at them), by passing ``\texttt{-i <node-name>}'' for each of
+them.
+
+Testudo reports source code locations using the file name and the line number
+of the source code line.  The file name is relative to the directory from which
+the compiler was invoked.  If you want to ignore a common initial path part,
+pass it as ``\texttt{-d <common-path>}'' (for instance, ``\texttt{-d
+  simulation/framework}'') and that path part will be replaced by
+``\texttt{...}''  in the test report.
+
 
 \chapter{Tests and test hierarchies}
 \label{cha:tests-test-hierarchies}
@@ -384,9 +438,8 @@ possibly also a test function or a priority.
 
 Test nodes and tests are declared and defined in any number of \Cpp{}
 translation units; each declaration or definition causes an action on the test
-tree (the creation or configuration of a node).  We can't control the order in
-which translation units are executed, but Testudo gives you means to control
-the order of execution of tests.
+tree (the creation or configuration of a node).  Testudo gives you means to
+control the order of execution of tests, even across translation units.
 
 Nodes you define as siblings (i.e., with the same parent) in a given
 translation unit will be created in the order they are mentioned in the code,
@@ -397,11 +450,43 @@ lower priority come first.  If two sibling nodes have the same priority,
 Testudo resorts to alphabetical ordering.
 
 Test nodes have two kinds of names: the name and the full name.  The ``name''
-proper is a string with no periods or spaces in it, and represents the name the
-node has \emph{relative to its parent}.  A test node can't have two children
-with the same name.  The full name of a test node is obtained by chaining all
-the names of its ancestors in order, finishing with its own name, separated by
-periods.  The \emph{title} of a test node is an arbitrary string.
+proper is a string that represents the name the node has \emph{relative to its
+  parent}.  A test node can't have two children with the same name.  The full
+name of a test node is obtained by chaining all the names of its ancestors in
+order, finishing with its own name, separated by periods.  The \emph{title} of
+a test node is an arbitrary string.
+
+When you define a test node or a test, you give its name and title in a
+comma-separated parenthesised group:
+\begin{cpplisting}
+define_test_node(tricorder,
+                 (medical, "medical capabilities"));
+\end{cpplisting}
+
+\begin{cpplisting}
+DEFINE_TEST_NODE(tricorder,
+                 (medical, "medical capabilities"));
+\end{cpplisting}
+
+The name allows you to refer to the test node or test later in the same
+translation unit, as a parent to another test node or test.  If you aren't
+going to refer to the test node or test (which is the most common case for
+tests\footnote{The most usual way of structuring test nodes and tests is to
+  have tests as leaves, and test nodes as non-leaves.}), you can choose to
+mention only the title, with no parentheses:
+\begin{cpplisting}
+define_test(medical, "switch on after") {
+  ...
+}
+\end{cpplisting}
+
+\begin{cpplisting}
+DEFINE_TEST(medical, "switch on after")
+{
+  ...
+}
+\end{cpplisting}
+
 
 \section{Non-top test nodes}
 \label{sec:non-top-test-nodes}
@@ -418,11 +503,13 @@ So, for instance, if you have already defined a test node called
 ``\texttt{tricorder}'', here's how to define a child test node called
 ``\texttt{medical}'', with the title ``medical capabilities'':
 \begin{cpplisting}
-define_test_node(tricorder, medical, "medical capabilities");
+define_test_node(tricorder,
+                 (medical, "medical capabilities"));
 \end{cpplisting}
 
 \begin{cpplisting}
-DEFINE_TEST_NODE(tricorder, medical, "medical capabilities");
+DEFINE_TEST_NODE(tricorder,
+                 (medical, "medical capabilities"));
 \end{cpplisting}
 
 For a test (a test node with a test function), the syntax includes the
@@ -430,11 +517,11 @@ definition of the test function itself, as if it were a regular \Cpp{}
 function, only with its declarator part (the one where you specify the return
 type, the function name, and the parameters) replaced by a Testudo macro.  If
 you have already defined a test node called ``\texttt{medical}'', here's how to
-define a child test called ``\texttt{switch\_on}'', titled ``switch on after
-creation'', that checks a tricorder medical sub-unit is off upon creation of the
-tricorder, and switches on appropriately:
+define an unnamed child test called titled ``switch on after creation'', that
+checks a tricorder medical sub-unit is off upon creation of the tricorder, and
+switches on appropriately:
 \begin{cpplisting}
-define_test(medical, switch_on, "switch on after") {
+define_test(medical, "switch on after creation") {
   declare(Tricorder t); // see~\Sref{cha:test-steps} for the test steps syntax
   check(not t.medical.is_on())_true;
   perform(t.medical.push_on_button());
@@ -443,7 +530,7 @@ define_test(medical, switch_on, "switch on after") {
 \end{cpplisting}
 
 \begin{cpplisting}
-DEFINE_TEST(medical, switch_on, "switch on after")
+DEFINE_TEST(medical, "switch on after creation")
 {
   DECLARE(Tricorder t); // see~\Sref{cha:test-steps} for the test steps syntax
   CHECK(not t.medical.is_on()) TRUE;
@@ -470,24 +557,23 @@ Here's how to define a top test node called ``\texttt{flux\_capacitor}'', child
 to a test node whose full name is ``\texttt{outatime.delorean}'':
 \begin{cpplisting}
 define_top_test_node("outatime.delorean", // parent full name
-                     flux_capacitor, // name
-                     "flux capacitor features", // title
+                     (flux_capacitor, // name
+                      "flux capacitor features"), // title
                      200); // priority
 \end{cpplisting}
 
 \begin{cpplisting}
 DEFINE_TOP_TEST_NODE("outatime.delorean", // parent full name
-                     flux_capacitor, // name
-                     "flux capacitor features", // title
+                     (flux_capacitor, // name
+                      "flux capacitor features"), // title
                      200); // priority
 \end{cpplisting}
 
 You can also define a top test (a top test node with a test function).  So,
-here's how to define a test called ``\texttt{doors\_closed\_on\_start}'', child
+here's how to define a test titled ``doors closed after constructions'', child
 to a test node whole full name is ``\texttt{outatime.delorean}'':
 \begin{cpplisting}
 define_top_test("outatime.delorean", // parent full name
-                doors_closed_on_start, // name
                 "doors closed after construction", // title
                 150) { // priority
   declare(Delorean d);
@@ -498,7 +584,6 @@ define_top_test("outatime.delorean", // parent full name
 
 \begin{cpplisting}
 DEFINE_TOP_TEST("outatime.delorean", // parent full name
-                doors_closed_on_start, // name
                 "doors closed after construction", // title
                 150) // priority
 {
@@ -629,6 +714,9 @@ check(dispersion_rate<(1./accuracy))_true;
 CHECK(dispersion_rate < (1. / accuracy)) TRUE;
 \end{cpplisting}
 
+See~\Sref{sec:check-expression-true-for} for an alternative version that can
+show you what the involved values were for a failed ``true'' check.
+
 \subsectiontestudopair{Check the expression is false}{\_false}{FALSE}
 \label{sec:check-expression-true}
 
@@ -646,6 +734,9 @@ check(dispersion_rate<(1./accuracy))_false;
 \begin{cpplisting}
 CHECK(dispersion_rate < (1. / accuracy)) FALSE;
 \end{cpplisting}
+
+See~\Sref{sec:check-expression-false-for} for an alternative version that can
+show you what the involved values were for a failed ``false'' check.
 
 \subsectiontestudopair{Check the expression is equal to a reference}%
   {\_equal}{EQUAL}
@@ -880,6 +971,43 @@ The opposite of the ``verify'' macro is the ``not-verify'' macro:
   \testudopair{\_not\_verify}{NOT\_VERIFY}
 \end{center}
 
+\subsectiontestudopair{Check the expression is true for certain values}%
+{\_true\_for}{TRUE\_FOR}
+\label{sec:check-expression-true-for}
+
+Compared to all the information the previous checks give in case of a fail, the
+``true'' (\Sref{sec:check-expression-true}) macro is quite uninformative.  For
+instance, when checking that a value is not greater than another value, if the
+check fails, that's all the information you'll get.  It would be good to know
+what the involved values were.  That is what the ``true-for'' macro does.
+
+The ``check-true-for'' syntax works like ``check-true'', but you specify in
+parentheses a set of expressions whose values you'd like to see if the check
+fails.
+
+\begin{cpplisting}
+check(a+b<c)_true_for(a, b, c);
+\end{cpplisting}
+
+\begin{cpplisting}
+CHECK(a+b<c) TRUE_FOR(a, b, c);
+\end{cpplisting}
+
+\subsectiontestudopair{Check the expression is false for certain values}%
+{\_false\_for}{FALSE\_FOR}
+\label{sec:check-expression-false-for}
+
+The opposite of the ``true-for'' macro is the ``false-for'' macro.
+
+\begin{cpplisting}
+check(a+b<c)_false_for(a, b, c);
+\end{cpplisting}
+
+\begin{cpplisting}
+CHECK(a+b<c) FALSE_FOR(a, b, c);
+\end{cpplisting}
+
+
 \subsectiontestudopair{Exception checks}%
   {check\_try \_catch}{CHECK\_TRY \_CATCH}
 \label{sec:exception-checks}
@@ -967,13 +1095,13 @@ SHOW_MULTILINE_VALUE(radio.communication_log());
 In some situations, such as when we want to check the effect of the destruction
 of an object that's gone out of scope, it can be useful to show where a scope
 begins and ends.  This is done by using the ``in-scope'' macro just before the
-opening brace of the scope, which writes a message to the report about the new
+opening brace of the scope, which writes a line to the report about the new
 scope.  You don't have to add anything to the closing brace: Testudo will
-automatically write a message when the scope ends.
+automatically write a scope-closing line when the scope ends.
 
 Most of the time, with short scopes, you don't need to name the scope.  This is
 done by using the ``in scope'' macro without any arguments.  If the scope is
-longer, it may be clearer to name it, since the scope's begin and end messages
+longer, it may be clearer to name it, since the scope's begin and end lines
 will display its name.  This is done by passing the scope name to the
 ``in-scope'' macro.
 
@@ -1068,7 +1196,7 @@ name.
 The ``step id'' instruction prints a tag on the report that applies to the
 following step in the test.
 \begin{cpplisting}
-define_test(medical, switch_on, "switch on after") {
+define_test(medical, "switch on after creation") {
   declare(Tricorder t);
   step_id(init_off); // in the tricorder medical test; no need to mention it
   check(not t.medical.is_on())_true;
@@ -1076,7 +1204,7 @@ define_test(medical, switch_on, "switch on after") {
 \end{cpplisting}
 
 \begin{cpplisting}
-DEFINE_TEST(medical, switch_on, "switch on after") {
+DEFINE_TEST(medical, "switch on after creation") {
   DECLARE(Tricorder t);
   STEP_ID(init_off); // in the tricorder medical test; no need to mention it
   CHECK(not t.medical.is_on()) TRUE;
@@ -1265,14 +1393,14 @@ void test_container_emptyness(
 
 class Cauldron { ... };
 
-define_test(container, emptyness_c, "Cauldron emptyness") {
+define_test(container, "Cauldron emptyness") {
   declare(Cauldron container);
   test_container_emptyness(test_management, container);
 }
 
 class Marmite { ... };
 
-define_test(container, emptyness_m, "Marmite emptyness") {
+define_test(container, "Marmite emptyness") {
   declare(Marmite container);
   test_container_emptyness(test_management, container);
 }
@@ -1289,7 +1417,7 @@ void test_container_emptyness(
 
 class Cauldron { ... };
 
-define_test(container, emptyness_c, "Cauldron emptiness")
+define_test(container, "Cauldron emptiness")
 {
   DECLARE(Cauldron container);
   test_container_emptyness(test_management, container);
@@ -1297,7 +1425,7 @@ define_test(container, emptyness_c, "Cauldron emptiness")
 
 class Marmite { ... };
 
-define_test(container, emptyness_m, "Marmite emptiness")
+define_test(container, "Marmite emptiness")
 {
   DECLARE(Marmite container);
   test_container_emptyness(test_management, container);
@@ -1361,6 +1489,52 @@ WITH_DATA(x, even_numbers)
     CHECK(x % 2) EQUAL(y % 2); // will fail when \texttt{y==9}
 \end{cpplisting}
 
+If you want to use structured binding for the variable in the ``with-data''
+macro, surround the variable names with parenthesis instead of square brackets:
+\begin{cpplisting}
+declare(list<tuple<int, int, int>>
+          list_of_sums{{1, 3, 4},
+                       {3, 7, 11}, // will fail
+                       {10, 15, 25}});
+with_data((a, b, sum), list_of_sums)
+  check(sum)_equal(a+b);
+\end{cpplisting}
+
+\begin{cpplisting}
+DECLARE(list<tuple<int, int, int>>
+          list_of_sums{ { 1, 3, 4 },
+                        { 3, 7, 11 }, // will fail
+                        { 10, 15, 25 } });
+WITH_DATA((a, b, sum), list_of_sums)
+  CHECK(sum) EQUAL(a+b);
+\end{cpplisting}
+
+\sectiontestudopair{With-data loops with multiline containers}%
+  {with\_multiline\_data}{WITH\_MULTILINE\_DATA}
+
+When you define the container directly in the ``with-data'' macro, if it's
+long, the report will break it in lines of the appropriate length, as it would
+do for any text longer than one line.  But in this case, this will probably
+obscure the structure of the container.  In such cases, you can use the
+``with-multiline-data'' macro instead.  It will do its best to break the
+container in such a way that the report shows one element per line.
+
+\begin{cpplisting}
+with_multiline_data((a, b, sum), list<tuple<int, int, int>>{
+    {1, 3, 4},
+    {3, 7, 11}, // will fail
+    {10, 15, 25}})
+  check(sum)_equal(a+b);
+\end{cpplisting}
+
+\begin{cpplisting}
+WITH_MULTILINE_DATA((a, b, sum), list<tuple<int, int, int>>{
+    {1, 3, 4},
+    {3, 7, 11}, // will fail
+    {10, 15, 25}})
+  CHECK(sum) EQUAL(a+b);
+\end{cpplisting}
+
 \section{How to generate data for with-data loops}
 \label{sec:generate-data-with-data-loops}
 
@@ -1368,7 +1542,8 @@ You can use the function ``\texttt{generate\_data()}'' to generate data for
 with-data loops.  The arguments for that function are the number of data to
 generate, and a function argument with no arguments that will be called
 repeatedly to generate the data.  A~common case is the generation of a large
-number of random data for verification of properties of types or algorithms.
+number of pseudorandom data for verification of properties of types or
+algorithms.
 
 Imagine you've coded a \textsc{2d} integer vector class ``\texttt{VectorI2}''
 \begin{cpplisting}
@@ -1377,22 +1552,22 @@ public:
   VectorI2(int x, int y);
   int x, y;
 };
-bool operator==(VectorI2 v, Vector I2w); // equality
-string to_text(VectorI2 v); // text representation
 VectorI2 operator+(VectorI2 v, VectorI2 w); // sum
+bool operator==(VectorI2 v, Vector I2w); // equality (\Sref{sec:equality})
+string to_text(VectorI2 v); // text representation %
+                               (\Sref{sec:textual-representation})
 \end{cpplisting}
-and you want to verify on it the following theorem
+and you want to verify on it the following theorem (commutativity of the sum):
 \begin{equation}
   \label{eq:1}
-  \forall (v, w) \in \texttt{VectorI2}^2, v + w = w + x
+  \forall (v, w) \in \texttt{VectorI2} \times \texttt{VectorI2}, v + w = w + v
 \end{equation}
-(commutativity of the sum).  You could code a random ``\texttt{VectorI2}''
-generator
+You can code a pseudorandom ``\texttt{VectorI2}'' generator
 \begin{cpplisting}
 VectorI2 random_vector2i(int max_abs_x, int max_abs_y);
 \end{cpplisting}
-and use it like this to check the theorem on $100 \times 100$ pairs of random
-values with a maximum absolute coordinate value of~$20$:
+and use it like this to check the theorem on $100 \times 100$ pairs of
+pseudorandom values with a maximum absolute coordinate value of~$20$:
 \begin{cpplisting}
 declare(auto generate_20_20=
         []() { return random_vector2i(20, 20); });
@@ -1463,14 +1638,14 @@ macro or the ``visible-fixture'' macro just after the title in the definition
 tests.  Like this:
 \begin{cpplisting}
 define_test(delorean,
-            engine_starts_off, "engine is off at start",
+            "engine is off at start",
             with_fixture(OutATimeFixture)) // with-fixture
 {
   check(not d->engine.is_running())_true;
 }
 
 define_test(delorean,
-            no_pu_at_start, "there's no Plutonium initially",
+            "there's no Plutonium initially",
             visible_fixture(OutATimeFixture)) // visible-fixture
 {
   check(d->pu())_approx(0.);
@@ -1479,14 +1654,14 @@ define_test(delorean,
 
 \begin{cpplisting}
 DEFINE_TEST(delorean,
-            engine_starts_off, "engine is off at start",
+            "engine is off at start",
             WITH_FIXTURE(OutATimeFixture)) // with-fixture
 {
   CHECK(not d->engine.is_running()) TRUE;
 }
 
 DEFINE_TEST(delorean,
-            no_pu_at_start, "there's no Plutonium initially",
+            "there's no Plutonium initially",
             VISIBLE_FIXTURE(OutATimeFixture)) // visible-fixture
 {
   CHECK(d->pu()) APPROX(0.);
@@ -1708,7 +1883,7 @@ class ImageMock
   : public MockClass<> {
 public:
   mock_method((void), set, ((float)));
-  mock_method((voud), set, ((int)));
+  mock_method((void), set, ((int)));
 };
 \end{cpplisting}
 so we'll have to identify one of the ``\texttt{set()}'' methods (or both) with
@@ -1718,7 +1893,7 @@ class ImageMock
   : public MockClass<> {
 public:
   mock_method((void), set, ((float)));
-  mock_method((voud), (set, set_int), ((int)));
+  mock_method((void), (set, set_int), ((int)));
 };
 \end{cpplisting}
 
@@ -1825,7 +2000,7 @@ public:
 \end{cpplisting}
 \item by using the ``set-ret-default'' macro as a method call on a mock object:
 \begin{cpplisting}
-define_test(mock_turtle, victorian, "Victorian recipe") {
+define_test(mock_turtle, "Victorian recipe") {
   declare(auto soup_mock=make_shared<SoupMock>());
   declare(bool is_tasty_now=true);
   perform(soup_mock->set_ret_default(
@@ -1852,7 +2027,7 @@ public:
   ...
 };
 ...
-define_test(..., ..., "...") {
+define_test(..., "...") {
   declare(auto soup_mock=make_shared<SoupMock>());
   // return a sequence of temperatures on subsequent calls:
   perform(soup_mock->schedule_ret(temp,
@@ -1873,7 +2048,7 @@ public:
   mock_method((bool), set_name_is_good, ((string)));
 };
 ...
-define_test(..., ..., "...") {
+define_test(..., "...") {
   declare(MockNamable namable);
   // return \texttt{true} for the first call, then throw an exception for the %
      second call:
@@ -1890,7 +2065,7 @@ value ``\texttt{void\_v}'' to represent one successful return.  This is
 necessary when you want to schedule an exception after a number of uneventful
 returns:
 \begin{cpplisting}
-define_test(..., ..., "...") {
+define_test(..., "...") {
   declare(MockNamable namable);
   // return normally from the first call, then throw an exception for the %
      second call:
@@ -2308,7 +2483,7 @@ namespace my_space {
 
 If you want to use the textual representation of a value ``\texttt{v}'' of
 another type contained in your type, use the expression
-``\texttt{testudo::to\_text\_testudo(v)}''.
+``\texttt{testudo::to\_text(v)}''.
 
 \section{Equality}
 \label{sec:equality}

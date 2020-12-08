@@ -1,7 +1,7 @@
 #ifndef NAUTOTEST
 
-#include "testudo_lc.h"
-#include "testudo_ext.h"
+#include <testudo/testudo_lc.h>
+#include <testudo/testudo_ext.h>
 
 namespace {
 
@@ -9,13 +9,13 @@ namespace {
 
   // a very short test to check the cartouche tag being longer than the
   // cartouched info
-  define_top_test("testudo", sh, "sh", 9999) {
+  define_top_test("testudo", "sh", 9999) {
     check(true)_true;
   }
 
-  define_top_test_node("testudo", testarudo, "testarudo tests", 10);
+  define_top_test_node("testudo", (testarudo, "testarudo tests"), 10);
 
-  define_test(testarudo, simple, "simple testarudo tests") {
+  define_test(testarudo, "simple testarudo tests") {
     check(true)_true;
     check(false)_true;
     check(true)_false;
@@ -23,27 +23,27 @@ namespace {
     check(2+2==5)_false;
   }
 
-  define_test_node(testarudo, complex, "complex testarudo tests");
+  define_test_node(testarudo, (complex, "complex testarudo tests"));
 
-  define_test(complex, difficult, "difficult test") {
+  define_test(complex, "difficult test") {
     check(7)_equal(8);
     check(7)_not_equal(8);
     check("un chat")_equal(string("un chat"));
   }
 
-  define_test(complex, complicated, "complicated test") {
+  define_test(complex, "complicated test") {
     check("it's")_equal("complicated");
     check(6*9)_equal(42);
   }
 
-  define_test(complex, with_error, "test_with_error") {
+  define_test(complex, "test_with_error") {
     check(22+22)_equal(44);
     perform(throw runtime_error("see if you can catch me!"));
     print_text("this should never appear");
     check("this should never appear either")_equal(string());
   }
 
-  define_test(complex, penultimate, "penultimate test") {
+  define_test(complex, "penultimate test") {
     check("there's nothing")_equal("penultimate");
   }
 
@@ -60,7 +60,7 @@ namespace {
   template <typename T>
   auto ne(T &&t) { return predicate_c_a((t), a not_eq t); }
 
-  define_test(complex, verify_syntax, "\"verify\" syntax") {
+  define_test(complex, "\"verify\" syntax") {
     declare(auto is_even=predicate_a((a%2)==0));
     declare(auto is_multiple_of=
             [](auto n) { return predicate_c_a((n), (a%n)==0); });
@@ -93,7 +93,20 @@ namespace {
     check(4)_verify(gt(6) and lt(10));
   }
 
-  define_test(complex, try_catch, "try-catch checks") {
+  define_test(complex, "\"true_for\" syntax") {
+    declare(int a=7);
+    declare(int b=8);
+    check(a<b)_true;
+    check(a>b)_true;
+    check(a<b)_true_for(a, b);
+    check(a>b)_true_for(a, b);
+    check(a<b)_false;
+    check(a>b)_false;
+    check(a<b)_false_for(a, b);
+    check(a>b)_false_for(a, b);
+  }
+
+  define_test(complex, (try_catch, "try-catch checks")) {
     check_try([]() { }())_catch();
     check_try(throw runtime_error("this'll be caught"))_catch();
     check_try(throw "this'll be too")_catch(char const *);
@@ -103,11 +116,11 @@ namespace {
 
   define_test(
     complex,
-    test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches,
-    "a test with so many characters in the name and in the title that it'll"
-    " have to be broken across several lines in the cartouche") { }
+    (test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches,
+     "a test with so many characters in the name and in the title that it'll"
+     " have to be broken across several lines in the cartouche")) { }
 
-  define_test(complex, with, "\"with\" checks") {
+  define_test(complex, "\"with\" checks") {
     declare(list<int> numbers_1{2, 4, 8});
     declare(list<int> numbers_2{2, 5, 8});
     with_data(x, numbers_1) check((x%2)==0)_true;
@@ -191,17 +204,33 @@ namespace {
         check(x%2)_equal(y%2);
     }
     with_data(x, numbers_1) check(0)_verify(is_even);
+
+    with_data(x, {1, 2, 3})
+      check(x)_equal(x);
+
+    with_data((x), list<tuple<int>>{{3}, {4}, {8}})
+      check((x%2)==0)_true;
+    declare(list<tuple<int, int, int>>
+              list_of_sums{{1, 3, 4}, {3, 7, 11}, {10, 15, 25}});
+    with_data((a, b, sum), list_of_sums)
+      check(sum)_equal(a+b);
+    with_data((x), list<tuple<int>>{{2}, {4}, {8}})
+      check((x%2)==0)_true;
+    declare(list<tuple<int, int, int>>
+              list_of_sums_2{{1, 3, 4}, {3, 7, 10}, {10, 15, 25}});
+    with_data((a, b, sum), list_of_sums_2)
+      check(sum)_equal(a+b);
   }
 
-  define_test_node(testarudo, disorder, "disordered tests");
+  define_test_node(testarudo, (disorder, "disordered tests"));
 
   define_top_test("testudo.testarudo.disorder",
-                  unu, "unu, but comes last", 10) {
+                  (unu, "unu, but comes last"), 10) {
     check(string("unu")>string("du"))_true;
   }
 
   define_top_test("testudo.testarudo.disorder",
-                  du, "du, but comes first", 10) {
+                  (du, "du, but comes first"), 10) {
     check(string("unu")<string("du"))_true;
   }
 
@@ -209,7 +238,7 @@ namespace {
   bool operator==(ClassWithNoRepresentation, ClassWithNoRepresentation)
     { return false; }
 
-  define_top_test("testudo.testarudo.disorder", absdiff, "absdiff()", 80) {
+  define_top_test("testudo.testarudo.disorder", (absdiff, "absdiff()"), 80) {
     set_approx_epsilon(1e-10);
     check(testudo::absdiff(5., 7.))_approx(2.);
     check(testudo::absdiff(7., 5.))_approx(2.);
@@ -218,12 +247,12 @@ namespace {
   }
 
   define_top_test("testudo.testarudo.disorder",
-                  no_representation, "class with no representation", 100) {
+                  (no_representation, "class with no representation"), 100) {
     check(ClassWithNoRepresentation())_equal(ClassWithNoRepresentation());
   }
 
   define_top_test("testudo.testarudo.disorder",
-                  testarudo_ext, "Testarudo support for STL objects", 90) {
+                  (testarudo_ext, "Testarudo support for STL objects"), 90) {
     set_approx_epsilon(1e-6);
     declare(tuple<float, int, double> ta={3.14, 8, 7.5});
     declare(tuple<double, float, int> tb={4.14, 7., 6});
@@ -267,26 +296,21 @@ namespace {
       { perform(throw "hey, here's something unexpected"); }
   };
 
-  define_top_test_node("testudo", fixture, "fixture tests", 245);
+  define_top_test_node("testudo", (fixture, "fixture tests"), 245);
 
-  define_test(
-      fixture,
-      addition_commutativity, "+ commutativity",
-      visible_fixture(NumbersFixture)) {
+  define_test(fixture, "+ commutativity",
+              visible_fixture(NumbersFixture)) {
     perform(check_initial_values());
     check(x+y)_approx(y+x);
   }
 
-  define_test(
-      fixture,
-      multiplication_commutativity, "* commutativity",
-      with_fixture(NumbersFixture)) {
+  define_test(fixture, "* commutativity",
+              with_fixture(NumbersFixture)) {
     perform(check_initial_values());
     check(x*y)_approx(y*x);
   }
 
-  define_test(fixture,
-              associativity, "associativity",
+  define_test(fixture, "associativity",
               with_fixture(NumbersFixture)) {
     check(x*(y+z))_approx(x*y+x*z);
     perform(throw_something_unexpected());
@@ -298,7 +322,7 @@ namespace {
     ~AtDestruction() { f(); }
     function<void ()> const f;
   };
-  define_top_test("testudo", scope, "scope begin and end", 375) {
+  define_top_test("testudo", (scope, "scope begin and end"), 375) {
     declare(int flag=10);
     in_scope("at_destruction_flag_20") {
       declare(AtDestruction at_destruction_flag_20([&flag]() { flag=20; }));
@@ -315,12 +339,27 @@ namespace {
     check(flag)_equal(20);
   }
 
-  define_top_test("testudo", testudo_syntax, "Testudo syntax", 500) {
+  define_top_test("testudo", "Testudo syntax", 500) {
     print_text("tags in \"||~\"...\"~||\" are used internally");
     print_text("but they should still appear here");
     declare(string code="~pre~ ||~bold~|| ~post~");
     show_value(code);
     check(code)_equal("~pre~ ||~bold~|| ~post~");
+  }
+
+}
+
+namespace testarudo_util {
+
+  extern void test_commutativity(testudo::test_management_t, int a, int b);
+
+}
+
+namespace {
+
+  define_test(testarudo, "external function") {
+    perform(testarudo_util::test_commutativity(test_management, 2, 3));
+    perform(testarudo_util::test_commutativity(test_management, -10, 7));
   }
 
 }

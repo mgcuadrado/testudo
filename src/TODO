@@ -8,6 +8,90 @@
 [ ] add options (like "just report stats", "show tests", "show failed tests",
   "show failed checks", "no color", et cetera)
 
+  current situation:
+
+      "-f <format_name>" selects format name
+
+      "-s <node-nade>" limits the execution to the subtree rooted at the
+        specified node (supports only one subtree root)
+
+  possible extensions:
+
+      * at the executable level,
+
+        [X] adding several subtree roots to execute [done by a combination of
+          "-s" to specify a (single) root, and "-i" to restrict the execution
+          to a list of nodes and their subtrees (several "-i" specifications
+          for several such nodes)
+
+        [X] selecting subtree roots by glob
+
+      * at the display (XSLT) level,
+
+        [ ] showing only fails (failed stats, steps, step-ids and step
+          locations)
+
+  possible developments:
+
+      * integrate the "XML -> text with codes -> ANSI text" (and variants
+        thereof) in the executable, so that the display-level extensions are
+        controlled by options passed to the executable
+
+      * integrate "make" invocation in the executable, with a "-j <n>" option
+        to be passed to "make"
+
+[ ] code ways to monitor the progression of test results, as features are coded
+  and bugs are solved; this would require a robust way of identifying check
+  steps; musings:
+
+    * explicit step ids are great, but we can't expect the user to add those
+      for all steps
+
+    * automatically-generated steps could be checksum based, and managed
+      separately for separate test functions; two distinct steps with the same
+      checksum in the same test function are expected to be for identical
+      steps, in different locations; they can be individually identified by
+      (arithmetically) adding to the checksum the occurrence number (0 for the
+      first time) in the same test function
+
+    * a specific output (display-level) mode for monitoring outputs only test
+      nodes and check step ids, and stats for each test node and step id
+
+    * some check tests can have an unknown state, if they come after an
+      unexpected exception
+
+    * questions that can be answered by the monitoring, compared to a reference
+      report:
+
+        * what is the delta for the stats of each test node
+
+        * what are the test ids that have changed status (new OKs, new FAILs,
+          new ERRs)
+
+        * what are the new test ids, and what are the test ids that have
+          disappeared
+
+[ ] code "given()" to check preconditions before undertaking certain test
+  steps:
+
+      given(a)_not_equal(0)
+      given(b>0)_true {
+        show_value(b/a);
+        check(a*(b/a))_equal(b);
+      }
+
+  if a "given()" fails, the tests it guards aren't even run, and an error is
+  tallied (as if an unexpected exception had been thrown); "given()" could
+  actually be implemented as a special "check()" that throws on fail, but it
+  should be enclosed ran a try-catch, so that it doesn't obliterate the rest of
+  the test; may not be trivial
+
+  other names for "given()":
+
+      * "assuming()"
+
+      * "provided()"
+
 ---- high priority -----------------------------------------
 
 [ ] Google Mock lays down expectations _before_ the function runs, and i guess
@@ -16,8 +100,20 @@
 
 ---- easy --------------------------------------------------
 
-[ ] make last argument of "define_test_node()" and similar macros optional?  or
-  rather, remove the need for an identifier, and use the title as the key
+[ ] code an easy way to add new formats that differ only in construction
+  options (see "testudo_format_color_text.cpp:TestFormatColorTextWithLines")
+
+[ ] make "show_value()" &al actually work in "with_data()"?  why would i put
+  such a thing in a "with_data()" otherwise?
+
+[ ] deprecate explicitly #include-ing "testudo_ext.h"; it should be always
+  included by "testudo.h", since it is very small (209 lines) compared to
+  what's already included when #include-ing "testudo.h" (1745 lines); change
+  doc accordingly
+
+[ ] code a templated random generator system, to be used with
+  "generate_data()"; generation of random data for a given type should probably
+  become another aspect of "adding Testudo support for your types"
 
 ---- in progress -------------------------------------------
 
@@ -25,17 +121,56 @@
 
 ---- tasks -------------------------------------------------
 
+[ ] ideas to consider for the diff engine:
+
+    [ ] find a cool name
+
+    [ ] maybe work directly on the XML format, instead of requiring a specific
+      "track" format; this may require a "flattening" of the XML report, prior
+      to computing the diff
+
+    [ ] add hyperlinks to the diff report, that take you to the specific
+      location in the report (not in the source code; the _report_ should have
+      hyperlinks that take you to the source code) (see "add hyperlinks to the
+      report" below)
+
+    [ ] allow the user to specify "min_length"
+
+[ ] add hyperlinks to the report (only in XML? how to do that? maybe a specific
+  viewer that shows you the report without the links, but allows you to select
+  them and open an editor at the exact location, exactly like links in Emacs'
+  "*compilation*" or "*grep*" buffers)
+
+[ ] MockTurtle: when checking logs, add a way to skip logged calls until a call
+  to a given method; additionally, add a way to combine the skip with the check
+  (the resulting instruction would mean "check that the next call to method
+  'foo' verifies 'blablablah'")
+
+[ ] MockTurtle: add a method to filter a log so we check only calls to a set of
+  methods
+
 [ ] solve the comment in "TestFormatColorText::output_location()"
+
+[ ] in certain contexts (such as when showing expression values of failed
+  checks), multiline values may be shown that break the line-breaking
+  algorithm; they show different with XML and colour-text formats (i think the
+  XML format isn't fooled, whereas the colour-text format is)
 
 [ ] check how "with_data()"-loops behave in the face of unexpected exceptions,
   and if they behave badly (to be expected), correct it
 
 [ ] more work on source line info:
 
-    [ ] adding the feature to the XML output
+    [X] adding the feature to the XML output
+
+    [X] adding a summarised line output: if the source code for a step is in
+      the same file as the test it's in, print just the line number; otherwise,
+      print the whole file+line
 
     [ ] ways to control wether we want no lines, lines only for failed steps,
       or lines for all steps
+
+    [ ] add line info to the summary
 
 [ ] support "iomanip" on the report output?
 
@@ -44,8 +179,7 @@
   compared to its expected use: who uses static methods that may need to me
   mocked?; if someone does, it's easy to just delegate a static method to a
   mocked method of a mocked singleton, so you get all the benefits of logs and
-  ledgers; maybe it'd would be better to explain this in the doc, with an
-  example
+  ledgers; maybe it would be better to explain this in the doc, with an example
 
 [ ] improve clarity of compiler errors (this is a big one; i'll have to put
   "static_assert" all over the place, and possibly use other tricks too)
@@ -139,6 +273,11 @@
   loop; check and correct
 
 ---- low priority, some time maybe -------------------------
+
+[ ] test with other compilers
+
+[ ] adapt to other SOs and their compilers (i should remove the dependency on
+  "bash", "make", et cetera)
 
 [ ] lower as much as possible the C++ version requirement (i'm compiling in
   C++17 right now; can i have everything with C++14, or even with C++11?); for
@@ -649,3 +788,25 @@
         % 2*1+1 ~ is_even : 9 -------------------------47- [FAIL]
 
 [X] rename "show_scope()" to "in_scope()"?
+
+[X] make last argument of "define_test_node()" and similar macros optional?  or
+  rather, remove the need for an identifier, and use the title as the key
+
+[X] document the new syntax for names and titles for tests and test nodes
+
+[X] if possible, enable and document structured binding syntax for
+  "with_data()"
+
+[X] add a new type of check similar to "_true", but allowing you to specify
+  what expression values to print if it fails; for instance:
+
+    check(a+b==b+a)_show(a, b)_true;
+    check(x<f(y))_show(x, y)_true
+
+  this would be just "[ OK ]" if ok, but print the value of "tuple{a, b}" if
+  not
+
+[X] code "with_data_multiline()", where data items are separated by newlines;
+  use the report for "testudo.diff.longest common subsequence" as an example to
+  improve; i think this may require some parsing of the text representation for
+  the data

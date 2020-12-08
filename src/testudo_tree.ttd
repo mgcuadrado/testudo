@@ -1,12 +1,12 @@
-#include "testudo_uc.h"
+#include <testudo/testudo_uc.h>
 
 namespace {
 
   using namespace std;
 
-  DEFINE_TOP_TEST_NODE("", testudo, "Testudo");
-  DEFINE_TOP_TEST_NODE("testudo", main, "main() test");
-  DEFINE_TEST(main, show_tree, "show test tree") {
+  DEFINE_TOP_TEST_NODE("", (testudo, "Testudo"));
+  DEFINE_TOP_TEST_NODE("testudo", (main, "main() test"));
+  DEFINE_TEST(main, "show test tree") {
     DECLARE(ostringstream trs);
     PERFORM(testudo::print_tree(trs, testudo::TestNode::root_node()));
     SHOW_MULTILINE_VALUE(trs.str());

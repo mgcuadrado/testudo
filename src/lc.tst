@@ -19,6 +19,7 @@ FAKE_PERFORM         fake_perform
 FIXTURE_MEMBER       fixture_member
 FIXTURE_INIT         fixture_init
 WITH_DATA            with_data
+WITH_MULTILINE_DATA  with_multiline_data
 CHECK_TRY            check_try
 CATCH                _catch
 SHOW_VALUE           show_value
@@ -33,6 +34,8 @@ SHOW_APPROX_EPSILON   show_approx_epsilon
 CHECK      check
 TRUE       _true
 FALSE      _false
+TRUE_FOR   _true_for
+FALSE_FOR  _false_for
 EQUAL      _equal
 NOT_EQUAL  _not_equal
 APPROX     _approx

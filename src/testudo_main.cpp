@@ -15,24 +15,6 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Testudo.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "testudo.h"
 #include "testudo_opt.h"
-#include "testudo_try_catch.h"
-#include <dlfcn.h>
 
-int main(main_opts_params) {
-  begintrycatch;
-  testudo::TestOptions to(main_opts_args);
-  for (std::string library: to.dynamic_libraries) {
-    dlopen(library.c_str(), RTLD_LAZY);
-    if (auto error=dlerror()) {
-      std::cerr << "dlopen() error opening \""+library+"\": "
-                << error << std::endl;
-      return 1;
-    }
-  }
-  testudo::TestNode::root_node()
-    ->test(testudo::test_format_named_creator(to.format_name)(std::cout),
-           to.subtree);
-  endtrycatch;
-}
+int main(main_params) { return testudo::testudo_main(main_args); }

@@ -1,7 +1,7 @@
 #ifndef NAUTOTEST
 
-#include "testudo_lc.h"
-#include "mock_turtle.h"
+#include <testudo/testudo_lc.h>
+#include <testudo/mock_turtle.h>
 #include <iostream>
 
 namespace {
@@ -50,7 +50,7 @@ namespace {
     return soup->is_tasty();
   }
 
-  define_top_test_node("testudo", mock_turtle, "mock turtle tests", 750);
+  define_top_test_node("testudo", (mock_turtle, "mock turtle tests"), 750);
 
   class SoupMock
     : public testudo::MockClass<Soup> {
@@ -84,7 +84,7 @@ namespace {
     wrap_method((void), inc_counter, ()) { ++counter; }
   };
 
-  define_test(mock_turtle, queen_of_hearts, "Queen of Hearts' recipe") {
+  define_test(mock_turtle, "Queen of Hearts' recipe") {
     declare(auto soup_mock=make_shared<SoupMock>());
     check(soup_mock->reverse({1, 2}))_equal(pair(2, 1));
     perform(soup_mock->schedule_ret(temp, 20, 40, 60, 80, 100));
@@ -110,8 +110,7 @@ namespace {
     check(soup_mock->logged_ret(is_tasty))_equal({{true}});
   }
 
-  define_test(mock_turtle,
-              queen_of_hearts_calls, "Queen of Hearts' recipe calls") {
+  define_test(mock_turtle, "Queen of Hearts' recipe calls") {
     declare(auto soup_mock=make_shared<SoupMock>());
     perform(soup_mock->set_ret_default(forty_two, 6*9));
     check(soup_mock->reverse({1, 2}))_equal(pair(2, 1));
@@ -152,7 +151,7 @@ namespace {
     }
   }
 
-  define_test(mock_turtle, approx, "approx") {
+  define_test(mock_turtle, "approx") {
     declare(auto soup_mock=make_shared<SoupMock>());
     // FIXME: the following check should warn about checking equality of floats
     check(soup_mock->reverse_float({1., 2.}))_equal(pair(2., 1.));
@@ -213,7 +212,7 @@ namespace {
     int level;
   };
 
-  define_test(mock_turtle, several_mocks, "calls with several mocks") {
+  define_test(mock_turtle, "calls with several mocks") {
     declare(testudo::CallLedger cl);
     declare(MockLevel lev1(12));
     perform(call_ledger_report_to(lev1, &cl));
@@ -237,7 +236,7 @@ namespace {
     check(it.method_name())_equal("readout");
   }
 
-  define_test(mock_turtle, predicates, "predicates") {
+  define_test(mock_turtle, "predicates") {
     declare(using namespace testudo);
     check(list<tuple<int, string>>{{1, "one"}, {1, "one"}})
       _verify(is_always(1, "one"));
@@ -286,7 +285,7 @@ namespace {
     mock_method((bool), set_name_is_good, ((string)));
   };
 
-  define_test(mock_turtle, exceptions_with_mock, "exceptions with mock") {
+  define_test(mock_turtle, "exceptions with mock") {
     declare(using namespace testudo);
     declare(MockNamable namable);
     perform(namable.schedule_ret(set_name_is_good,
@@ -314,7 +313,7 @@ namespace {
     }
   };
 
-  define_test(mock_turtle, exceptions_with_wrap, "exceptions with wrap") {
+  define_test(mock_turtle, "exceptions with wrap") {
     declare(WrapNamable namable);
     test_namable(test_management, namable);
   }

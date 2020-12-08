@@ -1,0 +1,48 @@
+% Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+
+% This file is part of Testudo.
+
+%     Testudo is free software: you can redistribute it and/or modify
+%     it under the terms of the GNU General Public License as published by
+%     the Free Software Foundation, either version 3 of the License, or
+%     (at your option) any later version.
+
+%     Testudo is distributed in the hope that it will be useful,
+%     but WITHOUT ANY WARRANTY; without even the implied warranty of
+%     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%     GNU General Public License for more details.
+
+%     You should have received a copy of the GNU General Public License
+%     along with Testudo.  If not, see <http://www.gnu.org/licenses/>.
+
+\documentclass[]{article}
+\usepackage{fontspec}
+\setmonofont{DejaVu Sans Mono}
+\usepackage{fancyvrb}
+\usepackage{xcolor, soul}
+
+\pagestyle{empty}
+
+\newcommand*\brown[1]{\textcolor{brown!60!black}{#1}}
+\newcommand*\sand[1]{\textcolor{brown!50!white}{#1}}
+\newcommand*\gray[1]{\textcolor{gray!50!white}{#1}}
+\newcommand*\green[1]{\textcolor{green!50!black}{#1}}
+\newcommand*\red[1]{\textcolor{red}{#1}}
+\newcommand*\orange[1]{\textcolor{orange!50!yellow}{#1}}
+\newcommand*\ok[1]{\textcolor{green!80!black}{#1}}
+\newcommand*\fail[1]{\textcolor{red}{\sethlcolor{yellow}\hl{#1}}}
+\newcommand*\cyan[1]{\textcolor{cyan}{#1}}
+
+\begin{document}
+
+\begin{Verbatim}[commandchars=+\{\}]
+Mayers Manx'                       [ +ok{OK} ]
+         +gray{-_}  +orange{.}+red{--}+brown{\}+sand{o_}+brown{,}+cyan{\}+red{_}+orange{.}     +sand{__  _,--.}
+DuneBuggy+sand{____}+red{`}(+gray{o})+red{---}(+gray{o})+sand{__,-' ,-'}   [+fail{FAIL}]
+\end{Verbatim}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

@@ -37,16 +37,15 @@ a test:
 #include "flux_capacitor.h"
 #include "delorean_test.h" // defines DeloreanFixture
 
-define_top_test_node("outatime.delorean", // parent full name
-                     flux_capacitor, // text name
-                     "flux capacitor features"); // title
+define_top_test_node("bttf1.outatime", // parent full name
+                     (flux_capacitor, // text name
+                      "FC features")); // title
 
 define_test(flux_capacitor, // parent
-            flux_capacitor_initial, // name
-            "flux capacitor after construction", // title
+            "FC after construction", // title
             with_fixture(DeloreanFixture)) { // use a fixture
   declare(FluxCapacitor fc);
-  perform(fc.connect_to(delorean)); // created by the fixture
+  perform(fc.connect_to(delorean)); // "delorean" is created by the fixture
   check(not fc.is_on())_true; // check bool is true
   check(fc.missing_jw())_approx(1.21); // check approximate value
 }
@@ -59,17 +58,16 @@ are two default styles; you can also add your own):
 #include "flux_capacitor.h"
 #include "delorean_test.h" // defines DeloreanFixture
 
-DEFINE_TOP_TEST_NODE("testudo.outatime", // parent full name
-                     flux_capacitor, // text name
-                     "FC features"); // title
+DEFINE_TOP_TEST_NODE("bttf2.outatime", // parent full name
+                     (flux_capacitor, // text name
+                      "FC features")); // title
 
 DEFINE_TEST(flux_capacitor, // parent
-            initial, // name
             "FC after construction", // title
             WITH_FIXTURE(DeloreanFixture)) // use a fixture
 {
   DECLARE(FluxCapacitor fc);
-  PERFORM(fc.connect_to(delorean)); // created by the fixture
+  PERFORM(fc.connect_to(delorean)); // "delorean" is created by the fixture
   CHECK(not fc.is_on()) TRUE; // check bool is true
   CHECK(fc.missing_jw()) APPROX(1.21); // check approximate value
 }
@@ -82,28 +80,31 @@ and didn't get zeir jigawatts right):
 | {testudo.outatime.flux_capacitor} FC features |
 `-----------------------------------------------'
  _________________________________________________________________
+| flux_capacitor_test.ttd:9                                       |
 | {testudo.outatime.flux_capacitor.initial} FC after construction |
 `-----------------------------------------------------------------'
 " with fixture DeloreanFixture "
-: FluxCapacitor fc ;
-# fc.connect_to(delorean) ;
-% not fc.is_on()                                                        [ OK ]
-% fc.missing_jw() // 1.21 +/- eps : 2.21 // 1.21 ---------------------- [FAIL]
+12 : FluxCapacitor fc ;
+13 # fc.connect_to(delorean) ;
+14 % not fc.is_on()                                                     [ OK ]
+15 % fc.missing_jw() // 1.21 +/- eps : 2.21 // 1.21 ------------------- [FAIL]
 {testudo.outatime.flux_capacitor.initial} 1/2 fail -------------------- [FAIL]
 
 {testudo.outatime.flux_capacitor} 1/2 fail ---------------------------- [FAIL]
 ```
-(only with colours, but `README.md` doesn't show colours).
+(only with colours, but `README.md` doesn't support colours).
 
 As you can see, all details of the source code are transferred to the full
 report, but results are added in the form of `[ OK ]` and `[FAIL]` tags, and
 accumulated counts, and each line is coded with various characters to mark what
-kind of a line it is (a declaration, an action, a check…).  When a value
-doesn't match its expected value, both the actual value and the expected value
-are printed, as in the check for `fc.missing_jw()`: you see the actual value
-`2.21` and the expected value `1.21`.  In that same line, `+/- eps` means the
-comparison used the current value for the tolerance; you can also change the
-tolerance, or specify a tolerance for a specific check.
+kind of a line it is (a declaration, an action, a check…).  Source code
+filename and line information are also added to the report (see filename and
+line in the test cartouche, and line numbers at the beginning of each test
+step).  When a value doesn't match its expected value, both the actual value
+and the expected value are printed, as in the check for `fc.missing_jw()`: you
+see the actual value `2.21` and the expected value `1.21`.  In that same line,
+`+/- eps` means the comparison used the current value for the tolerance; you
+can also change the tolerance, or specify a tolerance for a specific check.
 
 If you request just a summary instead of the full report, you get this:
 ```

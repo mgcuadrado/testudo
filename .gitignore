@@ -1,6 +1,8 @@
 .object/
 .testudo/
 .depend/
+.headers/
+.track/
 reports/
 
 keywords.tex

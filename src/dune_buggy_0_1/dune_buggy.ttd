@@ -1,0 +1,50 @@
+#include "dune_buggy.h"
+#include "../testudo_lc.h"
+
+namespace {
+
+  using namespace dune_buggy;
+
+  define_top_test_node("", (dune_buggy, "Dune Buggy"));
+
+  define_test_node(dune_buggy, (location, "location"));
+
+  define_test(location, "constructor") {
+    check(location{0., 0., 0.})_approx(origin);
+    declare(location p{1., -2., 3.});
+    check(p.x)_approx(1.);
+    check(p.y)_approx(-2.);
+    check(p.a)_approx(3.);
+    declare(location q{1., -2., -2.5-4*pi});
+    check(q.a)_approx(-2.5);
+  }
+
+  define_test(location, "-p") {
+    check(-origin)_approx(origin);
+    check(-location{-1., 2, 0.})_approx({1., -2., 0.});
+    check(-location{0., 0, .7})_approx({0., 0., -.7});
+  }
+
+  define_test(location, "p+q") {
+    check(location{1., -2., 0.}+location{10., 20., 0.})
+      _approx({11., 18., 0.});
+    check(location{0., 0., .9}+location{0., 0., -2.8})
+      _approx({0., 0., -1.9});
+    check(location{1., 2., pi}+location{10., 20., 0.})
+      _approx({-9., -18., pi});
+    check(location{1., 2., -pi/2.}+location{10., 20., 0.})
+      _approx({21., -8., -pi/2.});
+    check(location{1., 2., pi/2.}+location{10., 20., 0.})
+      _approx({-19., 12., pi/2.});
+  }
+
+  define_test(location, "p+(-p)") {
+    with_data(p, {location{1., -5., -8.},
+                  location{-10, 3., 1.8},
+                  location{-2, 7., 3.4}}) {
+      check(p+(-p))_approx(origin);
+      check(-p+p)_approx(origin);
+    }
+  }
+
+}

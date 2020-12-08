@@ -16,6 +16,7 @@
 //     along with Testudo.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "testudo.h"
+#include "glob_pattern.h"
 #include <list>
 #include <cassert>
 
@@ -24,10 +25,10 @@ namespace testudo___implementation {
   using namespace std;
 
   namespace {
-    std::string build_full_name(TestNode::pptr parent, name_t name) {
+    name_t build_full_name(TestNode::pptr parent, name_t name) {
       return (parent and (parent not_eq TestNode::root_node().get())
               ? (parent->full_name+".")
-              : std::string())+name;
+              : string())+name;
     }
   }
 
@@ -70,7 +71,7 @@ namespace testudo___implementation {
     return result;
   }
 
-  TestNode::sptr TestNode::get_node(std::string const &full_name) {
+  TestNode::sptr TestNode::get_node(name_t const &full_name) {
     if (full_name.empty())
       return root_node();
     else {
@@ -86,34 +87,13 @@ namespace testudo___implementation {
   }
 
   TestStats
-  TestNode::test(test_format_p test_format, string subtree) const {
-    bool this_is_root=this==root_node().get();
-    if (subtree.empty()) {
-      if (this_is_root and children.size()==1)
-        return children.begin()->second->test(test_format);
-      TestStats test_stats;
-      run_tests({test_format, test_stats});
-      test_format->print_test_readout();
-      return test_stats;
-    }
-    else {
-      if (this_is_root)
-        subtree=root_node()->name+"."+subtree;
-      auto dot=subtree.find('.');
-      if (dot==string::npos) {
-        if (subtree==name) // terminal self
-          return test(test_format, "");
-        else
-          return TestStats();
-      }
-
-      string rest=subtree.substr(dot+1);
-      string child_name=rest.substr(0, rest.find('.'));
-      if (auto it=children.find(child_name); it not_eq children.end())
-        return it->second->test(test_format, rest);
-      else
-        return TestStats();
-    }
+  TestNode::test(test_format_p test_format,
+                 list<name_t> include,
+                 list<string> glob) const {
+    TestStats test_stats;
+    run_tests({test_format, test_stats}, include, glob);
+    test_format->print_test_readout();
+    return test_stats;
   }
 
   list<TestNode::sptr> TestNode::ordered_children() const {
@@ -141,18 +121,80 @@ namespace testudo___implementation {
     return ordered_children;
   }
 
-  void TestNode::run_tests(test_management_t test_management) const {
-    test_management.format->output_location_title(location, full_name, title);
+  namespace {
 
-    // run the children's tests in order
-    for (auto const &child: ordered_children()) {
-      TestStats child_test_stats;
-      child->run_tests({test_management.format, child_test_stats});
-      test_management.stats+=child_test_stats;
+    bool matches_at_least_one_or_empty(name_t name, list<name_t> include) {
+      // when "include" is empty, all tests are run, so true
+      if (include.empty())
+        return true;
+      // otherwise, this child is run only if it's one of the included nodes,
+      auto name_dot=name+'.';
+      for (auto i: include)
+        // i.e., either a matching leaf, or a node that matches the beginning
+        // of an included node
+        if ((name==i) or (name_dot==i.substr(0, name_dot.length())))
+          return true;
+      return false;
     }
 
+    // if "include" is empty, the result must be empty; if "name" only matches
+    // exactly (without the trailing '.'), the result must be empty, meaning
+    // "all children"; otherwise, take elements matching the name with a
+    // trailing '.', and trim them
+    list<name_t> trim_include(name_t name, list<name_t> include) {
+      list<name_t> result;
+      auto name_dot=name+'.';
+      for (auto i: include)
+        if (name==i)
+          return {};
+        else if (name_dot==i.substr(0, name_dot.length()))
+          result.push_back(i.substr(name_dot.length()));
+      return result;
+    }
+
+  }
+
+  bool TestNode::matching_name(list<string> glob) const {
+    if (glob.empty()) // no globs -> always matching
+      return true;
+    else
+      for (auto g: glob)
+        if (glob::matches(full_name, g))
+          return true;
+    return false;
+  }
+
+  bool TestNode::some_matching_function(list<string> glob) const {
+    if (glob.empty()) // no globs -> run all
+      return true;
+    else if (test_f and matching_name(glob))
+      return true;
+    else
+      for (auto const &[name, child]: children)
+        if (child->some_matching_function(glob))
+          return true;
+    return false;
+  }
+
+  void TestNode::run_tests(test_management_t test_management,
+                           list<name_t> include,
+                           list<string> glob) const {
+    test_management.format->set_title_location(location);
+    test_management.format->output_title(full_name, title);
+
+    // run the children's tests in order
+    for (auto const &child: ordered_children())
+      if (matches_at_least_one_or_empty(child->name, include)
+          and child->some_matching_function(glob)) {
+        TestStats child_test_stats;
+        child->run_tests({test_management.format, child_test_stats},
+                         trim_include(child->name, include),
+                         glob);
+        test_management.stats+=child_test_stats;
+      }
+
     // run own test function if set
-    if (test_f) {
+    if (test_f and matching_name(glob)) {
       try {
         test_f(test_management);
       }
@@ -186,7 +228,7 @@ namespace testudo___implementation {
 
       bool last_child=(node==last_sibling);
       string line_prefix=parent ? (last_child ? "`-" : "|-") : "--";
-      os << prefix << line_prefix << node->name << "\n";
+      os << prefix << line_prefix << " " << node->name << "\n";
       string next_last_prefix=last_child ? "   " : last_prefix;
       for (auto const &child: ordered_children)
         print_tree_r(os, child,

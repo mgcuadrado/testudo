@@ -36,8 +36,8 @@ public:
 };
 
 #ifndef NAUTOTEST // we can disable tests by defining this macro
-#include "testudo_lc.h"
-#include "testudo_ext.h" // we need the support for lists
+#include <testudo/testudo_lc.h>
+#include <testudo/testudo_ext.h> // we need the support for lists
 
 namespace {
   using namespace std;
@@ -49,8 +49,9 @@ namespace {
   // source code) [cutting here so you can have the test in one page] \newpage
   // this defines a test named ``\texttt{use\_instructions}'', titled ``use
   // instructions''                               \label{pag:example-test-code}
-  define_top_test("testudo", use_instructions,
-                  "use instructions") {
+
+  define_top_test("testudo",
+                  (use_instructions, "use instructions")) {
     print_multiline_text("index:\n"
                          "  1. holding functionality\n"
                          "  2. exceptions\n"
