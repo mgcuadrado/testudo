@@ -26,7 +26,10 @@ code.  Its key features are:
 - you can organise your tests as a tree;
 
 - you can produce test summaries with success, fail, and error counts and
-  accumulated tallies across the test tree.
+  accumulated tallies across the test tree;
+  
+- you can automatically track your progress based on produced reports (in
+  progress).
 
 # A simple example
 
