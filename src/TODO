@@ -3,7 +3,31 @@
           | || _|\_  \| || | | | | | |  ,/___\/    [FAIL]
     ------|_||___|___/|_|-\__|__/|__/-----U-U----------------mgc--
 
+---- bugs --------------------------------------------------
+
 ---- big but important things ------------------------------
+
+[ ] update README.md with the latest developments (especially progress
+  tracking)
+
+[ ] make Testudo independent from Unix
+
+  [X] code an alternative to "xml_to_color" ("testudo xml_to_color")
+
+  [X] code an alternative to "xml_to_color -s" ("testudo xml_to_color_summary")
+
+  [ ] code an alternative to "xml_to_color -l" ("testudo xml_to_color_latex")
+
+  [X] code an alternative to "xml_to_color -b" ("testudo_xml_to_bw")
+
+  [X] code an alternative to "xml_to_color" option "-w" (to set the width of
+    the text)
+
+  [X] no need to code an alternative to "xml_to_color" option "-r", since it's
+    about stopping the conversion between the colour codes are converted to
+    ANSI codes
+
+  [ ] code a direct colour summary output format
 
 [ ] add options (like "just report stats", "show tests", "show failed tests",
   "show failed checks", "no color", et cetera)
@@ -92,6 +116,9 @@
 
       * "provided()"
 
+[ ] consider removing predicate checks ("VERIFY", "PREDICATE", et cetera) in
+  favour of  "TRUE_FOR"
+
 ---- high priority -----------------------------------------
 
 [ ] Google Mock lays down expectations _before_ the function runs, and i guess
@@ -99,6 +126,8 @@
   approach of "mock-turtle"?
 
 ---- easy --------------------------------------------------
+
+[ ] shouldn't '\' chars at the end of broken lines appear blue?
 
 [ ] code an easy way to add new formats that differ only in construction
   options (see "testudo_format_color_text.cpp:TestFormatColorTextWithLines")
@@ -115,11 +144,33 @@
   "generate_data()"; generation of random data for a given type should probably
   become another aspect of "adding Testudo support for your types"
 
+[ ] i believe in the following
+
+    with_data(a, generate_data(100, random_int))
+      with_data(b, generate_data(100, random_int)) {
+        show(a);
+        show(b);
+      }
+
+  the values "b" takes are different for each value of "a" (a fresh list of
+  random values for "b" is created for each "a" value); we may want the
+  opposite behaviour: having just 100 values for "b" that we cross with the 100
+  "a" values; this could be achieved with something like
+
+    with_data((a, b), cartesian(generate_data(100, random_int),
+                                generate_data(100, random_int))) {
+      show(a);
+      show(b);
+    }
+
 ---- in progress -------------------------------------------
 
 [ ] document
 
 ---- tasks -------------------------------------------------
+
+[ ] it may be possible to have a command that computes result diffs with
+  respect to any past version, using the appropriate version control command
 
 [ ] ideas to consider for the diff engine:
 
@@ -810,3 +861,23 @@
   use the report for "testudo.diff.longest common subsequence" as an example to
   improve; i think this may require some parsing of the text representation for
   the data
+
+[X] add installation procedure; should install the binaries to "~/local/bin/"
+  and the headers to "~/local/include/testudo/"
+
+[X] document installation procedure
+
+[X] make installation procedure configurable
+
+[X] "with_data changed" entries in a track report ("make diff_dune_buggy_test"
+  for instance) are reported with wrong line number: the line number should be
+  that of the outermost "with-data" loop beginning; instead, it's that of an
+  inner step (probably the last failed one, but i'm not sure)
+
+[X] support result tracking directly from the makefile: the latest results must
+  be stored with a given name (e.g., "testudo.results"), and there must be a
+  make targed that computes and shows the diff; there must be another target
+  (kinda like the current "success_test") that stores the current results; this
+  must always be done just prior to committing a new version
+
+[X] document result tracking with "make save_track" and "make track_progress"

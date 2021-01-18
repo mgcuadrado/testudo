@@ -1,5 +1,5 @@
 <testudo>
-  <test location="" name="/" title="" n_failed="86" n_total="1987" n_errors="4" success="false">
+  <test location="" name="/" title="" n_failed="94" n_total="2005" n_errors="4" success="false">
     <test location="" name="bttf1" title="" n_failed="1" n_total="2" n_errors="0" success="false">
       <test location="" name="bttf1.outatime" title="" n_failed="1" n_total="2" n_errors="0" success="false">
         <test location="" name="bttf1.outatime.flux_capacitor" title="FC features" n_failed="1" n_total="2" n_errors="0" success="false">
@@ -36,13 +36,49 @@
         </test>
       </test>
     </test>
-    <test location="" name="testudo" title="Testudo" n_failed="84" n_total="1983" n_errors="4" success="false">
+    <test location="" name="bttf3" title="" n_failed="1" n_total="2" n_errors="0" success="false">
+      <test location="" name="bttf3.outatime" title="" n_failed="1" n_total="2" n_errors="0" success="false">
+        <test location="" name="bttf3.outatime.flux_capacitor" title="FC features" n_failed="1" n_total="2" n_errors="0" success="false">
+          <test location="" name="bttf3.outatime.flux_capacitor.FC after construction" title="FC after construction" n_failed="1" n_total="2" n_errors="0" success="false">
+            <text location="" brief_location="">with fixture DeloreanFixture</text>
+            <declare location="" brief_location="">FluxCapacitor fc</declare>
+            <perform location="" brief_location="">fc.connect_to(delorean)</perform>
+            <check_true location="" brief_location="" success="true" prefix="">
+              <expression1>not fc.is_on()</expression1>
+            </check_true>
+            <check_approx location="" brief_location="" success="false" prefix="" max_error="eps">
+              <expression1 value="2.21">fc.missing_jw()</expression1>
+              <expression2 value="1.21">1.21</expression2>
+            </check_approx>
+          </test>
+        </test>
+      </test>
+    </test>
+    <test location="" name="bttf4" title="" n_failed="1" n_total="2" n_errors="0" success="false">
+      <test location="" name="bttf4.outatime" title="" n_failed="1" n_total="2" n_errors="0" success="false">
+        <test location="" name="bttf4.outatime.flux_capacitor" title="FC features" n_failed="1" n_total="2" n_errors="0" success="false">
+          <test location="" name="bttf4.outatime.flux_capacitor.FC after construction" title="FC after construction" n_failed="1" n_total="2" n_errors="0" success="false">
+            <text location="" brief_location="">with fixture DeloreanFixture</text>
+            <declare location="" brief_location="">FluxCapacitor fc</declare>
+            <perform location="" brief_location="">fc.connect_to(delorean)</perform>
+            <check_true location="" brief_location="" success="true" prefix="">
+              <expression1>not fc.is_on()</expression1>
+            </check_true>
+            <check_approx location="" brief_location="" success="false" prefix="" max_error="eps">
+              <expression1 value="2.21">fc.missing_jw()</expression1>
+              <expression2 value="1.21">1.21</expression2>
+            </check_approx>
+          </test>
+        </test>
+      </test>
+    </test>
+    <test location="" name="testudo" title="Testudo" n_failed="90" n_total="1997" n_errors="4" success="false">
       <test location="" name="testudo.main" title="main() test" n_failed="0" n_total="0" n_errors="0" success="true">
         <test location="" name="testudo.main.show test tree" title="show test tree" n_failed="0" n_total="0" n_errors="0" success="true">
           <declare location="" brief_location="">ostringstream trs</declare>
           <perform location="" brief_location="">testudo::print_tree(trs, testudo::TestNode::root_node())</perform>
           <show_multiline_value location="" brief_location="">
-            <expression1 value="-- /&#xa;|- bttf1&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;|- bttf2&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;`- testudo&#xa;   |- main&#xa;   |  `- show test tree&#xa;   |- use_instructions&#xa;   |- testarudo&#xa;   |  |- simple testarudo tests&#xa;   |  |- complex&#xa;   |  |  |- difficult test&#xa;   |  |  |- complicated test&#xa;   |  |  |- test_with_error&#xa;   |  |  |- penultimate test&#xa;   |  |  |- &quot;verify&quot; syntax&#xa;   |  |  |- &quot;true_for&quot; syntax&#xa;   |  |  |- try_catch&#xa;   |  |  |- test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches&#xa;   |  |  `- &quot;with&quot; checks&#xa;   |  |- disorder&#xa;   |  |  |- du&#xa;   |  |  |- unu&#xa;   |  |  |- absdiff&#xa;   |  |  |- testarudo_ext&#xa;   |  |  `- no_representation&#xa;   |  `- external function&#xa;   |- esperanto_test&#xa;   |  `- numbers&#xa;   |- fixture&#xa;   |  |- + commutativity&#xa;   |  |- * commutativity&#xa;   |  `- associativity&#xa;   |- scope&#xa;   |- Testudo syntax&#xa;   |- mock_turtle&#xa;   |  |- Queen of Hearts&apos; recipe&#xa;   |  |- Queen of Hearts&apos; recipe calls&#xa;   |  |- approx&#xa;   |  |- calls with several mocks&#xa;   |  |- predicates&#xa;   |  |- exceptions with mock&#xa;   |  `- exceptions with wrap&#xa;   |- crc&#xa;   |  |- crc32&#xa;   |  |  |- table&#xa;   |  |  `- examples&#xa;   |  `- crc64&#xa;   |     |- table&#xa;   |     |- examples&#xa;   |     `- sanity checks&#xa;   |- glob_test&#xa;   |  |- no special character&#xa;   |  |- question mark&#xa;   |  |- asterisk&#xa;   |  |- escape&#xa;   |  `- complex&#xa;   |- diff&#xa;   |  |- longest common subsequence&#xa;   |  |- shortest_edit&#xa;   |  `- track parsing&#xa;   `- sh&#xa;">trs.str()</expression1>
+            <expression1 value="-- /&#xa;|- bttf1&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;|- bttf2&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;|- bttf3&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;|- bttf4&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;`- testudo&#xa;   |- main&#xa;   |  `- show test tree&#xa;   |- use_instructions&#xa;   |- testarudo&#xa;   |  |- simple testarudo tests&#xa;   |  |- complex&#xa;   |  |  |- difficult test&#xa;   |  |  |- complicated test&#xa;   |  |  |- test_with_error&#xa;   |  |  |- penultimate test&#xa;   |  |  |- &quot;verify&quot; syntax&#xa;   |  |  |- &quot;true_for&quot; syntax&#xa;   |  |  |- try_catch&#xa;   |  |  |- test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches&#xa;   |  |  `- &quot;with&quot; checks&#xa;   |  |- disorder&#xa;   |  |  |- du&#xa;   |  |  |- unu&#xa;   |  |  |- absdiff&#xa;   |  |  |- testarudo_ext&#xa;   |  |  `- no_representation&#xa;   |  `- external function&#xa;   |- esperanto_test&#xa;   |  `- numbers&#xa;   |- fixture&#xa;   |  |- + commutativity&#xa;   |  |- * commutativity&#xa;   |  `- associativity&#xa;   |- scope&#xa;   |- Testudo syntax&#xa;   |- UTF8 length&#xa;   |- mock_turtle&#xa;   |  |- Queen of Hearts&apos; recipe&#xa;   |  |- Queen of Hearts&apos; recipe calls&#xa;   |  |- approx&#xa;   |  |- calls with several mocks&#xa;   |  |- predicates&#xa;   |  |- exceptions with mock&#xa;   |  `- exceptions with wrap&#xa;   |- crc&#xa;   |  |- crc32&#xa;   |  |  |- table&#xa;   |  |  `- examples&#xa;   |  `- crc64&#xa;   |     |- table&#xa;   |     |- examples&#xa;   |     `- sanity checks&#xa;   |- glob_test&#xa;   |  |- no special character&#xa;   |  |- question mark&#xa;   |  |- asterisk&#xa;   |  |- escape&#xa;   |  `- complex&#xa;   |- diff&#xa;   |  |- longest common subsequence&#xa;   |  |- shortest_edit&#xa;   |  `- track parsing&#xa;   `- sh&#xa;">trs.str()</expression1>
           </show_multiline_value>
         </test>
       </test>
@@ -113,7 +149,7 @@
         <perform location="" brief_location="">hf.hold(9.9)</perform>
         <uncaught_exception>already holding a double</uncaught_exception>
       </test>
-      <test location="" name="testudo.testarudo" title="testarudo tests" n_failed="62" n_total="238" n_errors="2" success="false">
+      <test location="" name="testudo.testarudo" title="testarudo tests" n_failed="68" n_total="247" n_errors="2" success="false">
         <test location="" name="testudo.testarudo.simple testarudo tests" title="simple testarudo tests" n_failed="2" n_total="5" n_errors="0" success="false">
           <check_true location="" brief_location="" success="true" prefix="">
             <expression1>true</expression1>
@@ -131,7 +167,7 @@
             <expression1>2+2==5</expression1>
           </check_true>
         </test>
-        <test location="" name="testudo.testarudo.complex" title="complex testarudo tests" n_failed="55" n_total="212" n_errors="2" success="false">
+        <test location="" name="testudo.testarudo.complex" title="complex testarudo tests" n_failed="61" n_total="221" n_errors="2" success="false">
           <test location="" name="testudo.testarudo.complex.difficult test" title="difficult test" n_failed="1" n_total="3" n_errors="0" success="false">
             <check_equal location="" brief_location="" success="false" prefix="">
               <expression1 value="7">7</expression1>
@@ -320,7 +356,7 @@
             <uncaught_exception>but this shouldn&apos;t</uncaught_exception>
           </test>
           <test location="" name="testudo.testarudo.complex.test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches" title="a test with so many characters in the name and in the title that it&apos;ll have to be broken across several lines in the cartouche" n_failed="0" n_total="0" n_errors="0" success="true"/>
-          <test location="" name="testudo.testarudo.complex.&quot;with&quot; checks" title="&quot;with&quot; checks" n_failed="32" n_total="168" n_errors="0" success="false">
+          <test location="" name="testudo.testarudo.complex.&quot;with&quot; checks" title="&quot;with&quot; checks" n_failed="38" n_total="177" n_errors="0" success="false">
             <declare location="" brief_location="">list&lt;int&gt; numbers_1{2, 4, 8}</declare>
             <declare location="" brief_location="">list&lt;int&gt; numbers_2{2, 5, 8}</declare>
             <with location="" brief_location="" var="x" container_first="numbers_1" container_rest="" summary="x in numbers_1" n_failed="0" n_total="3" n_errors="0" success="true">
@@ -748,6 +784,66 @@
                 <expression2 value="">x</expression2>
               </check_equal>
             </with>
+            <with location="" brief_location="" var="x" container_first="{1, 2, 3}" container_rest="" summary="x in {...}" n_failed="6" n_total="9" n_errors="0" success="false">
+              <check_true_for location="" brief_location="" success="with" prefix="">
+                <expression1>x&lt;x</expression1>
+                <expressionv value="">x</expressionv>
+              </check_true_for>
+              <with_results>
+                <show_value location="" brief_location="">
+                  <expression1 value="1">x</expression1>
+                </show_value>
+                <check_true_for location="" brief_location="" success="false" prefix="">
+                  <expression1>x&lt;x</expression1>
+                  <expressionv value="1">x</expressionv>
+                </check_true_for>
+                <show_value location="" brief_location="">
+                  <expression1 value="2">x</expression1>
+                </show_value>
+                <check_true_for location="" brief_location="" success="false" prefix="">
+                  <expression1>x&lt;x</expression1>
+                  <expressionv value="2">x</expressionv>
+                </check_true_for>
+                <show_value location="" brief_location="">
+                  <expression1 value="3">x</expression1>
+                </show_value>
+                <check_true_for location="" brief_location="" success="false" prefix="">
+                  <expression1>x&lt;x</expression1>
+                  <expressionv value="3">x</expressionv>
+                </check_true_for>
+              </with_results>
+              <check_true_for location="" brief_location="" success="with" prefix="">
+                <expression1>x==x</expression1>
+                <expressionv value="">x</expressionv>
+              </check_true_for>
+              <check_true_for location="" brief_location="" success="with" prefix="">
+                <expression1>x&gt;x</expression1>
+                <expressionv value="">x</expressionv>
+              </check_true_for>
+              <with_results>
+                <show_value location="" brief_location="">
+                  <expression1 value="1">x</expression1>
+                </show_value>
+                <check_true_for location="" brief_location="" success="false" prefix="">
+                  <expression1>x&gt;x</expression1>
+                  <expressionv value="1">x</expressionv>
+                </check_true_for>
+                <show_value location="" brief_location="">
+                  <expression1 value="2">x</expression1>
+                </show_value>
+                <check_true_for location="" brief_location="" success="false" prefix="">
+                  <expression1>x&gt;x</expression1>
+                  <expressionv value="2">x</expressionv>
+                </check_true_for>
+                <show_value location="" brief_location="">
+                  <expression1 value="3">x</expression1>
+                </show_value>
+                <check_true_for location="" brief_location="" success="false" prefix="">
+                  <expression1>x&gt;x</expression1>
+                  <expressionv value="3">x</expressionv>
+                </check_true_for>
+              </with_results>
+            </with>
             <with location="" brief_location="" var="(x)" container_first="list&lt;tuple&lt;int&gt;&gt;{{3}, {4}, {8}}" container_rest="" summary="(x) in list&lt;tuple&lt;int&gt;&gt;{...}" n_failed="1" n_total="3" n_errors="0" success="false">
               <check_true location="" brief_location="" success="with" prefix="">
                 <expression1>(x%2)==0</expression1>
@@ -1018,6 +1114,35 @@
           <expression1 value="||~tilde~||~pre||~tilde~||~ ||||~tilde~||~bold||~tilde~||~|| ||~tilde~||~post||~tilde~||~">code</expression1>
           <expression2 value="||~tilde~||~pre||~tilde~||~ ||||~tilde~||~bold||~tilde~||~|| ||~tilde~||~post||~tilde~||~">&quot;||~tilde~||~pre||~tilde~||~ ||||~tilde~||~bold||~tilde~||~|| ||~tilde~||~post||~tilde~||~&quot;</expression2>
         </check_equal>
+      </test>
+      <test location="" name="testudo.UTF8 length" title="UTF8 length" n_failed="0" n_total="5" n_errors="0" success="true">
+        <declare location="" brief_location="">using testudo___implementation::utf8_length</declare>
+        <check_equal location="" brief_location="" success="true" prefix="">
+          <expression1 value="10">utf8_length(&quot;hey there!&quot;)</expression1>
+          <expression2 value="10">10</expression2>
+        </check_equal>
+        <check_equal location="" brief_location="" success="true" prefix="">
+          <expression1 value="17">utf8_length(&quot;¿cómo está usted?&quot;)</expression1>
+          <expression2 value="17">17</expression2>
+        </check_equal>
+        <check_equal location="" brief_location="" success="true" prefix="">
+          <expression1 value="4">utf8_length(&quot;頑張って&quot;)</expression1>
+          <expression2 value="4">4</expression2>
+        </check_equal>
+        <check_equal location="" brief_location="" success="true" prefix="">
+          <expression1 value="2">utf8_length(&quot;▄▀&quot;)</expression1>
+          <expression2 value="2">2</expression2>
+        </check_equal>
+        <check_equal location="" brief_location="" success="true" prefix="">
+          <expression1 value="3">utf8_length(&quot;🙈🙉🙊&quot;)</expression1>
+          <expression2 value="3">3</expression2>
+        </check_equal>
+        <show_value location="" brief_location="">
+          <expression1 value="¡Ay mísero de mí, y ay, infelice! Apurar, cielos, pretendo, ya que me tratáis así, qué delito cometí contra vosotros naciendo; aunque si nací, ya entiendo qué delito he cometido. Bastante causa ha tenido vuestra justicia y rigor; pues el delito mayor del hombre es haber nacido.">&quot;¡Ay mísero de mí, y ay, infelice! &quot; &quot;Apurar, cielos, pretendo, &quot; &quot;ya que me tratáis así, &quot; &quot;qué delito cometí &quot; &quot;contra vosotros naciendo; &quot; &quot;aunque si nací, ya entiendo &quot; &quot;qué delito he cometido. &quot; &quot;Bastante causa ha tenido &quot; &quot;vuestra justicia y rigor; &quot; &quot;pues el delito mayor &quot; &quot;del hombre es haber nacido.&quot;</expression1>
+        </show_value>
+        <show_value location="" brief_location="">
+          <expression1 value="▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄-▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄--▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄">&quot;▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄&quot; &quot;▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄&quot; &quot;▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄&quot; &quot;-▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄&quot; &quot;▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄&quot; &quot;▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄&quot; &quot;--▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄&quot; &quot;▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄&quot; &quot;▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄&quot;</expression1>
+        </show_value>
       </test>
       <test location="" name="testudo.mock_turtle" title="mock turtle tests" n_failed="19" n_total="69" n_errors="0" success="false">
         <test location="" name="testudo.mock_turtle.Queen of Hearts&apos; recipe" title="Queen of Hearts&apos; recipe" n_failed="0" n_total="9" n_errors="0" success="true">
@@ -1815,7 +1940,7 @@
           </check_equal>
           <declare location="" brief_location="">auto ts=track_table_to_summary(tt, ttd, tt_table)</declare>
           <show_multiline_value location="" brief_location="">
-            <expression1 value="deleted&#xa;  wrong (1: 0/1 f)&#xa;    [phi.ttd:23] c-check_equal (0/1 f)&#xa;new&#xa;  good (2: 2/2 f)&#xa;    [psi.ttd:24] c-check_equal (1/1 f)&#xa;    [psi.ttd:24] c-check_equal (1/1 f)&#xa;  wrong (1: 0/1 f)&#xa;    [psi.ttd:24] c-check_equal (0/1 f)&#xa;good to wrong (1: 1/1 f -&gt; 0/1 f)&#xa;  [phi.ttd:23 -&gt; 24] c-check_equal (1/1 f -&gt; 0/1 f)&#xa;with_data changed (1: 12/15 f, 45 e -&gt; 1/24 f, 45 e)&#xa;  [phi.ttd:25 -&gt; 28] c-with_summary (12/15 f, 45 e -&gt; 1/24 f, 45 e)&#xa;">ts</expression1>
+            <expression1 value="deleted wrong (1: 1/1 f)&#xa;  [phi.ttd:23] c-check_equal (1/1 f)&#xa;new good (2: 0/2 f)&#xa;  [psi.ttd:24] c-check_equal (0/1 f)&#xa;  [psi.ttd:24] c-check_equal (0/1 f)&#xa;new wrong (1: 1/1 f)&#xa;  [psi.ttd:24] c-check_equal (1/1 f)&#xa;good to wrong (1: 0/1 f -&gt; 1/1 f)&#xa;  [phi.ttd:23 -&gt; 24] c-check_equal (0/1 f -&gt; 1/1 f)&#xa;with_data changed (1: 3/15 f, 45 e -&gt; 23/24 f, 45 e)&#xa;  [phi.ttd:25 -&gt; 28] c-with_summary (3/15 f, 45 e -&gt; 23/24 f, 45 e)&#xa;">ts</expression1>
           </show_multiline_value>
         </test>
       </test>

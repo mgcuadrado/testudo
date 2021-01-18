@@ -20,18 +20,23 @@
 #include <ostream>
 #include <regex>
 
-namespace {
+using namespace testudo;
+using namespace kmsxml;
+using namespace std;
 
-  using namespace testudo;
-  using namespace kmsxml;
-  using namespace std;
+namespace testudo___implementation {
 
-  // replace all "~" instances with "||~tilde~||~"; codes in "||~"..."~||"
-  // are assumed to have no length, so we add "~" after "||~tilde~||" so that
-  // it contributes to the computed length as what it's going to be; we'll
-  // have to simply remove all "||~tilde~||" instances at the end
   string escape_tilde(string s)
     { return regex_replace(s, regex("~"), "||~tilde~||~"); }
+
+  string unescape_tilde(string s)
+    { return regex_replace(s, regex("\\|\\|~tilde~\\|\\|~"), "~"); }
+
+}
+
+namespace {
+
+  using testudo___implementation::escape_tilde;
 
   string xml_bool(bool b) { return b ? "true" : "false"; }
   string xml_bool(string b) { return b; }
@@ -40,11 +45,11 @@ namespace {
     : public TestFormat {
   public:
     element_t::root_t root{element_t::make_root("testudo")};
-    stack<element_t::node_t<>> test_stack;
+    stack<element_t::node_t> test_stack;
     ostream &ts;
     TestFormatXML(ostream &os) : ts(os) { test_stack.push(root); }
 
-    element_t::node_t<> localize(element_t::node_t<> element) {
+    element_t::node_t localize(element_t::node_t element) {
       element
         ->append_attribute("location", get_location())
         ->append_attribute("brief_location", get_brief_location());
@@ -165,7 +170,7 @@ namespace {
         ->append_attribute("n_total", to_string(n_total))
         ->append_attribute("n_errors", to_string(n_errors))
         ->append_attribute("success",
-                           xml_bool((n_failed==0) and (n_errors==0)));
+                           xml_bool(n_failed+n_errors==0));
     }
 
     void output_with_summary(string, TestStats test_stats) override

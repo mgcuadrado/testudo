@@ -1,6 +1,7 @@
 #ifndef NAUTOTEST
 
-#include <testudo/testudo_lc.h>
+#include "testudo_typeset_color_text.h"
+#include <testudo/testudo_lc>
 #include <testudo/testudo_ext.h>
 
 namespace {
@@ -207,6 +208,11 @@ namespace {
 
     with_data(x, {1, 2, 3})
       check(x)_equal(x);
+    with_data(x, {1, 2, 3}) {
+      check(x<x)_true_for(x);
+      check(x==x)_true_for(x);
+      check(x>x)_true_for(x);
+    }
 
     with_data((x), list<tuple<int>>{{3}, {4}, {8}})
       check((x%2)==0)_true;
@@ -345,6 +351,35 @@ namespace {
     declare(string code="~pre~ ||~bold~|| ~post~");
     show_value(code);
     check(code)_equal("~pre~ ||~bold~|| ~post~");
+  }
+
+  define_top_test("testudo", "UTF8 length", 600) {
+    declare(using testudo___implementation::utf8_length);
+    check(utf8_length("hey there!"))_equal(10);
+    check(utf8_length("¿cómo está usted?"))_equal(17);
+    check(utf8_length("頑張って"))_equal(4);
+    check(utf8_length("▄▀"))_equal(2);
+    check(utf8_length("🙈🙉🙊"))_equal(3);
+    show_value("¡Ay mísero de mí, y ay, infelice! "
+               "Apurar, cielos, pretendo, "
+               "ya que me tratáis así, "
+               "qué delito cometí "
+               "contra vosotros naciendo; "
+               "aunque si nací, ya entiendo "
+               "qué delito he cometido. "
+               "Bastante causa ha tenido "
+               "vuestra justicia y rigor; "
+               "pues el delito mayor "
+               "del hombre es haber nacido.");
+    show_value("▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄"
+               "▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄"
+               "▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄"
+               "-▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄"
+               "▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄"
+               "▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄"
+               "--▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄"
+               "▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄"
+               "▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄");
   }
 
 }

@@ -28,14 +28,26 @@ namespace testudo___implementation {
   [[maybe_unused]] int argc, [[maybe_unused]] char *argv[]
 #define main_args argc, argv
 
+  struct opt_t
+    : std::string {
+    opt_t() : match(false) { }
+    opt_t(std::string text) : std::string(text), match(true) { }
+    operator bool() const { return match; }
+  private:
+    bool const match;
+  };
+
   struct opts_t
-  : std::list<std::string> {
+    : std::list<std::string> {
     opts_t(std::string executable) : executable(executable) { }
     std::string const executable;
+    operator bool() const { return not empty(); }
+    std::string arg();
+    bool opt(std::string o);
+    opt_t opt_arg(std::string o);
   };
 
   opts_t args_to_opts(main_params);
-  std::string front_and_shift(opts_t &);
 
   struct TestOptions {
     TestOptions(opts_t opts);
@@ -50,7 +62,7 @@ namespace testudo___implementation {
 
 }
 
-testudo___BRING(opts_t, args_to_opts, front_and_shift, TestOptions,
+testudo___BRING(opts_t, args_to_opts, TestOptions,
                 testudo_main)
 
 #endif

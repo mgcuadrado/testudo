@@ -1,5 +1,5 @@
 #include "testudo_diff.h"
-#include <testudo/testudo_lc.h>
+#include <testudo/testudo_lc>
 #include <testudo/testudo_ext.h>
 
 #include <iostream> // FIXME: rmme

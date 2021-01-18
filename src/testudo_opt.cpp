@@ -19,6 +19,7 @@
 #include "testudo_try_catch.h"
 #include "testudo_help.h"
 #include "testudo_diff.h"
+#include "testudo_xml_to_color.h"
 #include "testudo.h"
 #include <iostream>
 #include <dlfcn.h>
@@ -28,6 +29,31 @@ namespace testudo___implementation {
 
   using namespace std;
 
+  bool opts_t::opt(string o) {
+    if (front()==o) {
+      pop_front();
+      return true;
+    }
+    else
+      return false;
+  }
+
+  string opts_t::arg() {
+    string result;
+    if (not empty()) {
+      result=front();
+      pop_front();
+    }
+    return result;
+  }
+
+  opt_t opts_t::opt_arg(string o) {
+    if (opt(o))
+      return {arg()};
+    else
+      return {};
+  }
+
   opts_t args_to_opts(main_params) {
     opts_t result(argv[0]);
     for (int i=1; i<argc; ++i)
@@ -36,33 +62,27 @@ namespace testudo___implementation {
     return result;
   }
 
-  string front_and_shift(opts_t &o) {
-    auto result=o.front();
-    o.pop_front();
-    return result;
-  }
-
   TestOptions::TestOptions(opts_t opts) {
     // this is really the simplest implementation that will do to dectect
     // options; i should probably use a full-fledged option parser
-    for (auto i=opts.begin(); i not_eq opts.end(); ++i) {
-      if ((*i=="-f") and (++i not_eq opts.end()))
-        format_name=*i;
-      else if ((*i=="-s") and (++i not_eq opts.end()))
-        subtree=*i;
-      else if ((*i=="-i") and (++i not_eq opts.end()))
-        include.push_back(*i);
-      else if ((*i=="-g") and (++i not_eq opts.end()))
-        glob.push_back(*i);
-      else if ((*i=="-d") and (++i not_eq opts.end()))
-        TestFormat::location_t::common_directory=*i;
+    while (opts) {
+      if (auto f=opts.opt_arg("-f"))
+        format_name=f;
+      else if (auto s=opts.opt_arg("-s"))
+        subtree=s;
+      else if (auto i=opts.opt_arg("-i"))
+        include.push_back(i);
+      else if (auto g=opts.opt_arg("-g"))
+        glob.push_back(g);
+      else if (auto d=opts.opt_arg("-d"))
+        TestFormat::location_t::common_directory=d;
       else
-        dynamic_libraries.push_back(*i);
+        dynamic_libraries.push_back(opts.arg());
     }
 
     if (format_name=="") {
-      cerr << "error; format: " << opts.front() << " -f <test_output_format>"
-           << endl;
+      cerr << "error; format: "
+           << opts. executable << " -f <test_output_format>" << endl;
       exit(1);
     }
   }
@@ -70,13 +90,15 @@ namespace testudo___implementation {
   int testudo_main(std::string subtree, main_params) {
     begintrycatch;
     auto opts=testudo::args_to_opts(main_args);
-    if (opts.size()==0)
+    if (not opts)
       return testudo::testudo_help(), 0;
-    auto command=testudo::front_and_shift(opts);
+    auto command=opts.arg();
     if (command=="help")
       return testudo::testudo_help(), 0;
     else if (command=="diff")
-      testudo::testudo_diff(opts);
+      testudo___implementation::testudo_diff(opts);
+    else if (command=="xml_to_color")
+      testudo___implementation::testudo_xml_to_color(opts);
     else if (command=="run") {
       testudo::TestOptions to(opts);
       for (string library: to.dynamic_libraries) {

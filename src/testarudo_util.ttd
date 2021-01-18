@@ -1,6 +1,6 @@
 #ifndef NAUTOTEST
 
-#include <testudo/testudo_lc.h>
+#include <testudo/testudo_lc>
 
 namespace testarudo_util {
 

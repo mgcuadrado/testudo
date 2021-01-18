@@ -46,19 +46,19 @@ elif [ -n "$latex" ]; then
     lines="@color{orange}"
     failure="@color{red}"
     successtag="@color{green}"
-    # "failure" and "error" below is a horrible hack to have red bg
+    # "failure_tag" and "error" below use a horrible hack to have red bg
     failuretag="@color{red}@makebox[0pt][l]{@sethlcolor{yellow}@hl{     }}"
     error="@color{yellow}@makebox[0pt][l]{@sethlcolor{red}@hl{     }}"
     ident="@color{blue}"
 else
-    normal=$(echo  -e "\033[0;39m")
-    bold=$(echo    -e "\033[1;39m")
-    lines=$(echo   -e "\033[0;33m")
-    failure=$(echo -e "\033[1;31m")
+    normal=$(echo     -e "\033[0;39m")
+    bold=$(echo       -e "\033[1;39m")
+    lines=$(echo      -e "\033[0;33m")
+    failure=$(echo    -e "\033[1;31m")
     successtag=$(echo -e "\033[0;32m")
     failuretag=$(echo -e "\033[1;43;31m")
-    error=$(echo -e "\033[1;41;33m")
-    ident=$(echo   -e "\033[1;34m")
+    error=$(echo      -e "\033[1;41;33m")
+    ident=$(echo      -e "\033[1;34m")
 fi
 
 if [ -z $summary ]; then
@@ -133,7 +133,7 @@ xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
         h # keep the original line in hold space
         s/.*||~indent_as_b~||\(.*\)||~indent_as_e~||.*/\1/ # keep only the name
         s/[^.]//g # remove non-dots
-        s/\./    /g # replace each dot with an indentation
+        s/\./||~space_b~||  ||~space_e~||/g # replace each dot with an indent
         G # append hold space
         s/\n// # remove newline from append
         # replace hierarchy in test name with "-"
@@ -149,7 +149,6 @@ xsltproc "$(dirname "$0")"/$xml_format - | sed ' # indents
         # margin a the rigth, so the OK/FAIL/ERR- tags stand out
         margin='$margin'
         break_mark="||~break~||\\\n"
-        initial_indent=substr($0, 0, match($0, /[^ ]/)-1)
         match($0, /^.*\|\|~space_e~\|\|/)
         initial_indent=substr($0, 0, RLENGTH)
         gsub(/\|\|~space_[be]~\|\|/, "", initial_indent)

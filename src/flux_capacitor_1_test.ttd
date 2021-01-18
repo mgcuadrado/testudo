@@ -1,9 +1,9 @@
-#include <testudo/testudo_lc.h> // default lower-case style
+#include <testudo/testudo_lc> // default lower-case style
 #include "flux_capacitor.h"
 #include "delorean_test.h" // defines DeloreanFixture
 
 define_top_test_node("bttf1.outatime", // parent full name
-                     (flux_capacitor, // text name
+                     (flux_capacitor, // test name
                       "FC features")); // title
 
 define_test(flux_capacitor, // parent

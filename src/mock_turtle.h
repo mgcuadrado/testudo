@@ -25,7 +25,7 @@
 #include <unordered_set>
 
 // include auto-generated macros; matching defines here are commented-out
-#include "mock_turtle_macro_n.h"
+#include "mock_turtle_macro_n.gh"
 
 namespace testudo___implementation {
 

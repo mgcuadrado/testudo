@@ -24,7 +24,7 @@
 \usepackage{amsmath, amssymb, graphicx, wasysym, bm, fancyvrb, soul}
 \usepackage[final]{listings}
 \usepackage{tikz, tikzpeople, pgfornament}
-\usetikzlibrary{automata}
+\usetikzlibrary{automata, shapes.symbols, patterns}
 
 \newcommand*\testudocolor{\color{red!80!blue}}
 \newcommand*\testudo[1]{\texttt{\testudocolor{}#1}}
@@ -275,7 +275,148 @@ In the report, you'll see different colours for different elements:
 
 \input{reports/testudo.use_instructions.tex}
 
+\section{Development workflow with Testudo}
+\label{sec:development-workflow-with-testudo}
+
+Testudo can be used with any workflow, with any testing philosophy.  You can
+use it
+\begin{itemize}
+\item for test-driven development;
+\item to translate requirements into tests;
+\item to validate specifications;
+\item to continuously refactor code;
+\item to successfully refactor \emph{legacy} code;
+\item to avoid reappearing bugs by turning them into tests;
+\item to simply ensure your code is as bug-free as possible.
+\end{itemize}
+
+This is how you can use Testudo to improve your development workflow:
+\begin{itemize}
+\item code Testudo tests for your code, either before the code itself (as in
+  \textsc{tdd} and extreme programming), at the same time as the code, or after
+  the code (for refactoring, for instance);
+\item use Testudo to run the tests often; integrate test running into your
+  development cycle and discipline; for instance, you can institude a rule that
+  every commit must leave the code with no failed checks or errors; or, if you
+  have turned your requirements into tests, your rule can be about never
+  introducing regressions;
+\item use Testudo to check the progress of your development, by committing the
+  report status with every code commit; thus, you can know what the test result
+  changes are for your working directory compared to the last committed
+  revision, or compare any two revisions.
+\end{itemize}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[
+      x=2.5em, y=2em,
+      rounded corners,
+      every node/.append style={text depth=0.4ex, text height=1.4ex},
+      big node/.style={text depth=, text height=},
+      no rounded/.style={rounded corners=0},
+      printout/.style={
+        draw, big node, no rounded, tape, tape bend top=none,
+        minimum width=5em, minimum height=3em,
+        fill opacity=.5, pattern=horizontal lines light gray,
+        text opacity=1}]
+    \node[no rounded, pilot, monitor, minimum size=3em] (programmer)
+      at (-1, -1.2) {};
+    \node[big node] (write edit) at (0,0)
+      {\itshape\begin{tabular}{@{}c@{}}write\\\& edit\end{tabular}};
+    \node (code) at (3, 1) {\bfseries code};
+    \node (tests) at (3, -1)
+      {\bfseries\begin{tabular}{@{}c@{}}test\\code\end{tabular}};
+    \node (track) at (3, -3) {\bfseries track};
+    \draw[->] (write edit) -- +(1.5, 0) |- (code);
+    \draw[->] (write edit) -- +(1.5, 0) |- (tests);
+    \node(binaries) at (7, 1) {binaries};
+    \draw[->] (code) -- node[above, pos=.6]{\itshape build} (binaries);
+    \node[draw, big node] (run) at (7,-1)
+      {\begin{tabular}{c}Testudo\\``\texttt{run}''\end{tabular}};
+    \draw[->] (binaries) -> (run);
+    \draw[->] (tests) -> (run);
+    \draw[->] (run) |-
+      node[big node, below left]
+        {\itshape\begin{tabular}{r@{\,\,}}current\\track\end{tabular}}
+      (track);
+    \node[draw, big node] (diff) at (7,-6)
+      {\begin{tabular}{c}Testudo\\``\texttt{diff}''\end{tabular}};
+    \draw[->] (run) -- (diff);
+    \node[draw, big node] (version) at (3, -6)
+      {\begin{tabular}{c}version\\control\end{tabular}};
+    \draw[->] (version) --
+      node[below=2ex]{\itshape\begin{tabular}{c}versioned\\tracks\end{tabular}}
+      (diff);
+    \draw[no rounded=0, fill=gray, opacity=.2]
+      (version.north) -- (4.5, -3.75)
+      -- (4, -3.75) -- (4, 2) -- (2, 2) -- (2, -3.75)
+      -- (1.5, -3.75)
+      -- node[opacity=1, below, pos=.22]{%
+        \itshape\begin{tabular}{r}simultaneous\\commit\end{tabular}} cycle;
+    \node[printout] (report) at (10, -1)
+      {\itshape\begin{tabular}{@{}c@{}}test\\report\end{tabular}};
+    \node[printout] (progress) at (11.5, -6)
+      {\itshape\begin{tabular}{@{}c@{}}progress\\tracking\end{tabular}};
+    \draw[->] (run) -- (report);
+    \draw[->] (diff) -- (progress);
+    \coordinate (above write edit) at (3, 3);
+    \draw (report) |- (above write edit);
+    \draw[->] (progress) |- (above write edit)
+      -| ($(programmer.north)+(0,.4)$);
+  \end{tikzpicture}
+  \caption{Development workflow with Testudo}
+  \label{fig:workflow}
+\end{figure}
+
+\fref{fig:workflow} shows how Testudo is integrated into a workflow:
+\begin{itemize}
+\item you write and edit code, and tests for your code;
+\item you build your binaries using your build system;
+\item you use Testudo to run the tests on your binaries;
+\item based on the test reports you get, you make changes to your code and
+  tests to ensure quality;
+\item Testudo also generates \emph{tracks}; tracks are files that Testudo uses
+  to track the test result progress between different versions of your code;
+\item when you're happy with your code and changes, you commit them; it's
+  important that you commit your code, your tests, and your test tracks
+  \emph{simultaneously}; they act as a single, coherent entity;
+\item at any moment, you can use Testudo to report the difference between two
+  tracks; the difference can be between the latest committed track and your
+  current track (``how am i doing with this change?''), or between two
+  committed tracks (``what was the progress between these two versions?''); the
+  progress tracking also informs your changes to your code and tests.
+\end{itemize}
+
 \mainmatter
+
+
+\chapter{Installation}
+
+In the ``\texttt{testudo}'' directory, do
+\begin{itemize}
+\item install Testudo with
+\begin{bashlisting}
+make install
+\end{bashlisting}
+\item uninstall Testudo (asking confirmation for each deletion) with
+\begin{bashlisting}
+make uninstall
+\end{bashlisting}
+\item check installation parameters with
+\begin{bashlisting}
+make cat_install_params
+\end{bashlisting}
+\end{itemize}
+
+By default, Testudo installs itself to ``\texttt{\$HOME/local}'', where
+``\texttt{\$HOME}'' is the user's home directory.  You can change this by
+defining an environment variable ``\texttt{PREFIX}", or by passing
+``\texttt{make}'' such a variable.  The following commands are equivalent, and
+they will both install Testudo to ``\texttt{/usr/local}'':
+\begin{itemize}
+\item \texttt{PREFIX=/usr/local make install}
+\item \texttt{make PREFIX=/usr/local install}
+\end{itemize}
 
 
 \chapter{Test output formats}
@@ -365,6 +506,17 @@ given first in the ``\texttt{lc}'', cluttered style, then in the
 \chapter{How to use Testudo}
 \label{cha:how-to-use}
 
+\section{The makefile template}
+\label{sec:makefile-template}
+
+You can use the file ``\texttt{Makefile.template}'' as a simple building system
+(by copying it into your project directory as ``\texttt{Makefile}'') or just
+for your Testudo tests.  You just have to edit your copy and set the variables
+``\texttt{SHAREDLIBNAME}'' variable and, optionally, ``\texttt{EXENAME}''.
+
+\section{The test code}
+\label{sec:test-code}
+
 First, choose a macro style
 (see~\Sref{cha:test-definition-test-instruction-styles}).  Then, generate a
 header file for your style using the script ``\texttt{generate\_style}'' (this
@@ -372,7 +524,7 @@ is done automatically if you use ``\texttt{make}'').  Finally, include the
 generated header file in your \Cpp{} test source file.  For instance, if you
 want to use the default upper-case macro style, do
 \begin{cpplisting}
-#include "testudo_uc.h"
+#include "testudo_uc"
 \end{cpplisting}
 
 Additionally, if you require support for \textsc{stl} types, include
@@ -388,6 +540,50 @@ and compile it correctly.
 Your \Cpp{} must be compiled into a shared object file (this is automatically
 done by ``\texttt{make}'', using \textsc{gnu} \texttt{g++} flags
 ``\texttt{-fPIC -shared}'').
+
+\section{The tool}
+
+\subsection{Using ``\texttt{make}''}
+\label{sec:using-make}
+
+If you're using the makefile template, as described
+in~\Sref{sec:makefile-template}, you can use a set of ``\texttt{make}''
+commands to perform Testudo-related tasks.  The standard workflow assumes you
+have a saved report and a saved track that represent your ``baseline'';
+differences and progress and measured with respect to the baseline.  When using
+a version control system, you must add the saved report and track, and commit
+them with their matching version of the code and test code.
+\begin{itemize}
+\item \texttt{make show\_report}: runs the tests and shows a colour text report;
+\item \texttt{make show\_sync\_report}: runs the tests and shows a colour text
+  report, but bypassing \textsc{xml} generation; this is useful if your code is
+  crashing (see~\Sref{cha:test-output-formats});
+\item \texttt{make summary\_report}: runs the tests and shows a test summary;
+\item \texttt{make view\_report}: runs the tests and shows a colour text report
+  using the ``\texttt{less}'' text viewer;
+\item \texttt{make diff\_report}: shows the (plain Unix) ``\texttt{diff}''
+  between the baseline and the current report; this is useful if you want to
+  see just the new tests you've coded, and how they affect the tallies;
+\item \texttt{make diff\_report\_bw}: same as the previous one, but with no
+  colour codes; this is useful when you're using a terminal or terminal
+  emulator that doesn't support colours (e.g., if you're using Emacs'
+  ``\texttt{compile}'' command);
+\item \texttt{make save\_report}: runs the tests and saves the current report
+  as a baseline for ``\texttt{make diff\_test}'' and similar commands;
+\item \texttt{make track\_progress}: shows the tracked progress with respect to
+  the baseline;
+\item \texttt{make save\_track}: runs the tests and saves the current track as
+  a baseline for ``\texttt{make track\_progress}'';
+\item \texttt{make save\_test}: runs ``\texttt{make save\_report}'' and
+  ``\texttt{make save\_track}''.
+\end{itemize}
+
+
+\subsection{Directly calling the executable}
+\label{sec:directly-calling-executable}
+
+You can also run the Testudo executable directly, if you can't or don't want to
+use the makefile.
 
 The main executable for Testudo is called ``\texttt{testudo}''.  It needs the
 following arguments to execute tests:
@@ -2596,7 +2792,7 @@ Dependencies:
 \begin{itemize}
 \item a \Cpp{}17 compiler (duh);
 \item \texttt{bash}, \texttt{sed}, \texttt{awk} (used by scripts);
-\item \texttt{m4} (for generation of ``\texttt{mock\_turtle\_macro\_n.h}'');
+\item \texttt{m4} (for generation of ``\texttt{mock\_turtle\_macro\_n.gh}'');
 \item \texttt{make} (but you can use your own alternative);
 \item \texttt{xsltproc} (for \textsc{xml}-to-coloured-text translation);
 \item \LaTeX{}, \texttt{rubber} (to generate the \textsc{pdf} documentation).
@@ -2632,8 +2828,8 @@ exact needs and taste.  You just have to copy one of the two provided style
 files, ``\texttt{lc.tst}'' or ``\texttt{cp.tst}'', into a file of your own with
 the ``\texttt{.tst}'' extension, say ``\texttt{mystyle.tst}'', and customize
 the second half of each line, which is the macro name.  Then, instead of
-including ``\texttt{testudo\_lc.h}'' or ``\texttt{testudo\_lc.h}'', include
-``\texttt{testudo\_mystyle.h}''.
+including ``\texttt{testudo\_lc}'' or ``\texttt{testudo\_uc}'', include
+``\texttt{testudo\_mystyle}''.
 
 Here's an example where we adapt the macro names to be in Esperanto.  The
 ``\texttt{eo.tst}'' file is shown in~\fref{fig:esperanto-style}, and this is a

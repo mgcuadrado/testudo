@@ -1,0 +1,160 @@
+GPP ?= g++-10 -std=c++17 -pedantic
+
+BASICOPTS := -ggdb3
+CODEOPTS :=
+INCLUDEOPTS :=
+COMPILEOPTS = $(BASICOPTS) $(CODEOPTS) $(WARNINGOPTS) $(INCLUDEOPTS)
+
+CFLAGS :=
+LDFLAGS :=
+
+WARNINGOPTS += \
+	-Wall -Wextra \
+	-Wno-ctor-dtor-privacy -Wnon-virtual-dtor \
+	-Wno-ignored-qualifiers \
+	-Wreorder \
+	-Wold-style-cast -Wsign-promo \
+	-Woverloaded-virtual -Wfloat-equal -Wpointer-arith -Wcast-qual \
+	-Wcast-align -Wwrite-strings -Wconversion \
+	-Wdisabled-optimization \
+	-Werror \
+	-Wundef -Wpointer-arith \
+	-Wcast-qual -Wsign-compare \
+	-Wmissing-field-initializers \
+	-Winvalid-pch -Wstrict-null-sentinel \
+	-Winit-self -Wswitch-default \
+	-Wunused-parameter -Waddress \
+	-Wno-noexcept-type
+
+TESTUDOBINDIR := .testudo
+OBJDIR := .object
+DEPDIR := .depend
+
+ALLTESTUDOTESTS := $(wildcard *.ttd)
+ALLTESTUDOBINS  := $(ALLTESTUDOTESTS:%.ttd=$(TESTUDOBINDIR)/%.ttb)
+ALLTESTUDODEPENDS := $(ALLTESTUDOTESTS:%.ttd=$(DEPDIR)/%.td)
+ALLTESTUDOSPEC  := $(ALLTESTUDOBINS:%=%)
+
+ALLHEADERS := $(wildcard *.h)
+ALLSOURCES := $(wildcard *.cpp)
+ALLOBJECTS := $(ALLSOURCES:%.cpp=$(OBJDIR)/%.o)
+ALLDEPENDS := $(ALLSOURCES:%.cpp=$(DEPDIR)/%.d)
+
+SHAREDLIBS += $(SHAREDLIBNAME:%=$(OBJDIR)/%)
+EXE = $(OBJDIR)/$(EXENAME)
+
+ALLOBJLIBS := $(ALLOBJECTS) $(SHAREDLIBS)
+
+HEADERSDIR ?= $(HOME)/local/include
+BINSDIR ?= $(HOME)/local/bin
+
+TESTUDONAME := testudo
+TESTUDOBIN ?= $(BINSDIR)/$(TESTUDONAME)
+TESTUDOOPT = $(SHAREDLIBS)
+
+exe: $(EXE)
+
+$(TESTUDOBINDIR)/%.ttb: %.ttd $(TTD_ADDITIONAL_PREREQUISITES)
+	@ mkdir -p $(DEPDIR)/$(dir $<) $(dir $@)
+	@ echo compiling $@
+	@ $(GPP) -Wp,-MMD,$(DEPDIR)/$*.td,-MP,-MT,$@ $(CFLAGS) $(COMPILEOPTS) \
+		-x c++ -I$(HEADERSDIR) -fPIC -shared $< -o $@
+
+$(OBJDIR)/%.o: %.cpp $(O_ADDITIONAL_PREREQUISITES)
+	@ mkdir -p $(DEPDIR)/$(dir $<) $(dir $@)
+	@ echo compiling $@
+	@ $(GPP) -Wp,-MMD,$(DEPDIR)/$*.d,-MP,-MT,$@ \
+		-c $(CFLAGS) $(COMPILEOPTS) \
+		-fPIC $< -o $@
+
+$(SHAREDLIBS): $(ALLOBJECTS)
+	@ echo linking $@
+	@ $(GPP) $(CFLAGS) $(COMPILEOPTS) -shared $^ -o $@
+
+$(EXE): $(OBJDIR)/%: %.cpp $(SHAREDLIBS)
+	@ mkdir -p $(DEPDIR)/$(dir $<) $(dir $@)
+	@ echo compiling $@
+	@ $(GPP) -Wp,-MMD,$(DEPDIR)/$*.d,-MP,-MT,$@ \
+		$(CFLAGS) $(COMPILEOPTS) \
+		-fPIC $^ -o $@
+
+-include $(ALLDEPENDS)
+
+-include $(ALLTESTUDODEPENDS)
+
+NO_LOC_INFO = $(BINSDIR)/no_loc_info
+XML_TO_COLOR = $(TESTUDOBIN) xml_to_color
+XML_TO_COLOR_SUMMARY = $(TESTUDOBIN) xml_to_color -s
+XML_TO_COLOR_LATEX = $(BINSDIR)/xml_to_color -l -w 63
+UNCOLOR = $(BINSDIR)/uncolor
+XML_TO_TEXT = $(TESTUDOBIN) xml_to_color -b
+XML_FORMAT = -f xml
+TRACK_FORMAT = -f track
+SYNC_COLOR_TEXT_FORMAT = -f color_text
+SYNC_COLOR_TEXT_WITH_LINES_FORMAT = -f color_text_with_lines
+SAVE_FILE = testudo.report
+TRACK_FILE = testudo.track
+
+run_test: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) | $(XML_TO_COLOR)
+run_test_raw: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+	    | $(XML_TO_COLOR) -r
+run_test_no_loc: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+	    | $(NO_LOC_INFO) | $(XML_TO_COLOR)
+runsync_test: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	$< run $(SYNC_COLOR_TEXT_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC)
+runsync_test_with_lines: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	$< run $(SYNC_COLOR_TEXT_WITH_LINES_FORMAT) $(TESTUDOOPT) \
+		$(ALLTESTUDOSPEC)
+summary_test: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+	    | $(XML_TO_COLOR_SUMMARY)
+view_test: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+	    | $(XML_TO_COLOR) | less -R
+view_test_no_loc: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+	    | $(NO_LOC_INFO) | $(XML_TO_COLOR) | less -R
+diff_test: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	diff -bwu <(cat $(SAVE_FILE) | $(XML_TO_COLOR)) \
+	    <($< run $(TESTUDOOPT) $(XML_FORMAT) $(ALLTESTUDOSPEC) \
+		  | $(NO_LOC_INFO) | $(XML_TO_COLOR))
+diff_test_bw: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	diff -bwu <(cat $(SAVE_FILE) | $(XML_TO_TEXT)) \
+	    <($< run $(TESTUDOOPT) $(XML_FORMAT) $(ALLTESTUDOSPEC) \
+		  | $(NO_LOC_INFO) | $(XML_TO_TEXT))
+diffxml_test: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	diff -bwu <(cat $(SAVE_FILE)) \
+	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC))
+save_report: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	cp -i <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+		    | $(NO_LOC_INFO)) \
+	    $(SAVE_FILE)
+
+# aliases
+show_report: run_test
+show_sync_report: runsync_test
+summary_report: summary_test
+view_report: view_test
+view_report_no_loc: view_test_no_loc
+diff_report: diff_test
+diff_report_bw: diff_test_bw
+diffxml_report: diff_xml_test
+save_report: save_test
+success_test: save_test
+
+save_track: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	cp -i <($< run $(TRACK_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC)) \
+		$(TRACK_FILE)
+track_progress: $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+	$< diff $(TRACK_FILE) \
+		<($< run $(TRACK_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC))
+
+save_test: save_report save_track
+
+.PHONY: clean
+
+clean::
+	rm -rf $(OBJDIR) $(DEPDIR) $(TESTUDOBINDIR)

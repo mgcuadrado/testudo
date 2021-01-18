@@ -70,6 +70,7 @@ namespace testudo___implementation {
     virtual ~TestFormat() { };
 
     virtual void set_location(location_t location) { location_p=location; }
+    location_t get_full_location() const { return location_p; }
     virtual string get_location() const
       { return location_p.to_string(); }
     virtual string get_title_location() const
@@ -151,6 +152,8 @@ namespace testudo___implementation {
         return {};
       }
     }
+    static std::string bool_to_string(bool b) { return b ? "true" : "false"; }
+
   protected:
     location_t title_location_p, location_p;
     std::pair<string, string> var_and_values_format(var_values_t);

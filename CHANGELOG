@@ -1,5 +1,101 @@
-324 testudo-0.5
+369 testudo-0.6
+  testudo version 0.6
+367
+  moved ASCIIart to the "asciiart" project
+366
+  added some small details
+365
+  added a couple more makefile target aliases, and documented the makefiles
+364
+  an additional alias, "success_test", for projects that always maintain
+  a 100%-ok tests
+363
+  added a Makefile for projects to use with Testudo, added some target
+  aliases ("test"->"report"), and renamed the saved test report
+362
+  added Makefile targets to manage and use tracks
+361
+  corrected "try" track
+360
+  small adjustments to the workflow description
+359
+  wrote section "Development workflow with Testudo"
+358
+  corrected wrong "with-data" loop location
+357
+  drew a couple logos
+356
+  tiny correction to the ASCII logo
+355
+  corrected this: a "with-data" loop with several failed steps showed for
+  each step all failed steps so far
+354
+  small refactorisation; still some ANSI hard-coded code
+353
+  saved DuneBuggy reports
+352
+  improved and colorised track output
+351
+  "unbrought" some functions that aren't meant for the users
+350
+  installed only necessary headers
+349
+  implemented UTF8 support in test reports
+348
+  coded an alternative to "xml_to_color -w <width>"
+347
+  slightly improved option management code
+346
+  updated TODO
+345
+  updated forgotten includes
+344
+  coded an alternative to "xml_to_color -s"
+343
+  used the new XML-to-text filter for black-and-white text output
+342
+  refactored the color typesetter so it can do black-and-white too
+341
+  finished coding an alternative to "xml_to_color" (without any option;
+  i'll have to code the options too; see "TODO")
+339
+  corrected usage of "testudo" executable: from within the "testudo"
+  project itself, it must be the local version
+338
+  added an installable dynamic Testudo library, so you can choose to use
+  the executable and link your tests dynamically, or link your tests using
+  the compiler and provide a custom "main()"
+337
+  refactored the colour text output format into a helper typesetter class and
+  the format itself; this is an intermediate step towards having a non-Unix
+  "xml_to_color"
+336
+  corrected usage of "BINSDIR"
+335
+  documented installation, and made the installation prefix configurable
+334
+  added rudimentary install and uninstall procedures (with "make install"
+  and "make uninstall")
+332
+  removed temporary ASCII-art
+330
+  a lot of ASCII drawings for the presentation
+329
+  small logo detail
+328
+  added an "Unicode extravaganza" style to test what Unicode chars we can
+  use or Testudo macros
+327
+  some cosmetics: added an Esperanto flux capacitor test, a logo with an
+  autoportrait, and minor changes to the existing logo
+326
+  testudo version 0.6rc
+325 testudo-0.5
   testudo version 0.5
+324
+  corrected a couple of minor problems for releases: the release directory
+  may not be called "testudo", and there are now some subdirectories to
+  add to the release
 323
   delimited addresses with "[...]" rather than "<...>" so that parsing is
   easier ("->" in the track diff addresses might be confusing)

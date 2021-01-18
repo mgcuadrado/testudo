@@ -1,0 +1,12 @@
+#!/bin/bash
+
+function search {
+    echo "$1"
+    for h in $(sed -n 's/^#include "\(.*\)".*/\1/p' "$1"); do
+        search "$h"
+    done
+}
+
+for h in "$@"; do
+    search "$h"
+done | sort | uniq

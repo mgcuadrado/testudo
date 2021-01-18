@@ -411,6 +411,4 @@ namespace testudo___implementation {
 
 }
 
-testudo___BRING(testudo_diff)
-
 #endif

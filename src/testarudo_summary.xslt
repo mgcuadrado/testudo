@@ -43,14 +43,14 @@
       <xsl:text> ||~right~|| [||~successtag~|| OK ||~normal~||]</xsl:text>
     </xsl:if>
     <xsl:if test=".='false'">
-      <xsl:text>||~failure~|| ||~right~||-||~normal~||</xsl:text>
-      <xsl:text> [||~failuretag~||FAIL||~normal~||]</xsl:text>
+      <xsl:text>||~failure~|| ||~right~||- ||~normal~||</xsl:text>
+      <xsl:text>[||~failuretag~||FAIL||~normal~||]</xsl:text>
     </xsl:if>
   </xsl:template>
 
   <xsl:template name="flag_error">
-    <xsl:text>||~failure~|| ||~right~||-||~normal~||</xsl:text>
-    <xsl:text> [||~errortag~||ERR-||~normal~||]</xsl:text>
+    <xsl:text>||~failure~|| ||~right~||- ||~normal~||</xsl:text>
+    <xsl:text>[||~errortag~||ERR-||~normal~||]</xsl:text>
   </xsl:template>
 
 </xsl:stylesheet>

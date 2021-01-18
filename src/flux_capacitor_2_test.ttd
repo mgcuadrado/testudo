@@ -1,9 +1,9 @@
-#include <testudo/testudo_uc.h> // default upper-case style
+#include <testudo/testudo_uc> // default upper-case style
 #include "flux_capacitor.h"
-#include "delorean_test.h" // defines DeloreanFixture
+#include "delorean_test.h" // defines "DeloreanFixture"
 
 DEFINE_TOP_TEST_NODE("bttf2.outatime", // parent full name
-                     (flux_capacitor, // text name
+                     (flux_capacitor, // test name
                       "FC features")); // title
 
 DEFINE_TEST(flux_capacitor, // parent

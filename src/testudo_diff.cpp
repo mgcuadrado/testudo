@@ -17,6 +17,7 @@
 
 #include "testudo_diff.h"
 #include "crc.h"
+#include "testudo_typeset_color_text.h"
 #include <algorithm>
 #include <vector>
 #include <iostream>
@@ -27,6 +28,166 @@
 
 using namespace cyclic_redundancy_check;
 using namespace std;
+
+namespace testudo___implementation {
+
+  namespace {
+
+    using namespace diff_implementation;
+
+    auto read_track(string file_name) {
+      ifstream file(file_name);
+      return diff_implementation::parse_track(file);
+    }
+
+    string typeset_address(string a) { return a; }
+    string typeset_address(string s, string t) {
+      string
+        s_file=s.substr(0, s.find(':')),
+        t_file=s.substr(0, t.find(':'));
+      return typeset_address(s+" -> "
+                             +((s_file==t_file)
+                               ? t.substr(t.find(':')+1)
+                               : t));
+    }
+    string typeset_id(cyclic_redundancy_check::crc64_t id)
+      { return "["+to_hex(id)+"]"; }
+
+    // heuristics used for the color of the tag:
+    //     >0: for better (green)
+    //     <0: for worse (red)
+    //      0: same (blue)
+    string delta_stats(TestStats const &from, TestStats const &to) {
+      auto
+        delta_errors=to.n_errors()-from.n_errors(),
+        delta_failed=to.n_failed()-from.n_failed(),
+        delta_passed=to.n_passed()-from.n_passed();
+      // reducing errors is always the best result, and introducing errors is
+      // always the worst result:
+      if (delta_errors not_eq 0)
+        return to_string(-delta_errors);
+      // a change in the number of failed is more important than a change in
+      // the number of passed:
+      if (delta_failed not_eq 0)
+        return to_string(-delta_failed);
+      // finally, more passed is better:
+      if (delta_passed not_eq 0)
+        return to_string(+delta_passed);
+      return to_string(0);
+    }
+
+    string typeset_stats(TestStats const &ts) {
+      return
+        to_string(ts.n_failed())+"/"
+        +to_string(ts.n_passed()+ts.n_failed())+" f"
+        +(ts.n_errors()
+          ? (", "+to_string(ts.n_errors())+" e")
+          : string());
+    }
+
+    void output_track(ostream &os, track_summary const &ts,
+                      unsigned max_line_length,
+                      bool bw) {
+    auto typeset=
+      (bw ? text_track_typeset : color_text_track_typeset)(
+        os, max_line_length);
+    for (auto const &[evolution, tracks, is_to]:
+           list<tuple<string,
+                      list<track_element> const &,
+                      bool>>
+             {{"deleted good",  ts.deleted_good,  false},
+              {"deleted wrong", ts.deleted_wrong, false},
+              {"new good",      ts.new_good,      true},
+              {"new wrong",     ts.new_wrong,     true}}) {
+      if (not tracks.empty()) {
+        TestStats e_ts;
+        for (auto const &e: tracks)
+          e_ts+=e.stats;
+        auto e_ts_s=typeset_stats(e_ts);
+        typeset->track_header(evolution, to_string(tracks.size()),
+                              is_to ? "" : e_ts_s,
+                              is_to ? e_ts_s : "",
+                              delta_stats(is_to ? TestStats() : e_ts,
+                                          is_to ? e_ts : TestStats()));
+        for (auto const &e: tracks) {
+          auto stats_s=typeset_stats(e.stats);
+          typeset->track_entry(typeset_address(e.address),
+                               e.type,
+                               is_to ? "" : stats_s,
+                               is_to ? stats_s : "",
+                               delta_stats(is_to ? TestStats() : e.stats,
+                                           is_to ? e.stats : TestStats()));
+        }
+      }
+    }
+    for (auto const &[evolution, tracks]:
+           list<tuple<string,
+                      list<pair<track_element, track_element>> const &>>
+             {{"wrong to good", ts.wrong_to_good},
+              {"good to wrong", ts.good_to_wrong},
+              {"with_data changed", ts.with_data_changed}})
+      if (not tracks.empty()) {
+        TestStats s_ts, t_ts;
+        for (auto const &[s, t]: tracks) {
+          s_ts+=s.stats;
+          t_ts+=t.stats;
+        }
+        typeset->track_header(evolution, to_string(tracks.size()),
+                              typeset_stats(s_ts), typeset_stats(t_ts),
+                              delta_stats(s_ts, t_ts));
+        for (auto const &[s, t]: tracks) {
+          assert(s.type==t.type);
+          assert(s.id==t.id);
+          typeset->track_entry(typeset_address(s.address, t.address),
+                               s.type,
+                               typeset_stats(s.stats),
+                               typeset_stats(t.stats),
+                               delta_stats(s.stats, t.stats));
+        }
+      }
+    }
+
+    track_summary diff(track const &source, track const &target,
+                       std::size_t min_length=1) {
+      auto track_edit=shortest_edit(source, target, min_length);
+      auto table=edit_to_table(track_edit, source.size(), target.size());
+      return track_table_to_summary(source, target, table);
+    }
+
+  }
+
+  void testudo_diff(opts_t opts) {
+    bool bw=false;
+    unsigned max_line_length=default_max_line_length;
+    string source_filename, target_filename;
+    while (opts) {
+      if (opts.opt("-b"))
+        bw=true;
+      else if (auto w=opts.opt_arg("-w"))
+        max_line_length=stoi(w);
+      else {
+        if (source_filename.empty())
+          source_filename=opts.arg();
+        else if (target_filename.empty())
+          target_filename=opts.arg();
+        else {
+          cerr << opts.executable << ": too many file names" << endl;
+          exit(1);
+        }
+      }
+    }
+    if (source_filename.empty() or target_filename.empty()) {
+      cerr << opts.executable << ": two file names required" << endl;
+      exit(1);
+    }
+    auto
+      source=read_track(source_filename),
+      target=read_track(target_filename);
+
+    output_track(cout, diff(source, target, 1), max_line_length, bw);
+  }
+
+}
 
 namespace testudo___implementation::random {
 
@@ -243,26 +404,9 @@ namespace testudo___implementation::diff_implementation {
     return t;
   }
 
-  namespace {
-
-    string typeset_address(string a) { return "["+a+"]"; }
-    string typeset_address(string s, string t) {
-      string
-        s_file=s.substr(0, s.find(':')),
-        t_file=s.substr(0, t.find(':'));
-      return typeset_address(s+" -> "
-                             +((s_file==t_file)
-                               ? t.substr(t.find(':')+1)
-                               : t));
-    }
-    string typeset_id(cyclic_redundancy_check::crc64_t id)
-      { return "["+to_hex(id)+"]"; }
-
-  }
-
   ostream &operator<<(ostream &os, track_element const &e) {
     if (not e.address.empty())
-      os << typeset_address(e.address) << " ";
+      os << "[" << typeset_address(e.address) << "] ";
     os << e.type << " " << typeset_id(e.id);
     string stats=
       "r-"+to_string(e.stats.n_passed())
@@ -321,102 +465,10 @@ namespace testudo___implementation::diff_implementation {
     return ts;
   }
 
-  namespace {
-
-    string typeset_stats(TestStats const &ts) {
-      return
-        to_string(ts.n_passed())+"/"
-        +to_string(ts.n_passed()+ts.n_failed())+" f"
-        +(ts.n_errors()
-          ? (", "+to_string(ts.n_errors())+" e")
-          : string());
-    }
-
-  }
-
   ostream &operator<<(ostream &os, track_summary const &ts) {
-    for (auto const &[deleted_or_new, track_good, track_wrong]:
-           list<tuple<string,
-                      list<track_element> const &,
-                      list<track_element> const &>>
-             {{"deleted", ts.deleted_good, ts.deleted_wrong},
-              {"new", ts.new_good, ts.new_wrong}}) {
-      if (not (track_good.empty() and track_wrong.empty())) {
-        os << deleted_or_new << endl;
-        for (auto const &[kind, track]:
-               list<tuple<string, list<track_element> const &>>
-               {{"good", track_good},
-                {"wrong", track_wrong}})
-          if (not track.empty()) {
-            TestStats e_ts;
-            for (auto const &e: track)
-              e_ts+=e.stats;
-            os << "  " << kind << " (" << track.size()
-               << ": " << typeset_stats(e_ts) << ")" << endl;
-            for (auto const &e: track)
-              os << "    " << typeset_address(e.address) << " " << e.type
-                 << " (" << typeset_stats(e.stats) << ")" << endl;
-          }
-      }
-    }
-    for (auto const &[evolution, tracks]:
-           list<tuple<string,
-                      list<pair<track_element, track_element>> const &>>
-             {{"wrong to good", ts.wrong_to_good},
-              {"good to wrong", ts.good_to_wrong},
-              {"with_data changed", ts.with_data_changed}})
-      if (not tracks.empty()) {
-        TestStats s_ts, t_ts;
-        for (auto const &[s, t]: tracks) {
-          s_ts+=s.stats;
-          t_ts+=t.stats;
-        }
-        os << evolution << " (" << tracks.size()
-           << ": " << typeset_stats(s_ts)
-           << " -> " << typeset_stats(t_ts) << ")" << endl;
-        for (auto const &[s, t]: tracks) {
-          assert(s.type==t.type);
-          assert(s.id==t.id);
-          os << "  " << typeset_address(s.address, t.address)
-             << " " << s.type
-             << " (" << typeset_stats(s.stats)
-             << " -> " << typeset_stats(t.stats) << ")" << endl;
-        }
-      }
+    output_track(os, ts, default_max_line_length, true);
     return os;
   }
 
-  track_summary diff(track const &source, track const &target,
-                     std::size_t min_length=1) {
-    auto track_edit=shortest_edit(source, target, min_length);
-    auto table=edit_to_table(track_edit, source.size(), target.size());
-    return track_table_to_summary(source, target, table);
-  }
-
 }
 
-namespace testudo___implementation {
-
-  namespace {
-
-    auto read_track(string file_name) {
-      ifstream file(file_name);
-      return diff_implementation::parse_track(file);
-    }
-
-  }
-
-  void testudo_diff(opts_t opts) {
-    if (opts.size() not_eq 2) {
-      cerr << opts.executable << ": two file names required" << endl;
-      exit(1);
-    }
-    auto
-      source=read_track(front_and_shift(opts)),
-      target=read_track(front_and_shift(opts));
-    assert(opts.empty());
-
-    cout << diff(source, target, 1);
-  }
-
-}

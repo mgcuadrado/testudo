@@ -108,12 +108,12 @@ namespace testudo___implementation {
       }
     }
     auto child() { return children[counter-1]; }
-    void add(function<void ()> action)
-      { actions.push_back(action); }
-    void output() {
-      if (not actions.empty()) {
+    void add(string location, function<void ()> action)
+      { actions[location].push_back(action); }
+    void output(string location) {
+      if (auto a_i=actions.find(location); a_i not_eq actions.end()) {
         test_format->output_begin_with_results();
-        for (auto const &action: actions)
+        for (auto const &action: a_i->second)
           action();
         test_format->output_end_with_results();
       }
@@ -128,7 +128,7 @@ namespace testudo___implementation {
     size_t counter;
     bool all_successful_p=true;
     vector<shared_ptr<WithLoopLog>> children;
-    list<function<void ()>> actions;
+    map<string, list<function<void ()>>> actions;
   };
 
   class WithLoopTestFormat
@@ -166,6 +166,7 @@ namespace testudo___implementation {
       : parent_test_format(parent_test_format),
         non_with_ancestor(find_non_with_ancestor(parent_test_format)),
         log(log),
+        with_location(non_with_ancestor->get_full_location()),
         recursively_last_time(
           last_time and parent_recursively_last_time(parent_test_format)),
         full_var_values(compute_full_var_values(var_name, val)),
@@ -177,13 +178,18 @@ namespace testudo___implementation {
     }
     ~WithLoopTestFormat() {
       if (recursively_last_time
-          and not dynamic_pointer_cast<WithLoopTestFormat>(parent_test_format))
+          and not dynamic_pointer_cast<WithLoopTestFormat>(
+                    parent_test_format)) {
+        // reset the location of the opening "with_data()"
+        non_with_ancestor->set_location(with_location);
         non_with_ancestor
           ->output_with_summary(loop_name, log->test_stats_diff());
+      }
       output_end_with();
     }
 
     void set_location(location_t location) {
+      TestFormat::set_location(location);
       if (recursively_last_time)
         non_with_ancestor->set_location(location);
     }
@@ -199,10 +205,12 @@ namespace testudo___implementation {
     bool if_false_output_with_failed(string success,
                                      function<void ()> error_output) {
       if (success=="false") {
-        log->add([nwa=non_with_ancestor,
+        log->add(get_location(),
+                 [nwa=non_with_ancestor,
                   fvvf=var_and_values_format(full_var_values)]()
                    { nwa->output_show_value(fvvf.first, fvvf.second); });
-        log->add(error_output);
+        log->add(get_location(),
+                 error_output);
         failed();
         return true;
       }
@@ -264,7 +272,7 @@ namespace testudo___implementation {
           { nwa->output_catch(exception_type, error, caught, false); });
       if (recursively_last_time) {
         non_with_ancestor->output_catch(exception_type, "", "with", true);
-        log->output();
+        log->output(get_location());
       }
     }
     void output_show_value(string, string) override { }
@@ -296,7 +304,7 @@ namespace testudo___implementation {
         });
       if (recursively_last_time) {
         non_with_ancestor->output_check_true(expr_str, "with", prefix, true);
-        log->output();
+        log->output(get_location());
       }
     }
     void output_check_true_for(string expr_str,
@@ -313,7 +321,7 @@ namespace testudo___implementation {
       if (recursively_last_time) {
         non_with_ancestor->output_check_true_for(
           expr_str, exprv_str, "", "with", prefix, true);
-        log->output();
+        log->output(get_location());
       }
     }
     void output_check_equal(string expr1_str, string val1_str,
@@ -330,7 +338,7 @@ namespace testudo___implementation {
       if (recursively_last_time) {
         non_with_ancestor->output_check_equal(
           expr1_str, "", expr2_str, "", "with", prefix, true);
-        log->output();
+        log->output(get_location());
       }
     }
     void output_check_approx(string expr1_str, string val1_str,
@@ -348,7 +356,7 @@ namespace testudo___implementation {
       if (recursively_last_time) {
         non_with_ancestor->output_check_approx(
           expr1_str, "", expr2_str, "", max_error_str, "with", prefix, true);
-        log->output();
+        log->output(get_location());
       }
     }
     void output_check_verify(string expr_str, string val_str,
@@ -365,7 +373,7 @@ namespace testudo___implementation {
       if (recursively_last_time) {
         non_with_ancestor->output_check_verify(
           expr_str, "", pred_str, "with", prefix, true);
-        log->output();
+        log->output(get_location());
       }
     }
 
@@ -376,6 +384,7 @@ namespace testudo___implementation {
   private:
     test_format_p const parent_test_format, non_with_ancestor;
     shared_ptr<WithLoopLog> const log;
+    location_t const with_location;
     bool const recursively_last_time;
     var_values_t const full_var_values;
     string const loop_name;

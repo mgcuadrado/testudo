@@ -1,0 +1,6 @@
+SHELL= /bin/bash
+
+SHAREDLIBNAME = [project_name].so
+EXENAME = [executable_name]
+
+include $(HOME)/local/include/testudo/Makefile

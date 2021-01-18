@@ -19,7 +19,7 @@
 
 TSTFILE="$1"
 STYLE="${TSTFILE%.tst}"
-HEADERFILE="testudo_$STYLE.h"
+HEADERFILE="testudo_$STYLE"
 
 declare -A macros
 

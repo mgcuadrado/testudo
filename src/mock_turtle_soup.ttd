@@ -1,6 +1,6 @@
 #ifndef NAUTOTEST
 
-#include <testudo/testudo_lc.h>
+#include <testudo/testudo_lc>
 #include <testudo/mock_turtle.h>
 #include <iostream>
 

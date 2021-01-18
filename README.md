@@ -27,9 +27,8 @@ code.  Its key features are:
 
 - you can produce test summaries with success, fail, and error counts and
   accumulated tallies across the test tree;
-  
-- you can automatically track your progress based on produced reports (in
-  progress).
+
+- you can track your progress using test results.
 
 # A simple example
 

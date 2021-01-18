@@ -1,0 +1,16 @@
+#include <testudo/testudo_eo> // esperanta stilo
+#include "flux_capacitor.h"
+#include "delorean_test.h" // difinal fiksaĵon "DeloreanFixture"
+
+difini_ĉefa_testo_nodon("bttf3.outatime", // tuta nomo de patro
+                        (flux_capacitor, // nomo de testo
+                         "FC features")); // titolo
+
+difini_teston(flux_capacitor, // patro
+              "FC after construction", // titolo
+              kun_fiksaĵo(DeloreanFixture)) { // uzu fiksaĵon
+  deklari(FluxCapacitor fc);
+  fari(fc.connect_to(delorean)); // "delorean" estas kreata de la fiksaĵo
+  certigi(not fc.is_on())_vera; // certigi ke buleo veras
+  certigi(fc.missing_jw())_proksimas(1.21); // certigi proksiman valoron
+}

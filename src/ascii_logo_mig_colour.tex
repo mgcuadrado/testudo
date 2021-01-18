@@ -1,0 +1,37 @@
+\documentclass[]{article}
+\usepackage{fontspec}
+\setmonofont{DejaVu Sans Mono}
+\usepackage{fancyvrb}
+\usepackage{xcolor, soul}
+
+\pagestyle{empty}
+
+\newcommand*\skin[1]{\textcolor{brown!50!black}{#1}}
+\newcommand*\brown[1]{\textcolor{brown}{#1}}
+\newcommand*\gray[1]{\textcolor{gray!25!white}{#1}}
+\newcommand*\green[1]{\textcolor{green!50!black}{#1}}
+\newcommand*\red[1]{\textcolor{red!60!black}{#1}}
+\newcommand*\ok[1]{\textcolor{green!80!black}{#1}}
+\newcommand*\fail[1]{%
+  \raisebox{0pt}[0pt][0pt]{\textcolor{red}{\sethlcolor{yellow}\hl{\mbox{#1}}}}}
+\newcommand*\err[1]{%
+  \raisebox{0pt}[0pt][0pt]{\textcolor{yellow}{\sethlcolor{red}\hl{\mbox{#1}}}}}
+\newcommand*\blue[1]{\textcolor{blue}{#1}}
+
+\begin{document}
+
+\begin{Verbatim}[commandchars=+\{\}]
+            ,==.
+           // _ \  +blue{?}
+           +skin{G}| O o
+           `+skin{\} +red{_}+skin{`/}     [+err{ERR-}] +blue{!} +green{__}        ____ ___ ___ ___ _ _ __   __
+        +red{___}+skin{/ `-'}+red{_}     [+fail{FAIL}]  +green{(_}'+green{\}+red{.-.}   |_   | __|  _|   | | |  \ /  |
+       +red{/   `--'  `}    [ +ok{OK} ]    +green{\}+red{/___\}+green{,}   | || _|\_  \| || | | | | | |
+    +brown{---}+red{|}     +gray{mgc} +red{|}+brown{----------------}+green{U}+brown{-}+green{U}+brown{-----}|_||___|___/|_|+brown{-}\__|__/|__/+brown{---}
+\end{Verbatim}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

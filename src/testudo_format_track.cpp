@@ -80,10 +80,6 @@ namespace {
          << "c-" << code << " " << crc(content) << " "
          << encode_stats(test_stats) << "\n";
     }
-    void encode_try(string content, bool informative) {
-      ts << encode_location()
-         << (informative ? 'i' : 'c') << "-try " << crc(content) << " ";
-    }
     void encode_uncaught(string exception) {
       ts << encode_location()
          << "e-uncaught_exception" << crc(exception) << "\n";
@@ -111,8 +107,8 @@ namespace {
       { encode('i', "declare", code_str); }
     void output_perform(string code_str) override
       { encode('i', "perform", code_str); }
-    void output_try(string code_str, bool informative) override
-      { encode_try(code_str, informative); }
+    void output_try(string code_str, bool) override
+      { encode('i', "try", code_str); }
     void output_catch(string exception_type, string error,
                       string caught, bool informative) override
       { encode_check("catch", exception_type+error, caught, informative); }
