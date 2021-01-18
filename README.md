@@ -61,7 +61,7 @@ are two default styles; you can also add your own):
 #include "delorean_test.h" // defines DeloreanFixture
 
 DEFINE_TOP_TEST_NODE("bttf2.outatime", // parent full name
-                     (flux_capacitor, // text name
+                     (flux_capacitor, // test name
                       "FC features")); // title
 
 DEFINE_TEST(flux_capacitor, // parent
