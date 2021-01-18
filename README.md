@@ -40,7 +40,7 @@ a test:
 #include "delorean_test.h" // defines DeloreanFixture
 
 define_top_test_node("bttf1.outatime", // parent full name
-                     (flux_capacitor, // text name
+                     (flux_capacitor, // test name
                       "FC features")); // title
 
 define_test(flux_capacitor, // parent
