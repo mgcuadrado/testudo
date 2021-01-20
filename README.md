@@ -28,7 +28,8 @@ code.  Its key features are:
 - you can produce test summaries with success, fail, and error counts and
   accumulated tallies across the test tree;
 
-- you can track your progress using test results.
+- you can produce progress tracking reports, that show exactly and succintly
+  how your code changes affect the test results.
 
 # A simple example
 
@@ -113,6 +114,40 @@ If you request just a summary instead of the full report, you get this:
 {-.flux_capacitor} 1/2 fail ------------------------------------------- [FAIL]
     {-.initial} 1/2 fail ---------------------------------------------- [FAIL]
 ```
+
+If you later discover the bug in your code, and correct it, you'll get the
+following report:
+```
+ _______________________________________________
+| {testudo.outatime.flux_capacitor} FC features |
+`-----------------------------------------------'
+ _________________________________________________________________
+| flux_capacitor_test.ttd:9                                       |
+| {testudo.outatime.flux_capacitor.initial} FC after construction |
+`-----------------------------------------------------------------'
+" with fixture DeloreanFixture "
+12 : FluxCapacitor fc ;
+13 # fc.connect_to(delorean) ;
+14 % not fc.is_on()                                                     [ OK ]
+15 % fc.missing_jw() // 1.21 +/- eps                                    [ OK ]
+{testudo.outatime.flux_capacitor.initial} 0/2 fail -------------------- [ OK ]
+
+{testudo.outatime.flux_capacitor} 0/2 fail ---------------------------- [ OK ]
+```
+and the following report summary:
+```
+{-.flux_capacitor} 0/2 fail ------------------------------------------- [ OK ]
+    {-.initial} 0/2 fail ---------------------------------------------- [ OK ]
+```
+but more importantly, you can produce the following very concise progress
+tracking report, where you can pinpoint exactly what your changes did to the
+tests:
+```
+wrong to good (1: 1/1 f -> 0/1 f)
+  [flux_capacitor_1_test.ttd:15 -> 15] c-check_approx (1/1 f -> 0/1 f)
+```
+(meaning your changes have caused one check to go from wrong to good, and that
+check is in line 15 of the test file).
 
 Testudo has many more features and syntax elements than i can show you
 comfortably in this `README.md`.  Please refer to the
