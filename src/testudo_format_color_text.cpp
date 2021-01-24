@@ -77,12 +77,10 @@ namespace {
     }
 
     void output_text(string text) override {
-      output_location();
+      // don't print location for multiline text:
+      if (text.find('\n')==string::npos)
+        output_location();
       typeset->text(text);
-    }
-    void output_multiline_text(string text) override {
-      output_location();
-      typeset->multiline_text(text);
     }
 
     void output_declare(string code_str) override {
@@ -107,11 +105,6 @@ namespace {
     void output_show_value(string expr_str, string value_str) override {
       output_location();
       typeset->show_value(expr_str, value_str);
-    }
-    void output_show_multiline_value(
-        string expr_str, string value_str) override {
-      output_location();
-      typeset->show_multiline_value(expr_str, value_str);
     }
 
     void output_begin_with(string var_name,

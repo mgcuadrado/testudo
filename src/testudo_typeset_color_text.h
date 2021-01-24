@@ -46,7 +46,6 @@ namespace testudo___implementation {
     virtual void step_id(string id)=0;
 
     virtual void text(string text)=0;
-    virtual void multiline_text(string text)=0;
 
     virtual void declare(string code_str)=0;
 
@@ -57,7 +56,6 @@ namespace testudo___implementation {
                                  string caught)=0;
 
     virtual void show_value(string expr_str, string value_str)=0;
-    virtual void show_multiline_value(string expr_str, string value_str)=0;
 
     virtual void begin_with(string var_name,
                             string container_first, string container_rest)=0;
@@ -103,12 +101,13 @@ namespace testudo___implementation {
 
     virtual ~TextTrackTypeset()=default;
 
+    virtual void no_changes()=0;
     virtual void track_header(string evolution, string count,
                               string stats_from, string stats_to,
                               string delta_stats)=0;
     virtual void track_entry(string location, string type,
                              string stats_from, string stats_to,
-                             string delta_stats)=0;
+                             string delta_stats, bool show_label)=0;
   };
 
   std::string::size_type utf8_length(std::string const &s);

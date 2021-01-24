@@ -122,7 +122,7 @@ namespace {
     check(soup_mock->counter)_equal(4);
     perform(soup_mock->schedule_ret(temp, 20, 40, 60, 80, 100));
     perform(queen_of_hearts_mock_turtle_soup(soup_mock));
-    show_multiline_value(print_calls(soup_mock->calls()));
+    show_value(print_calls(soup_mock->calls()));
     with_declare(auto it=iterate(soup_mock)) {
       with_declare(auto call=it.pop_call(*soup_mock, reverse)) {
         check(call)_equal({{2, 1}}, {{1, 2}});
@@ -223,7 +223,7 @@ namespace {
     perform(equalize(lev1, lev2));
     check(lev1.readout())_equal(52);
     check(lev2.readout())_equal(52);
-    show_multiline_value(print_calls(cl.calls()));
+    show_value(print_calls(cl.calls()));
     declare(auto it=iterate(cl));
     perform(while (it.method_name() not_eq "large_up")
               it.next());

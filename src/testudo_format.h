@@ -88,15 +88,12 @@ namespace testudo___implementation {
     virtual void output_separator()=0;
     virtual void output_step_id(string id)=0;
     virtual void output_text(string text)=0;
-    virtual void output_multiline_text(string text)=0;
     virtual void output_declare(string code_str)=0;
     virtual void output_perform(string code_str)=0;
     virtual void output_try(string code_str, bool informative)=0;
     virtual void output_catch(string exception_type, string error,
                               string caught, bool informative)=0;
     virtual void output_show_value(
-      string expr_str, string value_str)=0;
-    virtual void output_show_multiline_value(
       string expr_str, string value_str)=0;
     virtual void output_begin_with(string var_name,
                                    string container_first,

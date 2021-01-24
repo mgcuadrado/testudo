@@ -9,7 +9,6 @@ VISIBLE_FIXTURE videbla_fiksaĵo
 
 STEP_ID              paŝo_id
 PRINT_TEXT           printi_tekston
-PRINT_MULTILINE_TEXT printi_multlinian_tekston
 PRINT_BREAK          printi_paŭzon
 
 DECLARE              deklari
@@ -23,7 +22,6 @@ WITH_MULTILINE_DATA  kun_multliniaj_datumoj
 CHECK_TRY            certigi_try
 CATCH                _catch
 SHOW_VALUE           montri_valoron
-SHOW_MULTILINE_VALUE montri_multlinian_valoron
 IN_SCOPE             montri_amplekson
 WITH_DECLARE         kun_deklaro
 

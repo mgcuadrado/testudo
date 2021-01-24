@@ -1,0 +1,10 @@
+#!/bin/bash
+
+esc='\o033\['
+lines="${esc}0;33m"
+normal="${esc}0;39m"
+
+sed "
+    /^${lines}.*${normal}/d
+    s/^\( *\)${lines}[0-9]\+${normal} /\1/
+"

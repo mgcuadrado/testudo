@@ -9,7 +9,6 @@ VISIBLE_FIXTURE visible_fixture
 
 STEP_ID              step_id
 PRINT_TEXT           print_text
-PRINT_MULTILINE_TEXT print_multiline_text
 PRINT_BREAK          print_break
 
 DECLARE              🖵
@@ -23,7 +22,6 @@ WITH_MULTILINE_DATA  with_multiline_data
 CHECK_TRY            check_try
 CATCH                _catch
 SHOW_VALUE           show_value
-SHOW_MULTILINE_VALUE show_multiline_value
 IN_SCOPE             in_scope
 WITH_DECLARE         with_declare
 

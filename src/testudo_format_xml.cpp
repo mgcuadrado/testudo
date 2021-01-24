@@ -95,11 +95,6 @@ namespace {
         ->append_text(escape_tilde(text));
     }
 
-    void output_multiline_text(string text) override {
-      localize(test_stack.top()->add_element("multiline_text"))
-        ->append_text(escape_tilde(text));
-    }
-
     void output_declare(string code_str) override {
       localize(test_stack.top()->add_element("declare"))
         ->append_text(escape_tilde(code_str));
@@ -125,16 +120,6 @@ namespace {
 
     void output_show_value(string expr_str, string value_str) override {
       auto show_value=localize(test_stack.top()->add_element("show_value"));
-      show_value
-        ->add_element("expression1")
-          ->append_text(escape_tilde(expr_str))
-          ->append_attribute("value", escape_tilde(value_str));
-    }
-
-    void output_show_multiline_value(
-        string expr_str, string value_str) override {
-      auto show_value=
-        localize(test_stack.top()->add_element("show_multiline_value"));
       show_value
         ->add_element("expression1")
           ->append_text(escape_tilde(expr_str))

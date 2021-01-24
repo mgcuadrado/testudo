@@ -58,13 +58,11 @@ namespace testudo___implementation {
     void output_separator() override { }
     void output_step_id(string) override { }
     void output_text(string) override { }
-    void output_multiline_text(string) override { }
     void output_declare(string) override { }
     void output_perform(string) override { }
     void output_try(string, bool) override { }
     void output_catch(string, string, string, bool) override { }
     void output_show_value(string, string) override { }
-    void output_show_multiline_value(string, string) override { }
     void output_begin_with(string, string, string, string) override { }
     void output_end_with() override { }
     void output_begin_with_results() override { }
@@ -247,10 +245,6 @@ namespace testudo___implementation {
       if (recursively_last_time)
         non_with_ancestor->output_text(text);
     }
-    void output_multiline_text(string text) override {
-      if (recursively_last_time)
-        non_with_ancestor->output_multiline_text(text);
-    }
     void output_declare(string code_str) override {
       if (recursively_last_time)
         non_with_ancestor->output_declare(code_str);
@@ -276,7 +270,6 @@ namespace testudo___implementation {
       }
     }
     void output_show_value(string, string) override { }
-    void output_show_multiline_value(string, string) override { }
     void output_begin_with(string var_name, string
                            container_first, string container_rest,
                            string summary) override {

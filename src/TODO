@@ -1,14 +1,17 @@
-         ____ _______ ___ _ _ __   __         __ ?
-        |_   | _ |  _|   | | |  \ /  |    .-./'_)  [ OK ]
+         ____ ___ ___ ___ _ _ __   __         __ ?
+        |_   | __|  _|   | | |  \ /  |    .-./'_)  [ OK ]
           | || _|\_  \| || | | | | | |  ,/___\/    [FAIL]
     ------|_||___|___/|_|-\__|__/|__/-----U-U----------------mgc--
 
 ---- bugs --------------------------------------------------
 
+[ ] minor bug: "print_text()" prints no line information for multiline text;
+  but if it did, it would take an additional almost empty line (with just the
+  line information); so i don't know what to do yet
+
 ---- big but important things ------------------------------
 
-[ ] update README.md with the latest developments (especially progress
-  tracking)
+[ ] make track progress reports more beautiful
 
 [ ] make Testudo independent from Unix
 
@@ -30,7 +33,7 @@
   [ ] code a direct colour summary output format
 
 [ ] add options (like "just report stats", "show tests", "show failed tests",
-  "show failed checks", "no color", et cetera)
+  "show failed checks", "no color", et cetera) for "testudo run"
 
   current situation:
 
@@ -126,6 +129,10 @@
   approach of "mock-turtle"?
 
 ---- easy --------------------------------------------------
+
+[ ] remove "no_loc_info" in favour of "testudo xml_to_color -n" and a new
+  option to "testudo run" that doesn't add location info to the XML (for "make
+  save_report")
 
 [ ] shouldn't '\' chars at the end of broken lines appear blue?
 
@@ -881,3 +888,24 @@
   must always be done just prior to committing a new version
 
 [X] document result tracking with "make save_track" and "make track_progress"
+
+[X] in "testudo_format_track.cpp", "crc(code, content)" should be used rather
+  than "crc(content)"; this will cause a format break for existing tracks
+
+[X] update README.md with the latest developments (especially progress
+  tracking)
+
+[X] when there's no progress, "make track_progress" should print something like
+  "no progress and no regress" (in blue?)
+
+[X] add a black-and-white version of "make track_progress" where regresses
+  stand out (with colour, it's easy, but in black-and-white, i'll have to find
+  some way to make them obvious)
+
+  [X] make track progress report clearer
+
+[X] "make -j 8 diff_track" warns about "jobserver unavailable: using -j1"
+
+[X] code "check_multiline()" for (string) arguments that span several lines; or
+  make "check()" (and maybe others) detect automatically multiline arguments,
+  and display them accordingly; did the automatic version

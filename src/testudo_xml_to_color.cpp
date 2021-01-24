@@ -38,12 +38,15 @@ namespace testudo___implementation {
   void testudo_xml_to_color(opts_t opts) {
     bool bw=false;
     bool summary=false;
+    bool show_lines=true;
     unsigned max_line_length=default_max_line_length;
     while (opts) {
       if (opts.opt("-b"))
         bw=true;
       else if (opts.opt("-s"))
         summary=true;
+      else if (opts.opt("-n"))
+        show_lines=false;
       else if (auto w=opts.opt_arg("-w"))
         max_line_length=stoi(w);
       else
@@ -54,7 +57,7 @@ namespace testudo___implementation {
       ? (bw ? text_summary_typeset : color_text_summary_typeset)(
           cout, max_line_length)
       : (bw ? text_report_typeset : color_text_report_typeset)(
-          cout, max_line_length, true);
+          cout, max_line_length, show_lines);
 
     using enc_t=element_t::node_const_t;
 
@@ -89,8 +92,6 @@ namespace testudo___implementation {
       [&](enc_t e) { typeset->step_id(attribute(e, "id")); };
     action_t process_text=
       [&](enc_t e) { typeset->text(text(e)); };
-    action_t process_multiline_text=
-      [&](enc_t e) { typeset->multiline_text(text(e)); };
     action_t process_declare=[&](enc_t e) { typeset->declare(text(e)); };
     action_t process_perform=[&](enc_t e) { typeset->perform(text(e)); };
     action_t process_try=[&](enc_t e) { typeset->try_catch_try(text(e)); };
@@ -105,12 +106,6 @@ namespace testudo___implementation {
         auto expr=get_child(e, "expression1");
         typeset->show_value(text(expr),
                             attribute(expr, "value"));
-      };
-    action_t process_show_multiline_value=
-      [&](enc_t e) {
-        auto expr=get_child(e, "expression1");
-        typeset->show_multiline_value(text(expr),
-                                      attribute(expr, "value"));
       };
     action_t process_with=
       [&](enc_t e) {
@@ -198,13 +193,11 @@ namespace testudo___implementation {
        element(separator),
        element(step_id),
        element(text),
-       element(multiline_text),
        element(declare),
        element(perform),
        element(try),
        element(catch),
        element(show_value),
-       element(show_multiline_value),
        element(with),
        element(with_results),
        element(check_true),

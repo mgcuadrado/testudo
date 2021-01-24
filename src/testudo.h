@@ -494,12 +494,6 @@ namespace testudo___implementation {
     testudo___SET_LOCATION loc;                                         \
     test_management.format->output_text(__VA_ARGS__);                   \
   testudo___END_GROUP
-  // print possibly multiline string as is
-#define testudo__PRINT_MULTILINE_TEXT_L(loc, ...)                       \
-  testudo___BEGIN_GROUP                                                 \
-    testudo___SET_LOCATION loc;                                         \
-    test_management.format->output_multiline_text(__VA_ARGS__);         \
-  testudo___END_GROUP
   // print a break line
 #define testudo__PRINT_BREAK_L(loc)                                     \
   testudo___BEGIN_GROUP                                                 \
@@ -719,14 +713,6 @@ namespace testudo___implementation {
   testudo___BEGIN_GROUP                                                 \
     testudo___SET_LOCATION loc;                                         \
     test_management.format->output_show_value(                          \
-      s, testudo::to_text(__VA_ARGS__));                                \
-  testudo___END_GROUP
-
-  // the the possibly multiline value of an expression
-#define testudo__SHOW_MULTILINE_VALUE_L_S(loc, s, ...)                  \
-  testudo___BEGIN_GROUP                                                 \
-    testudo___SET_LOCATION loc;                                         \
-    test_management.format->output_show_multiline_value(                \
       s, testudo::to_text(__VA_ARGS__));                                \
   testudo___END_GROUP
 

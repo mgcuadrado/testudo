@@ -100,7 +100,6 @@ print_macro_loc_v_string() {
     echo
     print_macro_forward STEP_ID
     print_macro_loc_forward PRINT_TEXT
-    print_macro_loc_forward PRINT_MULTILINE_TEXT
     print_macro_loc         PRINT_BREAK
     echo
     print_macro_loc_string   DECLARE
@@ -114,7 +113,6 @@ print_macro_loc_v_string() {
     print_macro_loc_string   CHECK_TRY
     print_macro_string       CATCH
     print_macro_loc_string   SHOW_VALUE
-    print_macro_loc_string   SHOW_MULTILINE_VALUE
     print_macro_loc_forward  IN_SCOPE
     print_macro_loc_string   WITH_DECLARE
     echo

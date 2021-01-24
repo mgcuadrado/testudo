@@ -25,8 +25,9 @@ TESTUDOBIN = $(OBJDIR)/$(TESTUDONAME)
 STYLES := $(wildcard *.tst)
 STYLE_HEADERS := $(STYLES:%.tst=testudo_%)
 
-XML_TO_COLOR_XSLT = $(BINSDIR)/xml_to_color
-XML_TO_COLOR_SUMMARY_XSLT = $(BINSDIR)/xml_to_color -s
+XML_TO_COLOR_LATEX = $(TESTUDOBIN) xml_to_color -w 63 | ./color_to_latex
+COLOR_NO_LOC_INFO = ./color_no_loc_info
+UNCOLOR = ./uncolor
 
 TTD_ADDITIONAL_PREREQUISITES = \
 	$(STYLE_HEADERS) mock_turtle_macro_n.gh $(HEADERSDIR)
@@ -132,39 +133,48 @@ clean_exe:
 	rm -f $(STYLE_HEADERS)
 	rm -f mock_turtle_macro_n.gh mock_turtle_macro_n_customize.m4
 
-diff_xml_text_test_xslt: $(TESTUDOBIN) $(ALLTESTUDOBINS)
-	diff -u \
-	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-		  | $(XML_TO_COLOR)) \
-	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-		  | $(XML_TO_COLOR_XSLT))
-diff_xml_text_test_bw: $(TESTUDOBIN) $(ALLTESTUDOBINS)
+diff_xml_text_test_bw: $(TEST_PREREQUISITES)
 	diff -u \
 	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
 		  | $(XML_TO_TEXT)) \
 	    <($< run $(SYNC_COLOR_TEXT_FORMAT) $(TESTUDOOPT) \
 			$(ALLTESTUDOSPEC) \
 		  | $(UNCOLOR))
-diff_xml_text_test_color: $(TESTUDOBIN) $(ALLTESTUDOBINS)
+diff_xml_text_test_color: $(TEST_PREREQUISITES)
 	diff -u \
 	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
 		  | $(XML_TO_COLOR)) \
 	    <($< run $(SYNC_COLOR_TEXT_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC))
-diff_xml_text_test_color_ansi: $(TESTUDOBIN) $(ALLTESTUDOBINS)
+diff_xml_text_test_color_ansi: $(TEST_PREREQUISITES)
 	diff -u \
 	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
 		  | $(XML_TO_COLOR) | ./show_ansi) \
 	    <($< run $(SYNC_COLOR_TEXT_FORMAT) $(TESTUDOOPT) \
 			$(ALLTESTUDOSPEC) \
 		  | ./show_ansi)
-diff_xml_summary_test_xslt: $(TESTUDOBIN) $(ALLTESTUDOBINS)
+diff_xml_text_test_saved_color: $(TEST_PREREQUISITES)
 	diff -u \
+	    <(cat testudo.report.saved | $(COLOR_NO_LOC_INFO)) \
+	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+		  | $(XML_TO_COLOR) | $(COLOR_NO_LOC_INFO))
+diff_xml_summary_test_saved_color: $(TEST_PREREQUISITES)
+	diff -u \
+	    testudo.summary.saved \
+	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+		  | $(XML_TO_COLOR_SUMMARY))
+
+save_color: $(TEST_PREREQUISITES)
+	cp -i \
+	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+		  | $(XML_TO_COLOR)) \
+	    testudo.report.saved
+save_summary_color: $(TEST_PREREQUISITES)
+	cp -i \
 	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
 		  | $(XML_TO_COLOR_SUMMARY)) \
-	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-		  | $(XML_TO_COLOR_SUMMARY_XSLT))
+	    testudo.summary.saved
 
-reports/%.tex: $(TESTUDOBIN) xml_to_color $(TESTUDOBINDIR)/testudo_doc.ttb
+reports/%.tex: $(TESTUDOBIN) $(TESTUDOBINDIR)/testudo_doc.ttb
 	mkdir -p reports
 	$< run $(XML_FORMAT) $(TESTUDOBINDIR)/testudo_doc.ttb -s $* \
 	    | $(XML_TO_COLOR_LATEX) > $@
@@ -202,10 +212,12 @@ clean_report:
 clean:: clean_doc clean_exe clean_report clean_ascii_logo
 
 diff_tests: diff_test \
-		diff_xml_text_test_xslt \
 		diff_xml_text_test_bw \
 		diff_xml_text_test_color \
-		diff_xml_summary_test_xslt
+		diff_xml_text_test_saved_color \
+		diff_xml_summary_test_saved_color
+
+save_test: save_color save_summary_color
 
 PREFIX?=$(HOME)/local
 BIN_DIR=$(PREFIX)/bin
@@ -213,9 +225,8 @@ LIB_DIR=$(PREFIX)/lib
 INCLUDE_DIR=$(PREFIX)/include
 TESTUDO_INCLUDE_DIR=$(INCLUDE_DIR)/testudo
 
-INSTALL_SCRIPT := no_loc_info show_ansi uncolor xml_to_color generate_style
-INSTALL_XSLT := $(wildcard *.xslt)
-INSTALL_HEADERS := $(shell ./headers \
+INSTALL_SCRIPT := no_loc_info show_ansi uncolor generate_style
+INSTALL_HEADERS = $(shell ./headers \
 				testudo_lc \
 				testudo_uc \
 				testudo_ext.h \
@@ -230,12 +241,12 @@ cat_install_params:
 	@echo INCLUDE_DIR: $(INCLUDE_DIR)
 	@echo TESTUDO_INCLUDE_DIR: $(TESTUDO_INCLUDE_DIR)
 
-install: $(TESTUDOBIN) $(TESTUDOLIB) $(INSTALL_HEADERS)
+install: $(TESTUDOBIN) $(TESTUDOLIB)
 	mkdir -p $(TESTUDO_INCLUDE_DIR)
 	cp -f $(INSTALL_HEADERS) $(TEMPLATE_MAKEFILE) $(TESTUDO_INCLUDE_DIR)
 	cp -f $(TESTUDO_MAKEFILE) $(TESTUDO_INCLUDE_DIR)/Makefile
 	mkdir -p $(BIN_DIR)
-	cp -f $(TESTUDOBIN) $(INSTALL_SCRIPT) $(INSTALL_XSLT) $(BIN_DIR)
+	cp -f $(TESTUDOBIN) $(INSTALL_SCRIPT) $(BIN_DIR)
 	mkdir -p $(LIB_DIR)
 	cp -f $(TESTUDOLIB) $(LIB_DIR)
 
@@ -243,7 +254,6 @@ uninstall:
 	for f in $(TESTUDO_INCLUDE_DIR) \
 		$(BIN_DIR)/$(TESTUDONAME) \
 		$(INSTALL_SCRIPT:%=$(BIN_DIR)/%) \
-		$(INSTALL_XSLT:%=$(BIN_DIR)/%) \
 		$(LIB_DIR)/$(TESTUDOLIB) \
 		; do \
 	    if [ -e $$f ]; then \

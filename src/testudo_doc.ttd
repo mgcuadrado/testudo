@@ -52,10 +52,10 @@ namespace {
 
   define_top_test("testudo",
                   (use_instructions, "use instructions")) {
-    print_multiline_text("index:\n"
-                         "  1. holding functionality\n"
-                         "  2. exceptions\n"
-                         "  3. list of forgotten doubles");
+    print_text("index:\n"
+               "  1. holding functionality\n"
+               "  2. exceptions\n"
+               "  3. list of forgotten doubles");
     print_break(); // ------------------------------------------------------
     declare(Hold hf);
     check(not hf.is_holding())_true;

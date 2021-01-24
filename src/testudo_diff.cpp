@@ -88,62 +88,73 @@ namespace testudo___implementation {
     void output_track(ostream &os, track_summary const &ts,
                       unsigned max_line_length,
                       bool bw) {
-    auto typeset=
-      (bw ? text_track_typeset : color_text_track_typeset)(
-        os, max_line_length);
-    for (auto const &[evolution, tracks, is_to]:
-           list<tuple<string,
-                      list<track_element> const &,
-                      bool>>
-             {{"deleted good",  ts.deleted_good,  false},
-              {"deleted wrong", ts.deleted_wrong, false},
-              {"new good",      ts.new_good,      true},
-              {"new wrong",     ts.new_wrong,     true}}) {
-      if (not tracks.empty()) {
-        TestStats e_ts;
-        for (auto const &e: tracks)
-          e_ts+=e.stats;
-        auto e_ts_s=typeset_stats(e_ts);
-        typeset->track_header(evolution, to_string(tracks.size()),
-                              is_to ? "" : e_ts_s,
-                              is_to ? e_ts_s : "",
-                              delta_stats(is_to ? TestStats() : e_ts,
-                                          is_to ? e_ts : TestStats()));
-        for (auto const &e: tracks) {
-          auto stats_s=typeset_stats(e.stats);
-          typeset->track_entry(typeset_address(e.address),
-                               e.type,
-                               is_to ? "" : stats_s,
-                               is_to ? stats_s : "",
-                               delta_stats(is_to ? TestStats() : e.stats,
-                                           is_to ? e.stats : TestStats()));
+      auto typeset=
+        (bw ? text_track_typeset : color_text_track_typeset)(
+          os, max_line_length);
+
+      if (ts.deleted_good.empty() and ts.deleted_wrong.empty()
+          and ts.new_good.empty() and ts.new_wrong.empty()
+          and ts.wrong_to_good.empty() and ts.good_to_wrong.empty()
+          and ts.with_data_changed.empty())
+        typeset->no_changes();
+      else {
+        for (auto const &[evolution, tracks, is_to]:
+               list<tuple<string,
+                          list<track_element> const &,
+                          bool>>
+                 {{"deleted good",  ts.deleted_good,  false},
+                  {"deleted wrong", ts.deleted_wrong, false},
+                  {"new good",      ts.new_good,      true},
+                  {"new wrong",     ts.new_wrong,     true}}) {
+          if (not tracks.empty()) {
+            TestStats e_ts;
+            for (auto const &e: tracks)
+              e_ts+=e.stats;
+            auto e_ts_s=typeset_stats(e_ts);
+            typeset->track_header(evolution, to_string(tracks.size()),
+                                  is_to ? "" : e_ts_s,
+                                  is_to ? e_ts_s : "",
+                                  delta_stats(is_to ? TestStats() : e_ts,
+                                              is_to ? e_ts : TestStats()));
+            for (auto const &e: tracks) {
+              auto stats_s=typeset_stats(e.stats);
+              typeset->track_entry(typeset_address(e.address),
+                                   e.type,
+                                   is_to ? "" : stats_s,
+                                   is_to ? stats_s : "",
+                                   delta_stats(is_to ? TestStats() : e.stats,
+                                               is_to ? e.stats : TestStats()),
+                                   false);
+            }
+          }
         }
-      }
-    }
-    for (auto const &[evolution, tracks]:
-           list<tuple<string,
-                      list<pair<track_element, track_element>> const &>>
-             {{"wrong to good", ts.wrong_to_good},
-              {"good to wrong", ts.good_to_wrong},
-              {"with_data changed", ts.with_data_changed}})
-      if (not tracks.empty()) {
-        TestStats s_ts, t_ts;
-        for (auto const &[s, t]: tracks) {
-          s_ts+=s.stats;
-          t_ts+=t.stats;
-        }
-        typeset->track_header(evolution, to_string(tracks.size()),
-                              typeset_stats(s_ts), typeset_stats(t_ts),
-                              delta_stats(s_ts, t_ts));
-        for (auto const &[s, t]: tracks) {
-          assert(s.type==t.type);
-          assert(s.id==t.id);
-          typeset->track_entry(typeset_address(s.address, t.address),
-                               s.type,
-                               typeset_stats(s.stats),
-                               typeset_stats(t.stats),
-                               delta_stats(s.stats, t.stats));
-        }
+        for (auto const &[evolution, tracks, show_label]:
+               list<tuple<string,
+                          list<pair<track_element, track_element>> const &,
+                          bool>>
+                 {{"wrong to good", ts.wrong_to_good, false},
+                  {"good to wrong", ts.good_to_wrong, false},
+                  {"with_data changed", ts.with_data_changed, true}})
+          if (not tracks.empty()) {
+            TestStats s_ts, t_ts;
+            for (auto const &[s, t]: tracks) {
+              s_ts+=s.stats;
+              t_ts+=t.stats;
+            }
+            typeset->track_header(evolution, to_string(tracks.size()),
+                                  typeset_stats(s_ts), typeset_stats(t_ts),
+                                  delta_stats(s_ts, t_ts));
+            for (auto const &[s, t]: tracks) {
+              assert(s.type==t.type);
+              assert(s.id==t.id);
+              typeset->track_entry(typeset_address(s.address, t.address),
+                                   s.type,
+                                   typeset_stats(s.stats),
+                                   typeset_stats(t.stats),
+                                   delta_stats(s.stats, t.stats),
+                                   show_label);
+            }
+          }
       }
     }
 
@@ -375,7 +386,7 @@ namespace testudo___implementation::diff_implementation {
         words.pop_front();
       }
 
-      if (e.type[0]=='c') {
+      if ((e.type[0]=='c') or (e.type[0]=='e')) { // check or error
         string stats=words.front();
         words.pop_front();
         if (stats.substr(0, 2) not_eq "r-")
@@ -412,7 +423,7 @@ namespace testudo___implementation::diff_implementation {
       "r-"+to_string(e.stats.n_passed())
       +"-"+to_string(e.stats.n_failed())
       +"-"+to_string(e.stats.n_errors());
-    if (e.type[0]=='c')
+    if ((e.type[0]=='c') or (e.type[0]=='e')) // check or error
       os << " " << stats;
     return os;
   }
@@ -437,19 +448,19 @@ namespace testudo___implementation::diff_implementation {
 
     for (auto i: table.source_disappeared) {
       auto const &te=source[i];
-      if (te.type[0]=='c')
+      if ((te.type[0]=='c') or (te.type[0]=='e')) // check or error
         (is_good(te.stats) ? ts.deleted_good : ts.deleted_wrong).push_back(te);
     }
     for (auto j: table.target_new) {
       auto const &e=target[j];
-      if (e.type[0]=='c')
+      if ((e.type[0]=='c') or (e.type[0]=='e')) // check or error
         (is_good(e.stats) ? ts.new_good : ts.new_wrong)
           .push_back(e);
     }
 
     for (auto [i, j]: table.source_matches) {
       auto const &es=source[i], &et=target[j];
-      if (es.type[0]=='c') {
+      if ((es.type[0]=='c') or (es.type[0]=='e')) { // check or error
         if (es.type=="c-with_summary") {
           if (not (es.stats==et.stats))
             ts.with_data_changed.push_back({es, et});

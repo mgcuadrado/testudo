@@ -353,6 +353,22 @@ namespace {
     check(code)_equal("~pre~ ||~bold~|| ~post~");
   }
 
+  define_top_test("testudo", "multiline", 550) {
+    print_text("all words in one line");
+    print_text("one\nword\nper\nline");
+    declare(string ol_text="all words in one line");
+    declare(string ml_text="one\nword\nper\nline");
+    show_value(ol_text);
+    show_value(ml_text);
+    check(ol_text)_equal("all words in one line");
+    check(ol_text)_equal("this isn't right");
+    check(ol_text)_equal("one\nword\nper\nline");
+    check(ml_text)_equal("all words in one line");
+    check(ml_text)_equal("this isn't right");
+    check(ml_text)_equal("this\nisn't\nright");
+    check(ml_text)_equal("one\nword\nper\nline");
+  }
+
   define_top_test("testudo", "UTF8 length", 600) {
     declare(using testudo___implementation::utf8_length);
     check(utf8_length("hey there!"))_equal(10);

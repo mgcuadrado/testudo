@@ -48,41 +48,54 @@ namespace {
     TestFormatTrack(ostream &os) : ts(os) { }
 
     string encode_location() { return  "["+get_location()+"] "; }
-    string encode_stats(TestStats test_stats) {
-      return "r-"+to_string(test_stats.n_passed())
+    string encode_stats(TestStats test_stats, bool informative=false) {
+      return (informative ? "i-" : "r-")+to_string(test_stats.n_passed())
         +"-"+to_string(test_stats.n_failed())
         +"-"+to_string(test_stats.n_errors());
     }
 
     string crc(string code)
-    { return "["+to_hex(crc64(code))+"]"; }
+      { return "["+to_hex(crc64(code))+"]"; }
     string crc(string code, string content)
-      { return to_hex(crc64(code+" "+content)); }
+      { return crc(code+" "+content); }
     void encode(char category, string code)
       { ts << category << "-" << code << "\n"; }
     void encode(char category, string code, string content)
-      { ts << category << "-" << code << " " << crc(content) << "\n"; }
+      { ts << category << "-" << code << " " << crc(code, content) << "\n"; }
     void encode_check(string code, string content,
                       string success, bool informative) {
       if (success=="with") {
         assert(informative);
         encode('i', code, content);
       }
-      else
+      else {
+        bool success_b=to_bool(success);
         ts << encode_location()
            << (informative ? 'i' : 'c') << "-"
-           << code << " " << crc(content) << " "
-           << (informative ? 'i' : 'r') << "-"
-           << (to_bool(success) ? "1-0-0" : "0-1-0") << "\n";
+           << code << " " << crc(code, content) << " "
+           << encode_stats({success_b, not success_b, 0}, informative) << "\n";
+      }
+    }
+    string check_try_code_str;
+    void encode_check_try(string code_str) {
+      assert(check_try_code_str.empty());
+      check_try_code_str=code_str;
+    }
+    void encode_check_catch(string exception_type,
+                            string success, bool informative) {
+      encode_check("try-catch ", check_try_code_str+exception_type,
+                   success, informative);
+      check_try_code_str="";
     }
     void encode_summary(string code, string content, TestStats test_stats) {
       ts << encode_location()
-         << "c-" << code << " " << crc(content) << " "
+         << "c-" << code << " " << crc(code, content) << " "
          << encode_stats(test_stats) << "\n";
     }
     void encode_uncaught(string exception) {
       ts << encode_location()
-         << "e-uncaught_exception" << crc(exception) << "\n";
+         << "e-uncaught_exception " << crc(exception) << " "
+         << encode_stats({0, 0, 1}) << "\n";
     }
 
     void output_title(string name, string title) override
@@ -101,23 +114,18 @@ namespace {
       { encode('i', "step_id", id); }
     void output_text(string text) override
       { encode('i', "text", text);  }
-    void output_multiline_text(string text) override
-      { encode('i', "multiline_text", text); }
     void output_declare(string code_str) override
       { encode('i', "declare", code_str); }
     void output_perform(string code_str) override
       { encode('i', "perform", code_str); }
     void output_try(string code_str, bool) override
-      { encode('i', "try", code_str); }
-    void output_catch(string exception_type, string error,
+      { encode_check_try(code_str); }
+    void output_catch(string exception_type, string,
                       string caught, bool informative) override
-      { encode_check("catch", exception_type+error, caught, informative); }
+      { encode_check_catch(exception_type, caught, informative); }
     void output_show_value(
         string expr_str, string value_str) override
       { encode('v', "show_value", expr_str+value_str); }
-    void output_show_multiline_value(
-        string expr_str, string value_str) override
-      { encode('v', "show_multiline_value", expr_str+value_str); }
     void output_begin_with(string var_name,
                            string container_first, string container_rest,
                            string) override

@@ -430,13 +430,11 @@ followed by the name of the format.  Standard formats are ``\texttt{xml}'' and
 
 The ``\texttt{xml}'' format outputs the printout in \textsc{xml} format.  This
 format records all details of the test suite, and is meant for consumption by
-an \textsc{xml} parser.  The available parser is ``\texttt{xml\_to\_color}'',
-which by default converts the printout to a full text report with colours.
-With the flag ``\texttt{-b}'', the output is identical but with no colours.
-With ``\texttt{-s}'', the output is only a summary, giving the check statistics
-for each test node and each test.  The default version uses the \textsc{xslt}
-file ``\texttt{testarudo.xslt}'' to interpret all possible elements and
-attributes in the \textsc{xml} printout.
+an \textsc{xml} parser.  The available parser is invoked by running
+``\texttt{testudo xml\_to\_color}'', which by default converts the printout to
+a full text report with colours.  With the flag ``\texttt{-b}'', the output is
+identical but with no colours.  With ``\texttt{-s}'', the output is only a
+summary, giving the check statistics for each test node and each test.
 
 The ``\texttt{color\_text}'' format outputs the printout directly as a full
 text report with colours, virtually identical to the one
@@ -553,6 +551,8 @@ have a saved report and a saved track that represent your ``baseline'';
 differences and progress and measured with respect to the baseline.  When using
 a version control system, you must add the saved report and track, and commit
 them with their matching version of the code and test code.
+
+Here are the available ``\texttt{make}'' commands:
 \begin{itemize}
 \item \texttt{make show\_report}: runs the tests and shows a colour text report;
 \item \texttt{make show\_sync\_report}: runs the tests and shows a colour text
@@ -572,11 +572,34 @@ them with their matching version of the code and test code.
   as a baseline for ``\texttt{make diff\_test}'' and similar commands;
 \item \texttt{make track\_progress}: shows the tracked progress with respect to
   the baseline;
+\item \texttt{make track\_progress\_bw}: same as the previous one, but with no
+  colour codes;
 \item \texttt{make save\_track}: runs the tests and saves the current track as
   a baseline for ``\texttt{make track\_progress}'';
+\item \texttt{make diff\_track}: runs ``\texttt{make diff\_report}''
+  unconditionally followed by ``\texttt{make track\_progress}'';
+\item \texttt{make diff\_track\_bw}: same as the previous one, but with no
+  colour codes;
 \item \texttt{make save\_test}: runs ``\texttt{make save\_report}'' and
   ``\texttt{make save\_track}''.
 \end{itemize}
+
+In most cases, you can do with only
+\begin{itemize}
+\item \texttt{make diff\_track};
+\item \texttt{make diff\_track\_bw};
+\item \texttt{make save\_test}.
+\end{itemize}
+
+Using these ``\texttt{make}'' commands, a simple coding workflow is
+\begin{enumerate}
+\item\label{step:code} code, change, solve, refactor\ellipsis{}
+\item \texttt{make diff\_track};
+\item iterate (to step \ref{step:code}) until happy;
+\item \texttt{make save\_test};
+\item commit;
+\item go to step \ref{step:code}.
+\end{enumerate}
 
 
 \subsection{Directly calling the executable}
@@ -1253,7 +1276,8 @@ the test, to help the human reader.
 \label{sec:showing-values}
 
 You can show the value of an expression in the report.  It doesn't add to the
-tally of tests, but it can add clarity about what's going on.
+tally of tests, but it can add clarity about what's going on.  Values with
+embedded newlines are displayed in a suitable format.
 
 \subsubsectiontestudopair{Show a plain value}%
   {show\_value}{SHOW\_VALUE}
@@ -1267,22 +1291,6 @@ show_value(helicopter.remaining_fuel());
 
 \begin{cpplisting}
 SHOW_VALUE(helicopter.remaining_fuel());
-\end{cpplisting}
-
-\subsubsectiontestudopair{Show a multiline value}
-  {show\_multiline\_value}{SHOW\_MULTILINE\_VALUE}
-\label{sec:show-multiline-value}
-
-If the value to show may contain newlines, the format used by the ``show
-multiline value'' macro will be clearer: it will be suited for multiline
-values, and it will respect the newlines.
-
-\begin{cpplisting}
-show_multiline_value(radio.communication_log());
-\end{cpplisting}
-
-\begin{cpplisting}
-SHOW_MULTILINE_VALUE(radio.communication_log());
 \end{cpplisting}
 
 \subsectiontestudopair{Scopes}{in\_scope}{IN\_SCOPE}
@@ -1419,7 +1427,8 @@ code.
 \label{sec:print-inline-text}
 
 The ``print text'' instruction displays its argument inline.  The argument must
-be a string of any kind.
+be a string of any kind.  Text with embedded newlines is displayed in a
+suitable format.
 
 \begin{cpplisting}
 print_text("the speed hasn't been updated yet");
@@ -1429,25 +1438,6 @@ print_text("the speed hasn't been updated yet");
 PRINT_TEXT("the speed hasn't been updated yet");
 \end{cpplisting}
 
-
-\subsectiontestudopair{Print multiline text}%
-  {print\_multiline\_text}{PRINT\_MULTILINE\_TEXT}
-\label{sec:print-multiline-text}
-
-If the message contains newlines, use the ``print multiline text'' instruction
-instead: it's suited for multiline text, and respects the newlines.
-
-\begin{cpplisting}
-print_multiline_text("the order will be:\n"
-                     "  1. insert all elements\n"
-                     "  2. sort the container");
-\end{cpplisting}
-
-\begin{cpplisting}
-PRINT_MULTILINE_TEXT("the order will be:\n"
-                     "  1. insert all elements\n"
-                     "  2. sort the container");
-\end{cpplisting}
 
 \subsectiontestudopair{Print a break}{print\_break}{PRINT\_BREAK}
 \label{sec:print-break}
@@ -2483,9 +2473,8 @@ You can also get a human-readable string listing of the recorded calls for a
 call ledger ``\texttt{cl}'', with ``\texttt{print\_calls(cl.calls())}''; each
 line shows the names of the mock object and mock method, and a number stating
 the zero-based order the call has on the particular mock-method log; you can
-print this string with
-``\texttt{show\_multiline\_value(print\_calls(cl.calls()))}''.  This can be
-  useful when designing or debugging a test.
+print this string with ``\texttt{show\_value(print\_calls(cl.calls()))}''.
+This can be useful when designing or debugging a test.
 
 Similarly to mock-method logs, checks with mock-method ledgers lend themselves
 to ``with-declare'' scopes (\Sref{sec:with-declare-scopes}).
@@ -2568,9 +2557,8 @@ A type needs four features in order to be fully Testudo-supported:
   considered valid unless you decide to code validity for the type, so you
   often won't need to deal with validity at all;
 \item it \emph{must} have a textual representation; this is used when you show
-  a value with the ``show-value'' macro (\Sref{sec:show-plain-value}) or with
-  the ``show-multiline-value'' macro (\Sref{sec:show-multiline-value}), but
-  also when the value is shown for a failed check;
+  a value with the ``show-value'' macro (\Sref{sec:show-plain-value}), but also
+  when the value is shown for a failed check;
 \item it \emph{can} support testing for equality, if you need it for your
   tests, in particular, if you use the ``equal'' macro
   (\Sref{sec:check-expression-equal-reference});
@@ -2794,7 +2782,6 @@ Dependencies:
 \item \texttt{bash}, \texttt{sed}, \texttt{awk} (used by scripts);
 \item \texttt{m4} (for generation of ``\texttt{mock\_turtle\_macro\_n.gh}'');
 \item \texttt{make} (but you can use your own alternative);
-\item \texttt{xsltproc} (for \textsc{xml}-to-coloured-text translation);
 \item \LaTeX{}, \texttt{rubber} (to generate the \textsc{pdf} documentation).
 \end{itemize}
 

@@ -1,0 +1,33 @@
+#!/bin/bash
+
+echo '% use packages fancyvrb and soul'
+echo '% make \\sethlcolor{red}'
+echo '% define \openbrace{}, \closebrace{}, and \atsign{}'
+echo '\begin{Verbatim}[numbers=left, %'
+echo '  frame=single, rulecolor=\color{black!25}, commandchars=@\{\}]'
+
+esc='\o033\['
+
+sed "
+  s/@/@atsign@@/g
+  s/{/@openbrace@@/g
+  s/}/@closebrace@@/g
+  s/\(@atsign\|@openbrace\|@closebrace\)@@/\1{}/g
+
+  s/${esc}0;39m/@color{black}@mdseries{}/g # normal
+  s/${esc}1;39m/@bfseries{}/g # bold
+  s/${esc}0;33m/@color{orange}/g #lines
+  s/${esc}1;31m/@color{red}/g #failure
+
+  s/${esc}0;32m/@color{green}/g # successtag
+  # 'failure_tag' and 'error' below use a horrible hack to have red background
+  # failuretag:
+  s/${esc}1;43;31m/@color{red}@makebox[0pt][l]{@sethlcolor{yellow}@hl{     }}/g
+  # error:
+  s/${esc}1;41;33m/@color{yellow}@makebox[0pt][l]{@sethlcolor{red}@hl{     }}/g
+  s/${esc}1;34m/@color{blue}/g # ident
+
+  \${/^\$/d} # remove last line if empty
+"
+
+echo '\end{Verbatim}'

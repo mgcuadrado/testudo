@@ -1,3 +1,58 @@
+392 testudo-0.7
+  testudo version 0.7
+391
+  improved "make diff_xml_text_test_savel_color" by removing line information
+390
+  in checks, automaticall detect multiline arguments and display them
+  accordingly
+389
+  corrected order in new "make diff_..."
+388
+  removed the XSLT-based conversion from XML to colour text; saved colour
+  and colour summary reports as new saved results, and added them to
+  "make diff_tests"
+387
+  added an interesting assert
+386
+  added "make show_report_bw"
+385
+  slightly improved "make diff_track", and moved "XML_TO_COLOR_LATEX" to
+  "Makefile"
+384
+  corrected "jobserver unavailable" warning when doing "make -j 8 diff_trac]"
+383
+  made "print_text()" automatically detect and correctly handle multiline
+  text, and removed "print_multiline_text()"
+382
+  documented the new newline-aware "show\_value()" and the removal of
+  "show_multiline\_value()"
+381
+  made "show_value()" automatically detect and correctly handle multiline
+  arguments, and removed "show_multiline_value()"
+380
+  added some words about coding workflow with "make" commands
+379
+  added black-and-white track progress report
+378
+  made track progress report clearer
+377
+  made progress tracking uncaught-exception-aware (was ignoring uncaught
+  exceptions)
+376
+  added a no-changes message to the progress track report when there are
+  no changes, and prefixed progress track report headers with four dashes
+375
+  added to the "README.md" some words and a printout about progress tracking
+374
+  improved track CRCs by including the type of intruction; breaks saved tracks
+373
+  corrected try-catch track format
+372
+  corrected installation from clean state
+371
+  last-minute updates for release 0.6
+370
+  testudo version 0.7rc
 369 testudo-0.6
   testudo version 0.6
 367

@@ -9,7 +9,7 @@ namespace {
   DEFINE_TEST(main, "show test tree") {
     DECLARE(ostringstream trs);
     PERFORM(testudo::print_tree(trs, testudo::TestNode::root_node()));
-    SHOW_MULTILINE_VALUE(trs.str());
+    SHOW_VALUE(trs.str());
   }
 
 }

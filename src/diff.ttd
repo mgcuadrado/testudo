@@ -190,7 +190,7 @@ namespace {
   define_test(diff, "track parsing") {
     declare(using namespace testudo___implementation::diff_implementation);
     declare(string tts=tts1());
-    show_multiline_value(tts);
+    show_value(tts);
     declare(istringstream isstts(tts));
     declare(auto tt=parse_track(isstts));
     check(tt.size())_equal(5);
@@ -215,7 +215,7 @@ namespace {
           _true;
     }
     declare(string ttsd=tts1_different_addresses());
-    show_multiline_value(ttsd);
+    show_value(ttsd);
     declare(istringstream issttsd(ttsd));
     declare(auto ttd=parse_track(issttsd));
     declare(auto tt_edit=shortest_edit(tt, ttd, 2));
@@ -227,7 +227,7 @@ namespace {
     check(tt_table.source_matches)_equal({{0, 0}, {1, 1}, {3, 4}, {4, 5}});
     check(tt_table.target_matches)_equal({{0, 0}, {1, 1}, {4, 3}, {5, 4}});
     declare(auto ts=track_table_to_summary(tt, ttd, tt_table));
-    show_multiline_value(ts);
+    show_value(ts);
   }
 
 }

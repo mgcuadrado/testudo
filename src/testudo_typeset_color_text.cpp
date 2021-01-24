@@ -36,45 +36,24 @@ namespace {
   struct Color {
     virtual ~Color()=default;
     string
-      normal,
-      bold,
-      lines,
-      success_tag,
-      failure,
-      failure_tag,
-      ident,
-      error;
+      normal, bold, lines,
+      plain_tag, success_tag, failure, failure_tag,
+      ident, error;
     string
-      step_id_begin,
-      step_id_end,
+      step_id_begin, step_id_end,
       text_ident,
-      declare_ident,
-      declare_end,
-      perform_ident,
-      perform_end,
-      begin_scope_ident,
-      end_scope_ident,
-      try_ident,
-      catch_ident,
-      catch_begin,
-      catch_end,
-      check_ident,
-      check_equal_sign,
-      check_approx_sign,
-      check_max_error,
+      declare_ident, declare_end,
+      perform_ident, perform_end,
+      begin_scope_ident, end_scope_ident,
+      try_ident, catch_ident, catch_begin, catch_end,
+      check_ident, check_equal_sign, check_approx_sign, check_max_error,
       check_verify_sign,
-      show_ident,
-      show_sep,
-      show_tab,
-      show_cont,
-      name_open,
-      name_close,
-      loc_begin,
-      loc_end;
-  string
-    ok_label,
-    fail_label,
-    error_label;
+      show_ident, show_sep, show_tab, show_cont,
+      name_open, name_close,
+      loc_begin, loc_end;
+    string ok_label, fail_label, error_label;
+    string track_loc_begin, track_loc_end;
+    string same_label, good_label, bad_label;
     function<string::size_type (string s, string::size_type from)> skip_codes=
       [](string, string::size_type) { return 0; };
     string::size_type real_length(string s) const {
@@ -134,6 +113,12 @@ namespace {
     color.ok_label="["+color.success_tag+" OK "+color.normal+"]";
     color.fail_label="["+color.failure_tag+"FAIL"+color.normal+"]";
     color.error_label="["+color.error+"ERR-"+color.normal+"]";
+
+    color.track_loc_begin=color.plain_tag+"["+color.normal;
+    color.track_loc_end=color.plain_tag+"]"+color.normal;
+    color.same_label="["+color.plain_tag+"same"+color.normal+"]";
+    color.good_label="["+color.success_tag+"good"+color.normal+"]";
+    color.bad_label="["+color.failure_tag+"-BAD-"+color.normal+"]";
   }
 
   Color const &get_color() {
@@ -143,6 +128,7 @@ namespace {
       color.normal="\033[0;39m";
       color.bold="\033[1;39m";
       color.lines="\033[0;33m";
+      color.plain_tag="\033[0;34m";
       color.success_tag="\033[0;32m";
       color.failure="\033[1;31m";
       color.failure_tag="\033[1;43;31m";
@@ -175,17 +161,6 @@ namespace {
     }
     return color;
   }
-
-  struct BlackAndWhiteCodes {
-    string const color_normal="";
-    string const color_bold="";
-    string const color_lines="";
-    string const color_success_tag="";
-    string const color_failure="";
-    string const color_failure_tag="";
-    string const color_ident="";
-    string const color_error="";
-  };
 
   auto const check_length=
     unsigned(get_color().real_length(get_color().ok_label));
@@ -231,6 +206,10 @@ namespace {
     string indent_spaces() const
       { return string(max(0, indent*2), ' '); }
 
+    string pad(string::size_type i, char padding=' ') const {
+      assert(i<=max_line_length);
+      return string(i, padding);
+    }
 
     pair<string, string> cut_line(string text) const {
       string non_last;
@@ -251,7 +230,7 @@ namespace {
         if (color_code==color.normal)
           color_code="";
         non_last+=color.show_cont+'\n';
-        text=indentation+string(cut_indent, ' ')+color_code+text.substr(cut_at);
+        text=indentation+pad(cut_indent)+color_code+text.substr(cut_at);
       }
       return make_pair(non_last, text);
     }
@@ -286,7 +265,7 @@ namespace {
       auto last_length=color.real_length(cut.second);
       string padding=
         ((last_length<text_line_length)
-         ? string(text_line_length-last_length, fill)
+         ? pad(text_line_length-last_length, fill)
          : "")
         +((last_length-1<text_line_length) ? " " : "");
       stream << cut.first << cut.second
@@ -306,8 +285,8 @@ namespace {
                      string pre_color, string post_color) {
       stream << format_text_prefix
              << pre_color
-             << string(separator_width-color.real_length(format_text_prefix),
-                       fill)
+             << pad(separator_width-color.real_length(format_text_prefix),
+                    fill)
              << post_color << endl;
     }
 
@@ -362,20 +341,20 @@ namespace {
            : text_line_length+1),
           title_location.length());
       string text=cut.first+cut.second;
-      ts << color.lines << " " << string(length+2, '_') << color.normal
+      ts << color.lines << " " << pad(length+2, '_') << color.normal
          << endl;
       if (not title_location.empty())
         ts << color.lines << "| "
            << title_location
-           << string(length-title_location.length(), ' ')
+           << pad(length-title_location.length())
            << " |" << color.normal << endl;
       istringstream cut_first_iss(text);
       string line;
       while (getline(cut_first_iss, line))
         ts << color.lines << "|" << color.normal << " "
-           << line << string(length-color.real_length(line), ' ')
+           << line << pad(length-color.real_length(line))
            << " " << color.lines << "|" << color.normal << endl;
-      ts << color.lines << "`" << string(length+2, '-') << "'"
+      ts << color.lines << "`" << pad(length+2, '-') << "'"
          << color.normal << endl;
     }
 
@@ -416,15 +395,17 @@ namespace {
       format_text(ts, color.step_id_begin+" "+id+" "+color.step_id_end);
     }
 
-    void multiline_text(string text) override {
-      ostringstream ossml;
-      ossml << text;
-      if (not ossml.str().empty())
-        ts << tabify(ossml.str()) << endl;
-    }
+    static bool is_multiline(string text)
+      { return (text.find('\n') not_eq string::npos); }
 
     void text(string text) override {
-      format_text(ts, color.text_ident+" "+text+" "+color.text_ident);
+      if (is_multiline(text)) { // multiline
+        ostringstream ossml;
+        ossml << text;
+        ts << tabify(ossml.str()) << endl;
+      }
+      else // one line
+        format_text(ts, color.text_ident+" "+text+" "+color.text_ident);
     }
 
     void declare(string code_str) override {
@@ -464,18 +445,16 @@ namespace {
 
     void show_value(string expr_str, string value_str) override {
       ostringstream oss;
-      oss << color.show_ident << " " << expr_str << " " << color.show_sep
-          << " " << value_str;
-      format_text(ts, oss.str());
-    }
-    void show_multiline_value(string expr_str, string value_str) override {
-      ostringstream oss;
       oss << color.show_ident << " " << expr_str << " " << color.show_sep;
-      format_text(ts, oss.str());
-      ostringstream ossml;
-      format_text(ossml, value_str);
-      if (not ossml.str().empty())
+      if (is_multiline(value_str)) { // multiline
+        format_text(ts, oss.str());
+        ostringstream ossml;
+        format_text(ossml, value_str);
         ts << tabify(ossml.str()) << endl;
+      } else { // one line
+        oss << " " << value_str;
+        format_text(ts, oss.str());
+      }
     }
 
     void begin_with(string var_name,
@@ -516,6 +495,13 @@ namespace {
         format_check(ts, oss.str(), to_bool(success));
     }
 
+    static bool is_any_multiline(list<string> const &texts) {
+      for (auto const &text: texts)
+        if (is_multiline(text))
+          return true;
+      return false;
+    }
+
     void output_check_general(string prefix,
                               list<string> const &text, string success,
                               list<string> const &additional_fail_text) {
@@ -526,10 +512,14 @@ namespace {
       if (success=="with")
         format_text(ts, report);
       else {
-        if (not to_bool(success))
+        bool multiline=is_any_multiline(additional_fail_text);
+        if (not to_bool(success) and not multiline)
           report+=
             " "+color.show_sep+" "+to_string_delim(additional_fail_text, " ");
         format_check(ts, report, to_bool(success));
+        if (not to_bool(success) and multiline)
+        for (auto const &text: additional_fail_text)
+          ts << tabify(text) << endl;
       }
     }
 
@@ -684,6 +674,14 @@ namespace {
         return from+" -> "+to;
     }
 
+    string delta_tag(string delta_stats) const {
+      auto delta_stats_i=stoll(delta_stats);
+      return
+        (delta_stats_i<0) ? color.bad_label
+        : (delta_stats_i>0) ? color.good_label
+        : color.same_label;
+    }
+
     string delta_color(string delta_stats) const {
       auto delta_stats_i=stoll(delta_stats);
       return
@@ -692,11 +690,18 @@ namespace {
         : color.ident;
     }
 
+    void no_changes() override {
+      format_text(ts,
+                  (color.same_label+" "+color.plain_tag
+                   +"no progress and no regress"+color.normal));
+    }
+
     void track_header(string evolution, string count,
                       string stats_from, string stats_to,
                       string delta_stats) override {
       format_text(ts,
-                  (delta_color(delta_stats)
+                  (delta_tag(delta_stats)+" "
+                   +delta_color(delta_stats)
                    +evolution
                    +" ("+count+": "
                    +typeset_from_to(stats_from, stats_to)
@@ -705,11 +710,12 @@ namespace {
 
     void track_entry(string location, string type,
                      string stats_from, string stats_to,
-                     string delta_stats) {
+                     string delta_stats, bool show_label) {
       increase_indent();
       format_text(ts,
-                  color.step_id_begin+color.lines+location+color.normal
-                  +color.step_id_end
+                  (show_label ? delta_tag(delta_stats)+" " : "")
+                  +color.track_loc_begin+color.lines+location+color.normal
+                  +color.track_loc_end
                   +" "+type+" "
                   +delta_color(delta_stats)+"("
                   +typeset_from_to(stats_from, stats_to)

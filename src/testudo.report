@@ -1,5 +1,5 @@
 <testudo>
-  <test location="" name="/" title="" n_failed="94" n_total="2005" n_errors="4" success="false">
+  <test location="" name="/" title="" n_failed="99" n_total="2012" n_errors="4" success="false">
     <test location="" name="bttf1" title="" n_failed="1" n_total="2" n_errors="0" success="false">
       <test location="" name="bttf1.outatime" title="" n_failed="1" n_total="2" n_errors="0" success="false">
         <test location="" name="bttf1.outatime.flux_capacitor" title="FC features" n_failed="1" n_total="2" n_errors="0" success="false">
@@ -72,18 +72,18 @@
         </test>
       </test>
     </test>
-    <test location="" name="testudo" title="Testudo" n_failed="90" n_total="1997" n_errors="4" success="false">
+    <test location="" name="testudo" title="Testudo" n_failed="95" n_total="2004" n_errors="4" success="false">
       <test location="" name="testudo.main" title="main() test" n_failed="0" n_total="0" n_errors="0" success="true">
         <test location="" name="testudo.main.show test tree" title="show test tree" n_failed="0" n_total="0" n_errors="0" success="true">
           <declare location="" brief_location="">ostringstream trs</declare>
           <perform location="" brief_location="">testudo::print_tree(trs, testudo::TestNode::root_node())</perform>
-          <show_multiline_value location="" brief_location="">
-            <expression1 value="-- /&#xa;|- bttf1&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;|- bttf2&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;|- bttf3&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;|- bttf4&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;`- testudo&#xa;   |- main&#xa;   |  `- show test tree&#xa;   |- use_instructions&#xa;   |- testarudo&#xa;   |  |- simple testarudo tests&#xa;   |  |- complex&#xa;   |  |  |- difficult test&#xa;   |  |  |- complicated test&#xa;   |  |  |- test_with_error&#xa;   |  |  |- penultimate test&#xa;   |  |  |- &quot;verify&quot; syntax&#xa;   |  |  |- &quot;true_for&quot; syntax&#xa;   |  |  |- try_catch&#xa;   |  |  |- test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches&#xa;   |  |  `- &quot;with&quot; checks&#xa;   |  |- disorder&#xa;   |  |  |- du&#xa;   |  |  |- unu&#xa;   |  |  |- absdiff&#xa;   |  |  |- testarudo_ext&#xa;   |  |  `- no_representation&#xa;   |  `- external function&#xa;   |- esperanto_test&#xa;   |  `- numbers&#xa;   |- fixture&#xa;   |  |- + commutativity&#xa;   |  |- * commutativity&#xa;   |  `- associativity&#xa;   |- scope&#xa;   |- Testudo syntax&#xa;   |- UTF8 length&#xa;   |- mock_turtle&#xa;   |  |- Queen of Hearts&apos; recipe&#xa;   |  |- Queen of Hearts&apos; recipe calls&#xa;   |  |- approx&#xa;   |  |- calls with several mocks&#xa;   |  |- predicates&#xa;   |  |- exceptions with mock&#xa;   |  `- exceptions with wrap&#xa;   |- crc&#xa;   |  |- crc32&#xa;   |  |  |- table&#xa;   |  |  `- examples&#xa;   |  `- crc64&#xa;   |     |- table&#xa;   |     |- examples&#xa;   |     `- sanity checks&#xa;   |- glob_test&#xa;   |  |- no special character&#xa;   |  |- question mark&#xa;   |  |- asterisk&#xa;   |  |- escape&#xa;   |  `- complex&#xa;   |- diff&#xa;   |  |- longest common subsequence&#xa;   |  |- shortest_edit&#xa;   |  `- track parsing&#xa;   `- sh&#xa;">trs.str()</expression1>
-          </show_multiline_value>
+          <show_value location="" brief_location="">
+            <expression1 value="-- /&#xa;|- bttf1&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;|- bttf2&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;|- bttf3&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;|- bttf4&#xa;|  `- outatime&#xa;|     `- flux_capacitor&#xa;|        `- FC after construction&#xa;`- testudo&#xa;   |- main&#xa;   |  `- show test tree&#xa;   |- use_instructions&#xa;   |- testarudo&#xa;   |  |- simple testarudo tests&#xa;   |  |- complex&#xa;   |  |  |- difficult test&#xa;   |  |  |- complicated test&#xa;   |  |  |- test_with_error&#xa;   |  |  |- penultimate test&#xa;   |  |  |- &quot;verify&quot; syntax&#xa;   |  |  |- &quot;true_for&quot; syntax&#xa;   |  |  |- try_catch&#xa;   |  |  |- test_with_an_absurdly_long_name_so_we_can_check_multiline_cartouches&#xa;   |  |  `- &quot;with&quot; checks&#xa;   |  |- disorder&#xa;   |  |  |- du&#xa;   |  |  |- unu&#xa;   |  |  |- absdiff&#xa;   |  |  |- testarudo_ext&#xa;   |  |  `- no_representation&#xa;   |  `- external function&#xa;   |- esperanto_test&#xa;   |  `- numbers&#xa;   |- fixture&#xa;   |  |- + commutativity&#xa;   |  |- * commutativity&#xa;   |  `- associativity&#xa;   |- scope&#xa;   |- Testudo syntax&#xa;   |- multiline&#xa;   |- UTF8 length&#xa;   |- mock_turtle&#xa;   |  |- Queen of Hearts&apos; recipe&#xa;   |  |- Queen of Hearts&apos; recipe calls&#xa;   |  |- approx&#xa;   |  |- calls with several mocks&#xa;   |  |- predicates&#xa;   |  |- exceptions with mock&#xa;   |  `- exceptions with wrap&#xa;   |- crc&#xa;   |  |- crc32&#xa;   |  |  |- table&#xa;   |  |  `- examples&#xa;   |  `- crc64&#xa;   |     |- table&#xa;   |     |- examples&#xa;   |     `- sanity checks&#xa;   |- glob_test&#xa;   |  |- no special character&#xa;   |  |- question mark&#xa;   |  |- asterisk&#xa;   |  |- escape&#xa;   |  `- complex&#xa;   |- diff&#xa;   |  |- longest common subsequence&#xa;   |  |- shortest_edit&#xa;   |  `- track parsing&#xa;   `- sh&#xa;">trs.str()</expression1>
+          </show_value>
         </test>
       </test>
       <test location="" name="testudo.use_instructions" title="use instructions" n_failed="2" n_total="12" n_errors="1" success="false">
-        <multiline_text location="" brief_location="">index:&#xa;  1. holding functionality&#xa;  2. exceptions&#xa;  3. list of forgotten doubles</multiline_text>
+        <text location="" brief_location="">index:&#xa;  1. holding functionality&#xa;  2. exceptions&#xa;  3. list of forgotten doubles</text>
         <separator location="" brief_location=""/>
         <declare location="" brief_location="">Hold hf</declare>
         <check_true location="" brief_location="" success="true" prefix="">
@@ -1115,6 +1115,46 @@
           <expression2 value="||~tilde~||~pre||~tilde~||~ ||||~tilde~||~bold||~tilde~||~|| ||~tilde~||~post||~tilde~||~">&quot;||~tilde~||~pre||~tilde~||~ ||||~tilde~||~bold||~tilde~||~|| ||~tilde~||~post||~tilde~||~&quot;</expression2>
         </check_equal>
       </test>
+      <test location="" name="testudo.multiline" title="multiline" n_failed="5" n_total="7" n_errors="0" success="false">
+        <text location="" brief_location="">all words in one line</text>
+        <text location="" brief_location="">one&#xa;word&#xa;per&#xa;line</text>
+        <declare location="" brief_location="">string ol_text=&quot;all words in one line&quot;</declare>
+        <declare location="" brief_location="">string ml_text=&quot;one\nword\nper\nline&quot;</declare>
+        <show_value location="" brief_location="">
+          <expression1 value="all words in one line">ol_text</expression1>
+        </show_value>
+        <show_value location="" brief_location="">
+          <expression1 value="one&#xa;word&#xa;per&#xa;line">ml_text</expression1>
+        </show_value>
+        <check_equal location="" brief_location="" success="true" prefix="">
+          <expression1 value="all words in one line">ol_text</expression1>
+          <expression2 value="all words in one line">&quot;all words in one line&quot;</expression2>
+        </check_equal>
+        <check_equal location="" brief_location="" success="false" prefix="">
+          <expression1 value="all words in one line">ol_text</expression1>
+          <expression2 value="this isn&apos;t right">&quot;this isn&apos;t right&quot;</expression2>
+        </check_equal>
+        <check_equal location="" brief_location="" success="false" prefix="">
+          <expression1 value="all words in one line">ol_text</expression1>
+          <expression2 value="one&#xa;word&#xa;per&#xa;line">&quot;one\nword\nper\nline&quot;</expression2>
+        </check_equal>
+        <check_equal location="" brief_location="" success="false" prefix="">
+          <expression1 value="one&#xa;word&#xa;per&#xa;line">ml_text</expression1>
+          <expression2 value="all words in one line">&quot;all words in one line&quot;</expression2>
+        </check_equal>
+        <check_equal location="" brief_location="" success="false" prefix="">
+          <expression1 value="one&#xa;word&#xa;per&#xa;line">ml_text</expression1>
+          <expression2 value="this isn&apos;t right">&quot;this isn&apos;t right&quot;</expression2>
+        </check_equal>
+        <check_equal location="" brief_location="" success="false" prefix="">
+          <expression1 value="one&#xa;word&#xa;per&#xa;line">ml_text</expression1>
+          <expression2 value="this&#xa;isn&apos;t&#xa;right">&quot;this\nisn&apos;t\nright&quot;</expression2>
+        </check_equal>
+        <check_equal location="" brief_location="" success="true" prefix="">
+          <expression1 value="one&#xa;word&#xa;per&#xa;line">ml_text</expression1>
+          <expression2 value="one&#xa;word&#xa;per&#xa;line">&quot;one\nword\nper\nline&quot;</expression2>
+        </check_equal>
+      </test>
       <test location="" name="testudo.UTF8 length" title="UTF8 length" n_failed="0" n_total="5" n_errors="0" success="true">
         <declare location="" brief_location="">using testudo___implementation::utf8_length</declare>
         <check_equal location="" brief_location="" success="true" prefix="">
@@ -1212,9 +1252,9 @@
           </check_equal>
           <perform location="" brief_location="">soup_mock-&gt;schedule_ret(temp, 20, 40, 60, 80, 100)</perform>
           <perform location="" brief_location="">queen_of_hearts_mock_turtle_soup(soup_mock)</perform>
-          <show_multiline_value location="" brief_location="">
+          <show_value location="" brief_location="">
             <expression1 value="{reverse @ 0}&#xa;{forty_two @ 0}&#xa;{inc_counter @ 0}&#xa;{add_counter @ 0}&#xa;{add_ingr @ 0} -- {add_ingr @ 4}&#xa;{set_heat @ 0}&#xa;{temp @ 0}&#xa;{wait @ 0}&#xa;{temp @ 1}&#xa;{wait @ 1}&#xa;{temp @ 2}&#xa;{wait @ 2}&#xa;{temp @ 3}&#xa;{wait @ 3}&#xa;{temp @ 4}&#xa;{set_heat @ 1}&#xa;{wait @ 4} -- {wait @ 13}&#xa;{is_tasty @ 0}&#xa;">print_calls(soup_mock-&gt;calls())</expression1>
-          </show_multiline_value>
+          </show_value>
           <declare_scope location="" brief_location="" declare="auto it=iterate(soup_mock)">
             <declare_scope location="" brief_location="" declare="auto call=it.pop_call(*soup_mock, reverse)">
               <check_equal location="" brief_location="" success="true" prefix="">
@@ -1405,9 +1445,9 @@
             <expression1 value="52">lev2.readout()</expression1>
             <expression2 value="52">52</expression2>
           </check_equal>
-          <show_multiline_value location="" brief_location="">
+          <show_value location="" brief_location="">
             <expression1 value="{lev1.readout @ 0}&#xa;{lev2.readout @ 0}&#xa;{lev1.readout @ 1}&#xa;{lev2.readout @ 1}&#xa;{lev1.large_up @ 0}&#xa;{lev1.readout @ 2}&#xa;{lev2.readout @ 2}&#xa;{lev1.large_up @ 1}&#xa;{lev1.readout @ 3}&#xa;{lev2.readout @ 3}&#xa;{lev1.large_up @ 2}&#xa;{lev1.readout @ 4}&#xa;{lev2.readout @ 4}&#xa;{lev1.large_up @ 3}&#xa;{lev1.readout @ 5}&#xa;{lev2.readout @ 5} -- {lev2.readout @ 6}&#xa;{lev1.readout @ 6}&#xa;{lev2.small_up @ 0}&#xa;{lev2.readout @ 7}&#xa;{lev1.readout @ 7}&#xa;{lev2.small_up @ 1}&#xa;{lev2.readout @ 8}&#xa;{lev1.readout @ 8}&#xa;{lev2.small_up @ 2}&#xa;{lev2.readout @ 9}&#xa;{lev1.readout @ 9}&#xa;{lev2.small_up @ 3}&#xa;{lev2.readout @ 10}&#xa;{lev1.readout @ 10}&#xa;{lev2.small_up @ 4}&#xa;{lev2.readout @ 11}&#xa;{lev1.readout @ 11} -- {lev1.readout @ 12}&#xa;{lev2.readout @ 12}&#xa;">print_calls(cl.calls())</expression1>
-          </show_multiline_value>
+          </show_value>
           <declare location="" brief_location="">auto it=iterate(cl)</declare>
           <perform location="" brief_location="">while (it.method_name() not_eq &quot;large_up&quot;) it.next()</perform>
           <check_equal location="" brief_location="" success="true" prefix="">
@@ -1880,9 +1920,9 @@
         <test location="" name="testudo.diff.track parsing" title="track parsing" n_failed="0" n_total="58" n_errors="0" success="true">
           <declare location="" brief_location="">using namespace testudo___implementation::diff_implementation</declare>
           <declare location="" brief_location="">string tts=tts1()</declare>
-          <show_multiline_value location="" brief_location="">
+          <show_value location="" brief_location="">
             <expression1 value="t-title [0123456789abcdef]&#xa;[phi.ttd:22] i-declare [e89ca44261d5c240]&#xa;[phi.ttd:23] c-check_equal [585280a21523ffff] r-0-1-0&#xa;[phi.ttd:23] c-check_equal [585280a21523d973] r-1-0-0&#xa;[phi.ttd:25] c-with_summary [a45be715e8bd0bb1] r-12-3-45&#xa;">tts</expression1>
-          </show_multiline_value>
+          </show_value>
           <declare location="" brief_location="">istringstream isstts(tts)</declare>
           <declare location="" brief_location="">auto tt=parse_track(isstts)</declare>
           <check_equal location="" brief_location="" success="true" prefix="">
@@ -1907,9 +1947,9 @@
             </with>
           </with>
           <declare location="" brief_location="">string ttsd=tts1_different_addresses()</declare>
-          <show_multiline_value location="" brief_location="">
+          <show_value location="" brief_location="">
             <expression1 value="t-title [0123456789abcdef]&#xa;[psi.ttd:23] i-declare [e89ca44261d5c240]&#xa;[psi.ttd:24] c-check_equal [585280a215230000] r-1-0-0&#xa;[psi.ttd:24] c-check_equal [585280a215232222] r-0-1-0&#xa;[psi.ttd:24] c-check_equal [585280a21523d973] r-0-1-0&#xa;[psi.ttd:28] c-with_summary [a45be715e8bd0bb1] r-1-23-45&#xa;[psi.ttd:24] c-check_equal [585280a215231111] r-1-0-0&#xa;">ttsd</expression1>
-          </show_multiline_value>
+          </show_value>
           <declare location="" brief_location="">istringstream issttsd(ttsd)</declare>
           <declare location="" brief_location="">auto ttd=parse_track(issttsd)</declare>
           <declare location="" brief_location="">auto tt_edit=shortest_edit(tt, ttd, 2)</declare>
@@ -1939,9 +1979,9 @@
             <expression2 value="vector{pair{0, 0}, pair{1, 1}, pair{4, 3}, pair{5, 4}}">{{0, 0}, {1, 1}, {4, 3}, {5, 4}}</expression2>
           </check_equal>
           <declare location="" brief_location="">auto ts=track_table_to_summary(tt, ttd, tt_table)</declare>
-          <show_multiline_value location="" brief_location="">
-            <expression1 value="deleted wrong (1: 1/1 f)&#xa;  [phi.ttd:23] c-check_equal (1/1 f)&#xa;new good (2: 0/2 f)&#xa;  [psi.ttd:24] c-check_equal (0/1 f)&#xa;  [psi.ttd:24] c-check_equal (0/1 f)&#xa;new wrong (1: 1/1 f)&#xa;  [psi.ttd:24] c-check_equal (1/1 f)&#xa;good to wrong (1: 0/1 f -&gt; 1/1 f)&#xa;  [phi.ttd:23 -&gt; 24] c-check_equal (0/1 f -&gt; 1/1 f)&#xa;with_data changed (1: 3/15 f, 45 e -&gt; 23/24 f, 45 e)&#xa;  [phi.ttd:25 -&gt; 28] c-with_summary (3/15 f, 45 e -&gt; 23/24 f, 45 e)&#xa;">ts</expression1>
-          </show_multiline_value>
+          <show_value location="" brief_location="">
+            <expression1 value="[good] deleted wrong (1: 1/1 f)&#xa;  [phi.ttd:23] c-check_equal (1/1 f)&#xa;[good] new good (2: 0/2 f)&#xa;  [psi.ttd:24] c-check_equal (0/1 f)&#xa;  [psi.ttd:24] c-check_equal (0/1 f)&#xa;[-BAD-] new wrong (1: 1/1 f)&#xa;  [psi.ttd:24] c-check_equal (1/1 f)&#xa;[-BAD-] good to wrong (1: 0/1 f -&gt; 1/1 f)&#xa;  [phi.ttd:23 -&gt; 24] c-check_equal (0/1 f -&gt; 1/1 f)&#xa;[-BAD-] with_data changed (1: 3/15 f, 45 e -&gt; 23/24 f, 45 e)&#xa;  [-BAD-] [phi.ttd:25 -&gt; 28] c-with_summary (3/15 f, 45 e -&gt; 23/24 f, 4\&#xa;      5 e)&#xa;">ts</expression1>
+          </show_value>
         </test>
       </test>
       <test location="" name="testudo.sh" title="sh" n_failed="0" n_total="1" n_errors="0" success="true">
