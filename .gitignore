@@ -9,9 +9,11 @@ keywords.tex
 mock_turtle_macro_n.h
 mock_turtle_macro_n_customize.m4
 style_table.tex
-testudo_lc.h
-testudo_uc.h
-testudo_eo.h
+testudo_lc
+testudo_uc
+testudo_eo
+testudo_unicode_extravaganza
+*.gh
 
 *.pdf
 *.aux
