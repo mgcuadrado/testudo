@@ -1,3 +1,152 @@
+508 testudo-0.8
+  testudo version 0.8
+507
+  minor edits
+506
+  integrated "The race" in the manual
+505
+  typeset a version of the tale with ASCII-art images and monospaced text
+504
+  some ASCII-art drawing
+503
+  some writing and cleaning up
+502
+  adjusted left margin for code listings
+501
+  added the "lc"- and "uc"-style editions of the manual
+500
+  corrected a few minor space issues with the "lc"-style examples
+499
+  transferred the remaining examples from the manual to the Testudo
+  examples file
+498
+  transferred yet more examples from the manual to the Testudo examples file;
+  the only remaining ones are those in sections 13 and C
+497
+  improved manual generation by moving temporary files into a subdirectory,
+  and moving the resulting PDF file after it's been generated (so, if you're
+  reading it, the time where it's invalid is much shorter); added an image
+  at the very end of the manual
+496
+  transferred some more examples from the manual to the Testudo examples file
+495
+  transferred more examples from the manual to the Testudo examples file
+494
+  started transferring examples from the manual (dead code) into a Testudo
+  test file (live code) from which snippets are extracted and formatted
+  for the document; this includes instances of "SHOW_APPROX_EPSILON" and
+  "FAKE_PERFORM", that had rotten for lack of exercise (they were mentioned
+  in the manual)
+493
+  corrected "FAKE_PERFORM" (it had no instance in the tests; i'll commit one)
+492
+  corrected "SHOW_APPROX_EPSILON" (it had no instance in the tests; i'll
+  commit one)
+491
+  minor edits
+490
+  added a test using a lambda that uses Testudo syntax
+489
+  testrengthened "kmsxml"
+488
+  in track reports, distinguised between "[-BAD-]" (failed checks) and
+  "[-VERY-BAD-]" (errors)
+487
+  coded "generate_data_tuple()" and "cartesian_product()", useful to generate
+  data for with-data loops
+486
+  added the possibility to pass "MockClass<>" several base classes to derive
+  from, but only the first one can have its constructor using'd
+485
+  allowed for functions used for mock method default value or scheduled
+  values to depend on the mock-method arguments
+484
+  a clarification and a couple of tasks, all about mock methods
+483
+  removed the requirement to add a second "const" after the "wrap_method()"
+  macro for wrapped const methods, at the cost of having to write all method
+  specifiers as a parenthesised list
+482
+  some thinking on the TODO and a minor edit to the manual
+481
+  enabled "show_value()" in with-data loops
+480
+  improved the section on textual representation, and made misc edits
+479
+  added the possibility to control textual representation with manipulators
+  (seemed easy, but i had to replace "testudo::to_text()" with
+  "testudo::to_stream()", and it was a big change)
+478
+  Rauda the rabbit doe
+477
+  a couple new tasks
+476
+  tiny code improvements
+475
+  minor corrections
+474
+  new "literary" task
+473
+  documented "the provided" syntax
+472
+  new cover
+471
+  implemented the "provided" syntax for code sections guarded by a check;
+  still to be documented
+470
+  now that it doesn't include STL headers, so it doesn't add to your included
+  headers, transferred "testudo_tex.h" into "testudo_base.h"
+469
+  generalised "testudo_ext.h" so that it includes as few headers as possible
+  (also removed an exception throwing in favour of returning a huge "absdiff")
+468
+  made all checks syntaxes, including and especially "_true_for()" and
+  "_false_for()", check the validity of their argument
+467
+  showed expressions checked for validity by the "true_for" syntax even
+  for passed checks (but their values are only shown for failed checks)
+466
+  made continuation '\' chars at the end of broken lines blue
+465
+  solved a few doc issues
+464
+  new TODO items
+463
+  corrected perfect forwarding
+462
+  removed rmme
+461
+  m4-automatised the remaining max-number-dependant macros
+460
+  fixed minor errors
+459
+  factored out the definition of SFINAE-based type traits for expression
+  validity
+455
+  new task
+452
+  some minor edits here and there
+451
+  turned the list of "make" commands into a table
+437
+  a new item
+406
+  minor edits
+402
+  added a black-and-white "text" format
+400
+  added global variable initialisation activation, for projects that
+  dynamically load Testudo's library (like "testudo_py")
+398
+  a couple of ideas
+397
+  corrected the rule to generate the executable: it was using as "$^"
+  all prerequisites, not just "$(SHAREDLIBS)"
+396
+  added the possibility of having an "interactive test" report whose XML
+  isn't processed
+393
+  testudo version 0.8rc
 392 testudo-0.7
   testudo version 0.7
 391

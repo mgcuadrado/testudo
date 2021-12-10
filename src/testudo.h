@@ -24,16 +24,13 @@
 //
 //     "testudo_base.h" to merely specialise "absdiff()" or "to_text()"
 //
-//     "testudo_ext.h" instead of "testudo.h" if your test expressions use STL
-//       containers (see "testudo_ext.h" to check which containers are
-//       supported)
-//
 //     additionally, "testudo_try_catch.h" to use "begintrycatch" and
 //       "endtrycatch"
 
 #include "testudo_macros.h"
 #include "testudo_format.h"
 #include "testudo_base.h"
+#include "testudo_activate.h"
 #include <string>
 #include <map>
 #include <list>
@@ -102,7 +99,7 @@ namespace testudo___implementation {
     using csptr=std::shared_ptr<TestNode const>; // shared pointer to const
     using pptr=TestNode *; // pointer to parent
 
-    // "root_node()" (a singleton) is the root node of the test tree
+    // "root_node()"
     static sptr root_node();
     // "get_node()" retrieves a test node by its full name; if it doesn't
     // exist, it, and any missing ancestors, are created as unset nodes
@@ -119,7 +116,7 @@ namespace testudo___implementation {
       sptr child=parent->get_child(location, name);
       // whether the child is newly created, or retrieved, if there are
       // additional arguments, use them to set it:
-      child->set(a...);
+      child->set(std::forward<A>(a)...);
       return child;
     }
 
@@ -128,8 +125,10 @@ namespace testudo___implementation {
     template <typename... A>
     static sptr make_node(TestFormat::location_t location,
                           name_t const &ancestors,
-                          name_t name, A &&...a)
-      { return make_node(location, get_node(ancestors), name, a...); }
+                          name_t name, A &&...a) {
+      return
+        make_node(location, get_node(ancestors), name, std::forward<A>(a)...);
+    }
 
     TestFormat::location_t const location;
     pptr const parent;
@@ -172,7 +171,7 @@ namespace testudo___implementation {
     // test function and possibly other things
     template <typename... A>
     void set(test_f_t set_test_f, A &&...a) {
-      set (a...);
+      set(std::forward<A>(a)...);
       test_f=set_test_f;
     }
 
@@ -193,9 +192,6 @@ namespace testudo___implementation {
   // please read the file "macros.txt" for a coherent explanation that
   // complements the comments in this file about the design and workings of
   // Testudo macros
-
-#define testudo___DECL_EAT_A_SEMICOLON                                  \
-  struct never_define_this_struct_68e47e1831e0eebbe5994ad57527f71b
 
 #define testudo___LOCATION(file, line)                                  \
   {file, #line}
@@ -295,7 +291,8 @@ namespace testudo___implementation {
   template <typename... A>
   auto select_fixture_spec(A &&...) { return FixtureSpec<>{}; }
   template <typename F, typename... A>
-  auto select_fixture_spec(FixtureSpec<F> &&fs, A &&...) { return fs; }
+  auto select_fixture_spec(FixtureSpec<F> &&fs, A &&...)
+    { return std::move(fs); }
 
   inline auto select_priority(end_mark_t)
     { return TestNode::priority_default; }
@@ -371,6 +368,7 @@ namespace testudo___implementation {
               : testudo___implementation                                \
                     ::make_null_test_format_for_fixtures(               \
                   test_management.format)),                             \
+             test_management.test_vfos,                                 \
              test_management.stats}),                                   \
           test_management(test_management),                             \
           visible(visible) { }                                          \
@@ -418,16 +416,27 @@ namespace testudo___implementation {
 
   /// test commands
 
+  // convert a value to string using "vfos"
+  template <typename T>
+  std::string to_text_show_value(value_format_ostream_t test_vfos,
+                                 T const &t) {
+    std::string result=to_text(test_vfos->fmt_os, t);
+    test_vfos->use_up_one_time_manipulators();
+    return result;
+  }
+
   // check whether two values are equal, and convert them to text (in the
   // "string &" arguments)
   template <typename ValT, typename RefT>
-  bool to_text_equal(ValT const &val, std::string &sval,
+  bool to_text_equal(value_format_ostream_t test_vfos,
+                     ValT const &val, std::string &sval,
                      RefT const &ref, std::string &sref) {
-    sval=to_text(val);
+    sval=to_text(test_vfos->fmt_os, val);
     if constexpr (std::is_constructible_v<ValT, RefT>)
-      sref=to_text(ValT(ref));
+      sref=to_text(test_vfos->fmt_os, ValT(ref));
     else
-      sref=to_text(ref);
+      sref=to_text(test_vfos->fmt_os, ref);
+    test_vfos->use_up_one_time_manipulators();
     return are_equal(val, ref);
   }
 
@@ -436,23 +445,28 @@ namespace testudo___implementation {
   bool approx(T1 const &arg1, T2 const &arg2, TE max_error)
     { return (absdiff(arg1, arg2)<=max_error); }
 
-  // check whether a value verifies a predicate
-  template <typename ValT, typename P>
-  bool to_text_verify(ValT const &val, std::string &sval,
-                      P const &p) {
-    sval=to_text(val);
-    return p(val);
-  }
-
   // check whether two values are closer than a tolerance, and convert them to
   // text (in the "string &" arguments)
   template <typename ValT, typename RefT>
-  bool to_text_approx(ValT const &val, std::string &sval,
+  bool to_text_approx(value_format_ostream_t test_vfos,
+                      ValT const &val, std::string &sval,
                       RefT const &ref, std::string &sref,
                       double max_error) {
-    sval=to_text(val);
-    sref=to_text(ref);
+    sval=to_text(test_vfos->fmt_os, val);
+    sref=to_text(test_vfos->fmt_os, ref);
+    test_vfos->use_up_one_time_manipulators();
     return approx(val, ref, max_error);
+  }
+
+  // check whether a value verifies a predicate and convert it to text (in the
+  // "string &" argument)
+  template <typename ValT, typename P>
+  bool to_text_verify(value_format_ostream_t test_vfos,
+                      ValT const &val, std::string &sval,
+                      P const &p) {
+    sval=to_text(test_vfos->fmt_os, val);
+    test_vfos->use_up_one_time_manipulators();
+    return p(val);
   }
 
   // the following is a way to run several instructions while making them
@@ -472,9 +486,10 @@ namespace testudo___implementation {
   // one argument only, that argument would be "pair<int" in that case)
 
   // the following instruction macros assume there is a "TestFormat" called
-  // "test_format"; for the macros "check()_approx()", there must be a double
-  // called "approx_epsilon", which will be used in lieu of the argument to
-  // "_tol" in "check()_approx()_tol()"
+  // "test_format", and an ostringstream called "test_vfos" that's used for
+  // textual representation of values; for the macros "check()_approx()", there
+  // must be a double called "approx_epsilon", which will be used in lieu of
+  // the argument to "_tol" in "check()_approx()_tol()"
 
   // we're gonna rename all macros for different styles, so the renamed macros
   // will expand arguments that are macros; in most instances, that's not what
@@ -500,6 +515,34 @@ namespace testudo___implementation {
     testudo___SET_LOCATION loc;                                         \
     test_management.format->output_separator();                         \
   testudo___END_GROUP
+
+  struct IndentMarker {
+    IndentMarker(test_format_p test_format)
+      : test_format(test_format)
+      { test_format->output_begin_indent(); }
+    ~IndentMarker()
+      { test_format->output_end_indent(); }
+  private:
+    test_format_p const test_format;
+  };
+
+  struct AtDestructionBeginIndent {
+    AtDestructionBeginIndent(test_format_p test_format)
+      : test_format(test_format) { }
+    ~AtDestructionBeginIndent()
+      { test_format->output_begin_indent(); }
+  private:
+    test_format_p const test_format;
+  };
+
+  struct AtDestructionEndIndent {
+    AtDestructionEndIndent(test_format_p test_format)
+      : test_format(test_format) { }
+    ~AtDestructionEndIndent()
+      { test_format->output_end_indent(); }
+  private:
+    test_format_p const test_format;
+  };
 
   struct ScopeMarker {
     ScopeMarker(test_format_p test_format, std::string name_="")
@@ -545,7 +588,7 @@ namespace testudo___implementation {
   // record an action, but don't do it (useful in some cases where, for some
   // compilation options, the usual action must be replaced with something
   // else)
-#define testudo__FAKE_PERFORM(s, ...)                                   \
+#define testudo__FAKE_PERFORM_L_S(loc, s, ...)                          \
   testudo___BEGIN_GROUP                                                 \
     testudo___SET_LOCATION loc;                                         \
     test_management.format->output_perform(s);                          \
@@ -609,48 +652,44 @@ namespace testudo___implementation {
       testudo___NO_SQUARE_BRACKETS_IF_NOT_B_,                           \
       testudo___IF_BRACKETS_B __VA_ARGS__))(__VA_ARGS__)
 
-  template <typename... T>
-  std::string to_text_brackets(T const &... t) {
-    std::list<std::string> tts;
-    (tts.push_back(to_text(t)), ...);
-    std::string result;
-    bool first=true;
-    for (auto t: tts) {
-      result+=(first ? "" : ", ")+t;
-      first=false;
-    }
-    return "("+result+")";
+
+  inline auto to_text_bind(std::ostream &fmt_os) {
+    return [&fmt_os](auto const &t) { return to_text(fmt_os, t); };
+  }
+  inline auto to_text_brackets_bind(std::ostream &fmt_os) {
+    return
+      [&fmt_os](auto const &...t) { return to_text_brackets(fmt_os, t...); };
   }
 
-#define testudo___TO_TEXT_BRACKETS_IF_B_B to_text_brackets
+#define testudo___TO_TEXT_BRACKETS_IF_B_B to_text_brackets_bind
 #define testudo___TO_TEXT_BRACKETS_IF_B_testudo___IF_BRACKETS_B         \
-  to_text,
+  to_text_bind,
 #define testudo___TO_TEXT_TUPLE_IF_BRACKETS(...)                        \
-  testudo___EXPAND_ARG1(                                                \
-    testudo___CAT(                                                      \
-      testudo___TO_TEXT_BRACKETS_IF_B_,                                 \
-      testudo___IF_BRACKETS_B __VA_ARGS__))
+    testudo___EXPAND_ARG1(                                              \
+      testudo___CAT(                                                    \
+        testudo___TO_TEXT_BRACKETS_IF_B_,                               \
+        testudo___IF_BRACKETS_B __VA_ARGS__))
 
 #define testudo__WITH_MULTILINE_DATA_L_S(loc, s, n, ...)                \
   testudo___WITH_DATA_L_S_IMPL(                                         \
     loc, testudo___implementation::break_multiline_data(s), n,          \
     testudo___ADD_BRACKETS_IF_NEEDED(n),                                \
     (testudo___REPLACE_BRACKETS_WITH_SQUARE_BRACKETS(n)),               \
-    testudo___TO_TEXT_TUPLE_IF_BRACKETS(n),                             \
+    testudo___implementation::testudo___TO_TEXT_TUPLE_IF_BRACKETS(n),   \
     __VA_ARGS__)
 #define testudo__WITH_DATA_L_S(loc, s, n, ...)                          \
   testudo___WITH_DATA_L_S_IMPL(                                         \
     loc, testudo___implementation::break_data(s), n,                    \
     testudo___ADD_BRACKETS_IF_NEEDED(n),                                \
     (testudo___REPLACE_BRACKETS_WITH_SQUARE_BRACKETS(n)),               \
-    testudo___TO_TEXT_TUPLE_IF_BRACKETS(n),                             \
-    __VA_ARGS__)
+    testudo___implementation::testudo___TO_TEXT_TUPLE_IF_BRACKETS(n),   \
+      __VA_ARGS__)
 #define testudo___WITH_DATA_L_S_IMPL(                                   \
-    loc, s, n, n_b, n_sb, to_text, ...)                                 \
+    loc, s, n, n_b, n_sb, to_text_bind, ...)                            \
   testudo___WITH_DATA_L_S_IMPL_IMPL(                                    \
-    loc, s, n, n_b, n_sb, to_text, __VA_ARGS__)
+    loc, s, n, n_b, n_sb, to_text_bind, __VA_ARGS__)
 #define testudo___WITH_DATA_L_S_IMPL_IMPL(                              \
-    loc, s, n, n_b, n_sb, to_text, ...)                                 \
+    loc, s, n, n_b, n_sb, to_text_bind, ...)                            \
   testudo___INSERT_ACTION(testudo___SET_LOCATION loc)                   \
   testudo___INSERT_DECLARATION(                                         \
     auto testudo___container=                                           \
@@ -669,7 +708,7 @@ namespace testudo___implementation {
             test_management.format,                                     \
             testudo___with_log,                                         \
             testudo___container_i==testudo___container.size()-1,        \
-            #n, testudo___implementation::to_text n_b,                  \
+            #n, to_text_bind(test_management.test_vfos->fmt_os) n_b,    \
             s)})                                                        \
       testudo___INSERT_ACTION(++testudo___container_i)
 
@@ -686,24 +725,28 @@ namespace testudo___implementation {
     try {                                                               \
       __VA_ARGS__;                                                      \
       test_management.format->output_catch(                             \
-        "", "<no exception>", "false", false);                          \
+        "", "<no exception>",                                           \
+        testudo___implementation::false_tag, false);                    \
       test_management.stats+=                                           \
-        testudo___implementation::CheckResult(false);                   \
+        testudo___implementation::check_result(false);                  \
     }
 #define testudo__CATCH_S(s, ...)                                        \
     catch (testudo___implementation                                     \
            ::default_to_exception_t<__VA_ARGS__> const &e) {            \
       test_management.format->output_catch(                             \
-        s, testudo___implementation::exception_to_text(e),              \
-        "true", false);                                                 \
+        s,                                                              \
+        testudo___implementation                                        \
+          ::exception_to_text(test_management.test_vfos->fmt_os, e),    \
+        testudo___implementation::true_tag, false);                     \
       test_management.stats+=                                           \
-        testudo___implementation::CheckResult(true);                    \
+        testudo___implementation::check_result(true);                   \
     }                                                                   \
     catch (...) {                                                       \
       test_management.format->output_catch(                             \
-        s, "<unexpected exception>", "false", false);                   \
+        s, "<unexpected exception>",                                    \
+        testudo___implementation::false_tag, false);                    \
       test_management.stats+=                                           \
-        testudo___implementation::CheckResult(false);                   \
+        testudo___implementation::check_result(false);                  \
       throw;                                                            \
     }                                                                   \
   testudo___END_GROUP
@@ -713,7 +756,9 @@ namespace testudo___implementation {
   testudo___BEGIN_GROUP                                                 \
     testudo___SET_LOCATION loc;                                         \
     test_management.format->output_show_value(                          \
-      s, testudo::to_text(__VA_ARGS__));                                \
+      s,                                                                \
+      testudo___implementation::to_text_show_value(                     \
+        test_management.test_vfos,__VA_ARGS__));                        \
   testudo___END_GROUP
 
   // print "begin scope", and automatically print "end scope" at the end of the
@@ -722,7 +767,7 @@ namespace testudo___implementation {
 #define testudo__IN_SCOPE_L(loc, ...)                                   \
   testudo___INSERT_ACTION(testudo___SET_LOCATION loc)                   \
   testudo___INSERT_DECLARATION(                                         \
-    testudo___implementation::ScopeMarker testudo_scope_marker(         \
+    testudo___implementation::ScopeMarker testudo___scope_marker(       \
       test_management.format, std::string(__VA_ARGS__)))
 
   // record a scoped declaration
@@ -730,7 +775,7 @@ namespace testudo___implementation {
   testudo___INSERT_ACTION(testudo___SET_LOCATION loc)                   \
   testudo___INSERT_DECLARATION(                                         \
     testudo___implementation::DeclareScopeMarker                        \
-      testudo_declare_scope_marker(                                     \
+      testudo___declare_scope_marker(                                   \
         test_management.format, s))                                     \
   testudo___INSERT_DECLARATION(__VA_ARGS__)
 
@@ -749,7 +794,7 @@ namespace testudo___implementation {
                        approx_epsilon=__VA_ARGS__)
   // show the tolerance for "check()_approx()"
 #define testudo__SHOW_APPROX_EPSILON_L(loc)                             \
-  testudo__SHOW_VALUE_S("approx_epsilon", approx_epsilon)
+  testudo__SHOW_VALUE_L_S(loc, "approx_epsilon", approx_epsilon)
 
   /// multi-macro checking instructions
 
@@ -764,16 +809,19 @@ namespace testudo___implementation {
   // the special object isn't used in any way, it is immediately destroyed; the
   // actual check is done in the object's destructor
 
+  // the support for "provided(expression) { ... }" is similar, but takes the
+  // form of an "if" statement to be followed by the provided-protected code
+
   // hold a value as a copy if it's an rvalue, or else as a reference
   template <typename T>
   class HoldValue {
   public:
     HoldValue(T &&t) // rvalue: hold a copy
-      : value_p(std::make_shared<T>(std::move(t))), value(*value_p) { }
+      : value_p(std::make_unique<T>(std::move(t))), value(*value_p) { }
     HoldValue(T const &t) // otherwise, point a reference
       : value(t) { }
   private:
-    std::shared_ptr<T const> value_p;
+    std::unique_ptr<T const> value_p;
   public:
     T const &value;
   };
@@ -796,29 +844,38 @@ namespace testudo___implementation {
     { using HoldValue<char const *>::HoldValue; };
 
   using truth_f=std::function<bool (bool)>;
-  truth_f const truth=[](bool b) { return b; };
-  truth_f const falsehood=[](bool b) { return not b; };
-  truth_f const always_false=[](bool) { return false; };
+  inline truth_f const affirmation=[](bool b) { return b; };
+  inline truth_f const negation=[](bool b) { return not b; };
+  inline truth_f const always_false=[](bool) { return false; };
+  using check_result_to_text_f=std::function<std::string (bool)>;
+  inline check_result_to_text_f const true_or_false=
+    [](bool b) { return b ? true_tag : false_tag; };
+  inline check_result_to_text_f const true_or_error=
+    [](bool b) { return b ? true_tag : error_tag; };
 
   // special class to hold the argument to "check()"
   template <typename A>
   struct Check {
     test_management_t const test_management;
-    HoldValue<A> const a;
     bool const is_a_valid;
+    HoldValue<A> const a;
     std::string const sa;
+    check_result_to_text_f const check_result_to_text;
 
     template <typename AA>
-    Check(test_management_t test_management, AA &&a, std::string sa)
+    Check(test_management_t test_management, AA &&a, std::string sa,
+          bool error_if_fail=false)
       : test_management(test_management),
-        a(std::forward<AA>(a)), is_a_valid(is_valid(a)), sa(sa) { }
+        is_a_valid(is_valid(a)), a(std::forward<AA>(a)), sa(sa),
+        check_result_to_text(error_if_fail ? true_or_error : true_or_false) { }
 
     template <typename Cont>
-    auto check_cont(Cont &&cont) const
-      { return cont.check(*this, is_a_valid ? truth : always_false, ""); }
+    auto check_cont(Cont &&cont) const {
+      return cont.check(*this, is_a_valid ? affirmation : always_false, "");
+    }
     template <typename Cont>
     auto check_cont_inverse(Cont &&cont) const {
-      return cont.check(*this, is_a_valid ? falsehood : always_false, "nay");
+      return cont.check(*this, is_a_valid ? negation : always_false, "nay");
     }
 
     template <typename P>
@@ -841,8 +898,11 @@ namespace testudo___implementation {
   // with immediate lambda evaluations); the constructor of "Check<A>" is again
   // templatised, to have a universal reference on the "A" parameter
   template <typename A>
-  auto make_check(test_management_t test_management, A &&a, std::string sa)
-    { return Check<std::decay_t<A>>(test_management, std::forward<A>(a), sa); }
+  auto make_check(test_management_t tm, A &&a, std::string sa)
+    { return Check<std::decay_t<A>>(tm, std::forward<A>(a), sa); }
+  template <typename A>
+  auto make_provided(test_management_t tm, A &&a, std::string sa)
+    { return Check<std::decay_t<A>>(tm, std::forward<A>(a), sa, true); }
 
   struct inverse_t { } constexpr inverse{};
 
@@ -851,74 +911,88 @@ namespace testudo___implementation {
     CheckTrue() { }
 
     template <typename A>
-    void check(Check<A> const &c, truth_f tf, std::string prefix) {
-      bool check_result=tf(c.a.value);
+    bool check(Check<A> const &c, truth_f tf, std::string prefix) {
+      bool result=tf(c.a.value);
+      std::string text_result=c.check_result_to_text(result);
       c.test_management.format
-        ->output_check_true(c.sa, to_text(check_result), prefix, false);
-      c.test_management.stats+=CheckResult(check_result);
+        ->output_check_true(c.sa, text_result, prefix, false);
+      c.test_management.stats+=check_result(text_result);
+      return result;
     }
   };
   // the reason to have a function to construct "CheckTrue()" is for
   // homogeneity with the other checking classes below
   inline auto make_check_true() { return CheckTrue(); }
 
-  inline std::string to_text_multiple()
-    { return ""; }
-  template <typename A>
-  std::string to_text_multiple(A &&a)
-    { return testudo::to_text(a); }
-  template <typename F, typename... R>
-  std::string to_text_multiple(F &&f, R &&... r)
-    { return to_text_multiple(f)+", "+to_text_multiple(r...); }
+  template <typename... T>
+  std::string to_text_multiple(value_format_ostream_t test_vfos,
+                               T &&...t)
+    { return to_text_comma_separated(test_vfos->fmt_os, t...); }
 
   // class to check for trueness, or else, showing given values
   struct CheckTrueFor {
+    value_format_ostream_t const test_vfos;
+    bool const are_v_valid;
     std::string valv, sv;
 
     template <typename... V>
-    CheckTrueFor(std::string sv, V &&...v)
-      : valv(to_text_multiple(v...)), sv(sv) { }
+    CheckTrueFor(value_format_ostream_t test_vfos,
+                 std::string sv, V &&...v)
+      : test_vfos(test_vfos),
+        are_v_valid((... and is_valid(v))),
+        valv(to_text_multiple(test_vfos, std::forward<V>(v)...)), sv(sv) { }
 
     template <typename A>
-    void check(Check<A> const &c, truth_f tf, std::string prefix) {
-      bool check_result=tf(c.a.value);
+    bool check(Check<A> const &c, truth_f tf, std::string prefix) {
+      bool result=are_v_valid and tf(c.a.value);
+      std::string text_result=c.check_result_to_text(result);
       c.test_management.format
-        ->output_check_true_for(c.sa, sv, valv, to_text(check_result),
-                                prefix, false);
-      c.test_management.stats+=CheckResult(check_result);
+        ->output_check_true_for(c.sa, sv, valv, text_result, prefix, false);
+      c.test_management.stats+=check_result(text_result);
+      return result;
     }
   };
   // see "Check" for the reason to have a function to construct this templated
   // class, rather than construct it directly
   template <typename... V>
-  auto make_check_true_for(std::string sv, V &&...v)
-    { return CheckTrueFor(sv, std::forward<V>(v)...); }
+  auto make_check_true_for(value_format_ostream_t test_vfos,
+                           std::string sv, V &&...v)
+    { return CheckTrueFor(test_vfos, sv, std::forward<V>(v)...); }
 
   // class to check for equality
   template <typename B>
   struct CheckEqual {
+    value_format_ostream_t const test_vfos;
+    bool const is_b_valid;
     HoldValue<B> const b;
     std::string const sb;
 
     template <typename BB>
-    CheckEqual(BB &&b, std::string sb)
-      : b(std::forward<BB>(b)), sb(sb) { }
+    CheckEqual(value_format_ostream_t test_vfos,
+               BB &&b, std::string sb)
+      : test_vfos(test_vfos),
+        is_b_valid(is_valid(b)), b(std::forward<BB>(b)), sb(sb) { }
 
     template <typename A>
-    void check(Check<A> const &c, truth_f tf, std::string prefix) {
+    bool check(Check<A> const &c, truth_f tf, std::string prefix) {
       std::string vala, valb;
-      bool check_result=
-        tf(to_text_equal(c.a.value, vala, b.value, valb));
+      bool result=
+        tf(to_text_equal(test_vfos, c.a.value, vala, b.value, valb));
+      std::string text_result=c.check_result_to_text(result);
       c.test_management.format->output_check_equal(
-        c.sa, vala, sb, valb, to_text(check_result), prefix, false);
-      c.test_management.stats+=CheckResult(check_result);
+        c.sa, vala, sb, valb, text_result, prefix, false);
+      c.test_management.stats+=check_result(text_result);
+      return result;
     }
   };
   // see "Check" for the reason to have a function to construct this templated
   // class, rather than construct it directly
   template <typename B>
-  auto make_check_equal(B &&b, std::string sb)
-    { return CheckEqual<std::decay_t<B>>(std::forward<B>(b), sb); }
+  auto make_check_equal(value_format_ostream_t test_vfos,
+                        B &&b, std::string sb) {
+    return CheckEqual<std::decay_t<B>>(test_vfos,
+                                       std::forward<B>(b), sb);
+  }
 
   // special class to check for nearness; on destruction,
   // "CheckApprox<B>::OnDestruction<A>" checks the two expressions have
@@ -926,59 +1000,78 @@ namespace testudo___implementation {
   // output), or to a specified tolerance
   template <typename B>
   struct CheckApprox {
+    value_format_ostream_t const test_vfos;
+    bool const is_b_valid;
     HoldValue<B> const b;
     std::string const sb;
     double const default_tol;
     std::string const default_stol;
 
     template <typename BB>
-    CheckApprox(BB &&b, std::string sb,
+    CheckApprox(value_format_ostream_t test_vfos,
+                BB &&b, std::string sb,
                 double default_tol, std::string default_stol)
-      : b(std::forward<BB>(b)), sb(sb),
+      : test_vfos(test_vfos),
+        is_b_valid(is_valid(b)), b(std::forward<BB>(b)), sb(sb),
         default_tol(default_tol), default_stol(default_stol) { }
 
     template <typename A>
-    void check(Check<A> const &c, truth_f tf, std::string prefix) {
+    bool check(Check<A> const &c, truth_f tf, std::string prefix) {
       std::string vala, valb;
       double tol=c.get("tol", default_tol);
       std::string stol=c.get("stol", default_stol);
-      bool check_result=
-        tf(to_text_approx(c.a.value, vala, b.value, valb, tol));
+      bool result=
+        tf(to_text_approx(test_vfos,c.a.value, vala, b.value, valb, tol));
+      std::string text_result=c.check_result_to_text(result);
       c.test_management.format->output_check_approx(
-        c.sa, vala, sb, valb, stol, to_text(check_result), prefix, false);
-      c.test_management.stats+=CheckResult(check_result);
+        c.sa, vala, sb, valb, stol, text_result, prefix, false);
+      c.test_management.stats+=check_result(text_result);
+      return result;
     }
   };
   // see "Check" for the reason to have a function to construct this templated
   // class, rather than construct it directly
   template <typename B>
-  auto make_check_approx(B &&b, std::string sb, double tol, std::string stol)
-    { return CheckApprox<std::decay_t<B>>(std::forward<B>(b), sb, tol, stol); }
+  auto make_check_approx(value_format_ostream_t test_vfos,
+                         B &&b, std::string sb, double tol, std::string stol) {
+    return CheckApprox<std::decay_t<B>>(test_vfos,
+                                        std::forward<B>(b), sb, tol, stol);
+  }
 
   // class to check for predicate-verification
   template <typename B>
   struct CheckVerify {
+    value_format_ostream_t const test_vfos;
+    bool const is_b_valid;
     HoldValue<B> const b;
     std::string const sb;
 
     template <typename BB>
-    CheckVerify(BB &&b, std::string sb)
-      : b(std::forward<BB>(b)), sb(sb) { }
+    CheckVerify(value_format_ostream_t test_vfos,
+                BB &&b, std::string sb)
+      : test_vfos(test_vfos),
+        is_b_valid(is_valid(b)), b(std::forward<BB>(b)), sb(sb) { }
 
     template <typename A>
-    void check(Check<A> const &c, truth_f tf, std::string prefix) {
+    bool check(Check<A> const &c, truth_f tf, std::string prefix) {
       std::string vala;
-      bool check_result=tf(to_text_verify(c.a.value, vala, b.value));
+      bool result=
+        tf(to_text_verify(test_vfos, c.a.value, vala, b.value));
+      std::string text_result=c.check_result_to_text(result);
       c.test_management.format->output_check_verify(
-        c.sa, vala, sb, to_text(check_result), prefix, false);
-      c.test_management.stats+=CheckResult(check_result);
+        c.sa, vala, sb, text_result, prefix, false);
+      c.test_management.stats+=check_result(text_result);
+      return result;
     }
   };
   // see "Check" for the reason to have a function to construct this templated
   // class, rather than construct it directly
   template <typename B>
-  auto make_check_verify(B &&b, std::string sb)
-    { return CheckVerify<std::decay_t<B>>(std::forward<B>(b), sb); }
+  auto make_check_verify(value_format_ostream_t test_vfos,
+                         B &&b, std::string sb) {
+    return CheckVerify<std::decay_t<B>>(test_vfos,
+                                        std::forward<B>(b), sb);
+  }
 
   template <typename T>
   struct testarudo_decay {
@@ -992,63 +1085,82 @@ namespace testudo___implementation {
   using testarudo_decay_t=typename testarudo_decay<std::decay_t<T>>::type;
 
 #define testudo__CHECK_L_S(loc, s, ...)                                 \
-  {                                                                     \
-    testudo___SET_LOCATION loc;                                         \
-    auto testudo___check_value=(__VA_ARGS__);                           \
-    using testudo___check_type [[maybe_unused]]=                        \
-      testudo___implementation::testarudo_decay_t<                      \
-        decltype(testudo___check_value)>;                               \
-    testudo___implementation::make_check(                               \
-      test_management, testudo___check_value, s).
+  (testudo___BEGIN_GROUP                                                \
+     testudo___SET_LOCATION loc;                                        \
+     using testudo___check_type [[maybe_unused]]=                       \
+       testudo___implementation::testarudo_decay_t<                     \
+         decltype(__VA_ARGS__)>;                                        \
+     testudo___implementation::make_check(                              \
+      test_management, __VA_ARGS__, s).
 
+#define testudo__PROVIDED_L_S(loc, s, ...)                              \
+  if (testudo___implementation::AtDestructionEndIndent                  \
+        testudo___at_destruction_end_indent(test_management.format);    \
+      testudo___BEGIN_GROUP                                             \
+        testudo___SET_LOCATION loc;                                     \
+        using testudo___check_type [[maybe_unused]]=                    \
+          testudo___implementation::testarudo_decay_t<                  \
+            decltype(__VA_ARGS__)>;                                     \
+        testudo___implementation::AtDestructionBeginIndent              \
+        testudo___at_destruction_begin_indent(test_management.format);  \
+        return testudo___implementation::make_provided(                 \
+          test_management, __VA_ARGS__, s).
 
 #define testudo__EQUAL_S(s, ...)                                        \
     check_cont(testudo___implementation::make_check_equal(              \
+                 test_management.test_vfos,                             \
                  testudo___check_type(__VA_ARGS__), s));                \
-  } testudo___DECL_EAT_A_SEMICOLON
+  testudo___END_GROUP)
 #define testudo__NOT_EQUAL_S(s, ...)                                    \
     check_cont_inverse(testudo___implementation::make_check_equal(      \
+                         test_management.test_vfos,                     \
                          testudo___check_type(__VA_ARGS__), s));        \
-  } testudo___DECL_EAT_A_SEMICOLON
+  testudo___END_GROUP)
 
 #define testudo__TOL_S(s, ...)                                          \
   set("tol", double(__VA_ARGS__)).set("stol", std::string(s)).
 #define testudo__APPROX_S(s, ...)                                       \
     check_cont(testudo___implementation::make_check_approx(             \
+                 test_management.test_vfos,                             \
                  testudo___check_type(__VA_ARGS__), s,                  \
                  approx_epsilon, "eps"));                               \
-  } testudo___DECL_EAT_A_SEMICOLON
+  testudo___END_GROUP)
 #define testudo__NOT_APPROX_S(s, ...)                                   \
     check_cont_inverse(testudo___implementation::make_check_approx(     \
+                         test_management.test_vfos,                     \
                          testudo___check_type(__VA_ARGS__), s,          \
                          approx_epsilon, "eps"));                       \
-  } testudo___DECL_EAT_A_SEMICOLON
+  testudo___END_GROUP)
 
 #define testudo__TRUE                                                   \
     check_cont(testudo___implementation::make_check_true());            \
-  } testudo___DECL_EAT_A_SEMICOLON
+  testudo___END_GROUP)
 #define testudo__FALSE                                                  \
     check_cont_inverse(testudo___implementation::make_check_true());    \
-  } testudo___DECL_EAT_A_SEMICOLON
+  testudo___END_GROUP)
 
 #define testudo__TRUE_FOR_S(s, ...)                                     \
     check_cont(testudo___implementation::make_check_true_for(           \
+                 test_management.test_vfos,                             \
                  s, __VA_ARGS__));                                      \
-  } testudo___DECL_EAT_A_SEMICOLON
+  testudo___END_GROUP)
 
 #define testudo__FALSE_FOR_S(s, ...)                                    \
     check_cont_inverse(testudo___implementation::make_check_true_for(   \
-                 s, __VA_ARGS__));                                      \
-  } testudo___DECL_EAT_A_SEMICOLON
+                         test_management.test_vfos,                     \
+                         s, __VA_ARGS__));                              \
+  testudo___END_GROUP)
 
 #define testudo__VERIFY_S(s, ...)                                       \
     check_cont(testudo___implementation::make_check_verify(             \
+                 test_management.test_vfos,                             \
                  (__VA_ARGS__), s));                                    \
-  } testudo___DECL_EAT_A_SEMICOLON
+  testudo___END_GROUP)
 #define testudo__NOT_VERIFY_S(s, ...)                                   \
     check_cont_inverse(testudo___implementation::make_check_verify(     \
+                         test_management.test_vfos,                     \
                          (__VA_ARGS__), s));                            \
-  } testudo___DECL_EAT_A_SEMICOLON
+  testudo___END_GROUP)
 
   /// predicates
   template <typename L>
@@ -1094,12 +1206,43 @@ namespace testudo___implementation {
     return result;
   }
 
+  template <typename... F>
+  auto generate_data_tuple(std::size_t size, F const &...f) {
+    std::list<std::tuple<decltype(f())...>> result;
+    for (std::size_t i=0; i<size; ++i)
+      result.emplace_back(f()...);
+    return result;
+  }
+
+  template <typename T>
+  auto cartesian_product(std::list<T> const &tl) {
+    std::list<std::tuple<T>> result;
+    for (auto const &t: tl)
+      result.emplace_back(t);
+    return result;
+  }
+
+  template <typename T, typename U, typename... V>
+  auto cartesian_product(std::list<T> const &tl,
+                         std::list<U> const &ul,
+                         std::list<V> const &...vl) {
+    auto cpuvl=cartesian_product(ul, vl...);
+    std::list<std::tuple<T, U, V...>> result;
+    for (auto const &t: tl)
+      for (auto const &uv: cpuvl)
+        result.emplace_back(std::tuple_cat(std::tuple{t}, uv));
+    return result;
+  }
+
+#define testudo__TFOS                                                   \
+  test_management.test_vfos->fmt_os
+
 }
 
 
 testudo___BRING(TestNode,
                 print_tree,
                 Fixture,
-                generate_data)
+                generate_data, generate_data_tuple, cartesian_product)
 
 #endif

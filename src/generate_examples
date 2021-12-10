@@ -1,0 +1,98 @@
+#!/bin/bash
+
+source=doc_examples.ttd
+dir="$1"
+
+function begin_listing
+{
+    echo '\begin{cpplisting}'
+}
+
+function end_listing
+{
+    echo '\end{cpplisting}'
+}
+
+# when a lc-style keyword begins with '_', we leave a space before the
+# replacement, unless the lc version already had a space; if we don't sort
+# "lc-to-uc" from longer to shorter, shorter strings may replace parts of
+# longer ones:
+lc_to_uc="$(cat lc.tst \
+        | sed -n '/[^ ]/s/^\([^ ]*\) \+\([^ ]*\)/s\/\2\/\1\/g/p' \
+        | sed '/^s\/_/s/s\/\(.*\)\/\(.*\)\/g/s\/ \1\/ \2\/g\ns\/\1\/ \2\/g/' \
+        | awk '{ print length, $0 }' \
+        | sort -nr | cut -d " " -f2-
+    # terrible hack follows: 'are_equal' is transformed to 'are EQUAL'; instead
+    # of solving the real problem, i revert the offending transformation
+    echo 's/are EQUAL/are_equal/g'
+    )
+"
+
+# uncomment the following to peruse the "lc_to_uc" script:
+# echo "$lc_to_uc" > generate_examples_script
+
+for example in $(cat "$source" | sed -n '/^ *\/\/ { /s///p'); do
+    echo $example
+
+    cat "$source" \
+        | sed -n '
+            /^ *\/\/ { '$example' *$/,/^ *\/\/ }/ { # begin-end of example
+                /^\( *\)\/\/ { .*$/{s//\1/;h} # store spaces before begin mark
+                /^ *\/\/ \({\|}\)/d # ignore begin and end marks
+                G # append stored spaces after line...
+                s/^\(.*\)\n\( *\)$/\2\n\1/ # ... and put them before line
+                s/^\( *\)\n\1// # remove as many spaces from line, and the \n...
+                s/^\( *\)\n$// # ... (but empty lines are OK)...
+                s/^.*\n/<INDENTATION ERROR>\n/ # ...or write an error message
+                p
+            }
+        ' | sed '1{/^$/d} # dunno why, i get a newline at the beginning' \
+        > $dir/$example.tex
+
+    (
+        begin_listing
+        cat $dir/$example.tex \
+            | sed -n '
+                /@hide@/!H # store everything in hold space except @hide@ lines
+                ${
+                    g # recover hold space
+                    s/^\n// # remove the spurious \n from the first line append
+                    s/SPACE//g # remove keep-space markers
+                    s/OPSP/ /g # turn "open-style spaces" into spaces
+                    s/CLSP//g # remove "cluttered-style spaces"
+                    p # print the whole pattern space
+                }
+            '
+        end_listing
+    ) > $dir/$example-lc-op.tex
+
+    (
+        begin_listing
+        cat $dir/$example.tex \
+            | sed -n '
+                /@hide@/!H # store everything in hold space except @hide@ lines
+                ${
+                    g # recover hold space
+                    s/^\n// # remove the spurious \n from the first line append
+                    s/{ /{/g
+                    s/\ }/}/g
+                    s/\n *{\n/ {\n/g # get end-line keys on the preceding line
+                    s/ \([-+*/<>]=\) /\1/g
+                    s/ \([-+=%]\)/\1/g
+                    s/\([-+=%]\) /\1/g
+                    s/ \([<>*/]\) /\1/g
+                    s/SPACE//g # remove keep-space markers
+                    s/OPSP//g # remove "open-style spaces"
+                    s/CLSP/ /g # turn "cluttered-style spaces" into spaces
+                    p # print the whole pattern space
+                }
+            ' \
+            | sed 's/\( \/\/ .*\) {$/ {\1/' # correct " // comment { "
+        end_listing
+    ) > $dir/$example-lc-cl.tex
+
+    cat $dir/$example-lc-op.tex | sed "$lc_to_uc" > $dir/$example-uc-op.tex
+    cat $dir/$example-lc-cl.tex | sed "$lc_to_uc" > $dir/$example-uc-cl.tex
+done
+
+date

@@ -64,7 +64,7 @@ namespace kmsxml {
     bool operator==(auto_weak_ptr<T> const &a, auto_weak_ptr<U> const &b)
       { return a.wp.lock()==b.wp.lock(); }
 
-    // the "appending_...()" methods return "this" as a "chaining_ptr_t<>", so
+    // the "append_...()" methods return "this" as a "chaining_ptr_t<>", so
     // that calls can be chained
     template <typename T>
     class chaining_ptr_t {
@@ -192,12 +192,14 @@ namespace kmsxml {
     using node_const_t=structure::auto_weak_ptr<element_t const>;
 
     template <typename... A>
-    static root_t make_root(A &&...a)
-      { return std::shared_ptr<element_t>(new element_t(a...)); }
+    static root_t make_root(A &&...a) {
+      return std::shared_ptr<element_t>(new element_t(std::forward<A>(a)...));
+    }
 
     template <typename... A>
     structure::chaining_ptr_t<element_t> append_attribute(A &&...a) {
-      attributes.push_back(std::make_shared<attribute_t>(a...));
+      attributes.push_back(
+        std::make_shared<attribute_t>(std::forward<A>(a)...));
       return this;
     }
 
@@ -207,8 +209,11 @@ namespace kmsxml {
       return child;
     }
     template <typename... A>
-    node_t add_element(A &&...a)
-      { return adopt_child(std::shared_ptr<element_t>(new element_t(a...))); }
+    node_t add_element(A &&...a) {
+      return
+        adopt_child(
+          std::shared_ptr<element_t>(new element_t(std::forward<A>(a)...)));
+    }
 
     structure::chaining_ptr_t<element_t> append_text(text_t text) {
       contents.push_back(std::make_shared<text_content_t>(text));

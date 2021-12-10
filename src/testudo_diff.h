@@ -394,10 +394,12 @@ namespace testudo___implementation {
         deleted_good,
         deleted_wrong,
         new_good,
-        new_wrong;
+        new_wrong,
+        new_error;
       std::list<std::pair<track_element, track_element>>
         wrong_to_good,
         good_to_wrong,
+        to_error,
         with_data_changed;
     };
 

@@ -30,6 +30,7 @@ SET_APPROX_EPSILON    set_approx_epsilon
 SHOW_APPROX_EPSILON   show_approx_epsilon
 
 CHECK      check
+PROVIDED   provided
 TRUE       _true
 FALSE      _false
 TRUE_FOR   _true_for
@@ -45,6 +46,8 @@ NOT_VERIFY _not_verify
 PREDICATE     predicate
 PREDICATE_A   predicate_a
 PREDICATE_C_A predicate_c_a
+
+TFOS tfos
 
 MOCK_METHOD     mock_method
 WRAP_METHOD     wrap_method

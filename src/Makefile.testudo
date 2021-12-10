@@ -76,7 +76,7 @@ $(EXE): $(OBJDIR)/%: %.cpp $(SHAREDLIBS)
 	@ echo compiling $@
 	@ $(GPP) -Wp,-MMD,$(DEPDIR)/$*.d,-MP,-MT,$@ \
 		$(CFLAGS) $(COMPILEOPTS) \
-		-fPIC $^ -o $@
+		-fPIC $< $(SHAREDLIBS) -o $@
 
 -include $(ALLDEPENDS)
 

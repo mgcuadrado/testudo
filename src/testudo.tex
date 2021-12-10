@@ -21,7 +21,7 @@
 \usepackage[spanish, british]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{amsmath, amssymb, graphicx, wasysym, bm, fancyvrb, soul}
+\usepackage{amsmath, amssymb, graphicx, wasysym, bm, fancyvrb, soul, pdfpages}
 \usepackage[final]{listings}
 \usepackage{tikz, tikzpeople, pgfornament}
 \usetikzlibrary{automata, shapes.symbols, patterns}
@@ -49,8 +49,23 @@
 \newcommand*\closebrace{\}}
 \newcommand*\atsign{@}
 
-\newcommand*{\cpplistingindent}{1.7em}
+\newcommand*{\cpplistingindent}{1.25em}
 \input{keywords.tex}
+
+\providecommand\typesetexample[1]{%
+  \input{examples/#1-lc-cl}%
+  \input{examples/#1-uc-op}%
+}
+
+\providecommand*\styletext{%
+  first in the ``\texttt{lc}'', more cluttered style, then in the
+  ``\texttt{uc}'', more open style}
+
+\providecommand*\openingbracesstyletext{%
+  Incidentally, in the ``\texttt{lc}''-style examples, opening braces don't
+  start a new line, whereas in the ``\texttt{uc}''-style examples they are
+  written on their own line.  This has nothing to do with the style, and you
+  can write opening braces however you want.}
 
 \newcommand*\commonlistinglstset{%
   \lstset{numbers=left,numberstyle=\tiny, stepnumber=1, numbersep=1em,
@@ -115,9 +130,13 @@
 
 \newcommand*\indentitem{\hspace*{1em}}
 
+\providecommand*\styleedition{%
+  ``\texttt{lc}''- and ``\texttt{uc}''-style edition}
+
 \title{\protect\includegraphics[width=\textwidth]%
-  {ascii_logo_colour_cropped.pdf}\\[1em]Testudo,\\an automatic test system\\for
-  \Cpp{} code\\[1em](version \protect\input{version}\unskip)}
+  {ascii_logo_colour_cropped.pdf}\\%[1em]%
+  Testudo,\\an automatic test system\\for \Cpp{} code\\[1em]%
+  \styleedition{}\\[1em](version \protect\input{version}\unskip)}
 
 \author{Miguel González Cuadrado\\\textsf{<mgcuadrado@gmail.com>}}
 
@@ -125,6 +144,66 @@
 \maxtocdepth{subsection}
 
 \begin{document}
+
+% from titlepages.tex
+\newlength{\tpheight}\setlength{\tpheight}{0.9\textheight}
+\newlength{\txtheight}\setlength{\txtheight}{.9\tpheight}
+\newlength{\tpwidth}\setlength{\tpwidth}{0.9\textwidth}
+\newlength{\txtwidth}\setlength{\txtwidth}{0.9\tpwidth}
+\newlength{\drop}
+\newcommand*{\titleGM}{\begingroup% Gentle Madness
+\drop = 0\txtheight
+\vspace*{\baselineskip}
+\vfill
+  \hbox{%
+  \hspace*{0.2\txtwidth}%
+  \rule{1pt}{.9\txtheight}
+  \hspace*{0.05\txtwidth}%
+%\fbox{%
+\parbox[b]{0.75\txtwidth}{
+  \vbox{%
+    \vspace{\drop}
+    \hspace*{-.1\textwidth}%
+    \includegraphics[width=\textwidth]{ascii_logo_colour_cropped.pdf}\\[1em]
+    {\HUGE\bfseries Testudo}\\[2\baselineskip]
+    {\Large\itshape An automatic test system\\[.2\baselineskip]for
+      \Cpp{} code}\\[.5\baselineskip]
+    {\hspace*{.05\txtwidth}\Large\itshape
+      \protect\styleedition}\\[.5\baselineskip]
+    {\hspace*{.05\txtwidth}\Large\itshape
+      version \protect\input{version}}\\[3\baselineskip]
+    {\Large
+      Miguel González Cuadrado\\[.5\baselineskip]<mgcuadrado@gmail.com>}\par
+    \vspace{0.47\txtheight}
+    {\noindent
+      % \hspace{-.5em}\raisebox{-1em}{\includegraphics[height=5em]{chc-cropped}}%
+      \hspace{-.3em}The $\chi$ Press}\\[\baselineskip]
+    }% end of vbox
+}% end of parbox
+%}% end of fbox
+  }% end of hbox
+\vfill
+\null
+\endgroup}
+
+\titleGM
+
+\thispagestyle{empty}
+
+\clearpage
+
+\vspace*{\fill}
+% \hspace{-.5em}\raisebox{-1em}{\includegraphics[height=5em]{chcs}}%
+% \hspace{-.3em}The $\chi$ Press
+
+\vspace{.2\textheight}
+\begin{small}
+\input{copyright.txt}
+\end{small}
+
+\thispagestyle{empty}
+
+\cleardoublepage
 
 \frontmatter
 
@@ -279,7 +358,7 @@ In the report, you'll see different colours for different elements:
 \label{sec:development-workflow-with-testudo}
 
 Testudo can be used with any workflow, with any testing philosophy.  You can
-use it
+use~it
 \begin{itemize}
 \item for test-driven development;
 \item to translate requirements into tests;
@@ -296,7 +375,7 @@ This is how you can use Testudo to improve your development workflow:
   \textsc{tdd} and extreme programming), at the same time as the code, or after
   the code (for refactoring, for instance);
 \item use Testudo to run the tests often; integrate test running into your
-  development cycle and discipline; for instance, you can institude a rule that
+  development cycle and discipline; for instance, you can institute a rule that
   every commit must leave the code with no failed checks or errors; or, if you
   have turned your requirements into tests, your rule can be about never
   introducing regressions;
@@ -387,6 +466,18 @@ This is how you can use Testudo to improve your development workflow:
   progress tracking also informs your changes to your code and tests.
 \end{itemize}
 
+\cleartoevenpage
+
+\addcontentsline{toc}{chapter}{The race}
+
+\newlength\pdfpagehoroffset
+\setlength\pdfpagehoroffset{\spinemargin}
+\addtolength\pdfpagehoroffset{.5\textwidth}
+\addtolength\pdfpagehoroffset{-.5\paperwidth}
+
+\includepdf[pages=-, pagecommand={}, offset=\pdfpagehoroffset{} 0mm]{the_race}
+
+
 \mainmatter
 
 
@@ -456,39 +547,34 @@ each test step.
 All test instructions described in this section are implemented as \Cpp{}
 macros.  You can choose among different styles for the macro names, or even
 rename them altogether to your liking
-(see~\Sref{cha:using-your-own-test-macro-names}).
-Out-of-the-box, the available styles are:
+(see~\Sref{cha:using-your-own-test-macro-names}).  You can even mix different
+styles in the same file.  Out-of-the-box, the available styles are:
 \begin{itemize}
 \item ``\texttt{lc}'' (lowercase), where all macro names are in lowercase, and
   continuing macros have a leading underscore, so that they can be stuck to the
-  preceding expression nicely; this style is easy on the eyes, but may be too
-  cluttered for some people; here's an example:
-\begin{cpplisting}
-declare(int a=7); // declare a variable
-check(a+2)_equal(9); // check for equality
-\end{cpplisting}
+  preceding expression nicely (but you can separate them if you want); this
+  style is easy on the eyes, but may be too cluttered for some people; here's
+  an example:
+  \input{examples/styles-lc-cl.tex}
 
 \item ``\texttt{uc}'' (uppercase), where all macro names are in uppercase, and
-  continuing macros are expected to be separated from the preceding expression
-  by a space; this style shows clearly the parts of check instructions, but may
-  be excessively macroish; here's the same example as for ``\texttt{lc}'', but
-  in ``\texttt{uc}'' style:
-\begin{cpplisting}
-DECLARE(int a = 7); // declare a variable
-CHECK(a + 2) EQUAL(9); // check for equality
-\end{cpplisting}
+  continuing macros are designed (but not required) to be separated from the
+  preceding expression by a space; this style shows clearly the parts of check
+  instructions, but may be excessively macroish; here's the same example as for
+  ``\texttt{lc}'', but in ``\texttt{uc}'' style:
+  \input{examples/styles-uc-op.tex}
 \end{itemize}
 
-See~\tref{tab:style-table} for a list of all macro syntax names, with their
-macro name in the ``\texttt{lc}'' and ``\texttt{uc}'' styles.
+See~\tref{tab:testudo-style-table} for a list of all macro syntax names, with
+their macro name in the ``\texttt{lc}'' and ``\texttt{uc}'' styles.
 
 \begin{table}
   \centering
   \begin{footnotesize}
     \input{style_table.tex}
   \end{footnotesize}
-  \caption{Macro names in the default styles}
-  \label{tab:style-table}
+  \caption{Testudo macro names in the default styles}
+  \label{tab:testudo-style-table}
 \end{table}
 
 Whatever the style you choose, your editor may help you writing and reading
@@ -497,8 +583,7 @@ see~\Sref{cha:editor-configuration} for details.
 
 In the following sections, matching ``\texttt{lc}'' and ``\texttt{uc}'' test
 instruction names are shown in the subsection titles, and all examples are
-given first in the ``\texttt{lc}'', cluttered style, then in the
-``\texttt{uc}'', open style.
+given \styletext{}.  \openingbracesstyletext{}
 
 
 \chapter{How to use Testudo}
@@ -522,13 +607,7 @@ is done automatically if you use ``\texttt{make}'').  Finally, include the
 generated header file in your \Cpp{} test source file.  For instance, if you
 want to use the default upper-case macro style, do
 \begin{cpplisting}
-#include "testudo_uc"
-\end{cpplisting}
-
-Additionally, if you require support for \textsc{stl} types, include
-``\texttt{testudo\_ext.h}'':
-\begin{cpplisting}
-#include "testudo_ext.h"
+#include <testudo/testudo_uc>
 \end{cpplisting}
 
 You can give your \Cpp{} test source file any extension, but if you give it the
@@ -552,39 +631,58 @@ differences and progress and measured with respect to the baseline.  When using
 a version control system, you must add the saved report and track, and commit
 them with their matching version of the code and test code.
 
-Here are the available ``\texttt{make}'' commands:
-\begin{itemize}
-\item \texttt{make show\_report}: runs the tests and shows a colour text report;
-\item \texttt{make show\_sync\_report}: runs the tests and shows a colour text
-  report, but bypassing \textsc{xml} generation; this is useful if your code is
-  crashing (see~\Sref{cha:test-output-formats});
-\item \texttt{make summary\_report}: runs the tests and shows a test summary;
-\item \texttt{make view\_report}: runs the tests and shows a colour text report
-  using the ``\texttt{less}'' text viewer;
-\item \texttt{make diff\_report}: shows the (plain Unix) ``\texttt{diff}''
-  between the baseline and the current report; this is useful if you want to
-  see just the new tests you've coded, and how they affect the tallies;
-\item \texttt{make diff\_report\_bw}: same as the previous one, but with no
-  colour codes; this is useful when you're using a terminal or terminal
-  emulator that doesn't support colours (e.g., if you're using Emacs'
-  ``\texttt{compile}'' command);
-\item \texttt{make save\_report}: runs the tests and saves the current report
-  as a baseline for ``\texttt{make diff\_test}'' and similar commands;
-\item \texttt{make track\_progress}: shows the tracked progress with respect to
-  the baseline;
-\item \texttt{make track\_progress\_bw}: same as the previous one, but with no
-  colour codes;
-\item \texttt{make save\_track}: runs the tests and saves the current track as
-  a baseline for ``\texttt{make track\_progress}'';
-\item \texttt{make diff\_track}: runs ``\texttt{make diff\_report}''
-  unconditionally followed by ``\texttt{make track\_progress}'';
-\item \texttt{make diff\_track\_bw}: same as the previous one, but with no
-  colour codes;
-\item \texttt{make save\_test}: runs ``\texttt{make save\_report}'' and
-  ``\texttt{make save\_track}''.
-\end{itemize}
+\begin{table}
+  \centering
+  \begin{tabularx}{\linewidth}{lX}
+    \toprule
+    \emph{``\texttt{make}'' target} & \emph{effect} \\
+    \midrule
+    \texttt{show\_report}
+      & runs the tests and shows a colour text report \\
+    \texttt{show\_report\_bw}
+      & same as the previous one, but with no colour codes; this is useful
+        when you're using a terminal or terminal emulator that doesn't support
+        colours (e.g., if you're using Emacs' ``\texttt{compile}'' command) \\
+    \texttt{show\_sync\_report}
+      & runs the tests and shows a colour text report, but bypassing
+        \textsc{xml} generation; this is useful if your code is crashing
+        (see~\Sref{cha:test-output-formats}) \\
+    \texttt{summary\_report}
+      & runs the tests and shows a test summary \\
+    \texttt{view\_report}
+      & runs the tests and shows a colour text report using the
+        ``\texttt{less}'' text viewer \\
+    \texttt{diff\_report}
+      & shows the (plain Unix) ``\texttt{diff}'' between the baseline and the
+        current report; this is useful if you want to see just the new tests
+        you've coded, and how they affect the tallies \\
+    \texttt{diff\_report\_bw}
+      & same as the previous one, but with no colour codes \\
+    \texttt{save\_report}
+      & runs the tests and saves the current report as a baseline for
+        ``\texttt{diff\_test}'' and similar targets \\
+    \texttt{track\_progress}
+      & shows the tracked progress with respect to the baseline \\
+    \texttt{track\_progress\_bw}
+      & same as the previous one, but with no colour codes \\
+    \texttt{save\_track}
+      & runs the tests and saves the current track as a baseline for
+        ``\texttt{track\_progress}'' \\
+    \texttt{diff\_track}
+      & runs ``\texttt{diff\_report}'' unconditionally followed by
+        ``\texttt{track\_progress}'' \\
+    \texttt{diff\_track\_bw}
+      & same as the previous one, but with no colour codes \\
+    \texttt{save\_test}
+      & runs ``\texttt{save\_report}'' and ``\texttt{save\_track}'' \\
+    \bottomrule
+  \end{tabularx}
+  \caption{``\texttt{make}'' commands}
+  \label{tab:make-commands}
+\end{table}
 
-In most cases, you can do with only
+\tref{tab:make-commands} shows the available ``\texttt{make}'' commands.  In
+most cases, you can do with only
 \begin{itemize}
 \item \texttt{make diff\_track};
 \item \texttt{make diff\_track\_bw};
@@ -677,15 +775,8 @@ a test node is an arbitrary string.
 
 When you define a test node or a test, you give its name and title in a
 comma-separated parenthesised group:
-\begin{cpplisting}
-define_test_node(tricorder,
-                 (medical, "medical capabilities"));
-\end{cpplisting}
 
-\begin{cpplisting}
-DEFINE_TEST_NODE(tricorder,
-                 (medical, "medical capabilities"));
-\end{cpplisting}
+\typesetexample{define-test-node}
 
 The name allows you to refer to the test node or test later in the same
 translation unit, as a parent to another test node or test.  If you aren't
@@ -693,19 +784,8 @@ going to refer to the test node or test (which is the most common case for
 tests\footnote{The most usual way of structuring test nodes and tests is to
   have tests as leaves, and test nodes as non-leaves.}), you can choose to
 mention only the title, with no parentheses:
-\begin{cpplisting}
-define_test(medical, "switch on after") {
-  ...
-}
-\end{cpplisting}
 
-\begin{cpplisting}
-DEFINE_TEST(medical, "switch on after")
-{
-  ...
-}
-\end{cpplisting}
-
+\typesetexample{define-test-ellipses}
 
 \section{Non-top test nodes}
 \label{sec:non-top-test-nodes}
@@ -721,15 +801,8 @@ order in the code, so no priority is specified.
 So, for instance, if you have already defined a test node called
 ``\texttt{tricorder}'', here's how to define a child test node called
 ``\texttt{medical}'', with the title ``medical capabilities'':
-\begin{cpplisting}
-define_test_node(tricorder,
-                 (medical, "medical capabilities"));
-\end{cpplisting}
 
-\begin{cpplisting}
-DEFINE_TEST_NODE(tricorder,
-                 (medical, "medical capabilities"));
-\end{cpplisting}
+\typesetexample{define-test-node}
 
 For a test (a test node with a test function), the syntax includes the
 definition of the test function itself, as if it were a regular \Cpp{}
@@ -739,24 +812,8 @@ you have already defined a test node called ``\texttt{medical}'', here's how to
 define an unnamed child test called titled ``switch on after creation'', that
 checks a tricorder medical sub-unit is off upon creation of the tricorder, and
 switches on appropriately:
-\begin{cpplisting}
-define_test(medical, "switch on after creation") {
-  declare(Tricorder t); // see~\Sref{cha:test-steps} for the test steps syntax
-  check(not t.medical.is_on())_true;
-  perform(t.medical.push_on_button());
-  check(t.medical.is_on())_true;
-}
-\end{cpplisting}
 
-\begin{cpplisting}
-DEFINE_TEST(medical, "switch on after creation")
-{
-  DECLARE(Tricorder t); // see~\Sref{cha:test-steps} for the test steps syntax
-  CHECK(not t.medical.is_on()) TRUE;
-  PERFORM(t.medical.push_on_button());
-  CHECK(t.medical.is_on()) TRUE;
-}
-\end{cpplisting}
+\typesetexample{define-test-full}
 
 \section{Top test nodes}
 \label{sec:top-test-nodes}
@@ -774,43 +831,14 @@ unit, for clarity.
 
 Here's how to define a top test node called ``\texttt{flux\_capacitor}'', child
 to a test node whose full name is ``\texttt{outatime.delorean}'':
-\begin{cpplisting}
-define_top_test_node("outatime.delorean", // parent full name
-                     (flux_capacitor, // name
-                      "flux capacitor features"), // title
-                     200); // priority
-\end{cpplisting}
 
-\begin{cpplisting}
-DEFINE_TOP_TEST_NODE("outatime.delorean", // parent full name
-                     (flux_capacitor, // name
-                      "flux capacitor features"), // title
-                     200); // priority
-\end{cpplisting}
+\typesetexample{top-test-node}
 
 You can also define a top test (a top test node with a test function).  So,
 here's how to define a test titled ``doors closed after constructions'', child
 to a test node whole full name is ``\texttt{outatime.delorean}'':
-\begin{cpplisting}
-define_top_test("outatime.delorean", // parent full name
-                "doors closed after construction", // title
-                150) { // priority
-  declare(Delorean d);
-  check(not d.left_door.is_open())_true;
-  check(not d.right_door.is_open())_true;
-}
-\end{cpplisting}
 
-\begin{cpplisting}
-DEFINE_TOP_TEST("outatime.delorean", // parent full name
-                "doors closed after construction", // title
-                150) // priority
-{
-  DECLARE(Delorean d);
-  CHECK(not d.left_door.is_open()) TRUE;
-  CHECK(not d.right_door.is_open()) TRUE;
-}
-\end{cpplisting}
+\typesetexample{top-test}
 
 
 \chapter{Test steps}
@@ -869,28 +897,16 @@ std::sort(v.begin(), v.end());
 
 All declarations in a test must be enclosed in a ``declare'' instruction.  They
 will be carried out as written, and written out to the report.
-\begin{cpplisting}
-declare(using namespace std);
-declare(pair<int, double> p={2, 3.5});
-\end{cpplisting}
 
-\begin{cpplisting}
-DECLARE(using namespace std);
-DECLARE(pair<int, double> p = { 2, 3.5 });
-\end{cpplisting}
+\typesetexample{declare}
 
 \subsectiontestudopair{Action}{perform}{PERFORM}
 \label{sec:action}
 
 All non-declaration instructions in a test must be enclosed in a ``perform''
 instruction.  They will be carried out as written, and written to the report.
-\begin{cpplisting}
-perform(p.first+=10);
-\end{cpplisting}
 
-\begin{cpplisting}
-PERFORM(p.first += 10);
-\end{cpplisting}
+\typesetexample{perform}
 
 
 \section{Checks}
@@ -917,6 +933,20 @@ validity in the definition of ``\texttt{operator==()}'', because if you did,
 negated checks (``false'' macro, ``not-equal'' macro, et cetera) on invalid
 values would be successful.
 
+Validity is also checked for other expressions known to the check syntax:
+\begin{itemize}
+\item the argument to the ``true'' and ``false'' syntaxes
+  (\Sref{sec:check-expression-true}, \Sref{sec:check-expression-false});
+\item the argument to the ``approx'' and ``not-approx'' syntaxes
+  (\Sref{sec:check-expression-near-reference});
+\item the argument to the ``verify'' and ``not-verify'' syntaxes
+  (\Sref{sec:predicate-checks});
+\item the argument to the ``true-for'' and ``false-for'' syntaxes
+  (\Sref{sec:check-expression-true-for},
+  \Sref{sec:check-expression-false-for}).
+\end{itemize}
+For those syntaxes, if the argument is invalid, the check fails no matter what.
+
 \subsectiontestudopair{Check the expression is true}{\_true}{TRUE}
 \label{sec:check-expression-true}
 
@@ -925,34 +955,24 @@ macro to the ``check'' instruction: the expression is converted to
 ``\texttt{bool}'', and the test check is successful if and only if the
 resulting bool is true.
 
-\begin{cpplisting}
-check(dispersion_rate<(1./accuracy))_true;
-\end{cpplisting}
-
-\begin{cpplisting}
-CHECK(dispersion_rate < (1. / accuracy)) TRUE;
-\end{cpplisting}
+\typesetexample{check-true}
 
 See~\Sref{sec:check-expression-true-for} for an alternative version that can
 show you what the involved values were for a failed ``true'' check.
 
 \subsectiontestudopair{Check the expression is false}{\_false}{FALSE}
-\label{sec:check-expression-true}
+\label{sec:check-expression-false}
 
 The opposite of the ``true'' macro is the ``false'' macro.  With the ``false''
 macro, the test output marks this check with the word ``nay''\footnote{I've
   chosen the word ``nay'' rather than the word ``not'' to avid confusion:
   imagine seeing a check for ``\texttt{not a and b}'', which should be
   equivalent to ``\texttt{(not a) and b}'' rather than ``\texttt{not (a and
-    b)}''.  No such confusion with ``\texttt{nay a and b}''.}.
+    b)}''.  No such confusion with ``\texttt{nay a and b}''.}.  This will be
+true of all the other negating checks explained below (``not-equal'',
+``not-approx'', ``not-verify'', and ``false-for'').
 
-\begin{cpplisting}
-check(dispersion_rate<(1./accuracy))_false;
-\end{cpplisting}
-
-\begin{cpplisting}
-CHECK(dispersion_rate < (1. / accuracy)) FALSE;
-\end{cpplisting}
+\typesetexample{check-false}
 
 See~\Sref{sec:check-expression-false-for} for an alternative version that can
 show you what the involved values were for a failed ``false'' check.
@@ -967,35 +987,20 @@ stating the reference value.  Testudo uses ``\texttt{operator==()}'' to
 compare the two values, and the test check is successful if and only if the
 result of the comparison is true.
 
-\begin{cpplisting}
-check(captain_age)_equal(26+10);
-\end{cpplisting}
-
-\begin{cpplisting}
-CHECK(captain_age) EQUAL(26 + 10);
-\end{cpplisting}
+\typesetexample{check-equal}
 
 The opposite of the ``equal'' macro is the ``not-equal'' macro:
 \begin{center}
   \testudopair{\_not\_equal}{NOT\_EQUAL}
 \end{center}
 
-The expression in the ``equal'' and ``not-equal'' macros is prefixed with the
-type of the expression in the ``check'' instruction, so you can leave out the
-type in many cases that would otherwise require more verboseness.  So, for
-instance, if ``\texttt{inventory}'' has type ``\texttt{map<string, int>}'', the
-following two checks are equivalent:
-\begin{cpplisting}
-check(inventory)
-  _equal(map<string, int>{{"apple", 2}, {"banana", 3}});
-check(inventory)_equal({{"apple", 2}, {"banana", 3}});
-\end{cpplisting}
+The expression in the ``equal'' and ``not-equal'' macros is automatically
+prefixed with the type of the expression in the ``check'' instruction, so you
+can leave out the type in many cases that would otherwise require more
+verboseness.  So, for instance, if ``\texttt{inventory}'' has type
+``\texttt{map<string, int>}'', the following two checks are equivalent:
 
-\begin{cpplisting}
-CHECK(inventory)
-  EQUAL(map<string, int>{ { "apple", 2 }, { "banana", 3 } });
-CHECK(inventory) EQUAL({ { "apple", 2 }, { "banana", 3 } });
-\end{cpplisting}
+\typesetexample{check-equal-automatic-type}
 
 
 \subsectiontestudopair{Check the expression is near a reference}%
@@ -1004,23 +1009,17 @@ CHECK(inventory) EQUAL({ { "apple", 2 }, { "banana", 3 } });
 
 For non-discrete types (floating-point, for instance), checking for equality
 isn't useful, as tiny rounding errors would make such a test fail\footnote{In
-  fact, when working with floating-point magnitudes, you should instruct your
-  compiler to treat equality comparisons between floating-point values as
-  errors.}.  What you want instead is to check whether the value of the
-expression is near a reference.  In order to do this, attach the ``approx''
-macro to the ``check'' instruction, giving it an argument stating the reference
-value.  Testudo uses ``\texttt{absdiff()}''
+  fact, when working with floating-point magnitudes, you would be well advised
+  to instruct your compiler to treat equality comparisons between
+  floating-point values as errors.}.  What you want instead is to check whether
+the value of the expression is near a reference.  In order to do this, attach
+the ``approx'' macro to the ``check'' instruction, giving it an argument
+stating the reference value.  Testudo uses ``\texttt{absdiff()}''
 (see~\Sref{sec:difference-between-two-values}) to compute the absolute distance
 between the two values.  The test check is successful if and only if that
 absolute distance is less than a certain tolerance.
 
-\begin{cpplisting}
-check(computed_pi)_approx(2.*asin(1.));
-\end{cpplisting}
-
-\begin{cpplisting}
-CHECK(computed_pi) APPROX(2. * asin(1.));
-\end{cpplisting}
+\typesetexample{check-approx}
 
 The opposite of the ``approx'' macro is the ``not-approx'' macro:
 \begin{center}
@@ -1037,8 +1036,8 @@ The default value for ``\texttt{approx\_epsilon}'' is ``\texttt{1e-6}'' (one
 millionth), but it can be changed and inspected.
 
 Similar to the ``equal'' macro, the expression in the ``approx'' and
-``not-approx'' macros is prefixed with the type of the expression in the
-``check'' instruction.
+``not-approx'' macros is automatically prefixed with the type of the expression
+in the ``check'' instruction.
 
 \subsubsectiontestudopair{Define a value for $\bm{\varepsilon}$}%
   {define\_approx\_epsilon}{DEFINE\_APPROX\_EPSILON}
@@ -1047,13 +1046,7 @@ Similar to the ``equal'' macro, the expression in the ``approx'' and
 In order to define $\varepsilon$ (in a situation where it isn't available), use
 the ``define approx epsilon'' macro with the initial value for $\varepsilon$.
 
-\begin{cpplisting}
-define_approx_epsilon(1e-3); // one thousandth
-\end{cpplisting}
-
-\begin{cpplisting}
-DEFINE_APPROX_EPSILON(1e-3); // one thousandth
-\end{cpplisting}
+\typesetexample{define-approx-epsilon}
 
 \subsubsectiontestudopair{Set the value of $\bm{\varepsilon}$}%
   {set\_approx\_epsilon}{SET\_APPROX\_EPSILON}
@@ -1064,13 +1057,7 @@ its value with the ``set approx epsilon'' macro, giving it the new value.  The
 new value will be used for all subsequent nearness checks, until it is changed
 again.
 
-\begin{cpplisting}
-set_approx_epsilon(1e-3); // one thousandth
-\end{cpplisting}
-
-\begin{cpplisting}
-SET_APPROX_EPSILON(1e-3); // one thousandth
-\end{cpplisting}
+\typesetexample{set-approx-epsilon}
 
 \subsubsectiontestudopair{Show the value of $\bm{\varepsilon}$}%
   {show\_approx\_epsilon}{SHOW\_APPROX\_EPSILON}
@@ -1079,13 +1066,7 @@ SET_APPROX_EPSILON(1e-3); // one thousandth
 You can also show what the value of $\varepsilon$ is in the test report, by
 using the ``show approx epsilon'' macro.
 
-\begin{cpplisting}
-show_approx_epsilon();
-\end{cpplisting}
-
-\begin{cpplisting}
-SHOW_APPROX_EPSILON();
-\end{cpplisting}
+\typesetexample{show-approx-epsilon}
 
 \subsubsectiontestudopair{Set a specific tolerance for nearness}%
   {\_tol}{TOL}
@@ -1095,13 +1076,7 @@ You can also choose to override the default tolerance value for a specific
 check, by attaching the ``tol'' macro with the tolerance value before the
 ``approx'' macro.
 
-\begin{cpplisting}
-check(area)_tol(.1)_approx(3.5); // use one-tenth tolerance just this once
-\end{cpplisting}
-
-\begin{cpplisting}
-CHECK(area) TOL(.1) APPROX(3.5); // use one-tenth tolerance just this once
-\end{cpplisting}
+\typesetexample{check-approx-tol}
 
 
 \subsectiontestudopair{Predicate checks}{\_verify}{VERIFY}
@@ -1109,73 +1084,38 @@ CHECK(area) TOL(.1) APPROX(3.5); // use one-tenth tolerance just this once
 
 The checked value can also be tested with a \emph{predicate}.  In Testudo, a
 predicate is a function object that accepts one argument and returns a
-bool.  A predicate can be constructed using in one of three ways:
+bool.  A predicate can be constructed in one of three ways:
 \begin{itemize}
 \item from a lambda expression: \testudopair{predicate}{PREDICATE}
-\begin{cpplisting}
-declare(auto is_negative=
-        predicate([](int x) { return x<0; }));
-\end{cpplisting}
 
-\begin{cpplisting}
-DECLARE(auto is_negative =
-        PREDICATE([](int x) { return x < 0; }));
-\end{cpplisting}
+  \typesetexample{predicate}
 
 \item from a bool expression:
   \testudopair{predicate\_a}{PREDICATE\_A} (the expression must use the
   parameter name ``\texttt{a}'')
-\begin{cpplisting}
-declare(auto is_even=predicate_a((a%2)==0));
-\end{cpplisting}
 
-\begin{cpplisting}
-DECLARE(auto is_even = PREDICATE_A((a % 2) == 0));
-\end{cpplisting}
+  \typesetexample{predicate-a}
 
 \item from a bool expression with capture:
   \testudopair{predicate\_c\_a}{PREDICATE\_C\_A} (like the previous one, but a
   first parenthesised\footnote{Captures are usually surrounded with square
     brackets, but in this syntax, they must me surrounded by regular brackets.}
   argument gives the list of captures)
-\begin{cpplisting}
-declare(auto is_multiple_of=
-        [](auto n)
-          { return predicate_c_a((n), (a%n)==0); });
-\end{cpplisting}
 
-\begin{cpplisting}
-DECLARE(auto is_multiple_of =
-        [](auto n)
-          { return PREDICATE_C_A((n), (a % n) == 0); });
-\end{cpplisting}
+  \typesetexample{predicate-c-a}
 \end{itemize}
+
 
 Using such predicate objects, the ``check-verify'' syntax checks whether the
 checked value verifies the predicate:
-\begin{cpplisting}
-check(number_of_cards)_verify(is_even);
-check(score)_verify(is_multiple_of(5));
-\end{cpplisting}
 
-\begin{cpplisting}
-CHECK(number_of_cards) VERIFY(is_even);
-CHECK(score) VERIFY(is_multiple_of(5));
-\end{cpplisting}
+\typesetexample{verify}
 
-Predicates can be combined with the logical operators ``\texttt{not}'',
-``\texttt{and}'', and ``\texttt{or}'':
-\begin{cpplisting}
-check(iterations)
-  _verify(not is_negative
-          and (is_even or is_multiple_of(5)));
-\end{cpplisting}
+Predicates can be combined with the standard \Cpp{} logical operators
+``\texttt{not}'', ``\texttt{and}'', and ``\texttt{or}'' (or their synonyms
+``\texttt{!}'', ``\texttt{\&\&}'', and ``\texttt{||}'' respectively):
 
-\begin{cpplisting}
-CHECK(iterations)
-  VERIFY(not is_negative
-         and (is_even or is_multiple_of(5)));
-\end{cpplisting}
+\typesetexample{verify-logical-ops}
 
 The ``check-verify'' syntax, when it is the natural means of expression for a
 check, is superior to the ``check-true'' syntax because
@@ -1204,13 +1144,7 @@ The ``check-true-for'' syntax works like ``check-true'', but you specify in
 parentheses a set of expressions whose values you'd like to see if the check
 fails.
 
-\begin{cpplisting}
-check(a+b<c)_true_for(a, b, c);
-\end{cpplisting}
-
-\begin{cpplisting}
-CHECK(a+b<c) TRUE_FOR(a, b, c);
-\end{cpplisting}
+\typesetexample{check-true-for}
 
 \subsectiontestudopair{Check the expression is false for certain values}%
 {\_false\_for}{FALSE\_FOR}
@@ -1218,13 +1152,7 @@ CHECK(a+b<c) TRUE_FOR(a, b, c);
 
 The opposite of the ``true-for'' macro is the ``false-for'' macro.
 
-\begin{cpplisting}
-check(a+b<c)_false_for(a, b, c);
-\end{cpplisting}
-
-\begin{cpplisting}
-CHECK(a+b<c) FALSE_FOR(a, b, c);
-\end{cpplisting}
+\typesetexample{check-false-for}
 
 
 \subsectiontestudopair{Exception checks}%
@@ -1241,29 +1169,14 @@ thrown, the test step is failed. If an exception with an unexpected type is
 thrown, the test step is failed, and an unexpected exception error is reported
 (see~\Sref{sec:unexpected-exceptions}).
 
-\begin{cpplisting}
-declare(list<int> numbers);
-check_try(numbers.front())_catch();
-\end{cpplisting}
-
-\begin{cpplisting}
-DECLARE(list<int> numbers);
-CHECK_TRY(numbers.front()) CATCH();
-\end{cpplisting}
+\typesetexample{check-try-catch}
 
 The ``check-try-catch'' instructions expects a exception with a type derived
 from ``\texttt{std::exception}'' by default.  You can change the expected
 exception type by passing it as an argument to the ``catch'' part of the
 instruction:
-\begin{cpplisting}
-declare(my_list<int> numbers);
-check_try(numbers.front())_catch(my_list_exception);
-\end{cpplisting}
 
-\begin{cpplisting}
-DECLARE(my_list<int> numbers);
-CHECK_TRY(numbers.front()) CATCH(my_list_exception);
-\end{cpplisting}
+\typesetexample{check-try-catch-exception}
 
 
 \section{Adding information to the report}
@@ -1285,13 +1198,7 @@ embedded newlines are displayed in a suitable format.
 
 The ``show value'' instruction shows the value of its argument inline.
 
-\begin{cpplisting}
-show_value(helicopter.remaining_fuel());
-\end{cpplisting}
-
-\begin{cpplisting}
-SHOW_VALUE(helicopter.remaining_fuel());
-\end{cpplisting}
+\typesetexample{show-value}
 
 \subsectiontestudopair{Scopes}{in\_scope}{IN\_SCOPE}
 \label{sec:scopes}
@@ -1309,33 +1216,7 @@ longer, it may be clearer to name it, since the scope's begin and end lines
 will display its name.  This is done by passing the scope name to the
 ``in-scope'' macro.
 
-\begin{cpplisting}
-declare(LoggedDestruction ld1("1"));
-check(LoggedDestruction::n_destructions())_equal(0);
-in_scope("outer scope") { // named scope
-  declare(LoggedDestruction ld2("2"));
-  in_scope() { // unnamed scope
-    declare(LoggedDestruction ld3("3"));
-  }
-  check(LoggedDestruction::n_destructions())_equal(1);
-}
-check(LoggedDestruction::n_destructions())_equal(2);
-\end{cpplisting}
-
-\begin{cpplisting}
-DECLARE(LoggedDestruction ld1("1"));
-CHECK(LoggedDestruction::n_destructions()) EQUAL(0);
-IN_SCOPE("outer scope") // named scope
-{
-  DECLARE(LoggedDestruction ld2("2"));
-  IN_SCOPE() // unnamed scope
-  {
-    DECLARE(LoggedDestruction ld3("3"));
-  }
-  CHECK(LoggedDestruction::n_destructions()) EQUAL(1);
-}
-CHECK(LoggedDestruction::n_destructions()) EQUAL(2);
-\end{cpplisting}
+\typesetexample{in-scope}
 
 \subsectiontestudopair{With-declare scopes}{with\_declare}{WITH\_DECLARE}
 \label{sec:with-declare-scopes}
@@ -1348,41 +1229,12 @@ macro.  The declaration is identical to what you would give the ``declare''
 macro.  You can also use the ``with-declare'' macro with no braces if the scope
 contains only one statement.
 
-\begin{cpplisting}
-with_declare(auto answer=client.request("get license")) {
-  check(answer.valid)_true;
-  check(answer.text)_equal("res://punk_license");
-}
-with_declare(auto answer=client.request("reset"))
-  check(answer.valid)_true;
-\end{cpplisting}
-
-\begin{cpplisting}
-WITH_DECLARE(auto answer=client.request("get license"))
-{
-  CHECK(answer.valid) TRUE;
-  CHECK(answer.text) EQUAL("res://punk_license");
-}
-WITH_DECLARE(auto answer=client.request("reset"))
-  CHECK(answer.valid) TRUE;
-\end{cpplisting}
+\typesetexample{with-declare}
 
 If you need to use the ``with-declare'' macro with several variable
 declarations, you can always use a ``structured binding declaration'':
-\begin{cpplisting}
-with_declare(auto [action, occurrences]=tuple{"sin", 77*7}) {
-  check(action)_equal("sin");
-  check(occurrences)_equal(539);
-}
-\end{cpplisting}
 
-\begin{cpplisting}
-WITH_DECLARE(auto [action, occurrences]=tuple{"sin", 77*7})
-{
-  CHECK(action) EQUAL("sin");
-  CHECK(occurrences) EQUAL(539);
-}
-\end{cpplisting}
+\typesetexample{with-declare-several}
 
 \section{Identifying steps}
 \label{sec:identifying-steps}
@@ -1399,21 +1251,8 @@ name.
 
 The ``step id'' instruction prints a tag on the report that applies to the
 following step in the test.
-\begin{cpplisting}
-define_test(medical, "switch on after creation") {
-  declare(Tricorder t);
-  step_id(init_off); // in the tricorder medical test; no need to mention it
-  check(not t.medical.is_on())_true;
-}
-\end{cpplisting}
 
-\begin{cpplisting}
-DEFINE_TEST(medical, "switch on after creation") {
-  DECLARE(Tricorder t);
-  STEP_ID(init_off); // in the tricorder medical test; no need to mention it
-  CHECK(not t.medical.is_on()) TRUE;
-}
-\end{cpplisting}
+\typesetexample{step-id}
 
 
 \section{Printing fixed text and separations}
@@ -1430,13 +1269,7 @@ The ``print text'' instruction displays its argument inline.  The argument must
 be a string of any kind.  Text with embedded newlines is displayed in a
 suitable format.
 
-\begin{cpplisting}
-print_text("the speed hasn't been updated yet");
-\end{cpplisting}
-
-\begin{cpplisting}
-PRINT_TEXT("the speed hasn't been updated yet");
-\end{cpplisting}
+\typesetexample{print-text}
 
 
 \subsectiontestudopair{Print a break}{print\_break}{PRINT\_BREAK}
@@ -1445,13 +1278,7 @@ PRINT_TEXT("the speed hasn't been updated yet");
 The ``print break'' instruction just prints a break, to show a change of focus
 in the test report.
 
-\begin{cpplisting}
-print_break();
-\end{cpplisting}
-
-\begin{cpplisting}
-PRINT_BREAK();
-\end{cpplisting}
+\typesetexample{print-break}
 
 
 \section{Fake declarations and actions}
@@ -1466,28 +1293,13 @@ carry out explicitly a replacement instruction, with no test instruction macro,
 so that test reports are the same across compilation settings.
 
 \subsectiontestudopair{Fake declaration}{fake\_declare}{FAKE\_DECLARE}
-\label{sec:fake-action}
+\label{sec:fake-declaration}
 
 You can report a fake declaration by enclosing an instruction in a
 ``fake-declare instruction.  The instruction will be written to the report,
 exactly as if it had been carried out, except it won't have.
-\begin{cpplisting}
-#ifdef DEBUGGING
-declare(LoggedInt n_cases); // optimised to \texttt{int} in production
-#else
-fake_declare(LoggedInt n_cases);
-int n_cases; // replacement declaration (naked)
-#endif
-\end{cpplisting}
 
-\begin{cpplisting}
-#ifdef DEBUGGING
-DECLARE(LoggedInt n_cases); // optimised to \texttt{int} in production
-#else
-FAKE_DECLARE(LoggedInt n_cases);
-int n_cases; // replacement declaration (naked)
-#endif
-\end{cpplisting}
+\typesetexample{fake-declare}
 
 
 \subsectiontestudopair{Fake action}{fake\_perform}{FAKE\_PERFORM}
@@ -1496,23 +1308,31 @@ int n_cases; // replacement declaration (naked)
 You can report a fake action by enclosing an instruction in a ``fake-perform''
 instruction.  The instruction will be written to the report, exactly as if it
 had been carried out, except it won't have.
-\begin{cpplisting}
-#ifdef DEBUGGING
-perform(terrible_pointer.report()); // won't work in production
-#else
-fake_perform(terrible_p.report());
-log << "terrible_p reported" << endl; // replacement action (naked)
-#endif
-\end{cpplisting}
 
-\begin{cpplisting}
-#ifdef DEBUGGING
-PERFORM(terrible_pointer.report()); // won't work in production
-#else
-FAKE_PERFORM(terrible_p.report());
-log << "terrible_p reported" << endl; // replacement action (naked)
-#endif
-\end{cpplisting}
+\typesetexample{fake-perform}
+
+
+\sectiontestudopair{Value textual representation format}%
+  {tfos}{TFOS}
+\label{sec:value-textual-representation-format}
+
+The macro ``tfos'' works as if it were the output stream used to print values.
+If you need to change the format of value representation for subsequent test
+steps, insert manipulators into it in a ``perform'' macro.
+
+\typesetexample{tfos}
+
+The format thus configured is used every time a value is printed to the output.
+So, it's used not only by ``show-value'', but also, for instance, by ``check''
+when a check fails.
+
+You can convert a value ``\texttt{v}'' to a string using Testudo's textual
+representation (see~\Sref{sec:textual-representation}) with
+``\texttt{testudo::to\_text(v)}''.  If you use
+``\texttt{testudo::to\_text(\textit{tfos}, v)}'', you'll be using the output
+format stored in \emph{tfos}.
+
+\typesetexample{tfos-to-text}
 
 
 \section{Unexpected exceptions}
@@ -1552,6 +1372,39 @@ achieve the intended results, and their workings may be confusing, so try to
 pay no attention to that man behind the curtain.
 
 
+\chaptertestudopair{Check-guarded code sections}{provided}{PROVIDED}
+\label{cha:check-guarded-code-sections}
+
+In some situations, certain test steps only make sense if a prior condition is
+met.  A simple example is checking the state of a resource (such as an object
+accessed through a pointer): if the resource hasn't even been acquired (if the
+pointer isn't non-null), then it doesn't make sense to check its status,
+because it's bound to yield a lot of meaningless fails or even uncaught
+exceptions.
+
+You can express and efficiently deal with that state of affairs by using a
+``provide'' instruction.  Its syntax is exactly the same as that of the
+``check'' instruction, except it's followed by the guarded test steps as though
+it were a regular ``if'' statement.  Regarding the guarded test steps, the
+behaviour is identical to a ``if'' statement: the guarded test steps must be in
+curly braces, unless there's only one of them, in which case it can stand on
+its own with no curly braces; and you can also chain ``provided'' instructions
+as you would chain ``if'' statements.
+
+\typesetexample{provided}
+
+In the test report, the check steps that are guarded by a ``provided''
+instruction are typeset with an indentation relative to their ``provided''
+instruction, to show they are subordinate to it.  They are executed only if the
+``provided'' instruction yielded a successful test.
+
+A successful ``provided'' instruction contributes one ``pass'' to the tally of
+successful tests; additionally, its guarded steps contribute to the tally
+normally.  On the other hand, a failed ``provided'' instruction contributes one
+``error'' rather than one ``fail'' as a ``check'' instruction would.  This is
+so, in the total count, a failed ``provided'' instruction always appears worse
+than a successful one containing failed steps.
+
 \chapter{Test-aware functions}
 \label{cha:test-aware-functions}
 
@@ -1569,54 +1422,8 @@ The ``\texttt{test\_management\_t}'' is always available as
 ``\texttt{test\_management}'' in a test definition.
 
 Here's an example where we test emptiness of two container-like classes:
-\begin{cpplisting}
-template <typename Container>
-void test_container_emptyness(
-    test_management_t test_management,
-    Container &container) {
-  check(container.empty())_true;
-}
 
-class Cauldron { ... };
-
-define_test(container, "Cauldron emptyness") {
-  declare(Cauldron container);
-  test_container_emptyness(test_management, container);
-}
-
-class Marmite { ... };
-
-define_test(container, "Marmite emptyness") {
-  declare(Marmite container);
-  test_container_emptyness(test_management, container);
-}
-\end{cpplisting}
-
-\begin{cpplisting}
-template <typename Container>
-void test_container_emptyness(
-    test_management_t test_management,
-    Container &container)
-{
-  CHECK(container.empty()) TRUE;
-}
-
-class Cauldron { ... };
-
-define_test(container, "Cauldron emptiness")
-{
-  DECLARE(Cauldron container);
-  test_container_emptyness(test_management, container);
-}
-
-class Marmite { ... };
-
-define_test(container, "Marmite emptiness")
-{
-  DECLARE(Marmite container);
-  test_container_emptyness(test_management, container);
-}
-\end{cpplisting}
+\typesetexample{test-aware-functions}
 
 
 \chaptertestudopair{With-data loops}{with\_data}{WITH\_DATA}
@@ -1646,54 +1453,13 @@ for them, grouping failed coordinated values into single-line fail reports, and
 outputting only one success line in case of success.
 
 Here is an example:
-\begin{cpplisting}
-declare(auto is_even=predicate_a((a%2)==0));
-declare(list<int> even_numbers{2, 4, 8}); // even numbers
-with_data(x, even_numbers)
-  check(x)_verify(is_even);
-with_data(x, even_numbers) {
-  declare(int y=x+1);
-  check(y)_verify(not is_even);
-}
-with_data(x, even_numbers)
-  with_data(y, {2, 4, 9})
-    check(x%2)_equal(y%2); // will fail when \texttt{y==9}
-\end{cpplisting}
 
-\begin{cpplisting}
-DECLARE(auto is_even=PREDICATE_A((a % 2) == 0));
-DECLARE(list<int> even_numbers{ 2, 4, 8 }); // even numbers
-WITH_DATA(x, even_numbers)
-  CHECK(x) VERIFY(is_even);
-WITH_DATA(x, even_numbers)
-{
-  DECLARE(int y = x + 1);
-  CHECK(y) VERIFY(not is_even);
-}
-WITH_DATA(x, even_numbers)
-  WITH_DATA(y, { 2, 4, 9 })
-    CHECK(x % 2) EQUAL(y % 2); // will fail when \texttt{y==9}
-\end{cpplisting}
+\typesetexample{with-data}
 
 If you want to use structured binding for the variable in the ``with-data''
 macro, surround the variable names with parenthesis instead of square brackets:
-\begin{cpplisting}
-declare(list<tuple<int, int, int>>
-          list_of_sums{{1, 3, 4},
-                       {3, 7, 11}, // will fail
-                       {10, 15, 25}});
-with_data((a, b, sum), list_of_sums)
-  check(sum)_equal(a+b);
-\end{cpplisting}
 
-\begin{cpplisting}
-DECLARE(list<tuple<int, int, int>>
-          list_of_sums{ { 1, 3, 4 },
-                        { 3, 7, 11 }, // will fail
-                        { 10, 15, 25 } });
-WITH_DATA((a, b, sum), list_of_sums)
-  CHECK(sum) EQUAL(a+b);
-\end{cpplisting}
+\typesetexample{with-data-structured-binding}
 
 \sectiontestudopair{With-data loops with multiline containers}%
   {with\_multiline\_data}{WITH\_MULTILINE\_DATA}
@@ -1705,70 +1471,57 @@ obscure the structure of the container.  In such cases, you can use the
 ``with-multiline-data'' macro instead.  It will do its best to break the
 container in such a way that the report shows one element per line.
 
-\begin{cpplisting}
-with_multiline_data((a, b, sum), list<tuple<int, int, int>>{
-    {1, 3, 4},
-    {3, 7, 11}, // will fail
-    {10, 15, 25}})
-  check(sum)_equal(a+b);
-\end{cpplisting}
+\typesetexample{with-multiline-data}
 
-\begin{cpplisting}
-WITH_MULTILINE_DATA((a, b, sum), list<tuple<int, int, int>>{
-    {1, 3, 4},
-    {3, 7, 11}, // will fail
-    {10, 15, 25}})
-  CHECK(sum) EQUAL(a+b);
-\end{cpplisting}
+\section{Showing values in with-data loops}
+\label{sec:showing-values-with-data-loops}
+
+In general, don't use ``show-value'' in a with-data loop.  The purpose of a
+with-data loop is to perform the same check steps for a lot of data while
+having an $O(1)$ report length with respect to the data size, barring failed
+checks.  Using ``show-value'' in a with-data loop would defeat that purpose,
+and yield an $O(n)$ report length.  But you can still do it, and it can come in
+handy when developing or debugging your tests, to check your assumptions about
+expression values; you'll get, as expected, a ``show-value'' instance for each
+data element.  Just remember to remove it before you commit your test code.
+
 
 \section{How to generate data for with-data loops}
 \label{sec:generate-data-with-data-loops}
 
-You can use the function ``\texttt{generate\_data()}'' to generate data for
-with-data loops.  The arguments for that function are the number of data to
-generate, and a function argument with no arguments that will be called
-repeatedly to generate the data.  A~common case is the generation of a large
-number of pseudorandom data for verification of properties of types or
-algorithms.
+You can use ``\texttt{generate\_data(\textit{n}, \textit{gen})}'' to generate
+data for with-data loops.  It returns a list of \texttt{\textit{n}} data, each
+generated by a call to the \texttt{\textit{gen()}} function.  A~common case is
+the generation of a large number of pseudorandom data for verification of
+properties of types or algorithms.
 
 Imagine you've coded a \textsc{2d} integer vector class ``\texttt{VectorI2}''
-\begin{cpplisting}
-class VectorI2 {
-public:
-  VectorI2(int x, int y);
-  int x, y;
-};
-VectorI2 operator+(VectorI2 v, VectorI2 w); // sum
-bool operator==(VectorI2 v, Vector I2w); // equality (\Sref{sec:equality})
-string to_text(VectorI2 v); // text representation %
-                               (\Sref{sec:textual-representation})
-\end{cpplisting}
+\typesetexample{data-for-with-data-vector}
 and you want to verify on it the following theorem (commutativity of the sum):
 \begin{equation}
   \label{eq:1}
   \forall (v, w) \in \texttt{VectorI2} \times \texttt{VectorI2}, v + w = w + v
 \end{equation}
 You can code a pseudorandom ``\texttt{VectorI2}'' generator
-\begin{cpplisting}
-VectorI2 random_vector2i(int max_abs_x, int max_abs_y);
-\end{cpplisting}
+\typesetexample{data-for-with-data-generator}
 and use it like this to check the theorem on $100 \times 100$ pairs of
 pseudorandom values with a maximum absolute coordinate value of~$20$:
-\begin{cpplisting}
-declare(auto generate_20_20=
-        []() { return random_vector2i(20, 20); });
-with_data(v, generate_data(100, generate_20_20))
-  with_data(w, generate_data(100, generate_20_20))
-    check(v+w)_equal(w+v);
-\end{cpplisting}
 
-\begin{cpplisting}
-DECLARE(auto generate_20_20=
-        []() { return random_vector2i(20, 20); });
-WITH_DATA(v, generate_data(100, generate_20_20))
-  WITH_DATA(w, generate_data(100, generate_20_20))
-    CHECK(v+w) EQUAL(w+v);
-\end{cpplisting}
+\typesetexample{data-for-with-data-loop}
+
+For with-data loops with several variables, you can use
+``\texttt{generate\_data\_tuple(\textit{n}, \textit{gen...})}'', which
+generates \texttt{\textit{n}} tuples, each containing an element generated with
+a call to each one of the \texttt{\textit{gen()...}} functions:
+
+\typesetexample{data-for-with-data-generate-data-tuple}
+
+Using ``\texttt{generate\_data\_tuple(\textit{n}, \textit{gen...})}'' gives you
+tuples generated independently.  If you need the cartesian product of two or
+more lists of data instead, use ``\texttt{cartesian\_product(dataset...)}'',
+which returns the cartesion product of all its arguments:
+
+\typesetexample{data-for-with-data-cartesian-product}
 
 
 \chapter{Fixtures}
@@ -1788,32 +1541,8 @@ fixture, you have to code a class that derives from
 destructor, if you code it, is the teardown procedure.
 
 Here's an example:
-\begin{cpplisting}
-struct OutATimeFixture : Fixture {
-  OutATimeFixture(test_management_t test_management)
-    : Fixture(test_management)
-    { perform(d=new Delorean); }
-  ~OutATimeFixture()
-    { perform(delete d); }
-  Delorean *d; // dumb pointer, just so we can show a teardown procedure
-};
-\end{cpplisting}
 
-\begin{cpplisting}
-struct OutATimeFixture : Fixture
-{
-  OutATimeFixture(test_management_t test_management)
-    : Fixture(test_management)
-  {
-    PERFORM(d=new Delorean);
-  }
-  ~OutATimeFixture()
-  {
-    PERFORM(delete d);
-  }
-  Delorean *d; // dumb pointer, just so we can show a teardown procedure
-};
-\end{cpplisting}
+\typesetexample{fixture-outatime-definition}
 
 \section{Usage}
 \label{sec:fixture-usage}
@@ -1822,37 +1551,8 @@ In order to have a test use a fixture, you have to add the ``with-fixture''
 macro or the ``visible-fixture'' macro just after the title in the definition
 (before other arguments if any); this works both with non-top and with top
 tests.  Like this:
-\begin{cpplisting}
-define_test(delorean,
-            "engine is off at start",
-            with_fixture(OutATimeFixture)) // with-fixture
-{
-  check(not d->engine.is_running())_true;
-}
 
-define_test(delorean,
-            "there's no Plutonium initially",
-            visible_fixture(OutATimeFixture)) // visible-fixture
-{
-  check(d->pu())_approx(0.);
-}
-\end{cpplisting}
-
-\begin{cpplisting}
-DEFINE_TEST(delorean,
-            "engine is off at start",
-            WITH_FIXTURE(OutATimeFixture)) // with-fixture
-{
-  CHECK(not d->engine.is_running()) TRUE;
-}
-
-DEFINE_TEST(delorean,
-            "there's no Plutonium initially",
-            VISIBLE_FIXTURE(OutATimeFixture)) // visible-fixture
-{
-  CHECK(d->pu()) APPROX(0.);
-}
-\end{cpplisting}
+\typesetexample{fixture-outatime-test}
 
 If you use the ``with-fixture'' macro, Testudo macros used in the fixture
 implementation, whether in the constructor, the destructor, or any other
@@ -1880,27 +1580,8 @@ macro encloses an attribute declaration of any kind: it can contain several
 declarations, or default values.  The ``fixture-init'' macro accepts as its
 first argument the name of the attribute, and as its second argument its
 initial value.  Here's an example of usage:
-\begin{cpplisting}
-struct NumbersFixture : Fixture {
-  NumbersFixture(test_management_t test_management)
-    : Fixture(test_management),
-      fixture_init(x, 1.), fixture_init(z, 3.14) { }
-  fixture_member(double x);
-  fixture_member(double y=-2.5, z);
-};
-\end{cpplisting}
 
-\begin{cpplisting}
-struct NumbersFixture : Fixture
-{
-  NumbersFixture(test_management_t test_management)
-    : Fixture(test_management),
-      FIXTURE_INIT(x, 1.),
-      FIXTURE_INIT(z, 3.14) { }
-  FIXTURE_MEMBER(double x);
-  FIXTURE_MEMBER(double y=-2.5, z);
-};
-\end{cpplisting}
+\typesetexample{fixture-members}
 
 Other actions in the fixture implementation are enclosed in Testudo macros in
 the usual way (with the ``declare'' macro, the ``perform'' macro, and so on).
@@ -1912,12 +1593,14 @@ the usual way (with the ``declare'' macro, the ``perform'' macro, and so on).
 Testudo supports mock objects through its ``Mock Turtle'' module.  Include
 header file ``\texttt{mock\_turtle.h}'' to use it.
 
+\typesetexample{include-mock-turtle}
+
 You can build your mock objects in any way you want: with simple method
 overriding, with virtual method overriding, or with no overriding and no
 derivation.  The mock method macros define the methods precisely in accordance
 with your specification, so it's up to you to decide.
 
-Here's Mock Turtle's approach to mock testing:
+Here's MocTurtle's approach to mock testing:
 \begin{itemize}
 \item define mock classes using the mock-method macros ``mock-method'' and
   ``wrap-method'' (\Sref{sec:mock-method-macros}); this adds scheduling and
@@ -1941,7 +1624,7 @@ When you need to test a functionality, you may want to use mock implementations
 for some of the parts that are needed but aren't the focus of the test.
 Typically, these parts are functionality that is external to your code, or
 costly to run, or slow, or having dependencies on unavailable resources.  The
-usual way to achieve this is in \Cpp{} by replacing the affected parts by
+usual way to achieve this in \Cpp{} is by replacing the affected parts by
 objects that have the same interface as the problematic ones, but ad-hoc
 implementations tailored to the test.
 
@@ -1966,33 +1649,19 @@ whether by merely defining it, or by overriding a virtual one in the base
 class.
 
 Before you use these macros, you must define the mock class.  The only
-requirement is that it publicly must derive from
-``\texttt{MockClass<>}''.  If your mock class derives from a base
-class (say ``\texttt{Base}''), you can make it derive from
-``\texttt{MockClass<Base>}'' instead, which derives from both
-``\texttt{Base}'' and ``\texttt{MockClass<>}'', and inherits
-``\texttt{Base}'' constructors.  Here are a couple of examples, one for a mock
-class deriving from a virtual class, and one for a non-derived mock class:
-\begin{cpplisting}
-class KettleBase {
-public:
-  virtual ~KettleBase()=default;
-  virtual void fill(float volume)=0;
-  virtual float temperature() const=0;
-};
+requirement is that it publicly must derive from ``\texttt{MockClass<>}''.  If
+your mock class has to derive from a base class (say ``\texttt{Base}''), you
+can make it derive from ``\texttt{MockClass<Base>}'' instead, which derives
+from both ``\texttt{Base}'' and ``\texttt{MockClass<>}'', and inherits (using
+``\texttt{using}'') ``\texttt{Base}'' constructors.  You can also derive from
+several base classes if you specify them all as arguments to
+``\texttt{MockClass<>}'', but in that case, only the constructor of the first
+base class is inherited with ``\texttt{using}''; you can always derive directly
+from some of the base classes if you need to use their constructors explicitly.
+Here are a couple of examples, one for a mock class deriving from a virtual
+class, and one for a non-derived mock class:
 
-class KettleMock
-  : public MockClass<KettleBase> {
-public:
-  // method mocks and wraps overriding base methods\ellipsis{}
-};
-
-class ContainerMock
-  : public MockClass<> {
-public:
-  // method mocks and wraps defining a cointainer interface\ellipsis{}
-};
-\end{cpplisting}
+\typesetexample{mock-class}
 
 \subsectiontestudopair{Mocking a method}{mock\_method}{MOCK\_METHOD}
 \label{sec:mocking-method}
@@ -2009,18 +1678,17 @@ The arguments to the ``mock-method'' macro are, in order (see below for an
 explanation of the usage of the word \emph{parenthesised}),
 \begin{itemize}
 \item the \emph{parenthesised} return type;
-\item the name of the method (or a its name and an alternative name; see
-  below);
+\item the name of the method (or its name and an alternative name; see below);
 \item a \emph{parenthesised} list of \emph{parenthesised} arguments;
-\item optional method specifiers like ``\texttt{const}'',
-  ``\texttt{override}'', or ``\texttt{final}'', separated by spaces; leave this
+\item an optional list of \emph{parenthesised} method specifiers like
+  ``\texttt{const}'', ``\texttt{\&}'', ``\texttt{\&\&}'', ``\texttt{override}'', or ``\texttt{final}''; leave this
   argument out if you don't need it.
 \end{itemize}
 
 The return type macro argument is \emph{parenthesised}, which means it must be
 enclosed between ``\texttt{(}'' and ``\texttt{)}''.  This is done so the macros
 aren't confused by templated types that may contain commas in
-them\footnote{I've seen Google Mock solves this issue in a similar way, but the
+them\footnote{Google Mock solves this issue in a similar way, but the
   parentheses are optional, meaning that if your type doesn't contain any
   macro-fooling comma, you can leave them out.  I prefer to make
   parenthesisation mandatory, because once you get used to it, you won't be
@@ -2064,46 +1732,24 @@ will use the alternative name.  To specify an alternative name, just replace
 the name-of-method argument with the name of the method and the alternative
 name separated by a comma, in parentheses.  So, for instance, the following
 wouldn't work
-\begin{cpplisting}
-class ImageMock
-  : public MockClass<> {
-public:
-  mock_method((void), set, ((float)));
-  mock_method((void), set, ((int)));
-};
-\end{cpplisting}
+
+\typesetexample{mock-class-name-clash}
+
 so we'll have to identify one of the ``\texttt{set()}'' methods (or both) with
 an alternative name:
-\begin{cpplisting}
-class ImageMock
-  : public MockClass<> {
-public:
-  mock_method((void), set, ((float)));
-  mock_method((void), (set, set_int), ((int)));
-};
-\end{cpplisting}
 
-Finally, the method-specifiers macro argument consists of what you'd put after
-the method signature if you were defining it directly.  Things like
-``\texttt{const}'' (for method constness), ``\texttt{override}'', or
-``\texttt{final}'' go there, separated by spaces.  If there's nothing to
-specify here, just leave out the macro argument (no need to add the comma after
-the previous argument).  Here's an example with const and non-const overrides:
-\begin{cpplisting}
-class KettleBase {
-public:
-  virtual ~KettleBase()=default;
-  virtual void fill(float volume)=0;
-  virtual float temperature() const=0;
-};
+\typesetexample{mock-class-name-clash-avoided}
 
-class KettleMock
-  : public MockClass<KettleBase>> {
-public:
-  mock_method((void), fill, ((float volume)), override);
-  mock_method((float, temperature, (), const override);
-};
-\end{cpplisting}
+Finally, the method-specifiers macro argument is a \emph{parenthesised} list
+containing the specifiers you'd put after the method signature if you were
+defining it directly, separated by commas.  Things like ``\texttt{const}'' (for
+method constness), ``\texttt{\&}'' (for \emph{lvalue} references),
+``\texttt{\&\&}'' (for \emph{rvalue} references), ``\texttt{override}'', or
+``\texttt{final}'' go there.  If there's nothing to specify here, just leave
+out the macro argument (no need to add the comma after the previous argument).
+Here's an example with const and non-const overrides:
+
+\typesetexample{mock-class-mock-method}
 
 
 \subsectiontestudopair{Wrapping a method}{wrap\_method}{WRAP\_METHOD}
@@ -2116,11 +1762,7 @@ specify exactly what the method does and returns.
 In order to wrap a method, use the ``wrap-method'' macro in the same way that
 you'd use the ``macro-method'', but instead of adding a semicolon after it,
 write your method implementation in braces.  The ``wrap-method'' is essentially
-taking the place of the signature of your method.  You still have to add
-``\texttt{const}'' before the method implementation if appropriate (but not
-``\texttt{override}'' or ``\texttt{final}''); this will amount, in most cases
-where you have ``\texttt{const}'' in the macro method-specifier argument, to
-repeat it just after the macro.
+taking the place of the signature of your method.
 
 What the ``wrap-method'' macro affords you compared to writing your own method
 is automatic log and ledger handling (\Sref{sec:check-mock-method-logs},
@@ -2129,26 +1771,12 @@ the ``mock-method'' macro.  Scheduling is not added to a wrapped macro, since
 you'll be specifying what is returned.
 
 Here's an example with wrapped methods:
-\begin{cpplisting}
-class Tally {
-public:
-  virtual ~Tally()=default;
-  virtual void add_counter(int delta)=0;
-  virtual int total() const=0;
-};
 
-class TallyMock
-  : public MockClass<Tally> {
-public:
-  int counter=0;
-  wrap_method((void), add_counter, ((int delta))) {
-    counter+=delta;
-  }
-  wrap_method((int), total, (), const) const { // \texttt{const} twice
-    return counter;
-  }
-};
-\end{cpplisting}
+\typesetexample{mock-class-wrap-method}
+
+You can have both mocked methods and wrapped methods in the same class.
+% don't remove the first "methods", or the sentence may seem to imply you can
+% have methods that are both mocked and wrapped
 
 
 \section{How to schedule mock-method behaviour}
@@ -2172,30 +1800,28 @@ of the scheduler when asked for a return value is this:
 
 You can change the default return value in one of two ways:
 \begin{itemize}
-\item by assigning a value or function to the ``mock-method'' macro expression
-  in the mock class definition:
-\begin{cpplisting}
-class SoupMock
-  : public MockClass<Soup> {
-public:
-  ...
-  // by default, return \texttt{true}:
-  mock_method((bool), is_tasty, (), const override)=true;
-  ...
-};
-\end{cpplisting}
+\item by assigning a value or a function\footnote{A \emph{function} here is a
+    value that can be called as a function, i.e., a lambda expression, a
+    function object, or a pointer to function.} to the ``mock-method'' macro
+  expression in the mock class definition:
+
+  \typesetexample{mock-class-mock-method-default-return-value-assign}
+
 \item by using the ``set-ret-default'' macro as a method call on a mock object:
-\begin{cpplisting}
-define_test(mock_turtle, "Victorian recipe") {
-  declare(auto soup_mock=make_shared<SoupMock>());
-  declare(bool is_tasty_now=true);
-  perform(soup_mock->set_ret_default(
-            is_tasty,
-            [&is_tasty_now]() { return is_tasty_now; });
-  ...
-}
-\end{cpplisting}
+
+  \typesetexample{mock-class-mock-method-default-return-value-set-ret-default}
+
 \end{itemize}
+
+When the default return value is defined as a function, the function can have
+either no arguments, or a signature compatible with that of the mock method
+(same number of arguments, argument types compatible), in which case it will
+get the argument values of the mock-method invocation.
+
+Note that functions can also be scheduled with the ``schedule-ret'' macro, but
+this is less useful than scheduling values, because you generally want to use
+functions for genericity, but scheduled functions will be used up, one per
+method invocation.
 
 \subsectiontestudopair{Schedule return values or exceptions}%
   {schedule\_ret}{SCHEDULE\_RET}
@@ -2204,65 +1830,22 @@ In order to schedule a sequence of return values for a method, you must use the
 ``schedule-ret'' macro as a method call on a mock object, giving it first the
 name of the method you want to schedule for, and then any number of return
 values to use in sequence:
-\begin{cpplisting}
-class SoupMock
-  : public MockClass<Soup> {
-public:
-  ...
-  mock_method((int), (temperature, temp), (), const final);
-  ...
-};
-...
-define_test(..., "...") {
-  declare(auto soup_mock=make_shared<SoupMock>());
-  // return a sequence of temperatures on subsequent calls:
-  perform(soup_mock->schedule_ret(temp,
-                                  20, 40, 60, 80, 100));
-  ...
-}
-\end{cpplisting}
+
+\typesetexample{mock-class-mock-method-schedule-ret}
 
 You can also set the default value or any of the scheduled return values to
 throw an exception, rather than returning a value.  This is achieved by
 replacing a return value in the ``schedule-ret'' macro with a call to the
 function ``\texttt{throw\_exception()}'', giving it the exception to throw:
-\begin{cpplisting}
-class MockNamable
-  : public MockClass<> {
-public:
-  mock_method((void), create, ());
-  mock_method((bool), set_name_is_good, ((string)));
-};
-...
-define_test(..., "...") {
-  declare(MockNamable namable);
-  // return \texttt{true} for the first call, then throw an exception for the %
-     second call:
-  perform(
-    namable.schedule_ret(set_name_is_good,
-      true,
-      throw_exception(runtime_error("already named"))));
-  ...
-}
-\end{cpplisting}
+
+\typesetexample{mock-class-mock-method-schedule-exception}
 
 If the return type of the method is \texttt{void}, you can use the special
 value ``\texttt{void\_v}'' to represent one successful return.  This is
 necessary when you want to schedule an exception after a number of uneventful
 returns:
-\begin{cpplisting}
-define_test(..., "...") {
-  declare(MockNamable namable);
-  // return normally from the first call, then throw an exception for the %
-     second call:
-  perform(
-    namable.schedule_ret(create,
-      void_v,
-      throw_exception(runtime_error("already created"))));
-  ...
-}
 
-\end{cpplisting}
+\typesetexample{mock-class-mock-method-schedule-exception-after-void}
 
 \section{How to check mock-method logs}
 \label{sec:check-mock-method-logs}
@@ -2270,6 +1853,12 @@ define_test(..., "...") {
 Each mock method (mocked or wrapped) keeps a log of calls to it, with arguments
 and return values.  After you've run code that uses your mock objects, you can
 perform checks on the logs, with the usual Testudo syntax.
+
+Checks with mock-method logs lend themselves to ``with-declare'' scopes
+(\Sref{sec:with-declare-scopes}), where the declaration is for instance the
+result of a ``logged-ret-args'' macro, and the contents are checks on that
+value.  This is also true of mock-method ledgers; see~\Sref{sec:scan-ledger}
+for examples of ``with-declare'' scopes used to check ledgers.
 
 \subsectiontestudopair{Logged arguments}{logged\_args}{LOGGED\_ARGS}
 
@@ -2280,35 +1869,22 @@ call follows the syntax for a regular method, and has as its argument the name
 call, and each tuple contains all the arguments of the call.  So, for instance,
 in the following example, we're checking that the ``\texttt{add\_ingr}'' method
 was called five times, and we're checking the specific arguments for all calls:
-\begin{cpplisting}
-declare(auto soup_mock=make_shared<SoupMock>());
-...
-// five calls, with specific arguments
-check(soup_mock->logged_args(add_ingr))
-  _equal({{"calf brains", 4},
-          {"pork liver", 3},
-          {"water", 1},
-          {"water", 1},
-          {"water", 1}});
-\end{cpplisting}
+
+\typesetexample{check-mock-method-logs}
 
 Since the value returned by the ``logged-args'' is a plain \textsc{stl} vector,
 you can use it in any vector-like way to check results.  You can, for instance:
 \begin{itemize}
 \item check its size (although a better way is to use the ``log-size'' macro;
-  see below);
+  see~\Sref{sec:mock-method-number-of-calls});
 \item check a specific call by its number:
-\begin{cpplisting}
-// check \emph{third} call
-check(soup_mock->logged_args(add_ingr)[2])
-  _equal({"water", 1});
-\end{cpplisting}
+
+  \typesetexample{check-mock-method-logs-specific-call}
+
 \item check a specific argument of a specific call:
-\begin{cpplisting}
-// check \emph{first} argument of third call:
-check(get<0>(soup_mock->logged_args(add_ingr)[2]))
-  _equal("water");
-\end{cpplisting}
+
+  \typesetexample{check-mock-method-logs-specific-call-specific-argument}
+
 \item or more complex things like checking totals of numerical arguments.
 \end{itemize}
 
@@ -2318,12 +1894,8 @@ Similarly, the ``logged-ret'' macro returns a vector of tuples containing the
 return values for all calls to a mock method\footnote{These are tuples rather
   than naked return values in order to accommodate methods that return
   \texttt{void}, which have empty tuples.}.
-\begin{cpplisting}
-declare(auto soup_mock=make_shared<SoupMock>());
-...
-// a single call, that returned \texttt{true}
-check(soup_mock->logged_ret(is_tasty))_equal({{true}});
-\end{cpplisting}
+
+\typesetexample{check-mock-method-logs-return-values}
 
 \subsectiontestudopair{Logged arguments and return values}%
   {logged\_ret\_args}{LOGGED\_RET\_ARGS}
@@ -2331,32 +1903,16 @@ check(soup_mock->logged_ret(is_tasty))_equal({{true}});
 The ``logged-ret-args'' macro combines the ``logged-ret'' and ``logged-args''
 macros: it returns a vector of pairs, where each pair contains a tuple with the
 return value and a tuple with the arguments of a call.
-\begin{cpplisting}
-declare(auto soup_mock=make_shared<SoupMock>());
-...
-// five calls, with specific arguments and return values
-check(soup_mock->logged_ret_args(add_ingr))
-  _equal({{{4}, {"calf brains", 4}},
-          {{7}, {"pork liver", 3}},
-          {{8}, {"water", 1}},
-          {{9}, {"water", 1}},
-          {{10}, {"water", 1}}});
-\end{cpplisting}
+
+\typesetexample{check-mock-method-logs-return-arguments-values}
 
 \subsectiontestudopair{Number of calls}{log\_size}{LOG\_SIZE}
+\label{sec:mock-method-number-of-calls}
 
 Finally, the ``log-size'' macro returns the number of calls to a mock method:
-\begin{cpplisting}
-declare(auto soup_mock=make_shared<SoupMock>());
-...
-// a single call
-check(soup_mock->log_size(is_tasty))_equal(1);
-\end{cpplisting}
 
-Checks with mock-method logs lend themselves to ``with-declare'' scopes
-(\Sref{sec:with-declare-scopes}), where the declaration is for instance the
-result of a ``logged-ret-args'' macro, and the contents are checks on that
-value.
+\typesetexample{check-mock-method-logs-number-of-calls}
+
 
 \subsection{Utilities for log checking}
 \label{sec:utilities-log-checking}
@@ -2378,10 +1934,10 @@ returned by this method have been different'':
 \section{How to check mock-method ledgers}
 \label{sec:check-mock-method-ledgers}
 
-In addition to per-mock-method logs (\Sref{sec:check-mock-method-logs}), Mock
-Turtle keeps track of the order in which different methods are invoked.  This
-tracking is managed by the class ``\texttt{MockClass<>}'' (the one
-mock classes must derive from).
+In addition to per-mock-method logs (\Sref{sec:check-mock-method-logs}),
+MocTurtle keeps track of the order in which different methods are invoked.
+This tracking is managed by the class ``\texttt{MockClass<>}'' (the one mock
+classes must derive from).
 
 \subsectiontestudopair{Checks across mock objects}%
   {call\_ledger\_report\_to}{CALL\_LEDGER\_REPORT\_TO}
@@ -2406,13 +1962,8 @@ calls across several methods with the same object, you can do it by using the
 mock object itself as the call ledger.
 
 Here's an example of cross-object call ledger setup:
-\begin{cpplisting}
-declare(CallLedger cl);
-declare(MockLevel lev1(12));
-perform(call_ledger_report_to(lev1, &cl)); // identified as ``\texttt{lev1}''
-declare(auto lev2=shared_ptr<MockLevel>(47));
-perform(call_ledger_report_to(lev2, &cl)); // identified as ``\texttt{lev2}''
-\end{cpplisting}
+
+\typesetexample{ledger-setup}
 
 \subsection[Scanning the ledger]%
   {Scanning the ledger:
@@ -2424,9 +1975,9 @@ After you've run code that uses your mock objects, you can check the call
 ledgers.  Since a ledger logs calls to methods with different signatures, you
 can't access a ledger in one call.  You have to use a kind of iterator instead,
 that we'll call the \emph{call ledger iterator}.  You obtain the call ledger
-iterator by passing the call ledger to the ``\texttt{iterate()}''
-function.  Initially, the iterator points to the first ledger entry.  This is
-what you can do with a call ledger ``\texttt{it}'':
+iterator by passing the call ledger to the ``\texttt{iterate()}'' function.
+Initially, the iterator points to the first ledger entry.  Here's what you can
+do with a call ledger ``\texttt{it}'':
 \begin{itemize}
 \item increment it, with ``\texttt{it.next()}'';
 \item check if it's pointing past the end of the ledger, with
@@ -2447,18 +1998,15 @@ what you can do with a call ledger ``\texttt{it}'':
   method are not the actual ones, the returned object is \emph{invalid}, and
   all checks performed on it will fail; here's an example of usage of the
   ``get-call'' macro:
-\begin{cpplisting}
-with_declare(auto call=it.get_call(*soup_mock, add_ingr))
-  check(call)_equal({7}, {"water", 1});
-\end{cpplisting}
+
+  \typesetexample{ledger-iterator-get-call}
+
 \item \emph{pop} the call record it points to, by using the ``pop-call'' macro
   on the iterator, rather than the ``get-call'' macro; these macros have the
   same arguments and return the same value, but ``pop-call'' automatically
   increments the iterator \emph{if the returned call record is valid:}
-\begin{cpplisting}
-with_declare(auto call=it.pop_call(*soup_mock, add_ingr))
-  check(call)_equal({7}, {"water", 1});
-\end{cpplisting}
+
+  \typesetexample{ledger-iterator-pop-call}
 \end{itemize}
 
 You can perform the following operations on a call record ``\texttt{cr}'':
@@ -2480,70 +2028,30 @@ Similarly to mock-method logs, checks with mock-method ledgers lend themselves
 to ``with-declare'' scopes (\Sref{sec:with-declare-scopes}).
 
 Here's an example with mock-method ledgers:
-\begin{cpplisting}
-declare(auto soup_mock=make_shared<SoupMock>());
-...
-with_declare(auto it=iterate(soup_mock)) {
-  with_declare(auto call=it.pop_call(*soup_mock, add_ingr)) {
-    check(call.ret())_equal(4);
-    check(call.args())_equal("calf brains", 4);
-  }
-  ...
-  with_declare(auto call=it.pop_call(*soup_mock, temp))
-    check(call.ret())_equal(20);
-  ...
-  with_declare(auto call=it.pop_call(*soup_mock, is_tasty))
-    check(call.ret())_true;
-  // check it was the last call:
-  check(it.done())_true;
-}
-\end{cpplisting}
+
+\typesetexample{ledger-with-declare}
 
 Here's an example involving the ``call-ledger-report-to'' macro:
-\begin{cpplisting}
-declare(CallLedger cl);
-declare(MockLevel lev1(12));
-perform(call_ledger_report_to(lev1, &cl));
-declare(MockLevel lev2(47));
-perform(call_ledger_report_to(lev2, &cl));
-perform(equalize(lev1, lev2)); // this is the function we're checking
-check(lev1.readout())_equal(52);
-check(lev2.readout())_equal(52);
-declare(auto it=iterate(cl));
-// fast forward to the first invocation to ``\texttt{large\_up()}'':
-perform(while (it.method_name() not_eq "large_up")
-          it.next());
-check(it.mock_name())_equal("lev1");
-check(it.method_name())_equal("large_up");
-perform(it.next());
-check(it.mock_name())_equal("lev1");
-check(it.method_name())_equal("readout");
-\end{cpplisting}
+
+\typesetexample{ledger-call-ledger-report-to}
 
 
 \chapter{Testudo support for \textsc{stl} containers}
 \label{cha:testudo-support-stl-types}
 
-If you're going to use \textsc{stl} containers as subjects for your tests,
-meaning you're going to show their value, or use it for checks, just include
-the ``\texttt{testudo\_ext.h}'' header:
-\begin{cpplisting}
-#include "testudo_ext.h"
-\end{cpplisting}
-
-This will make \textsc{stl} containers printable by Testudo.  Additionally,
+Testudo has support for \textsc{stl} containers. It can print them when needed,
+using a simple comma-separated, curly-braced representation.  Additionally,
 although \textsc{stl} containers can be compared with the standard
 ``\texttt{operator==()}'' operator, so there's nothing to add in that regard,
-``\texttt{testudo\_ext.h}'' adds the following two features
+Testudo implements the following two features
 \begin{itemize}
-\item an \textsc{stl} container will be considered valid
+\item an \textsc{stl} container is considered valid
   (\Sref{sec:checked-expression}) if and only if all its elements are;
 \item ``approx'' checks (\Sref{sec:check-expression-near-reference}) will use
   the Manhattan distance on the container elements.
 \end{itemize}
 
-Bottom line: if you include ``\texttt{testudo\_ext.h}'', Testudo will work well
-on \textsc{stl} containers.
+Bottom line: Testudo works well on \textsc{stl} containers.
 
 
 \chapter{Adding Testudo support for your types}
@@ -2556,9 +2064,10 @@ A type needs four features in order to be fully Testudo-supported:
   on it (\Sref{sec:checked-expression}); by default, all values of a type are
   considered valid unless you decide to code validity for the type, so you
   often won't need to deal with validity at all;
-\item it \emph{must} have a textual representation; this is used when you show
-  a value with the ``show-value'' macro (\Sref{sec:show-plain-value}), but also
-  when the value is shown for a failed check;
+\item it \emph{must} have a textual representation if you want to see its
+  values in the reports; this is used when you show a value with the
+  ``show-value'' macro (\Sref{sec:show-plain-value}), but also when the value
+  is shown for a failed check;
 \item it \emph{can} support testing for equality, if you need it for your
   tests, in particular, if you use the ``equal'' macro
   (\Sref{sec:check-expression-equal-reference});
@@ -2573,13 +2082,17 @@ the following sections.  You don't need to include any style
 whole Testudo set of functionality.  It's enough if you include the
 ``\texttt{testudo\_base.h}'' header (and if your definitions don't use the
 basic implementations in Testudo, not even that will be needed):
-\begin{cpplisting}
-#include "testudo_base.h"
-\end{cpplisting}
 
-In general, when you customize Testudo support for your type, you either code a
-general function for your type, like ``\texttt{operator==()}'' or redirection
-to output stream, or define a Testudo-specific function in the same namespace
+\typesetexample{include-testudo-base}
+
+As a convention, you can give header files that implement Testudo support for
+your types the extension ``\texttt{.tth}''.  These header files include
+``\texttt{testudo\_base.h}'' and the necessary headers from your project, and
+then implement the required Testudo customization.
+
+In general, when you customise Testudo support for your type, you either code a
+general function for your type, like ``\texttt{operator==()}'' or insertion
+into output stream, or define a Testudo-specific function in the same namespace
 as your type.  In the latter case, the function name will end with
 ``\texttt{\_testudo}'' (see each section for the exact name).  If you need to
 use any of those Testudo-specific functions (for example, when coding the
@@ -2589,23 +2102,14 @@ without the ``\texttt{\_testudo}'', and in the ``\texttt{testudo}'' namespace.
 
 So, for instance, if you're defining validity for type
 ``\texttt{my\_space::MyType<T>}'', you have to define
-\begin{cpplisting}
-namespace my_space {
-  template <typename T>
-  bool is_valid_testudo(MyType<T> ct &mt);
-}
-\end{cpplisting}
+
+\typesetexample{testudo-support-my-type-is-valid-testudo}
+
 but if the definition depends on the validity of a contained attribute with
 type ``\texttt{list<T>}'', then you'll have to use
 ``\texttt{testudo::is\_valid()}'':
-\begin{cpplisting}
-namespace my_space {
-  template <typename T>
-  bool is_valid_testudo(MyType<T> ct &mt) {
-    return testudo::is_valid(mt.list_of_elements);
-  }
-}
-\end{cpplisting}
+
+\typesetexample{testudo-support-my-type-is-valid-testudo-is-valid}
 
 
 \section{Validity}
@@ -2614,17 +2118,10 @@ namespace my_space {
 All values are considered valid by default by Testudo
 (\Sref{sec:checked-expression}).  If you have a type that may have invalid
 values (i.e., values that always yield failed Testudo checks), you have code a
-``\texttt{bool is\_valid()}'' function in the type's namespace, that accepts as
-its sole argument an object of the type:
-\begin{cpplisting}
-namespace my_space {
-  class MyVector {
-  public:
-    ...
-  };
-  bool is_valid(MyVector const &mv) { ... }
-}
-\end{cpplisting}
+``\texttt{bool is\_valid\_testudod()}'' function in the type's namespace, that
+accepts as its sole argument an object of the type:
+
+\typesetexample{testudo-support-my-vector-is-valid-testudo}
 
 If you want to refer to the validity of a value ``\texttt{v}'' of another type
 contained in your type, use the expression ``\texttt{testudo::is\_valid(v)}''.
@@ -2635,39 +2132,39 @@ contained in your type, use the expression ``\texttt{testudo::is\_valid(v)}''.
 In order to tell Testudo how to produce a text representation for a value of
 your type, you can either
 \begin{itemize}
-\item code the ``redirection to output stream'' operator for your type:
-\begin{cpplisting}
-namespace my_space {
-  class MyVector {
-  public:
-    double x, y;
-    ...
-  };
-  ostream &operator<<(ostream &os, MyVector const &mv) {
-    return os << "(" << mv.x << " " << mv.y << ")";
-  }
-}
-\end{cpplisting}
-\item or code a ``\texttt{to\_text\_testudo()}'' function in the type's
-  namespace, that accepts as its sole argument an object of the type, and
-  returns a string that represents it:
-\begin{cpplisting}
-namespace my_space {
-  class MyVector {
-  public:
-    double x, y;
-    ...
-  };
-  string to_text_testudo(MyVector const &mv) {
-    return "("+to_string(mv.x)+" "+to_string(mv.y)+")";
-  }
-}
-\end{cpplisting}
+\item code the ``insertion into output stream'' operator for your type:
+
+  \typesetexample{testudo-support-my-vector-insertion}
+
+\item or code a ``\texttt{to\_stream\_testudo()}'' function in the type's
+  namespace, that accepts as arguments an output stream reference and a value
+  of the type, and writes the value to the output stream:
+
+  \typesetexample{testudo-support-my-vector-to-stream-testudo}
 \end{itemize}
 
-If you want to use the textual representation of a value ``\texttt{v}'' of
-another type contained in your type, use the expression
-``\texttt{testudo::to\_text(v)}''.
+Testudo will use ``\texttt{to\_stream\_testudo()}'' if available, or the
+regular output stream insertion operator otherwise.  In case even the latter is
+missing too, the placeholder ``\texttt{<...>}'' will be used.
+
+When defining ``\texttt{to\_stream\_testudo()}'', if you need Testudo's textual
+representation of a value ``\texttt{v}'' of another type contained in your
+type, instead of the standard ``\texttt{os <{}< v}'', which would never use the
+Testudo-specific functions, use
+\begin{itemize}
+\item ``\texttt{testudo::to\_stream(os, v)}'';
+
+  \typesetexample{testudo-support-my-vector-to-stream-testudo-to-stream}
+
+\item or the conversion to string ``\texttt{testudo::to\_text(os, v)}''
+  (see~\Sref{sec:value-textual-representation-format}); here, ``\texttt{os}''
+  is used only for its format, and can be omitted if the default format is
+  always appropriate;
+
+  \typesetexample{testudo-support-my-vector-to-stream-testudo-to-text}
+
+\end{itemize}
+
 
 \section{Equality}
 \label{sec:equality}
@@ -2677,40 +2174,16 @@ Checks for equality between values
 ``\texttt{==}'' operator on the values.  So you just have to code the
 appropriate ``\texttt{operator==()}'' for your type to be supported by Testudo
 checks for equality:
-\begin{cpplisting}
-namespace my_space {
-  template <typename T>
-  class MyPair {
-  public:
-    ...
-    T first, second;
-  };
-  template <typename T>
-  bool operator==(MyPair<T> const &mp1,
-                  MyPair<T> const &mp2) {
-    // see below for ``\texttt{testudo::are\_equal()}''
-    return (testudo::are_equal(mp1.first, mp2.first)
-             and testudo::are_equal(mp1.second, mp2.second));
-  }
-}
-\end{cpplisting}
+
+\typesetexample{testudo-support-my-pair-equality}
 
 Similarly to the other cases, you can also choose to define the
 ``\texttt{are\_equal\_testudo()}'' function for your type, if you prefer
 Testudo to use a different implementation for equality, and you should use
-``\texttt{testudo::are\_equal()}'' to test for equality of other values:
-\begin{cpplisting}
-namespace my_space {
-  template <typename T>
-  class MyPair { ... };
-  template <typename T>
-  bool are_equal_testudo(MyPair<T> const &mp1,
-                         MyPair<T> const &mp2) {
-    return (testudo::are_equal(mp1.first, mp2.first)
-             and testudo::are_equal(mp1.second, mp2.second));
-  }
-}
-\end{cpplisting}
+``\texttt{testudo::are\_equal()}'' to test for equality of other values when
+defining these functions:
+
+\typesetexample{testudo-support-my-pair-are-equal-testudo}
 
 \section{Difference between two values}
 \label{sec:difference-between-two-values}
@@ -2718,55 +2191,26 @@ namespace my_space {
 Checks for nearness between values (\Sref{sec:check-expression-near-reference})
 are done by checking if the absolute difference between the values is below the
 tolerance.  For simple scalar types like \texttt{float} and \texttt{double},
-this absolute difference is simple the absolute value of the difference, but
+this absolute difference is simply the absolute value of the difference, but
 for other types that you want to use ``approx'' checks on, you have to define
 exactly how it's computed.  This is done by defining a
 ``\texttt{absdiff\_testudo()}'' function in the type's namespace, that accepts
 the two values to compare, and returns the absolute difference as a
 \texttt{double} value.
-\begin{cpplisting}
-class MyVector {
-public:
-  double x, y;
-  ...
-};
-double absdiff_testudo(MyVector const &mv1,
-                       MyVector const &mv2) {
-  double dx=mv1.x-mv2.y;
-  double dy=mv1.y-mv2.y;
-  return sqrt(dx*dx+dy*dy);
-}
-\end{cpplisting}
+
+\typesetexample{testudo-support-my-vector-absdiff-testudo}
 
 The absolute difference need not be exactly the norm of the difference.  Any
 function that is zero for identical values and grows for values that are more
 and more apart, while giving an order of magnitude of the actual difference, is
 \textsc{ok}:
-\begin{cpplisting}
-double absdiff_testudo(MyVector const &mv1,
-                       MyVector const &mv2) {
-  double dx=mv1.x-mv2.y;
-  double dy=mv1.y-mv2.y;
-  return abs(dx)+abs(dy); // this is also \textsc{ok}
-}
-\end{cpplisting}
 
-You may have to use ``\texttt{testudo::absdiff\_testudo()}'' on other values
-contained in your type:
-\begin{cpplisting}
-template <typename T>
-class MyPair {
-public:
-  ...
-  T first, second;
-};
-template <typename T>
-double absdiff_testudo(MyPair<T> const &mp1,
-                       MyPair<T> const &mp2) {
-  return (testudo::absdiff(mp1.first, mp2.first)
-          +testudo::absdiff(mp1.second, mp2.second));
-}
-\end{cpplisting}
+\typesetexample{testudo-support-my-vector-absdiff-testudo-manhattan}
+
+When defining this function, you may have to use
+``\texttt{testudo::absdiff()}'' on other values contained in your type:
+
+\typesetexample{testudo-support-my-vector-absdiff-testudo-absdiff}
 
 
 \cleartooddpage
@@ -2812,21 +2256,20 @@ customization expression for your ``\texttt{.emacs}'' file.
 
 You can define your own style for Testudo macros, so macro names suit your
 exact needs and taste.  You just have to copy one of the two provided style
-files, ``\texttt{lc.tst}'' or ``\texttt{cp.tst}'', into a file of your own with
-the ``\texttt{.tst}'' extension, say ``\texttt{mystyle.tst}'', and customize
+files, ``\texttt{lc.tst}'' or ``\texttt{uc.tst}'', into a file of your own with
+the ``\texttt{.tst}'' extension, say ``\texttt{mystyle.tst}'', and customise
 the second half of each line, which is the macro name.  Then, instead of
 including ``\texttt{testudo\_lc}'' or ``\texttt{testudo\_uc}'', include
-``\texttt{testudo\_mystyle}''.
+``\texttt{testudo\_mystyle}''.  Note that your customized names must follow
+\Cpp{} rules for names, but can still contain almost any alphanumeric Unicode
+character (accented characters, dingbats, emojis, Chinese characters,
+Cypro-Minoan, you name it).
 
 Here's an example where we adapt the macro names to be in Esperanto.  The
 ``\texttt{eo.tst}'' file is shown in~\fref{fig:esperanto-style}, and this is a
 test specified with that style:
-\begin{cpplisting}
-difini_teston(esperanto_test, numbers, "numbers") {
-  deklari(auto const dictionary=vortaro);
-  certigi(dictionary.at("unu"))_egalas(1);
-}
-\end{cpplisting}
+
+\typesetexample{esperanto}
 
 \begin{figure}
   \centering
@@ -2841,9 +2284,19 @@ difini_teston(esperanto_test, numbers, "numbers") {
 
 \backmatter
 
+\cleartoevenpage
+
+\thispagestyle{empty}
+
+\vspace*{\fill}
+
+\begin{center}
+\includegraphics[width=\textwidth]{ascii_logo_mig_colour_cropped.pdf}
+\end{center}
 
 \end{document}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
+%%% compile-command: "make testudo.pdf"
 %%% End:

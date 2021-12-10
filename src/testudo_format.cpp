@@ -51,6 +51,8 @@ namespace testudo___implementation {
       : parent_test_format(parent_test_format) { }
 
     void output_title(string, string) override { assert(false); }
+    void output_begin_indent() override { }
+    void output_end_indent() override { }
     void output_begin_scope(string) override { }
     void output_end_scope(string) override { }
     void output_begin_declare_scope(string) override { }
@@ -194,21 +196,23 @@ namespace testudo___implementation {
 
     auto child_log() { return log->child(); }
 
+    void log_output(function<void ()> output) {
+      log->add(get_location(),
+               [nwa=non_with_ancestor,
+                fvvf=var_and_values_format(full_var_values)]()
+                 { nwa->output_show_value(fvvf.first, fvvf.second); });
+      log->add(get_location(), output);
+    }
     void failed() {
       log->failed();
       if (auto parent_with_loop=
             dynamic_pointer_cast<WithLoopTestFormat>(parent_test_format))
         parent_with_loop->failed();
     }
-    bool if_false_output_with_failed(string success,
-                                     function<void ()> error_output) {
-      if (success=="false") {
-        log->add(get_location(),
-                 [nwa=non_with_ancestor,
-                  fvvf=var_and_values_format(full_var_values)]()
-                   { nwa->output_show_value(fvvf.first, fvvf.second); });
-        log->add(get_location(),
-                 error_output);
+    bool if_false_log_output_with_failed(string success,
+                                         function<void ()> error_output) {
+      if (success==false_tag) {
+        log_output(error_output);
         failed();
         return true;
       }
@@ -217,6 +221,14 @@ namespace testudo___implementation {
     }
 
     void output_title(string, string) override { assert(false); }
+    void output_begin_indent() override {
+      if (recursively_last_time)
+        non_with_ancestor->output_begin_indent();
+    }
+    void output_end_indent() override {
+      if (recursively_last_time)
+        non_with_ancestor->output_end_indent();
+    }
     void output_begin_scope(string name) override {
       if (recursively_last_time)
         non_with_ancestor->output_begin_scope(name);
@@ -260,7 +272,7 @@ namespace testudo___implementation {
     void output_catch(string exception_type, string error,
                       string caught, bool) override {
       log->incr_counter();
-      if_false_output_with_failed(
+      if_false_log_output_with_failed(
         caught,
         [=, nwa=non_with_ancestor]()
           { nwa->output_catch(exception_type, error, caught, false); });
@@ -269,7 +281,17 @@ namespace testudo___implementation {
         log->output(get_location());
       }
     }
-    void output_show_value(string, string) override { }
+    void output_show_value(string expr_str, string value_str) override {
+      log->incr_counter();
+      log_output(
+        [=, nwa=non_with_ancestor]() {
+          nwa->output_show_value(expr_str, value_str);
+        });
+      if (recursively_last_time) {
+        non_with_ancestor->output_show_value(expr_str, "");
+        log->output(get_location());
+      }
+    }
     void output_begin_with(string var_name, string
                            container_first, string container_rest,
                            string summary) override {
@@ -290,7 +312,7 @@ namespace testudo___implementation {
     void output_check_true(string expr_str, string success,
                            string prefix, bool) override {
       log->incr_counter();
-      if_false_output_with_failed(
+      if_false_log_output_with_failed(
         success,
         [=, nwa=non_with_ancestor]() {
           nwa->output_check_true(expr_str, success, prefix, false);
@@ -305,7 +327,7 @@ namespace testudo___implementation {
                                string success,
                                string prefix, bool) override {
       log->incr_counter();
-      if_false_output_with_failed(
+      if_false_log_output_with_failed(
         success,
         [=, nwa=non_with_ancestor]() {
           nwa->output_check_true_for(expr_str, exprv_str, valv_str,
@@ -322,7 +344,7 @@ namespace testudo___implementation {
                             string success,
                             string prefix, bool) override {
       log->incr_counter();
-      if_false_output_with_failed(
+      if_false_log_output_with_failed(
         success,
         [=, nwa=non_with_ancestor]() {
           nwa->output_check_equal(expr1_str, val1_str, expr2_str, val2_str,
@@ -340,7 +362,7 @@ namespace testudo___implementation {
                              string success,
                              string prefix, bool) override {
       log->incr_counter();
-      if_false_output_with_failed(
+      if_false_log_output_with_failed(
         success,
         [=, nwa=non_with_ancestor]() {
           nwa->output_check_approx(expr1_str, val1_str, expr2_str, val2_str,
@@ -357,7 +379,7 @@ namespace testudo___implementation {
                              string success,
                              string prefix, bool) override {
       log->incr_counter();
-      if_false_output_with_failed(
+      if_false_log_output_with_failed(
         success,
         [=, nwa=non_with_ancestor]() {
           nwa->output_check_verify(expr_str, val_str, pred_str,

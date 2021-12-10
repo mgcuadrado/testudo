@@ -44,17 +44,11 @@
 #include "testudo_macros.h"
 #include <string>
 #include <sstream>
+#include <tuple>
+#include <cfloat>
+#include <cassert>
 
 namespace testudo___implementation {
-
-  // values are valid by default:
-  template <typename T>
-  bool is_valid_testudo(T const &)
-    { return true; }
-
-  template <typename T>
-  bool is_valid(T const &t)
-    { return is_valid_testudo(t); }
 
   template <typename T, typename U>
   bool are_equal_testudo(T const &t, U const &u)
@@ -81,61 +75,308 @@ namespace testudo___implementation {
     template <typename...>
     using void_t=void;
 
-    // detect if a type supports "ostream <<"
-    template <typename T, typename=void>
-    struct has_textual_representation_t : std::false_type { };
-    template <typename T>
-    struct has_textual_representation_t<
-      T, void_t<decltype(std::declval<std::ostream &>() << std::declval<T>())>>
-      : std::true_type { };
-    template <typename T>
-    constexpr bool has_textual_representation_v=
-      has_textual_representation_t<T>::value;
+#define define_support_for(name, ...)                                   \
+    template <typename T1=void, typename T2=void, typename T3=void,     \
+              typename=void>                                            \
+    struct support_for_##name##_t : std::false_type { };                \
+    template <typename T1, typename T2, typename T3>                    \
+    struct support_for_##name##_t<T1, T2, T3,                           \
+                                  void_t<decltype((__VA_ARGS__))>>      \
+      : std::true_type { };                                             \
+    template <typename T1=void, typename T2=void, typename T3=void>     \
+    constexpr bool support_for_##name##_v=                              \
+      support_for_##name##_t<T1, T2, T3>::value;                        \
+    testudo___DECL_EAT_A_SEMICOLON
 
-    // detect if a type supports ".what()" (meant for exceptions)
-    template <typename T, typename=void>
-    struct has_what_representation_t : std::false_type { };
-    template <typename T>
-    struct has_what_representation_t<
-      T, void_t<decltype(std::declval<T>().what())>>
-      : std::true_type { };
-    template <typename T>
-    constexpr bool has_what_representation_v=
-      has_what_representation_t<T>::value;
+    define_support_for(
+      textual_representation,
+      std::declval<std::ostream &>() << std::declval<T1>());
+    define_support_for(
+      what_representation,
+      std::declval<T1>().what());
+    define_support_for(
+      cbegin_cend,
+      (++std::declval<T1>().cbegin())==std::declval<T1>().cend());
+    define_support_for(
+      tuple_size,
+      std::tuple_size<T1>::value);
+
+#undef define_support_for
   }
+
+  // // textual representation for a value; if available, use "ostream <<";
+  // // otherwise, return a placeholder
+  // template <typename T>
+  // std::enable_if_t<
+  //   (not implementation::support_for_cbegin_cend_v<T>
+  //    and not implementation::support_for_tuple_size_v<T>),
+  //   std::string>
+  // to_text_testudo(T const &t) {
+  //   if constexpr (implementation::support_for_textual_representation_v<T>) {
+  //     std::ostringstream oss;
+  //     oss << std::boolalpha << t;
+  //     return oss.str();
+  //   }
+  //   else
+  //     return "<...>";
+  // }
+
+  // template <typename C, typename T, typename A>
+  // std::string to_text_testudo(std::basic_string<C, T, A> const &s)
+  //   { return s; }
+
+  // template <typename T>
+  // std::string to_text(T const &t)
+  //   { return to_text_testudo(t); }
+
 
   // textual representation for a value; if available, use "ostream <<";
   // otherwise, return a placeholder
   template <typename T>
-  std::string to_text_testudo(T const &t) {
-    if constexpr (implementation::has_textual_representation_v<T>) {
-      std::ostringstream oss;
-      oss << std::boolalpha << t;
-      return oss.str();
+  std::enable_if_t<
+    (not implementation::support_for_cbegin_cend_v<T>
+     and not implementation::support_for_tuple_size_v<T>),
+    void>
+  to_stream_testudo(std::ostream &os, T const &t) {
+    if constexpr (implementation::support_for_textual_representation_v<T>) {
+      os << t;
     }
     else
-      return "<...>";
+      os << "<...>";
   }
 
-  template <typename T>
-  std::string to_text(T const &t)
-    { return to_text_testudo(t); }
+  template <typename C, typename T, typename A>
+  void to_stream_testudo(
+      std::ostream &os, std::basic_string<C, T, A> const &s)
+    { os << s; }
 
-  // textual representation for an exception "e"; if available, use
-  // "to_text(e.what())"; otherwise, "to_text(e)"
-  template <typename E>
-  std::string exception_to_text(E const &e) {
-    if constexpr (implementation::has_what_representation_v<E>) {
-      return to_text(e.what());
-    }
+  template <typename T>
+  void to_stream(std::ostream &os, T const &t)
+    { to_stream_testudo(os, t); }
+
+  template <typename T>
+  std::string to_text(std::ostream &fmt_os, T const &t) {
+    std::ostringstream oss;
+    oss.copyfmt(fmt_os);
+    to_stream(oss, t);
+    return oss.str();
+  }
+
+  extern std::ostringstream default_fmt_os;
+
+  template <typename T>
+  std::string to_text(T const &t) { return to_text(default_fmt_os, t); }
+
+
+  // values are valid by default:
+  template <typename T>
+  std::enable_if_t<
+    (not implementation::support_for_cbegin_cend_v<T>
+     and not implementation::support_for_tuple_size_v<T>),
+    bool>
+  is_valid_testudo(T const &)
+    { return true; }
+
+  template <typename C, typename T, typename A>
+  bool is_valid_testudo(std::basic_string<C, T, A> const &)
+    { return true; }
+
+  template <typename T>
+  bool is_valid(T const &t)
+    { return is_valid_testudo(t); }
+
+}
+
+/// support for STL tuple, pair, and containers
+
+namespace testudo___implementation {
+
+  template <typename A, std::size_t... i>
+  bool is_valid_get(A const &a, std::index_sequence<i...>)
+    { return (is_valid(std::get<i>(a)) and ...); }
+
+  template <typename A>
+  bool is_valid_sequence(A const &a) {
+    for (auto const &e: a)
+      if (not is_valid(e))
+        return false;
+    return true;
+  }
+
+  template <typename A, typename B, std::size_t... i>
+  double absdiff_get(A const &a, B const &b, std::index_sequence<i...>)
+    { return (absdiff(std::get<i>(a), std::get<i>(b))+...); }
+
+  template <typename A, typename B>
+  double absdiff_sequence(A const &a, B const &b) {
+    double result=0.;
+    auto ai=a.cbegin();
+    auto bi=b.cbegin();
+    for (; (ai not_eq a.cend()) and (bi not_eq b.cend()); ++ai, ++bi)
+      result+=absdiff(*ai, *bi);
+    if ((ai==a.cend()) and (bi==b.cend()))
+      return result;
     else
-      return to_text(e);
+      return DBL_MAX;
+  }
+
+  inline void to_stream_comma_separated(std::ostream &)
+    { }
+  template <typename T>
+  void to_stream_comma_separated(std::ostream &os, T const &t)
+    { to_stream(os, t); }
+  template <typename F, typename... R>
+  void to_stream_comma_separated(std::ostream &os, F const &f, R const &...r) {
+    to_stream(os, f);
+    os << ", ";
+    to_stream_comma_separated(os, r...);
+  }
+
+  template <typename... T>
+  std::string to_text_comma_separated(std::ostream &fmt_os, T const &...t) {
+    std::ostringstream oss;
+    oss.copyfmt(fmt_os);
+    to_stream_comma_separated(oss, t...);
+    return oss.str();
+  }
+
+  template <typename... T>
+  std::string to_text_brackets(std::ostream &fmt_os, T const &...t)
+    { return "("+to_text_comma_separated(fmt_os, t...)+")"; }
+
+  template <typename Tu, std::size_t... i>
+  void to_stream_get(std::ostream &os, Tu const &t, std::index_sequence<i...>)
+    { to_stream_comma_separated(os, std::get<i>(t)...); }
+  template <typename Tu,
+            auto size=std::tuple_size<Tu>::value> // also valid for pairs
+  void to_stream_get(std::ostream &os,
+                     Tu const &t)
+    { to_stream_get(os, t, std::make_index_sequence<size>()); }
+
+  template <typename A>
+  void to_stream_sequence(std::ostream &os,
+                          A const &a) {
+    if (not a.empty()) {
+      bool first=true;
+      for (auto const &e: a) {
+        if (not first)
+          os << ", ";
+        to_stream(os, e);
+        first=false;
+      }
+    }
+  }
+
+  template <typename Tu>
+  std::string to_text_get(std::ostream &fmt_os, Tu const &t) {
+    std::ostringstream oss;
+    oss.copyfmt(fmt_os);
+    to_stream_get(oss, t);
+    return oss.str();
   }
 
 }
 
-testudo___BRING(is_valid_testudo)
-testudo___BRING(to_text)
-testudo___BRING(absdiff)
+namespace std {
+  // overloads are in the "std" namespace, where the types they apply to are
+  // defined, so they're found by argument-dependent lookup
+
+  /// "is_valid()" overloads
+
+  // tuples and pairs
+  template <typename Tu,
+            auto size=std::tuple_size<Tu>::value>
+  std::enable_if_t<
+    testudo___implementation::implementation
+      ::support_for_tuple_size_v<Tu>,
+    bool>
+  is_valid_testudo(Tu const &tu) {
+    return testudo___implementation::is_valid_get(
+      tu, std::make_index_sequence<size>());
+  }
+
+  // containers
+  template <typename Ca>
+  std::enable_if_t<
+    testudo___implementation::implementation
+      ::support_for_cbegin_cend_v<Ca>,
+    bool>
+  is_valid_testudo(Ca const &a)
+    { return testudo___implementation::is_valid_sequence(a); }
+
+  /// "absdiff()" overloads
+
+  // two tuples or pairs
+  template <typename Ta, typename Tb,
+            auto size_a=std::tuple_size<Ta>::value,
+            auto size_b=std::tuple_size<Tb>::value>
+  std::enable_if_t<
+    (testudo___implementation::implementation
+       ::support_for_tuple_size_v<Ta>
+     and testudo___implementation::implementation
+           ::support_for_tuple_size_v<Tb>),
+    double>
+  absdiff_testudo(Ta const &a,
+                         Tb const &b) {
+    static_assert(size_a==size_b);
+    return testudo___implementation::absdiff_get(
+      a, b, std::make_index_sequence<size_a>());
+  }
+
+  // two containers
+  template <typename Ca, typename Cb>
+  std::enable_if_t<
+    (testudo___implementation::implementation
+       ::support_for_cbegin_cend_v<Ca>
+     and testudo___implementation::implementation
+           ::support_for_cbegin_cend_v<Cb>),
+    double>
+  absdiff_testudo(Ca const &a, Cb const &b)
+    { return testudo___implementation::absdiff_sequence(a, b); }
+
+  /// "to_text()" overloads
+
+  // tuples and pairs
+  template <typename Tu,
+            auto size=std::tuple_size<Tu>::value>
+  std::enable_if_t<
+    testudo___implementation::implementation
+      ::support_for_tuple_size_v<Tu>,
+    void>
+  to_stream_testudo(std::ostream &os, Tu const &t) {
+    os << "{";
+    testudo___implementation::to_stream_get(os, t);
+    os << "}";
+  }
+
+  // containers
+  template <typename Ca>
+  std::enable_if_t<
+    testudo___implementation::implementation
+      ::support_for_cbegin_cend_v<Ca>,
+    void>
+  to_stream_testudo(std::ostream &os, Ca const &a) {
+    os << "{";
+    testudo___implementation::to_stream_sequence(os, a);
+    os << "}";
+  }
+
+}
+
+namespace testudo___implementation {
+
+  /// exceptions
+  template <typename E>
+  std::string exception_to_text(std::ostream &fmt_os, E const &e) {
+    if constexpr (implementation::support_for_what_representation_v<E>) {
+      return to_text(fmt_os, e.what());
+    }
+    else
+      return to_text(fmt_os, e);
+    }
+
+}
+
+testudo___BRING(is_valid, are_equal, to_stream, to_text, absdiff)
 
 #endif

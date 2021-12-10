@@ -31,9 +31,14 @@ namespace testudo___implementation {
 
     virtual ~TextTypeset()=default;
 
+    virtual void interactive_test()=0;
+
     virtual void title(string location, string name, string title)=0;
 
     virtual void location(string brief_location)=0;
+
+    virtual void begin_indent()=0;
+    virtual void end_indent()=0;
 
     virtual void begin_scope(string name)=0;
     virtual void end_scope(string name)=0;

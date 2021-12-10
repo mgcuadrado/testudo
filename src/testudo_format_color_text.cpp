@@ -29,8 +29,8 @@ namespace {
   class TestFormatColorText
     : public TestFormat {
   public:
-    TestFormatColorText(ostream &os, bool show_location=true)
-      : typeset(color_text_report_typeset(
+    TestFormatColorText(ostream &os, bool color=true, bool show_location=true)
+      : typeset((color ? color_text_report_typeset: text_report_typeset)( 
                   os, default_max_line_length, show_location)) { }
   private:
     shared_ptr<TextTypeset> const typeset;
@@ -50,19 +50,26 @@ namespace {
       set_location({});
     }
 
-    void output_begin_scope(string name) {
+    void output_begin_indent() override {
+      typeset->begin_indent();
+    }
+    void output_end_indent() override {
+      typeset->end_indent();
+    }
+
+    void output_begin_scope(string name) override {
       output_location();
       typeset->begin_scope(name);
     }
-    void output_end_scope(string name) {
+    void output_end_scope(string name) override {
       typeset->end_scope(name);
     }
 
-    void output_begin_declare_scope(string code_str) {
+    void output_begin_declare_scope(string code_str) override {
       output_location();
       typeset->begin_declare_scope(code_str);
     }
-    void output_end_declare_scope() {
+    void output_end_declare_scope() override {
       typeset->end_declare_scope();
     }
 
@@ -192,11 +199,21 @@ namespace {
       rc{test_format_named_creator(), "color_text"};
   };
 
+  class TestFormatText
+    : public TestFormatColorText {
+  public:
+    TestFormatText(ostream &os, bool show_location=true)
+      : TestFormatColorText(os, false, show_location) { }
+  private:
+    inline static pattern::register_creator<TestFormatText>
+      rc{test_format_named_creator(), "text"};
+  };
+
   class TestFormatColorTextWithLines
     : public TestFormatColorText {
   public:
     TestFormatColorTextWithLines(ostream &os)
-      : TestFormatColorText(os, true) { }
+      : TestFormatColorText(os, true, true) { }
   private:
     inline static pattern::register_creator<TestFormatColorTextWithLines>
       rc{test_format_named_creator(), "color_text_with_lines"};

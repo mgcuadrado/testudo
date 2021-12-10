@@ -20,7 +20,9 @@
 
 #include "testudo_macros.h"
 #include "testudo_stats.h"
+#include "testudo_activate.h"
 #include "named_create.h"
+#include <sstream>
 #include <string>
 #include <list>
 #include <cassert>
@@ -81,6 +83,8 @@ namespace testudo___implementation {
       { return location_p.to_string_brief(title_location_p); }
 
     virtual void output_title(string name, string title)=0;
+    virtual void output_begin_indent()=0;
+    virtual void output_end_indent()=0;
     virtual void output_begin_scope(string name)=0;
     virtual void output_end_scope(string name)=0;
     virtual void output_begin_declare_scope(string code_str)=0;
@@ -140,27 +144,36 @@ namespace testudo___implementation {
     virtual void print_test_readout() const=0;
 
     static bool to_bool(string s) {
-      if (s=="true")
+      if (s==true_tag)
         return true;
-      else if (s=="false")
+      else // everything else; like "false" or "error"
         return false;
-      else {
-        assert(false);
-        return {};
-      }
     }
-    static std::string bool_to_string(bool b) { return b ? "true" : "false"; }
+    static std::string bool_to_string(bool b)
+      { return b ? true_tag : false_tag; }
 
   protected:
     location_t title_location_p, location_p;
     std::pair<string, string> var_and_values_format(var_values_t);
   };
 
+  /// ostream format management
+  struct ValueFormatOStream {
+    std::ostringstream fmt_os;
+
+    void use_up_one_time_manipulators() {
+      fmt_os << "";
+      fmt_os.str("");
+    }
+  };
+
   using test_format_p=std::shared_ptr<TestFormat>;
   using test_format_pc=std::shared_ptr<TestFormat const>;
+  using value_format_ostream_t=std::shared_ptr<ValueFormatOStream>;
 
   struct test_management_t {
     test_format_p format;
+    value_format_ostream_t test_vfos;
     TestStats &stats;
   };
 
@@ -189,8 +202,8 @@ namespace testudo___implementation {
   // have the contents of the "with()"-loop in the report once), handles
   // "output_begin_with()" and "output_end_with()" (on the first-first
   // iteration, "output_begin_with()" is passed down; on the last-last
-  // iteration, "output_end_with()" is passed down), and reports a failed
-  // iteration on destruction
+  // iteration, "output_end_with()" is passed down), and reports failed
+  // iterations on destruction
   std::shared_ptr<TestFormat>
   make_with_loop_test_format(test_format_p parent_test_format,
                              std::shared_ptr<WithLoopLog> log, bool last_time,

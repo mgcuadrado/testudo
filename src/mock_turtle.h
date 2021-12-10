@@ -18,14 +18,9 @@
 #ifndef MGCUADRADO_TESTUDO_MOCK_TURTLE_HEADER_
 #define MGCUADRADO_TESTUDO_MOCK_TURTLE_HEADER_
 
-#include "testudo_macros.h"
-#include "testudo_ext.h"
 #include "testudo.h"
 #include <tuple>
 #include <unordered_set>
-
-// include auto-generated macros; matching defines here are commented-out
-#include "mock_turtle_macro_n.gh"
 
 namespace testudo___implementation {
 
@@ -51,9 +46,10 @@ namespace testudo___implementation {
   inline auto make_ret() { return std::make_tuple(); }
 
   template <typename T>
-  std::string ret_to_text(std::tuple<T> const &r)
-    { return to_text(get_ret(r)); }
-  inline std::string ret_to_text(std::tuple<> const &) { return "void"; }
+  std::string ret_to_text(std::ostream &fmt_os, std::tuple<T> const &r)
+    { return to_text(fmt_os, get_ret(r)); }
+  inline std::string ret_to_text(std::ostream &fmt_os, std::tuple<> const &)
+    { return to_text(fmt_os, "void"); }
 
 
   // get info about a signature
@@ -113,16 +109,16 @@ namespace testudo___implementation {
     auto ret() const { return check_valid(), get_ret(content->first); }
     auto args() const { return check_valid(), content->second; }
 
-    std::string content_to_text() const {
+    std::string content_to_text(std::ostream &fmt_os) const {
       return
-        "{"+ret_to_text(content->first)
-        +" (" +testudo___implementation::to_text_get(content->second)+")}";
+        "{"+ret_to_text(fmt_os, content->first)
+        +" (" +to_text_get(fmt_os, content->second)+")}";
     }
     std::string const method_name;
     bool is_valid() const { return is_valid_p; }
   private:
     bool const is_valid_p;
-    void check_valid() {
+    void check_valid() const {
       if (not is_valid())
         throw std::runtime_error("invalid call record");
     }
@@ -146,13 +142,13 @@ namespace testudo___implementation {
   }
 
   template <typename S>
-  std::string to_text(call_record<S> const &c) {
+  void to_stream_testudo(std::ostream &os, call_record<S> const &c) {
     if (c.is_valid()) { // "method_name:{ret (arg1, arg2)}"
-      return
-        c.method_name+(c.method_name.empty() ? "" : ":")+c.content_to_text();
+      os << c.method_name << (c.method_name.empty() ? "" : ":")
+         << c.content_to_text(os);
     }
     else // "method_name:invalid"
-      return c.method_name+":invalid";
+      os << c.method_name << ":invalid";
   }
 
 
@@ -166,41 +162,60 @@ namespace testudo___implementation {
 
   // return value schedule
   template <typename S>
-  struct Schedule {
+  class Schedule;
+  template <typename R_t, typename... A>
+  class Schedule <R_t (A...)> {
+  public:
+    using S=R_t (A...);
     using R=ret_t<S>;
     Schedule() : default_value(convert(R())) { }
     template <typename T>
     Schedule(T const &t) : default_value(convert(t)) { }
     template <typename T>
     void set_default(T const &t) { default_value=convert(t); }
-    R return_value() {
-      if (ret_values_p.empty()) // when the schedule empties, use default value
-        return default_value();
-      else {
-        auto r=ret_values_p.front()();
-        ret_values_p.pop_front();
-        return r;
-      }
-    }
+    R return_value(std::tuple<A...> const &args)
+      { return return_value(args, std::make_index_sequence<sizeof...(A)>()); }
     template <typename... T>
     void push_back(T const &...t)
       { (ret_values_p.push_back(convert(t)), ...); }
   private:
+    template <auto... i>
+    R return_value(std::tuple<A...> const &args, std::index_sequence<i...>)
+      { return return_value_from_args(std::get<i>(args)...); }
+    R return_value_from_args(A... a) {
+      if (ret_values_p.empty()) // when the schedule empties, use default value
+        return default_value(a...);
+      else {
+        auto r=ret_values_p.front()(a...);
+        ret_values_p.pop_front();
+        return r;
+      }
+    }
     template <typename T>
     static auto convert(T const &t,
                         std::enable_if_t<std::is_convertible_v<T, R>, int> =0)
       { return convert(R(t)); }
-    static auto convert(R const &r) { return [r]() { return r; }; }
+    static auto convert(R const &r) { return [r](A...) { return r; }; }
     template <typename E>
     static auto convert(throw_exception<E> const &te)
-      { return [te]() -> R { throw te.exception; }; }
+      { return [te](A...) -> R { throw te.exception; }; }
     template <typename F>
-    static auto convert(F const &f,
-                        std::enable_if_t<std::is_convertible_v<
-                        decltype(std::declval<F>()()), R>, int> =0)
-      { return f; }
-    std::function<R ()> default_value;
-    std::list<std::function<R ()>> ret_values_p;
+    static
+    std::enable_if_t<std::is_convertible_v<
+                       decltype(std::declval<F>()()), R>,
+                     std::function<S>>
+    convert(F const &f)
+      { return [f](A...) { return f(); }; }
+    template <typename F>
+    static
+    std::enable_if_t<(sizeof...(A) not_eq 0)
+                     and std::is_convertible_v<
+                       decltype(std::declval<F>()(std::declval<A>()...)), R>,
+                     std::function<S>>
+    convert(F const &f)
+      { return [f](A... a) { return f(a...); }; }
+    std::function<R (A...)> default_value;
+    std::list<std::function<R (A...)>> ret_values_p;
   };
 
   // per-method log of return value and value of the arguments
@@ -236,10 +251,10 @@ namespace testudo___implementation {
   auto get_return_value_and_log(Schedule<R (A...)> &s, RetArgsLog<R (A...)> &l,
                                 std::tuple<A...> const &tu) {
     auto &r=l.log_values(tu);
-    r=s.return_value();
+    r=s.return_value(tu);
     return get_ret(r);
   }
-  template <typename T=void>
+  template <typename... Base>
   class MockClass;
 
   struct MockClassEntry {
@@ -248,14 +263,15 @@ namespace testudo___implementation {
     std::string method_name;
     std::size_t method_call_n;
   };
-  inline std::string to_text(MockClassEntry const &cle) {
-    return
-      "{"+cle.mock_name+(cle.mock_name.empty() ? "" : ".")
-      +cle.method_name+" @ "+to_text(cle.method_call_n)+"}";
+  inline void to_stream_testudo(std::ostream &os, MockClassEntry const &cle) {
+    os << "{" << cle.mock_name << (cle.mock_name.empty() ? "" : ".")
+       << cle.method_name << " @ ";
+    to_stream(os, cle.method_call_n);
+    os << "}";
   }
 
   template <>
-  class MockClass<void> {
+  class MockClass<> {
   public:
     void report_to(MockClass<> *parent, std::string as)
       { testudo___parents.emplace_back(parent, as); }
@@ -319,11 +335,11 @@ namespace testudo___implementation {
 
   using CallLedger=MockClass<>;
 
-  template <class Base>
-  class MockClass
-    : public Base, public MockClass<> {
+  template <class FirstBase, class... RestBase>
+  class MockClass<FirstBase, RestBase...>
+    : public FirstBase, public RestBase..., public MockClass<> {
   public:
-    using Base::Base;
+    using FirstBase::FirstBase;
   };
 
   inline void call_ledger_report_to_implementation(
@@ -335,19 +351,19 @@ namespace testudo___implementation {
     { call_ledger_report_to_implementation(*child, parent, as); }
 
   template <typename C>
-  std::string print_calls(C const &c) {
+  std::string print_calls(std::ostream &fmt_os, C const &c) {
     if (c.empty())
       return {};
     MockClassEntry const *strike_first=&c.front(), *strike_last=strike_first;
     bool first=true;
-    std::string result=to_text(*strike_last);
+    std::string result=to_text(fmt_os, *strike_last);
     for (auto const &e: c) {
       if (not first) {
         if (not ((e.call_ledger==strike_last->call_ledger)
                  and (e.method_name==strike_last->method_name))) {
           if (strike_first not_eq strike_last)
-            result+=" -- "+to_text(*strike_last);
-          result+="\n"+to_text(e);
+            result+=" -- "+to_text(fmt_os, *strike_last);
+          result+="\n"+to_text(fmt_os, e);
           strike_first=&e;
         }
         strike_last=&e;
@@ -355,10 +371,15 @@ namespace testudo___implementation {
       first=false;
     }
     if (strike_first not_eq strike_last)
-      result+=" -- "+to_text(*strike_last);
+      result+=" -- "+to_text(fmt_os, *strike_last);
     result+="\n";
     return result;
   }
+
+  template <typename C>
+  std::string print_calls(C const &c)
+    { return print_calls(default_fmt_os, c); }
+
 
   // you can call "iterate()" with a reference to a call ledger, or a pointer,
   // or a smart pointer
@@ -441,19 +462,40 @@ namespace testudo___implementation {
 
 #define testudo___ARG3(_1, _2, _3, ...) _3
 
+  // the specs in brackets are transcribed as is for the primary method
+  // definition (the automatically defined one):
+#define testudo__PRIMARY_SPEC(spec) spec
+#define testudo__PRIMARY_SPECS(...)                                     \
+  testudo___FOR_EACH(testudo__PRIMARY_SPEC, __VA_ARGS__)
+  // from the specs in brackets, "override" and "final" aren't transcribed for
+  // the secondary method definition (the one whose body the user defines for
+  // wrapped methods); "const", "volatile", "&", and "&&" must remain (since
+  // "&" and "&&" won't be concatenated because they're symbols, they don't
+  // need their definition):
+#define testudo__SECONDARY_SPEC_TRANSFORM_ // remove for non-concatenated
+#define testudo__SECONDARY_SPEC_TRANSFORM_const const       // remains
+#define testudo__SECONDARY_SPEC_TRANSFORM_volatile volatile // remains
+#define testudo__SECONDARY_SPEC_TRANSFORM_override          // disappears
+#define testudo__SECONDARY_SPEC_TRANSFORM_final             // disappears
+#define testudo__SECONDARY_SPEC(spec)                                   \
+  testudo___CAT(\
+    testudo__SECONDARY_SPEC_, testudo___CAT(TRANSFORM_, spec))
+#define testudo__SECONDARY_SPECS(...)                                   \
+  testudo___FOR_EACH(testudo__SECONDARY_SPEC, __VA_ARGS__)
+
 #define testudo__MOCK_METHOD(b_ret, name, ...)                          \
   testudo___ARG3(__VA_ARGS__,                                           \
                  testudo___MOCK_METHOD_IMPL,                            \
                  testudo___MOCK_METHOD_IMPL_NO_SPEC, )(                 \
     b_ret, name, __VA_ARGS__)
 #define testudo___MOCK_METHOD_IMPL_NO_SPEC(b_ret, name, b_args)         \
-  testudo___MOCK_METHOD_IMPL(b_ret, name, b_args, )
+  testudo___MOCK_METHOD_IMPL(b_ret, name, b_args, ())
 #define testudo___MOCK_METHOD_IMPL(b_ret, name, b_args, b_spec)         \
-  testudo___MOCK_METHOD_IMPL_SPEC(b_ret, name, b_args, (b_spec))
+  testudo___MOCK_METHOD_IMPL_SPEC(b_ret, name, b_args, b_spec)
 #define testudo___MOCK_METHOD_IMPL_SPEC(b_ret, name, b_args, b_spec)    \
   testudo___REMOVE_BRACKETS b_ret                                       \
   testudo___SINGLE_OR_1ST(name)(testudo___ARGS_TYPE_NAME(b_args))       \
-  testudo___REMOVE_BRACKETS b_spec {                                    \
+  testudo__PRIMARY_SPECS b_spec  {                                      \
     this->log_call(                                                     \
       testudo___STRING(testudo___SINGLE_OR_2ND(name)),                  \
       testudo___CAT(testudo___SINGLE_OR_2ND(name), _log).size());       \
@@ -488,16 +530,16 @@ namespace testudo___implementation {
                  testudo___WRAP_METHOD_IMPL_NO_SPEC, )(                 \
     b_ret, name, __VA_ARGS__)
 #define testudo___WRAP_METHOD_IMPL_NO_SPEC(b_ret, name, b_args)         \
-  testudo___WRAP_METHOD_IMPL(b_ret, name, b_args, )
+  testudo___WRAP_METHOD_IMPL(b_ret, name, b_args, ())
 #define testudo___WRAP_METHOD_IMPL(b_ret, name, b_args, b_spec)         \
-  testudo___WRAP_METHOD_IMPL_SPEC(b_ret, name, b_args, (b_spec))
+  testudo___WRAP_METHOD_IMPL_SPEC(b_ret, name, b_args, b_spec)
 #define testudo___WRAP_METHOD_IMPL_SPEC(b_ret, name, b_args, b_spec)    \
   mutable testudo___implementation::RetArgsLog<                         \
       testudo___SIGNATURE(b_ret, b_args)>                               \
     testudo___CAT(testudo___SINGLE_OR_2ND(name), _log);                 \
   testudo___REMOVE_BRACKETS b_ret                                       \
   testudo___SINGLE_OR_1ST(name)(testudo___ARGS_TYPE_NAME(b_args))       \
-  testudo___REMOVE_BRACKETS b_spec {                                    \
+  testudo__PRIMARY_SPECS b_spec {                                       \
     log_call(                                                           \
       testudo___STRING(testudo___SINGLE_OR_2ND(name)),                  \
       testudo___CAT(testudo___SINGLE_OR_2ND(name), _log).size());       \
@@ -517,7 +559,8 @@ namespace testudo___implementation {
   testudo___REMOVE_BRACKETS b_ret                                       \
   testudo___CAT(testudo___SINGLE_OR_2ND(name),                          \
                 _testudo___implementation)                              \
-    (testudo___ARGS(b_args))
+    (testudo___ARGS(b_args))                                            \
+    testudo__SECONDARY_SPECS b_spec
 
 
 #define testudo__LOGGED_ARGS(name) name##_log.arg_values()

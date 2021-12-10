@@ -91,7 +91,7 @@ namespace testudo___implementation {
                  list<name_t> include,
                  list<string> glob) const {
     TestStats test_stats;
-    run_tests({test_format, test_stats}, include, glob);
+    run_tests({test_format, {}, test_stats}, include, glob);
     test_format->print_test_readout();
     return test_stats;
   }
@@ -187,7 +187,7 @@ namespace testudo___implementation {
       if (matches_at_least_one_or_empty(child->name, include)
           and child->some_matching_function(glob)) {
         TestStats child_test_stats;
-        child->run_tests({test_management.format, child_test_stats},
+        child->run_tests({test_management.format, {}, child_test_stats},
                          trim_include(child->name, include),
                          glob);
         test_management.stats+=child_test_stats;
@@ -196,7 +196,9 @@ namespace testudo___implementation {
     // run own test function if set
     if (test_f and matching_name(glob)) {
       try {
-        test_f(test_management);
+        value_format_ostream_t test_vfos=make_shared<ValueFormatOStream>();
+        test_vfos->fmt_os.copyfmt(default_fmt_os);
+        test_f({test_management.format, test_vfos, test_management.stats});
       }
       catch (exception const &excp) {
         test_management.format->uncaught_exception(excp.what());

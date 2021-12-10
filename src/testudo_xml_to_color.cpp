@@ -75,6 +75,12 @@ namespace testudo___implementation {
                          attribute(e, "n_errors"),
                          attribute(e, "success"));
       };
+    action_t process_indent=
+      [&](enc_t e) {
+        typeset->begin_indent();
+        process(e);
+        typeset->end_indent();
+      };
     action_t process_scope=
       [&](enc_t e) {
         typeset->begin_scope(attribute(e, "name"));
@@ -188,6 +194,7 @@ namespace testudo___implementation {
       {
 #define element(name) {#name, locate(process_##name)}
        element(test),
+       element(indent),
        element(scope),
        element(declare_scope),
        element(separator),
@@ -212,8 +219,12 @@ namespace testudo___implementation {
     process=[&](enc_t e) { process_children(e, actions); };
 
     auto root=read_element(cin);
-    must_be_element(root, "testudo");
-    process(root);
+    if (must_be_element(root)->name=="interactive_test")
+      typeset->interactive_test();
+    else {
+      must_be_element(root, "testudo");
+      process(root);
+    }
   }
 
 }

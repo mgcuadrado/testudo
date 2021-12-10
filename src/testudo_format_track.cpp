@@ -100,6 +100,10 @@ namespace {
 
     void output_title(string name, string title) override
       { encode('t', "title", name+title); }
+    void output_begin_indent() override
+      { encode('i', "begin_indent"); }
+    void output_end_indent() override
+      { encode('i', "end_indent"); }
     void output_begin_scope(string name) override
       { encode('i', "begin_scope", name); }
     void output_end_scope(string name) override

@@ -111,7 +111,7 @@ namespace testudo___implementation {
       }
       auto test_root=
         testudo__TOP_TEST_NODE(to.subtree.empty() ? subtree : to.subtree);
-      if  (test_root)
+      if (test_root)
         test_root
           ->test(testudo::test_format_named_creator(to.format_name)(cout),
                  to.include, to.glob);

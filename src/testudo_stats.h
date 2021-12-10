@@ -23,20 +23,13 @@
 // test cases
 
 #include "testudo_macros.h"
+#include <string>
 #include <cstdint>
+#include <cassert>
 
 namespace testudo___implementation {
 
   using integer=int_fast64_t;
-
-  // this class just wraps a bool representing wether a single test case
-  // succeeded or failed; its purpose is making "TestStats::operator+=()"
-  // clearer
-  class CheckResult {
-  public:
-    constexpr CheckResult(bool passed) : passed(passed) { }
-    bool const passed;
-  };
 
   // test statistics class; keeps track of passed and failed tests; a
   // "TestStats" object can be incremented with another "TestStats" object (in
@@ -48,16 +41,14 @@ namespace testudo___implementation {
     constexpr TestStats(integer n_p, integer n_f, integer n_e)
       : n_passed_p(n_p), n_failed_p(n_f), n_errors_p(n_e) { }
     constexpr TestStats() : TestStats(0, 0, 0) { }
+
     TestStats &operator+=(TestStats const &arg) {
       n_passed_p+=arg.n_passed_p;
       n_failed_p+=arg.n_failed_p;
       n_errors_p+=arg.n_errors_p;
       return *this;
     }
-    TestStats &operator+=(CheckResult arg) {
-      ++(arg.passed ? n_passed_p : n_failed_p);
-      return *this;
-    }
+
     void unexpected_error() { ++n_errors_p; }
 
     integer n_passed() const { return n_passed_p; }
@@ -81,6 +72,28 @@ namespace testudo___implementation {
       and ts1.n_failed()==ts2.n_failed()
       and ts1.n_errors()==ts2.n_errors();
   }
+
+  inline const TestStats
+    one_pass{1, 0, 0},
+    one_fail{0, 1, 0},
+    one_error{0, 0, 1};
+
+  using static_string=char const *;
+  inline static_string const
+    true_tag="true",
+    false_tag="false",
+    error_tag="error";
+
+  inline TestStats check_result(std::string success) {
+    return
+      (success==true_tag) ? one_pass
+      : (success==false_tag) ? one_fail
+      : (success==error_tag) ? one_error
+      : (assert(false), TestStats{});
+  }
+
+  inline TestStats check_result(bool success)
+    { return success ? one_pass : one_fail; }
 
 }
 

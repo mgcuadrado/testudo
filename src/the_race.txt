@@ -1,0 +1,132 @@
+.                                                                             .
+
+
+
+              ______
+                /    /
+               /    /__    __      ___   ___    __    __
+              /    /   ) /___)    /   ) ___ ) /   ' /___)
+             /    /   / (___     /     (___(_(___  (___
+
+
+
+  Testarudo the Turtle and       ))        _
+  Rauda the Rabbit agreed to    ((       (__)
+  race across the forest.       (x)    (____ ))      The goal was set at the
+                               ,' `.                     clearing atop Ingalls
+               ^.^.^.^.^ _ ^.^/ ^-^ \.^.^.^.^.^.^.^.^    Mountain, and marked
+              /\/\/\/\/\ \)  / ^.^.^ \  __  /\/\/\/\/    with a big fire that
+             /__\/__\/_  /') .^.^.^.^. (_'\.-.  \/__\    sent a column of smoke
+              ||  ||   ,/ |  \/\/\/\/\   \/___\,  ||     skywards.
+             ----------(_)|)---------------U U-------
+
+  Rauda was as fast as her cousin the       Testarudo, on the other hand, was
+  Hare, but unlike him, she was not         as undefatigable as his cousin the
+  lazy.  Once she starting running,         Tortoise, but on top of that, he
+  she never stopped until she reached       was insistently conscientious, and
+  her goal.                                 very perceptive.
+
+No course was decided: the racers would have to find their own way through the
+forest.  Lots of spectators gathered at the summit.  The announcement of the
+race had caused a great excitement.
+
+                        =-----.
+                        =-._   \       The Crow gave the start signal and
+                       ____|`  /__     immediately flew up high into the
+                       >__    ___.\    sky, to follow the race from above.
+                          `//'   `V
+                    _      `>>
+                    \)
+               ,___./')       Rauda darted away towards the goal,
+              _( .__,\_       leaping high above her rival.
+             (_,-'__ `-'
+              .-./`_)
+            ,/___\/         Testarudo started off with a firm,
+          ----U-U------     calm gait.
+
+      From his vantage point, inaccessible to anyone else, the Crow saw the
+      two racers evolve.
+                                      ,:;      ___V___
+              ,;     ::    .    ,',   '`       '--v--'
+              '            `:    '
+         ,                          ,',
+        ','   Rauda started          '        o
+             fast towards the                (_)    Testarudo avanced
+        ..   goal but deviated     ::        :':    slowly but steadily,
+        ''   or took sharp bends,            : :    always in the direction
+               often away from    ,,          : :   of the goal.
+          .`.     the goal        ''          : :
+           `    ..           ..               : :
+                ''     ::    ''  ,   .`.      : :
+                _               ','   `      : :
+               o_          ,',         ..   : :
+              -'-`-' ::     '          ''   : :
+                                           : :
+                                       ::  : :
+.                                                                             .
+.                                                                             .
+
+Rauda was soon deep in the forest. She couldn't see the goal, but she was sure
+she was on the right track, because she had been careful to always choose the
+steepest path upwards. She would get there in no time!
+
+      //  \\ ? _ _ !              And, sure enough, soon she was out of the
+     //    \\  \|/      v.        forest, and could see the summit a few dozen
+    //______\\ (")   Y V\|\Y      steps ahead.  But where were the fire and the
+       | o|    / \    \|/ /       smoke column?  She wasn't at the right mount!
+   ----|  |---((|))----\|/----    So, she quickly got back in the forest.
+
+Testarudo wasn't as fast as Rauda, by a long shot.  But being calmer afforded
+him more vision and patience to check and think.  Every few steps, he checked
+his bearings and looked for landmarks.
+                                                              __       ((
+  If he saw some light at the top of the forest           .-./'_)      ))
+  roof, he would check its direction.  He looked        ,/___\/        (x)
+  for high rocks to climb atop, even if it was          ,-U-U-.   /\  ,' `.
+  a lot of effort, to check his landmarks, find    /\.-'.      `./  \/ /\^ /
+  the smoke column, and correct his course.       / /    \       \___\/  \/
+
+                            ---.''-----''.---
+
+       ,==.      Hey, i'm the narrator.  So, yeah, as you can imagine, Rauda
+      // _ \     runs faster and faster while her situation gets worse and
+      G| O o     worse, and Testarudo just keeps walking in the right
+      `\ _`/     direction, doing his thing.  In the end, Rauda, who has
+   ___/ `-'_     emerged once again at the wrong summit, sees Testarudo in the
+  /   `--'  `    distance get to the goal.
+  |     mgc |           ____ _  _ ___     ___ _  _ __      .VV_
+                       |_   | || | __|   | __| \| |  \      ''
+                         | || __ | _|    | _||    | | |
+                         |_||_||_|___|   |___|_|\_|__/
+  Postlude
+ ----------
+
+But!  There were two things i didn't tell you.  First,                 _
+when Rauda realised she had a problem with orientation,            ?  (/
+she started asking directions from everybody she met.                ('\
+That only made things worse, because the animals she            !     | \,
+asked, especially the smaller ones, only knew the         --,@"------(|(_)--
+surroundings of their homes, but tried to "help"
+anyway.  Rauda followed everyone's advice, with no discrimination.  Testarudo
+also recruited help, but he checked the advice he got against his own, very
+                                  robust judgement.  He especially valued the
+          __ ?   ! __()           help of a strange animal, MocTurtle the
+      .-./'_)      \_^\.-.        Mock Turtle, who could climb trees and had
+    ,/___\/          \/___\@      an acute vision, and was so kind she kept
+  ----U-U--------------U-U----    helping Testarudo for the rest of the race.
+
+And!  In spite of MocTurtle's help, when Testarudo finally got to the goal, it
+was late in the eveningy.  The sun was setting, and all the spectators had gone
+home.  So sad...
+
+  ,-------------------------------------------------------------------------.
+  | Don't lose your speed and creativity: always be Rauda.  But make        |
+  | conscious efforts to constantly push in the right direction, like       |
+  | Testarudo.  You'll get much faster to the goal.  You can achieve this   |
+  | with minimal effort, even joy, by using the right tools and help.  Use  |
+  | Testudo and Mock Turtle to write good code that works, and to keep it   |
+  | always in good shape.  It can be great fun: treat it like a game where  |
+  | Testudo reports are your score, and Testudo tracks are your progress.   |
+  `-------------------------------------------------------------------------'
+                                                github.com/mgcuadrado/testudo
+.                                                                             .

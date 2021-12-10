@@ -2,7 +2,8 @@
 
 #include "testudo_typeset_color_text.h"
 #include <testudo/testudo_lc>
-#include <testudo/testudo_ext.h>
+#include <random>
+#include <iomanip>
 
 namespace {
 
@@ -107,6 +108,65 @@ namespace {
     check(a>b)_false_for(a, b);
   }
 
+  struct WrappedInt {
+    WrappedInt(int value) : valid(true), value(value) { }
+    WrappedInt() : valid(false), value(0) { }
+    bool valid;
+    int value;
+  };
+
+  bool operator==(WrappedInt a, WrappedInt b) {
+    return
+      (not a.valid and not b.valid)
+      or (a.valid and b.valid and (a.value==b.value));
+  }
+  bool operator not_eq(WrappedInt a, WrappedInt b)
+    { return not (a==b); }
+
+  bool is_valid_testudo(WrappedInt wi) { return wi.valid; }
+
+  ostream &operator<<(ostream &os, WrappedInt wi)
+    { return os << "WI(" << wi.valid << "," << wi.value << ")"; }
+
+  define_test(complex, "\"true_for\" checking for validity") {
+    declare(WrappedInt a=7);
+    declare(WrappedInt b=8);
+    declare(WrappedInt c);
+    perform(c.value=8);
+    check(c==c)_true;
+    check(c not_eq c)_true;
+    check(c)_equal(c);
+    check(c)_not_equal(c);
+    check(c==c)_true_for(c);
+    check(c==c)_false_for(c);
+    check(c not_eq c)_true_for(c);
+    check(c not_eq c)_false_for(c);
+    check(c==b)_true;
+    check(c not_eq b)_true;
+    check(c)_equal(b);
+    check(c)_not_equal(b);
+    check(c==b)_true_for(c, b);
+    check(c==b)_false_for(c, b);
+    check(c not_eq b)_true_for(c, b);
+    check(c not_eq b)_false_for(c, b);
+    check(a.value<b.value)_true;
+    check(a.value>b.value)_true;
+    check(a.value<b.value)_true_for(a, b);
+    check(a.value>b.value)_true_for(a, b);
+    check(a.value<c.value)_true;
+    check(a.value>c.value)_true;
+    check(a.value<c.value)_true_for(a, c);
+    check(a.value>c.value)_true_for(a, c);
+    check(a.value<b.value)_false;
+    check(a.value>b.value)_false;
+    check(a.value<b.value)_false_for(a, b);
+    check(a.value>b.value)_false_for(a, b);
+    check(a.value<c.value)_false;
+    check(a.value>c.value)_false;
+    check(a.value<c.value)_false_for(a, c);
+    check(a.value>c.value)_false_for(a, c);
+  }
+
   define_test(complex, (try_catch, "try-catch checks")) {
     check_try([]() { }())_catch();
     check_try(throw runtime_error("this'll be caught"))_catch();
@@ -138,14 +198,14 @@ namespace {
       check(x)_verify(is_even);
       print_text("let's do something, just to see how it's shown");
       declare(auto y=x+1);
-      show_value(y); // this shouldn't appear
+      show_value(y);
     }
     with_data(x, numbers_2) {
       declare(auto is_even=predicate_a((a%2)==0));
       check(x)_verify(is_even);
       print_text("let's do something, just to see how it's shown");
       declare(auto y=x+1);
-      show_value(y); // this shouldn't appear
+      show_value(y);
     }
 
     print_break();
@@ -411,6 +471,136 @@ namespace {
   define_test(testarudo, "external function") {
     perform(testarudo_util::test_commutativity(test_management, 2, 3));
     perform(testarudo_util::test_commutativity(test_management, -10, 7));
+  }
+
+  define_test(testarudo, "absdiff with mismatched sizes") {
+    check(list{1., 2., 3.})_approx(list{1., 2., 3.});
+    check(list{1., 2., 3.})_approx(list{1., 2., 3., 0.});
+    check(list{1., 2., 3.})_not_approx(list{1., 2., 3.});
+    check(list{1., 2., 3.})_not_approx(list{1., 2., 3., 0.});
+  }
+
+  define_test(testarudo, "provided") {
+    declare(double a=4.);
+    declare(double b=4.0001);
+    set_approx_epsilon(.001);
+    provided(a)_approx(b) {
+      check(a)_approx(a);
+      check(a)_not_approx(a);
+    }
+    provided(a)_not_approx(b) {
+      check(a)_approx(a);
+      check(a)_not_approx(a);
+    }
+    provided(1+2)_equal(2)
+      check(a)_approx(a);
+    provided(1+2)_equal(3)
+      check(a)_approx(a);
+    provided(1+2)_equal(3)
+      provided(2+2)_equal(4) {
+        check(2+3)_equal(6);
+        provided(2+5)_equal(7)
+          check(2+6)_equal(8);
+        provided(2+7)_equal(10)
+          check(2+8)_equal(10);
+    }
+  }
+
+  define_test(testarudo, "tfos") {
+    show_value(26);
+    check(26)_equal(29+31);
+    perform(tfos << hex << setfill('~') << setw(6));
+    show_value(26);
+    check(26)_equal(29+31);
+    perform(tfos << setw(6));
+    check(26)_equal(29+31);
+    show_value(26);
+    check(testudo::to_text(28))_equal("28");
+    check(testudo::to_text(tfos, 28))_equal("1c");
+  }
+
+  define_test(testarudo, "show_value() in with_data()") {
+    declare(list<int> numbers_1{2, 5, 6, 7, 8, 9, 12, 24});
+    with_data(x, numbers_1) {
+      show_value(x/2);
+      check(x/2+x/2)_equal(x);
+      show_value(x+x);
+      check(x/3+x/3+x/3)_equal(x);
+      show_value(x/3);
+    }
+  }
+
+  define_test(testarudo, "random data generators") {
+    declare(using namespace testudo);
+    declare(minstd_rand rg);
+    declare(uniform_int_distribution<> uid_0_9(0, 9));
+    declare(auto random_0_9=[&rg, &uid_0_9]() { return uid_0_9(rg); });
+    declare(auto seed=125);
+    perform(rg.seed(seed));
+    show_value(generate_data(4, random_0_9));
+    show_value(generate_data(4, random_0_9));
+    perform(rg.seed(seed));
+    show_value(generate_data_tuple(4));
+    perform(rg.seed(seed));
+    show_value(generate_data_tuple(4, random_0_9));
+    perform(rg.seed(seed));
+    show_value(generate_data_tuple(4, random_0_9, random_0_9));
+    perform(rg.seed(seed));
+    declare(list a{0, 1, 2, 3});
+    declare(list b{4, 5, 6});
+    declare(list c{7, 8});
+    show_value(cartesian_product(a));
+    show_value(cartesian_product(a, b));
+    show_value(cartesian_product(a, b, c));
+    perform(rg.seed(seed));
+    with_data((x, y), generate_data_tuple(4, random_0_9, random_0_9))
+      show_value(x+y);
+    perform(rg.seed(seed));
+    with_data((x, y), cartesian_product(generate_data(4, random_0_9),
+                                        generate_data(3, random_0_9)))
+      show_value(x+y);
+  }
+
+  define_test(testarudo, "track this") {
+    check(2)_equal(2);
+    check(2)_equal(3);
+    perform(throw "hey there");
+  }
+
+  template <typename T, typename D>
+  struct Wrap {
+    Wrap(T value) : value(value) { }
+    operator T() const { return value; }
+  private:
+    T value;
+  };
+
+  struct CommutInt
+    : Wrap<int, CommutInt> {
+    using Wrap::Wrap;
+    using Wrap<int, CommutInt>::operator int;
+  };
+  CommutInt operator+(CommutInt a, CommutInt b)
+    { return int(a)+int(b); }
+
+  struct NonCommutInt
+    : Wrap<int, NonCommutInt> {
+    using Wrap::Wrap;
+    using Wrap<int, NonCommutInt>::operator int;
+  };
+  NonCommutInt operator+(NonCommutInt a, NonCommutInt b)
+    { return int(a)+2*int(b); }
+
+  define_test(testarudo, "lambda inside test") {
+    declare(auto check_plus_commutativity=
+            [this](auto x, auto y) {
+              check(x+y)_equal(y+x);
+            });
+    perform(check_plus_commutativity(1, 2));
+    perform(check_plus_commutativity('a', 3));
+    perform(check_plus_commutativity('a', '3'));
+    perform(check_plus_commutativity(CommutInt(1), CommutInt(2)));
+    perform(check_plus_commutativity(NonCommutInt(1), NonCommutInt(2)));
   }
 
 }

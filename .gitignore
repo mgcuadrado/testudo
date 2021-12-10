@@ -22,3 +22,8 @@ testudo_unicode_extravaganza
 *.log
 *.lof
 *.lot
+
+generate_examples_script
+rubbertmp
+emacs_add_keywords_*.txt
+examples

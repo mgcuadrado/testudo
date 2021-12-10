@@ -30,6 +30,7 @@ SET_APPROX_EPSILON    asigni_proksimo_epsilonon
 SHOW_APPROX_EPSILON   montri_proksimo_epsilonon
 
 CHECK      certigi
+PROVIDED   kondiĉe_ke
 TRUE       _vera
 FALSE      _malvera
 TRUE_FOR   _vera_por
@@ -45,6 +46,8 @@ NOT_VERIFY _ne_verigas
 PREDICATE     predikato
 PREDICATE_A   predikato_a
 PREDICATE_C_A predikato_c_a
+
+TFOS tfos
 
 MOCK_METHOD     imita_metodo
 WRAP_METHOD     volva_metodo

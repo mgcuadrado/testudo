@@ -38,7 +38,11 @@ namespace {
 
   using testudo___implementation::escape_tilde;
 
-  string xml_bool(bool b) { return b ? "true" : "false"; }
+  string xml_bool(bool b) {
+    return
+      b ? testudo___implementation::true_tag
+      : testudo___implementation::false_tag;
+  }
   string xml_bool(string b) { return b; }
 
   class TestFormatXML
@@ -66,21 +70,28 @@ namespace {
         ->append_attribute("title", escape_tilde(title));
     }
 
-    void output_begin_scope(string name) {
+    void output_begin_indent() override {
+      auto new_indent=localize(test_stack.top()->add_element("indent"));
+      test_stack.push(new_indent);
+    }
+
+    void output_end_indent() override { test_stack.pop(); }
+
+    void output_begin_scope(string name) override {
       auto new_scope=localize(test_stack.top()->add_element("scope"));
       test_stack.push(new_scope);
       new_scope->append_attribute("name", escape_tilde(name));
     }
 
-    void output_end_scope(string) { test_stack.pop(); }
+    void output_end_scope(string) override { test_stack.pop(); }
 
-    void output_begin_declare_scope(string code_str) {
+    void output_begin_declare_scope(string code_str) override {
       auto new_scope=localize(test_stack.top()->add_element("declare_scope"));
       test_stack.push(new_scope);
       new_scope->append_attribute("declare", escape_tilde(code_str));
     }
 
-    void output_end_declare_scope() { test_stack.pop(); }
+    void output_end_declare_scope() override { test_stack.pop(); }
 
     void output_separator() override
       { localize(test_stack.top()->add_element("separator")); }

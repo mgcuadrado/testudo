@@ -9,7 +9,50 @@
   but if it did, it would take an additional almost empty line (with just the
   line information); so i don't know what to do yet
 
+[ ] i think "make diff_test" should make both "make diff_report" and "make
+  diff_track", even if the former returns an error (i.e., if there are diffs in
+  the report); no, wait, that's "make diff_track"; what does "make diff_test"
+  do?
+
 ---- big but important things ------------------------------
+
+[ ] write a cheatsheet in the form of a complete Testudo example that exercises
+  everything, with annotations; it should fit in an A4 paper; well this seems
+  impossible, since the list of all syntax names barely fits in an A4 paper;
+  instead, i can try to have separate tests, each one focused on one aspect of
+  Testudo and Mock Turtle, each one fitting in an A4 paper (but several small
+  ones may be fitted in a single page); rundown:
+
+      * testrengthening, "make" targets
+
+      * test structure ("define_top_test_node", "define_test", etc)
+
+      * regular tests (values and checks, including scopes, with-data,
+        provided, etc)
+
+      * fixtures (including fixture definition, with-fixture, visible-fixture,
+        etc)
+
+      * Mock Turtle
+
+      * adding Testudo support to types
+
+[ ] write more documentation about tracks
+
+[ ] add static asserts and probably other things to improve compile error
+  messages; also, tips in the doc; like
+
+      if the compiler complains about an unknown "testudo____TEST_my_test",
+      it's because you haven't defined a test node or test with the name
+      "my_test"
+
+[ ] support outputting test report in the same run as the test track
+
+[ ] make the XML parser resistant to unfinished XML, so that we can have at
+  least an incomplete report even if the test crashes
+
+[ ] consider running each test as a separate process, so that the whole
+  procedure is more resistant to crashes
 
 [ ] make track progress reports more beautiful
 
@@ -98,29 +141,8 @@
         * what are the new test ids, and what are the test ids that have
           disappeared
 
-[ ] code "given()" to check preconditions before undertaking certain test
-  steps:
-
-      given(a)_not_equal(0)
-      given(b>0)_true {
-        show_value(b/a);
-        check(a*(b/a))_equal(b);
-      }
-
-  if a "given()" fails, the tests it guards aren't even run, and an error is
-  tallied (as if an unexpected exception had been thrown); "given()" could
-  actually be implemented as a special "check()" that throws on fail, but it
-  should be enclosed ran a try-catch, so that it doesn't obliterate the rest of
-  the test; may not be trivial
-
-  other names for "given()":
-
-      * "assuming()"
-
-      * "provided()"
-
 [ ] consider removing predicate checks ("VERIFY", "PREDICATE", et cetera) in
-  favour of  "TRUE_FOR"
+  favour of "TRUE_FOR"
 
 ---- high priority -----------------------------------------
 
@@ -130,51 +152,57 @@
 
 ---- easy --------------------------------------------------
 
+[ ] document (and add to "testarudo.ttd") this most interesting fact: if you
+  define a lambda inside a test, you only need to add "this" to its captures to
+  be able to use Testudo syntax in it (see "kmsxml/kmsxml.ttd")
+
+[ ] code a "testudo" option to testrengthen ([teˈstreŋkθən]) a project (rather
+  than copying and renaming ~/local/include/Makefile.template, then editing it,
+  you should be able to do something like "testudo -m -l mylib -e -myexe")
+
+[ ] check "color_no_loc_info" and the make target that use it; there's
+  something fishy going on
+
 [ ] remove "no_loc_info" in favour of "testudo xml_to_color -n" and a new
   option to "testudo run" that doesn't add location info to the XML (for "make
   save_report")
 
-[ ] shouldn't '\' chars at the end of broken lines appear blue?
-
 [ ] code an easy way to add new formats that differ only in construction
   options (see "testudo_format_color_text.cpp:TestFormatColorTextWithLines")
-
-[ ] make "show_value()" &al actually work in "with_data()"?  why would i put
-  such a thing in a "with_data()" otherwise?
-
-[ ] deprecate explicitly #include-ing "testudo_ext.h"; it should be always
-  included by "testudo.h", since it is very small (209 lines) compared to
-  what's already included when #include-ing "testudo.h" (1745 lines); change
-  doc accordingly
 
 [ ] code a templated random generator system, to be used with
   "generate_data()"; generation of random data for a given type should probably
   become another aspect of "adding Testudo support for your types"
-
-[ ] i believe in the following
-
-    with_data(a, generate_data(100, random_int))
-      with_data(b, generate_data(100, random_int)) {
-        show(a);
-        show(b);
-      }
-
-  the values "b" takes are different for each value of "a" (a fresh list of
-  random values for "b" is created for each "a" value); we may want the
-  opposite behaviour: having just 100 values for "b" that we cross with the 100
-  "a" values; this could be achieved with something like
-
-    with_data((a, b), cartesian(generate_data(100, random_int),
-                                generate_data(100, random_int))) {
-      show(a);
-      show(b);
-    }
 
 ---- in progress -------------------------------------------
 
 [ ] document
 
 ---- tasks -------------------------------------------------
+
+[ ] "literature"
+
+    [ ] write a reimagining of the turtle (actually tortoise...) and the hare,
+      where the hare isn't actually lazy but unfocused, and runs with all his
+      speed but in any direction, not stopping in time to check his course, and
+      the turtle walks more slowly, but always checking his direction; thus,
+      the turtle always moves towards the goal, where the hare doesn't most of
+      the time, and actually often runs away from it; is coding with tests
+      slower than coding without them? only in terms of total lines written per
+      hour (most of which are wrong for the hare-style coding); if you count
+      functionality per hour, it's way faster, and the result is cleaner, more
+      elegant, better documented (tests document too), easier to understand,
+      and more maintainable
+
+    [ ] then, maybe write about Testarudo's friend, Mock Turtle, connecting the
+      software to Lewis Carroll's character
+
+[ ] add the possibility for fixtures to have construct arguments; these should
+  be passed with something like "with_fixture_arguments(...)" when defining a
+  test with a fixture
+
+[ ] print results to a different stream than "cout", so that it doesn't get
+  mixed with other, non-test output?
 
 [ ] it may be possible to have a command that computes result diffs with
   respect to any past version, using the appropriate version control command
@@ -230,17 +258,12 @@
 
     [ ] add line info to the summary
 
-[ ] support "iomanip" on the report output?
-
 [ ] do something to mock static methods; i've started (shelve "attempt at
   mocking static methods"), and it seems feasible, but it may be too much work
   compared to its expected use: who uses static methods that may need to me
   mocked?; if someone does, it's easy to just delegate a static method to a
   mocked method of a mocked singleton, so you get all the benefits of logs and
   ledgers; maybe it would be better to explain this in the doc, with an example
-
-[ ] improve clarity of compiler errors (this is a big one; i'll have to put
-  "static_assert" all over the place, and possibly use other tricks too)
 
 [ ] use the "DuneBuggy" as an example (buggy) module to write a guide
 
@@ -909,3 +932,148 @@
 [X] code "check_multiline()" for (string) arguments that span several lines; or
   make "check()" (and maybe others) detect automatically multiline arguments,
   and display them accordingly; did the automatic version
+
+[X] document: in section "The test code", the #include's use quotes, but they
+  should use square brackets
+
+[X] document: make target "show_report_bw" isn't listed
+
+[X] document the ".tth" convention for testudo-enhancing headers
+
+[X] shouldn't '\' chars at the end of broken lines appear blue?
+
+[X] should the result of a "_true_for()" check depend on the validity of the
+  arguments to "_true_for()"?
+
+[X] deprecate explicitly #include-ing "testudo_ext.h"; it should be always
+  included by "testudo.h", since it is very small (209 lines) (well, yes, but
+  it brings in a few STL headers that aren't tiny) compared to what's already
+  included when #include-ing "testudo.h" (1745 lines); change doc accordingly
+
+[X] code "given()" to check preconditions before undertaking certain test
+  steps:
+
+      given(a)_not_equal(0)
+      given(b>0)_true {
+        show_value(b/a);
+        check(a*(b/a))_equal(b);
+      }
+
+  if a "given()" fails, the tests it guards aren't even run, and an error is
+  tallied (as if an unexpected exception had been thrown); "given()" could
+  actually be implemented as a special "check()" that throws on fail, but it
+  should be enclosed in a try-catch, so that it doesn't obliterate the rest of
+  the test; may not be trivial
+
+  other names for "given()":
+
+      * "assuming()"
+
+      * "provided()"
+
+[X] support "iomanip" on the report output?  like, sometimes, i'd like to print
+  an int in hexadecimal, so i'd like to be able to do something like
+
+    show_value(setw(4), setfill('0'), hex, integer_value);
+
+  how about adding this feature to the fail report of checks, for instance?
+
+  current situation:
+
+      macros use "testudo::to_text(value)"
+
+      "testudo::to_text(value)" uses "to_text_testudo(value)"
+
+      if no user-provided "to_text_testudo(value)" exists, this reverts to
+        "testudo::to_text_testudo(value)"
+
+      "testudo::to_text_testudo(value)" uses "os << value"
+
+      if no user-provided "os << value" exists, this reverts to standard
+
+  what we want:
+
+      macros use "testudo::to_stream(vfos, value)" ("vfos" stands for "value
+        formatter ostream"; it's a configurable macro, same as "show_value" and
+        all the others; the state of "vfos" is saved for equality checks, for
+        instance, since both the reference and the test value must be formatted
+        with the same format, and some manipulators [the ones with an argument,
+        like "setw(...)"] are cleared when used; so we must save the state,
+        output the first value, recover the state, and output the second value)
+
+      "testudo::to_stream(vfos, value)" uses "to_stream_testudo(vfos, value)"
+        (but saves the state of "vfos" before calling it and restores it
+        afterwards: we don't want "to_stream_testudo(vfos, value)" to affect
+        "vfos" in unpredictable ways; but! one-time manipulators should be
+        cleared as expected; maybe do some 'vfos << ""' that we don't use)
+
+      if no user-provided "to_stream_testudo(vfos, value)" exists, this reverts
+        to "testudo::to_stream_testudo(vfos, value)"
+
+      "testudo::to_stream_testudo(vfos, value)" uses "os << value"
+
+      if no user-provided "os << value" exists, this reverts to standard
+
+[X] make "show_value()" &al actually work in "with_data()"?  why would i put
+  such a thing in a "with_data()" otherwise?
+
+[-] is there any way to code a templated version of "with_data()", so that the
+  parameters (types or otherwise) can be used as a template argument in the
+  "with_data()" body?  i doubt it: "a template declaration cannot appear at
+  block scope"; if i try the following trick:
+
+  void function() {
+    struct TemplateHolder {
+      template <typename T>
+      void test_things(T const &t) { ... }
+    };
+  }
+
+  i get "invalid declaration of member template in local class";
+  "https://en.cppreference.com/w/cpp/language/class" states "local classes
+  other than closure types cannot have member templates"; it may be achievable
+  with lambdas with auto arguments, but then we'd be templatising only on
+  types; the only sensible approach seems to be "test-aware functions" (see
+  thusly-named section in manual)
+
+[X] allow the function assigned to a mock method to depend on the mocked
+  method's arguments (see "How to schedule mock-method behaviour" in the
+  manual)
+
+[X] maybe implement multiple inheritance in mock classes, by giving
+  "MockClass<>" any number of arguments?
+
+[X] i believe in the following
+
+    with_data(a, generate_data(100, random_int))
+      with_data(b, generate_data(100, random_int)) {
+        show(a);
+        show(b);
+      }
+
+  the values "b" takes are different for each value of "a" (a fresh list of
+  random values for "b" is created for each "a" value); we may want the
+  opposite behaviour: having just 100 values for "b" that we cross with the 100
+  "a" values; this could be achieved with something like
+
+    with_data((a, b), cartesian(generate_data(100, random_int),
+                                generate_data(100, random_int))) {
+      show(a);
+      show(b);
+    }
+
+  but consider this: for repeatability, we might want to set the seed before
+  every usage of "generate_data()"; if so, the following would achieve almost
+  the desired effect (although the "cartesian()" thing would be cleaner):
+
+    perform(set_seed(1234));
+    with_data(a, generate_data(100, random_int)) {
+      perform(set_seed(8888);
+      with_data(b, generate_data(100, random_int)) {
+        show(a);
+        show(b);
+      }
+    }
+
+[X] in track reports, distinguish between [bad] ([OK] instances turning [FAIL])
+  and [very-bad] (having new [ERR-] instances)

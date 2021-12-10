@@ -30,16 +30,38 @@ COLOR_NO_LOC_INFO = ./color_no_loc_info
 UNCOLOR = ./uncolor
 
 TTD_ADDITIONAL_PREREQUISITES = \
-	$(STYLE_HEADERS) mock_turtle_macro_n.gh $(HEADERSDIR)
+	$(STYLE_HEADERS) testudo_macros_n.gh $(HEADERSDIR)
 
 O_ADDITIONAL_PREREQUISITES := $(TTD_ADDITIONAL_PREREQUISITES)
 
 include Makefile.testudo
 
-testudo.pdf: testudo.tex ascii_logo_colour_cropped.pdf version \
+EXAMPLESDIR := examples
+
+$(EXAMPLESDIR)/examples_generated: doc_examples.ttd generate_examples
+	mkdir -p $(EXAMPLESDIR)
+	./generate_examples $(EXAMPLESDIR) > $@
+
+clean_examples:
+	rm -rf $(EXAMPLESDIR)
+
+RUBBERDIR := rubbertmp
+
+MANUALS := $(wildcard testudo*.tex)
+PDFMANUALS := $(MANUALS:%.tex=%.pdf)
+
+all_manuals: $(PDFMANUALS)
+
+$(PDFMANUALS): %.pdf: %.tex testudo.tex the_race.pdf \
+		ascii_logo_colour_cropped.pdf\
+		ascii_logo_mig_colour_cropped.pdf \
+		version \
 		reports/testudo.use_instructions.tex \
-		style_table.tex keywords.tex
-	rubber -d testudo
+		style_table.tex keywords.tex copyright.txt \
+		$(EXAMPLESDIR)/examples_generated
+	mkdir -p $(RUBBERDIR)
+	rubber --jobname $(RUBBERDIR)/$* -d $*
+	mv $(RUBBERDIR)/$@ $@
 
 style_table.tex: generate_LaTeX_style_table lc.tst uc.tst
 	./$^ > $@
@@ -50,24 +72,28 @@ keywords.tex: generate_keywords lc.tst uc.tst eo.tst
 emacs_add_keywords_%.txt: generate_emacs_add_keywords %.tst
 	./$^ > $@
 
-ascii_logo_colour.pdf \
-		ascii_logo_mig_colour.pdf \
-		testudo_gaming_colour.pdf \
-		testudo_kavalir_colour.pdf \
-		dune_buggy_logo.pdf: %.pdf: %.tex
-	rubber -m xelatex $<
+the_race.pdf: %.pdf: %.tex %.txt
+	mkdir -p $(RUBBERDIR)
+	rubber -m xelatex --jobname $(RUBBERDIR)/$* $*
+	mv $(RUBBERDIR)/$@ $@
 
-ascii_logo_colour_cropped.pdf \
-		ascii_logo_mig_colour_cropped.pdf \
-		testudo_gaming_colour_cropped.pdf \
-		testudo_kavalir_colour_cropped.pdf \
-		dune_buggy_logo_cropped.pdf: %_cropped.pdf: %.pdf
+LOGOS := $(wildcard *_logo*.tex)
+PDFLOGOS := $(LOGOS:%.tex=%.pdf)
+CROPPEDPDFLOGOS := $(PDFLOGOS:%.pdf=%_cropped.pdf)
+
+$(PDFLOGOS): %.pdf: %.tex
+	mkdir -p $(RUBBERDIR)
+	rubber -m xelatex --jobname $(RUBBERDIR)/$* $*
+	mv $(RUBBERDIR)/$@ $@
+
+$(CROPPEDPDFLOGOS): %_cropped.pdf: %.pdf
 	pdfcrop $< $@
 
 clean_doc:
-	rubber -d --clean testudo
-	rubber -m xelatex --clean ascii_logo_colour.tex
-	rm -f ascii_logo_colour_cropped.pdf style_table.tex keywords.tex
+	rm -f testudo.pdf
+	rm -rf $(RUBBERDIR)
+	rm -f $(PDFLOGOS) $(CROPPEDPDFLOGOS)
+	rm -f style_table.tex keywords.tex
 	rm -f emacs_add_keywords_*.txt
 
 LINKOPTS = $(COMPILEOPTS) $(LIBRARYOPTS) $(COMMONLIBRARIES)
@@ -81,7 +107,7 @@ COMMONLIBRARIES= -rdynamic -lm -ldl -pthread
 
 PRINTDIR := .print
 OBJDIR := .object
-ALLHEADERS := $(ALLHEADERS) mock_turtle_macro_n.gh
+ALLHEADERS := $(ALLHEADERS) testudo_macros_n.gh
 
 TESTUDOBIN := .object/$(TESTUDONAME)
 TESTUDOLIB := .object/lib$(TESTUDONAME).so
@@ -100,10 +126,10 @@ check_variables:
 $(STYLE_HEADERS): testudo_%: %.tst generate_style
 	./generate_style $<
 
-mock_turtle_macro_n_customize.m4:
+testudo_macros_n_customize.m4:
 	echo "define(\`max_n', 32)\`'dnl" > $@
 
-mock_turtle_macro_n.gh: mock_turtle_macro_n.m4 mock_turtle_macro_n_customize.m4
+testudo_macros_n.gh: testudo_macros_n.m4 testudo_macros_n_customize.m4
 	m4 $< > $@
 
 $(HEADERSDIR):
@@ -131,7 +157,7 @@ test: $(TESTUDOBIN)
 clean_exe:
 	rm -rf $(HEADERSDIR) $(PRINTDIR)
 	rm -f $(STYLE_HEADERS)
-	rm -f mock_turtle_macro_n.gh mock_turtle_macro_n_customize.m4
+	rm -f testudo_macros_n.gh testudo_macros_n_customize.m4
 
 diff_xml_text_test_bw: $(TEST_PREREQUISITES)
 	diff -u \
@@ -209,7 +235,7 @@ clean_ascii_logo:
 clean_report:
 	rm -rf reports
 
-clean:: clean_doc clean_exe clean_report clean_ascii_logo
+clean:: clean_doc clean_exe clean_report clean_ascii_logo clean_examples
 
 diff_tests: diff_test \
 		diff_xml_text_test_bw \
@@ -229,7 +255,6 @@ INSTALL_SCRIPT := no_loc_info show_ansi uncolor generate_style
 INSTALL_HEADERS = $(shell ./headers \
 				testudo_lc \
 				testudo_uc \
-				testudo_ext.h \
 				testudo_opt.h \
 				testudo_try_catch.h) \
 			lc.tst uc.tst

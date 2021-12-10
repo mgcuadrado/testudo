@@ -63,8 +63,11 @@ namespace testudo___implementation {
         delta_failed=to.n_failed()-from.n_failed(),
         delta_passed=to.n_passed()-from.n_passed();
       // reducing errors is always the best result, and introducing errors is
-      // always the worst result:
-      if (delta_errors not_eq 0)
+      // always the worst result, but introducing errors must be reported
+      // explicitly:
+      if (delta_errors>0)
+          return error_tag;
+      if (delta_errors<0)
         return to_string(-delta_errors);
       // a change in the number of failed is more important than a change in
       // the number of passed:
@@ -105,7 +108,8 @@ namespace testudo___implementation {
                  {{"deleted good",  ts.deleted_good,  false},
                   {"deleted wrong", ts.deleted_wrong, false},
                   {"new good",      ts.new_good,      true},
-                  {"new wrong",     ts.new_wrong,     true}}) {
+                  {"new wrong",     ts.new_wrong,     true},
+                  {"new error",     ts.new_error,     true}}) {
           if (not tracks.empty()) {
             TestStats e_ts;
             for (auto const &e: tracks)
@@ -134,6 +138,7 @@ namespace testudo___implementation {
                           bool>>
                  {{"wrong to good", ts.wrong_to_good, false},
                   {"good to wrong", ts.good_to_wrong, false},
+                  {"to error",      ts.to_error,      true},
                   {"with_data changed", ts.with_data_changed, true}})
           if (not tracks.empty()) {
             TestStats s_ts, t_ts;
@@ -438,6 +443,8 @@ namespace testudo___implementation::diff_implementation {
 
     bool is_good(TestStats const &ts)
       { return (ts.n_failed()==0) and (ts.n_errors()==0); }
+    bool is_error(TestStats const &ts)
+      { return (ts.n_errors() not_eq 0); }
 
   }
 
@@ -454,7 +461,9 @@ namespace testudo___implementation::diff_implementation {
     for (auto j: table.target_new) {
       auto const &e=target[j];
       if ((e.type[0]=='c') or (e.type[0]=='e')) // check or error
-        (is_good(e.stats) ? ts.new_good : ts.new_wrong)
+        (is_error(e.stats) ? ts.new_error
+         : is_good(e.stats) ? ts.new_good
+         : ts.new_wrong)
           .push_back(e);
     }
 
@@ -467,7 +476,9 @@ namespace testudo___implementation::diff_implementation {
           // FIXME: but we're missing changes that leave the summary unchanged
         }
         else if (is_good(es.stats) not_eq is_good(et.stats)) {
-          (is_good(es.stats) ? ts.good_to_wrong : ts.wrong_to_good)
+          (is_error(et.stats) ? ts.to_error
+           : is_good(es.stats) ? ts.good_to_wrong
+           : ts.wrong_to_good)
             .push_back({es, et});
         }
       }

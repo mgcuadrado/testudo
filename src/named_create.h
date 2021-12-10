@@ -79,8 +79,9 @@ namespace pattern {
     struct creator_caller_t {
       creator_caller_t(creator_t const &creator) : creator(creator) { }
       template <typename... PA>
-      std::shared_ptr<T> operator()(P const &... p, PA &&...pa) const
-        { return creator(p..., additional_t{std::any(pa)...}); }
+      std::shared_ptr<T> operator()(P const &... p, PA &&...pa) const {
+        return creator(p..., additional_t{std::any(std::forward<PA>(pa))...});
+      }
     private:
       creator_t const creator;
     };
@@ -102,7 +103,7 @@ namespace pattern {
     void register_creator_function(std::string name, creator_t creator)
       { creators[name]=creator; }
     std::map<std::string, creator_t> creators;
-    template <typename CONST>
+    template <typename CT>
     friend struct register_creator;
   };
 

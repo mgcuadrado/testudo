@@ -1,0 +1,1210 @@
+#ifndef NAUTOTEST
+
+#include <testudo/testudo_lc>
+#include <testudo/testudo_eo>
+// { include-testudo-base
+#include <testudo/testudo_base.h>
+// }
+// { include-mock-turtle
+#include <testudo/mock_turtle.h>
+// }
+#include <cmath>
+#include <iomanip>
+
+#define SPACE
+#define OPSP
+#define CLSP
+
+  // This file contains the (working, in a sense) examples used in the manual.
+  // each example is marked by
+  //
+  //     // { <example-name>
+  //     ... example code ...
+  //     // }
+  //
+  // for identification by the extractor.  The extractor extracts each example,
+  // then creates four LaTeX versions: two of them in "lc" style, two in "uc"
+  // style; two of them in "open" style ("op"), two of them in "cluttered"
+  // style ("class").  The suffixes for the files are "lc-cl", "lc-op",
+  // "uc-cl", and "uc-op".  Resulting LaTeX example files have the
+  // "\begin{cpplisting}" and "\end{cpplisting}" LaTeX grouping commands.
+  //
+  // Here are the rules for writing examples:
+  //
+  //   * write them in the "lc-op" style; the others are generated
+  //     automatically from it;
+  //
+  //   * words in comments that are also Testudo keywords are broken in two
+  //     with a "{}" so that the lc-to-uc filter doesn't convert them;
+  //
+  //   * add "SPACE" where you want spaces to be kept in the "cl" style;
+  //
+  //   * write "OPSP" to generate a space in the "op" style, but none in the
+  //     "cl" style
+  //
+  //   * write "CLSP" to achieve the opposite effect of "OPSP"
+  //
+  //   * end with "// @hide@" lines that the code needs but you don't want in
+  //     the document
+
+namespace {
+
+  using namespace std;
+  using namespace testudo;
+
+  define_top_test_node("testudo", (examples, "examples"), 1000);
+
+  define_test(examples, "style")
+  {
+    // { styles
+    declare(int a = 7); // d{}eclare a variable
+    check(a + 2)_equal(9); // c{}heck for equality
+    // }
+  }
+
+  define_test_node(examples, (tricorder, "tricorder"));
+
+  // { define-test-node
+  define_test_node(tricorder,
+                   (medical, "medical capabilities"));
+  // }
+
+  // { define-test-ellipses
+  define_test(medical, "switch on after creation")
+  {
+    // \texttt{...}
+  }
+  // }
+
+  struct Tricorder {
+    struct Medical {
+      bool is_on() const { return true; }
+      void push_on_button() { }
+    } medical;
+  };
+
+  namespace tricorder2 {
+    define_test_node(examples, (tricorder2, "tricorder2"));
+
+    define_test_node(tricorder2,
+                     (medical, "medical capabilities"));
+
+    // { define-test-full
+    define_test(medical, "switch on after creation")
+    {
+      declare(Tricorder t); // see~\Sref{cha:test-steps} for the test steps syntax
+      check(not t.medical.is_on())_true;
+      perform(t.medical.push_on_button());
+      check(t.medical.is_on())_true;
+    }
+    // }
+  }
+
+  // { top-test-node
+  define_top_test_node("outatime.delorean", // parent full name
+                       (flux_capacitor, // name
+                        "flux capacitor features"), // title
+                       200); // priority
+  // }
+
+  struct Delorean {
+    struct Door {
+      bool is_open() const { return true; }
+    } left_door, right_door;
+    struct Engine {
+      bool is_running() const { return false; }
+    } engine;
+    double pu() const { return 0.; }
+  };
+
+  // { top-test
+  define_top_test("outatime.delorean", // parent full name
+                  "doors closed after construction", // title
+                  150) // priority
+  {
+    declare(Delorean d);
+    check(not d.left_door.is_open())_true;
+    check(not d.right_door.is_open())_true;
+  }
+  // }
+
+  using my_list_exception = std::runtime_error;
+
+  template <typename>
+  struct my_list {
+    void first_element() const { throw my_list_exception("nothing here"); }
+  };
+
+  struct Helicopter {
+    double remaining_fuel() const { return 0.; }
+  };
+
+  struct LoggedDestruction {
+    LoggedDestruction(string) { }
+    static int n_destructions() { return 0; }
+  };
+
+  struct Client {
+    struct answer {
+      bool valid=true;
+      string text="res::/punk_license";
+    };
+    answer request(string) const { return {}; }
+  };
+
+  define_test(examples, "100")
+  {
+    // { declare
+    declare(using namespace std);
+    declare(pair<int, double> p = { 2, 3.5 });
+    // }
+
+    // { perform
+    perform(p.first += 10);
+    // }
+
+    declare(double dispersion_rate = .001);
+    declare(double accuracy = 100.);
+
+    // { check-true
+    check(dispersion_rate < (1. / accuracy))_true;
+    // }
+
+    // { check-false
+    check(dispersion_rate < (1. / accuracy))_false;
+    // }
+
+    declare(int captain_age = 36);
+
+    // { check-equal
+    check(captain_age)_equal(26 + 10);
+    // }
+
+    declare(map<string, int> inventory);
+
+    // { check-equal-automatic-type
+    check(inventory)
+      _equal(map<string, int>{ { "apple", 2 }, { "banana", 3 } });
+    check(inventory)_equal({ { "apple", 2 }, { "banana", 3 } });
+    // }
+
+    declare(double computed_pi = 0.);
+
+    // { check-approx
+    check(computed_pi)_approx(2. * asin(1.));
+    // }
+
+    // { define-approx-epsilon
+    define_approx_epsilon(1e-3); // one thousandth
+    // }
+
+    // { set-approx-epsilon
+    set_approx_epsilon(1e-3); // one thousandth
+    // }
+
+    // { show-approx-epsilon
+    show_approx_epsilon();
+    // }
+
+    declare(double area = 0.);
+
+    // { check-approx-tol
+    check(area)_tol(.1)_approx(3.5); // use one-tenth tolerance just this once
+    // }
+
+    // { predicate
+    declare(auto is_negative =
+            predicate([](int x) {SPACE return x < 0; SPACE}));
+    // }
+
+    // { predicate-a
+    declare(auto is_even = predicate_a((a % 2) == 0));
+    // }
+
+    // { predicate-c-a
+    declare(auto is_multiple_of =
+            [](auto n)
+              {SPACE return predicate_c_a((n), (a % n) == 0); SPACE});
+    // }
+
+    declare(int number_of_cards = 0);
+    declare(int score = 0);
+
+    // { verify
+    check(number_of_cards)_verify(is_even);
+    check(score)_verify(is_multiple_of(5));
+    // }
+
+    declare(int iterations = 0);
+
+    // { verify-logical-ops
+    check(iterations)
+      _verify(not is_negative
+            CLSP and (is_even or is_multiple_of(5)));
+    // }
+
+    declare(int a=0);
+    declare(int b=0);
+    declare(int c=0);
+
+    // { check-true-for
+    check(a + b < c)_true_for(a, b, c);
+    // }
+
+    // { check-false-for
+    check(a + b < c)_false_for(a, b, c);
+    // }
+
+    in_scope() {
+
+      // { check-try-catch
+      declare(my_list<int> numbers);
+      check_try(numbers.first_element())_catch();
+      // }
+
+    }
+
+    in_scope() {
+
+      // { check-try-catch-exception
+      declare(my_list<int> numbers);
+      check_try(numbers.first_element())_catch(my_list_exception);
+      // }
+
+    }
+
+    declare(Helicopter helicopter);
+
+    // { show-value
+    show_value(helicopter.remaining_fuel());
+    // }
+
+    // { in-scope
+    declare(LoggedDestruction ld1("1"));
+    check(LoggedDestruction::n_destructions())_equal(0);
+    in_scope("outer scope") { // named scope
+      declare(LoggedDestruction ld2("2"));
+      in_scope() { // unnamed scope
+        declare(LoggedDestruction ld3("3"));
+      SPACE}
+      check(LoggedDestruction::n_destructions())_equal(1);
+    SPACE}
+    check(LoggedDestruction::n_destructions())_equal(2);
+    // }
+
+    declare(Client client);
+
+    // { with-declare
+    with_declare(auto answer = client.request("get license")) {
+      check(answer.valid)_true;
+      check(answer.text)_equal("res://punk_license");
+    }
+    with_declare(auto answer = client.request("reset"))
+      check(answer.valid)_true;
+    // }
+
+    // { with-declare-several
+    with_declare(auto [action, n] = tuple{ "sin", 77 * 7 }) {
+      check(action)_equal("sin");
+      check(n)_equal(539);
+    }
+    // }
+  }
+
+  namespace tricorder3 {
+    define_test_node(examples, (tricorder3, "tricorder3"));
+
+    define_test_node(tricorder3,
+                     (medical, "medical capabilities"));
+
+    // { step-id
+    define_test(medical, "switch on after creation")
+    {
+      declare(Tricorder t);
+      step_id(init_off); // relative to this test; no need to identify the test
+      check(not t.medical.is_on())_true;
+    }
+    // }
+  }
+
+  struct Terrible {
+    void report() const;
+  };
+
+  struct Resource {
+    bool acquired() const { return true; }
+    int size() const { return 10; }
+  };
+
+  define_test(examples, "200")
+  {
+    // { print-text
+    print_text("the speed hasn't been updated yet");
+    // }
+
+    // { print-break
+    print_break();
+    // }
+
+    // { fake-declare
+    #ifdef DEBUGGING
+    declare(LoggedInt n_cases); // optimised to \texttt{int} in production
+    #else
+    fake_declare(LoggedInt n_cases);
+    int n_cases; // replacement declaration (naked)
+    #endif
+    // }
+
+    perform((void) n_cases);
+
+    declare(Terrible terrible_p);
+    declare(ostringstream log);
+
+    // { fake-perform
+    #ifdef DEBUGGING
+    perform(terrible_p.report()); // won't work in production
+    #else
+    fake_perform(terrible_p.report());
+    log << "terrible_p reported" << endl; // replacement action (naked)
+    #endif
+    // }
+
+    perform((void) terrible_p);
+
+    // { tfos
+    perform(tfos << hex << setw(8));
+    show_value(31); // will print in hexadecimal with a width of 8
+    // }
+
+    declare(int h = 26);
+
+    // { tfos-to-text
+    perform(tfos << hex);
+    check(testudo::to_text(tfos, h))_equal("1a");
+    // }
+
+    declare(Resource res);
+    declare(int totals[2] = { 1, 2 });
+    declare(int totals_size = 2);
+
+    // { provided
+    provided(res.acquired())_true
+      check(res.size())_equal(10);
+    provided(totals_size)_equal(2) {
+      check(totals[0] > 0)
+        _true_for(totals[0]);
+      check(totals[1] > totals[0])
+        _true_for(totals[0], totals[1]);
+    }
+    // }
+  }
+
+  define_test_node(examples, (container, "container"));
+
+  // { test-aware-functions
+  template <typename Container>
+  void test_container_emptyness(
+      test_management_t test_management,
+      Container &container)
+  {
+    check(container.empty())_true;
+  }
+
+  class Cauldron {
+  public:
+    bool empty() const;
+    // \texttt{...}
+  };
+
+  define_test(container, "Cauldron emptyness")
+  {
+    declare(Cauldron container);
+    test_container_emptyness(test_management, container);
+  }
+
+  class Marmite {
+  public:
+    bool empty() const;
+    // \texttt{...}
+  };
+
+  define_test(container, "Marmite emptyness")
+  {
+    declare(Marmite container);
+    test_container_emptyness(test_management, container);
+  }
+  // }
+
+  bool Cauldron::empty() const { return true; }
+  bool Marmite::empty() const { return true; }
+
+  define_test(examples, "300")
+  {
+    // { with-data
+    declare(auto is_even=predicate_a((a % 2) == 0));
+    declare(list<int> even_numbers{ 2, 4, 8 }); // even numbers
+    with_data(x, even_numbers)
+      check(x)_verify(is_even);
+    with_data(x, even_numbers)
+    {
+      declare(int y = x + 1);
+      check(y)_verify(not is_even);
+    }
+    with_data(x, even_numbers)
+      with_data(y, { 2, 4, 9 })
+        check(x % 2)_equal(y % 2); // will fail when \texttt{y==9}
+    // }
+
+    // { with-data-structured-binding
+    declare(list<tuple<int, int, int>>
+              list_of_sums{ { 1, 3, 4 },
+                          OPSP { 3, 7, 11 }, // will fail
+                          OPSP { 10, 15, 25 } });
+    with_data((a, b, sum), list_of_sums)
+      check(sum)_equal(a+b);
+    // }
+
+    // { with-multiline-data
+    with_multiline_data((a, b, sum), list<tuple<int, int, int>>{
+        { 1, 3, 4 },
+        { 3, 7, 11 }, // will fail
+        { 10, 15, 25 } })
+      check(sum)_equal(a+b);
+    // }
+  }
+
+  namespace vectori2 {
+    // { data-for-with-data-vector
+    class VectorI2
+    {
+    public:
+      VectorI2(int x, int y);
+      int x, y;
+    };
+    VectorI2 operator+(VectorI2 v, VectorI2 w); // sum
+    bool operator==(VectorI2 v, VectorI2 w); // equality (\Sref{sec:equality})
+    string to_text(VectorI2 v); // text representation (\Sref{sec:textual-representation})
+    // }
+
+    // { data-for-with-data-generator
+    VectorI2 random_vector2i(int max_abs_x, int max_abs_y);
+    // }
+
+    VectorI2::VectorI2(int, int) : x(0), y(0) { }
+    VectorI2 operator+(VectorI2, VectorI2) { return {0, 0}; }
+    bool operator==(VectorI2, VectorI2) { return true; }
+    [[maybe_unused]] string to_text(VectorI2) { return ""; }
+    VectorI2 random_vector2i(int, int) { return {0, 0}; }
+
+    define_test(examples, "400")
+    {
+      in_scope() {
+        // { data-for-with-data-loop
+        declare(auto generate_20_20=
+                []() {SPACE return random_vector2i(20, 20); SPACE});
+        // 10,000 che{}cks:
+        with_data(v, generate_data(100, generate_20_20))
+          with_data(w, generate_data(100, generate_20_20))
+          check(v + w)_equal(w + v);
+        // }
+      }
+
+      in_scope() {
+        // { data-for-with-data-generate-data-tuple
+        declare(auto generate_20_20=
+                []() { return random_vector2i(20, 20); });
+        // 100 che{}cks:
+        with_data((v, w),
+                  generate_data_tuple(100,
+                                      generate_20_20,
+                                      generate_20_20))
+          check(v + w)_equal(w + v);
+        // }
+      }
+
+      in_scope() {
+        // { data-for-with-data-cartesian-product
+        declare(auto generate_20_20=
+                []() { return random_vector2i(20, 20); });
+        // 10,000 che{}cks:
+        with_data((v, w),
+                  cartesian_product(
+                    generate_data(100, generate_20_20),
+                    generate_data(100, generate_20_20)))
+          check(v + w)_equal(w + v);
+        // }
+      }
+    }
+  }
+
+  // { fixture-outatime-definition
+  struct OutATimeFixture : Fixture
+  {
+    OutATimeFixture(test_management_t test_management)
+      : Fixture(test_management)
+    {
+      perform(d = new Delorean);
+    SPACE}
+    ~OutATimeFixture()
+    {
+      perform(delete d);
+    SPACE}
+    Delorean *d; // dumb pointer, just so we can show a teardown procedure
+  };
+  // }
+
+  define_test_node(examples, (delorean, "Delorean"));
+
+  // { fixture-outatime-test
+  define_test(delorean,
+              "engine is off at start",
+              with_fixture(OutATimeFixture)) // with-fixture
+  {
+    check(not d->engine.is_running())_true;
+  }
+
+  define_test(delorean,
+              "there's no Plutonium initially",
+              visible_fixture(OutATimeFixture)) // visible-fixture
+  {
+    check(d->pu())_approx(0.);
+  }
+  // }
+
+  // { fixture-members
+  struct NumbersFixture : Fixture
+  {
+    NumbersFixture(test_management_t test_management)
+      : Fixture(test_management),
+        fixture_init(x, 1.),
+        fixture_init(z, 3.14) { }
+    fixture_member(double x);
+    fixture_member(double y = -2.5, z); // two variables defined here
+  };
+  // }
+
+  define_test(examples,
+              "fixture members",
+              visible_fixture(NumbersFixture)) {
+    check(x)_approx(1.);
+    check(y)_approx(-2.5);
+    check(z)_approx(3.14);
+  }
+
+  namespace first_mocks {
+
+    // { mock-class
+    class KettleBase
+    {
+    public:
+      virtual ~KettleBase()=default;
+      virtual void fill(float volume)=0;
+      virtual float temperature() const=0;
+    };
+
+    class KettleMock
+      : public MockClass<KettleBase>
+    {
+    public:
+      // method mocks and wraps overriding base methods\ellipsis{}
+    };
+
+    class ContainerMock
+      : public MockClass<>
+    {
+    public:
+      // method mocks and wraps defining a cointainer interface\ellipsis{}
+    };
+    // }
+
+#if 0
+    // { mock-class-name-clash
+    class ImageMock
+      : public MockClass<>
+    {
+    public:
+      mock_method((void), set, ((float)));
+      mock_method((void), set, ((int))); // name clash!
+    };
+    // }
+#endif
+
+    // { mock-class-name-clash-avoided
+    class ImageMock
+      : public MockClass<>
+    {
+    public:
+      mock_method((void), set, ((float)));
+      mock_method((void), (set, set_int), ((int)));
+    };
+    // }
+
+  }
+
+  // { mock-class-mock-method
+  class KettleBase
+  {
+  public:
+    virtual ~KettleBase()=default;
+    virtual void fill(float volume)=0;
+    virtual float temperature() const=0;
+  };
+
+  class KettleMock
+    : public MockClass<KettleBase>
+  {
+  public:
+    mock_method((void), fill, ((float volume)), (override));
+    mock_method((float), temperature, (), (const, override));
+  };
+  // }
+
+  // { mock-class-wrap-method
+  class Tally
+  {
+  public:
+    virtual ~Tally()=default;
+    virtual void add_counter(int delta)=0;
+    virtual int total() const=0;
+  };
+
+  class TallyMock
+    : public MockClass<Tally>
+  {
+  public:
+    int counter=0;
+    wrap_method((void), add_counter, ((int delta)))
+    {
+      counter+=delta;
+    SPACE}
+    wrap_method((int), total, (), (const))
+    {
+      return counter;
+    SPACE}
+  };
+  // }
+
+  class Soup
+  {
+  public:
+    virtual ~Soup()=default;
+    virtual bool is_tasty() const { return true; }
+    virtual int temperature() const { return 0; }
+    virtual int add_ingr(string, int) { return 0; }
+  };
+
+  // { mock-class-mock-method-default-return-value-assign
+  class SoupMock
+    : public MockClass<Soup>
+  {
+  public:
+    // \texttt{...}
+    // by default, return \texttt{true}:
+    mock_method((bool), is_tasty, (), (const, override)) = true;
+    // \texttt{...}
+  };
+  // }
+
+  define_test_node(examples, (mock_turtle, "Mock Turtle"));
+
+  // { mock-class-mock-method-default-return-value-set-ret-default
+  define_test(mock_turtle, "Victorian recipe")
+  {
+    declare(auto soup_mock=make_shared<SoupMock>());
+    declare(bool is_tasty_now=true);
+    perform(soup_mock->set_ret_default(
+              is_tasty,
+              [&is_tasty_now]() {SPACE return is_tasty_now; SPACE}));
+    // \texttt{...}
+  }
+  // }
+
+  namespace another_soup {
+
+    // { mock-class-mock-method-schedule-ret
+    class SoupMock
+      : public MockClass<Soup>
+    {
+    public:
+      // \texttt{...}
+      mock_method((int), (temperature, temp), (), (const, final));
+      // \texttt{...}
+    };
+    // \texttt{...}
+    define_test(mock_turtle, "recipe")
+    {
+      declare(auto soup_mock=make_shared<SoupMock>());
+      // return a sequence of temperatures on subsequent calls:
+      perform(soup_mock->schedule_ret(temp,
+                                      20, 40, 60, 80, 100));
+      // \texttt{...}
+    }
+    // }
+
+  }
+
+  define_test_node(examples, (namable, "namable"));
+
+  // { mock-class-mock-method-schedule-exception
+  class MockNamable
+    : public MockClass<>
+  {
+  public:
+    mock_method((void), create, ());
+    mock_method((bool), set_name_is_good, ((string)));
+  };
+  // \texttt{...}
+  define_test(namable, "exception 2nd set_name_is_good()")
+  {
+    declare(MockNamable namable);
+    // return \texttt{true} for the first call, then throw an exception for the second call:
+    perform(
+      namable.schedule_ret(set_name_is_good,
+        true,
+        throw_exception(runtime_error("already named"))));
+    // \texttt{...}
+  }
+  // }
+
+  // { mock-class-mock-method-schedule-exception-after-void
+  define_test(namable, "exception 2nd create()") {
+    declare(MockNamable namable);
+    // return normally from the first call, then throw an exception for the second call:
+    perform(
+      namable.schedule_ret(create,
+        void_v,
+        throw_exception(runtime_error("already created"))));
+    // \texttt{...}
+  }
+  // }
+
+  namespace mock_turtle_recipe {
+
+    class SoupMock
+      : public MockClass<Soup>
+    {
+    public:
+      mock_method((int), add_ingr, ((string), (int)), (override));
+      mock_method((bool), is_tasty, (), (const, override)) = true;
+      mock_method((int), (temperature, temp), (), (const, final));
+    };
+
+    define_test(mock_turtle, "mock turtle recipe 100")
+    {
+      // { check-mock-method-logs
+      declare(auto soup_mock = make_shared<SoupMock>());
+      // \texttt{...}
+      // five calls, with specific arguments
+      check(soup_mock->logged_args(add_ingr))
+        _equal({ { "calf brains", 4 },
+                { "pork liver", 3 },
+                { "water", 1 },
+                { "water", 1 },
+                { "water", 1 } });
+      // }
+
+      // { check-mock-method-logs-specific-call
+      // c{}heck \emph{third} call
+      provided(soup_mock->log_size(add_ingr) >= 3)_true
+        check(soup_mock->logged_args(add_ingr)[2])
+          _equal({ "water", 1 });
+      // }
+
+      // { check-mock-method-logs-specific-call-specific-argument
+      // c{}heck \emph{first} argument of third call:
+      provided(soup_mock->log_size(add_ingr) >= 3)_true
+        check(get<0>(soup_mock->logged_args(add_ingr)[2]))
+          _equal("water");
+      // }
+    }
+
+    define_test(mock_turtle, "mock turtle recipe 200")
+    {
+      // { check-mock-method-logs-return-values
+      declare(auto soup_mock = make_shared<SoupMock>());
+      // \texttt{...}
+      // a single call, that returned \texttt{true}
+      check(soup_mock->logged_ret(is_tasty))_equal({ { true } });
+      // }
+    }
+
+    define_test(mock_turtle, "mock turtle recipe 300")
+    {
+      // { check-mock-method-logs-return-arguments-values
+      declare(auto soup_mock = make_shared<SoupMock>());
+      // \texttt{...}
+      // five calls, with specific arguments and return values
+      check(soup_mock->logged_ret_args(add_ingr))
+        _equal({ { {  4 }, { "calf brains", 4 } },
+                { {  7 }, { "pork liver", 3 } },
+                { {  8 }, { "water", 1 } },
+                { {  9 }, { "water", 1 } },
+                { { 10 }, { "water", 1 } } });
+      // }
+    }
+
+    define_test(mock_turtle, "mock turtle recipe 400")
+    {
+      // { check-mock-method-logs-number-of-calls
+      declare(auto soup_mock = make_shared<SoupMock>());
+      // \texttt{...}
+      // a single call
+      check(soup_mock->log_size(is_tasty))_equal(1);
+      // }
+    }
+
+  }
+
+  class MockLevel
+    : public MockClass<>
+  {
+  public:
+    MockLevel(int) { }
+    mock_method((int), readout, ())=-1;
+    mock_method((void), large_up, ());
+  };
+
+  define_test(examples, "ledgers")
+  {
+    // { ledger-setup
+    declare(CallLedger cl);
+    declare(MockLevel lev_1(12));
+    perform(call_ledger_report_to(lev_1, &cl)); // identified as ``\texttt{lev\_1}''
+    declare(auto lev_2=make_shared<MockLevel>(47));
+    perform(call_ledger_report_to(lev_2, &cl)); // identified as ``\texttt{lev\_2}''
+    // }
+  }
+
+  namespace mock_turtle_recipe {
+
+    define_test(mock_turtle, "mock turtle recipe 500")
+    {
+      declare(auto soup_mock = make_shared<SoupMock>());
+      declare(CallLedger cl);
+      declare(call_ledger_report_to(*soup_mock, &cl));
+      declare(auto it = iterate(cl));
+      // { ledger-iterator-get-call
+      with_declare(auto call = it.get_call(*soup_mock, add_ingr))
+        check(call)_equal({ 7 }, { "water", 1 });
+      // }
+
+      // { ledger-iterator-pop-call
+      with_declare(auto call = it.pop_call(*soup_mock, add_ingr))
+        check(call)_equal({ 7 }, { "water", 1 });
+      // }
+    }
+
+    define_test(mock_turtle, "mock turtle recipe 600")
+    {
+      // { ledger-with-declare
+      declare(auto soup_mock = make_shared<SoupMock>());
+      // \texttt{...}
+      with_declare(auto it = iterate(soup_mock)) {
+        with_declare(auto call = it.pop_call(*soup_mock, add_ingr)) {
+          check(call.ret())_equal(4);
+          check(call.args())_equal("calf brains", 4);
+        SPACE}
+        // \texttt{...}
+        with_declare(auto call = it.pop_call(*soup_mock, temp))
+          check(call.ret())_equal(20);
+        // \texttt{...}
+        with_declare(auto call = it.pop_call(*soup_mock, is_tasty))
+          check(call.ret())_true;
+        // c{}heck it was the last call:
+        check(it.done())_true;
+      SPACE}
+      // }
+    }
+
+  }
+
+  template <typename Level>
+  void equalize(Level &la, Level &lb) {
+    la.large_up();
+    lb.large_up();
+  }
+
+  define_test(examples, "call_ledger_report_to")
+  {
+    // { ledger-call-ledger-report-to
+    declare(CallLedger cl);
+    declare(MockLevel lev_1(12));
+    perform(call_ledger_report_to(lev_1, &cl));
+    declare(MockLevel lev_2(47));
+    perform(call_ledger_report_to(lev_2, &cl));
+    perform(equalize(lev_1, lev_2)); // this is the function we're c{}hecking
+    check(lev_1.readout())_equal(52);
+    check(lev_2.readout())_equal(52);
+    declare(auto it = iterate(cl));
+    // fast forward to the first invocation to ``\texttt{large\_up()}'':
+    perform(while (it.method_name() not_eq "large_up")
+              it.next());
+    check(it.mock_name())_equal("lev_1");
+    check(it.method_name())_equal("large_up");
+    perform(it.next());
+    check(it.mock_name())_equal("lev_1");
+    check(it.method_name())_equal("readout");
+    // }
+  }
+
+  namespace testrengthen_types {
+
+    namespace my_space {
+
+      template <typename T>
+      struct MyType
+      {
+        list<T> list_of_elements;
+      };
+    }
+
+    // { testudo-support-my-type-is-valid-testudo
+    namespace my_space
+    {
+      template <typename T>
+      bool is_valid_testudo(MyType<T> const &mt);
+    SPACE}
+    // }
+
+    // { testudo-support-my-type-is-valid-testudo-is-valid
+    namespace my_space
+    {
+      template <typename T>
+      bool is_valid_testudo(MyType<T> const &mt)
+      {
+        return testudo::is_valid(mt.list_of_elements);
+      SPACE}
+    SPACE}
+    // }
+
+    namespace version_100 {
+      // { testudo-support-my-vector-is-valid-testudo
+      namespace my_space {
+        class MyVector {
+        public:
+          // \texttt{...}
+        SPACE};
+
+        [[maybe_unused]] // @hide@
+        bool is_valid_testudo(MyVector const &mv)
+        {
+          // \texttt{...}
+          (void) mv; // @hide@
+          return true; // @hide@
+        SPACE}
+      SPACE}
+      // }
+    }
+
+    namespace version_200 {
+      // { testudo-support-my-vector-insertion
+      namespace my_space
+      {
+        class MyVector
+        {
+        public:
+          double x, y;
+          // \texttt{...}
+        SPACE};
+
+        [[maybe_unused]] // @hide@
+        ostream &operator<<(ostream &os, MyVector const &mv)
+        {
+          return os << "(" << mv.x << " " << mv.y << ")";
+        SPACE}
+      SPACE}
+      // }
+    }
+
+    namespace version_300 {
+      // { testudo-support-my-vector-to-stream-testudo
+      namespace my_space
+      {
+        class MyVector
+        {
+        public:
+          double x, y;
+          // \texttt{...}
+        SPACE};
+
+        [[maybe_unused]] // @hide@
+        void to_stream_testudo(ostream &os, MyVector const &mv)
+        {
+          os << "(" << mv.x << " " << mv.y << ")";
+        SPACE}
+      SPACE}
+      // }
+    }
+
+    namespace version_400 {
+      // { testudo-support-my-vector-to-stream-testudo-to-stream
+      namespace my_space
+      {
+        class MyVector
+        {
+        public:
+          double x, y;
+          // \texttt{...}
+        SPACE};
+
+        [[maybe_unused]] // @hide@
+        void to_stream_testudo(ostream &os, MyVector const &mv)
+        {
+          os << "(";
+          testudo::to_stream(os, mv.x);
+          os << " ";
+          testudo::to_stream(os, mv.y);
+          os << ")";
+        SPACE}
+      SPACE}
+      // }
+    }
+
+    namespace version_500 {
+      // { testudo-support-my-vector-to-stream-testudo-to-text
+      namespace my_space
+      {
+        class MyVector
+        {
+        public:
+          double x, y;
+          // \texttt{...}
+        SPACE};
+
+        [[maybe_unused]] // @hide@
+        void to_stream_testudo(ostream &os, MyVector const &mv)
+        {
+          os << "(" << testudo::to_text(os, mv.x)
+             << " " << testudo::to_text(os, mv.y) << ")";
+        SPACE}
+      SPACE}
+      // }
+    }
+
+    namespace version_600 {
+      // { testudo-support-my-pair-equality
+      namespace my_space {
+        template <typename T>
+        class MyPair
+        {
+        public:
+          // \texttt{...}
+          T first, second;
+        SPACE};
+
+        template <typename T>
+        bool operator==(MyPair<T> const &mp1,
+                        MyPair<T> const &mp2)
+        {
+          // see below for ``\texttt{testudo::are\_e{}qual()}''
+          return (testudo::are_equal(mp1.first, mp2.first)
+                  and testudo::are_equal(mp1.second, mp2.second));
+        SPACE}
+      SPACE}
+      // }
+    }
+
+    namespace version_700 {
+      // { testudo-support-my-pair-are-equal-testudo
+      namespace my_space
+      {
+        template <typename T>
+        class MyPair
+        {
+        public:
+          // \texttt{...}
+          T first, second;
+        SPACE};
+
+        template <typename T>
+        bool are_equal_testudo(MyPair<T> const &mp1,
+                               MyPair<T> const &mp2) {
+          return (testudo::are_equal(mp1.first, mp2.first)
+                  and testudo::are_equal(mp1.second, mp2.second));
+        SPACE}
+      SPACE}
+      // }
+    }
+
+    namespace version_800 {
+      // { testudo-support-my-vector-absdiff-testudo
+      class MyVector
+      {
+      public:
+        double x, y;
+        // \texttt{...}
+      SPACE};
+
+      [[maybe_unused]] // @hide@
+      double absdiff_testudo(MyVector const &mv1,
+                             MyVector const &mv2)
+      {
+        double dx=mv1.x-mv2.y;
+        double dy=mv1.y-mv2.y;
+        return sqrt(dx*dx+dy*dy);
+      SPACE}
+      // }
+    }
+
+    namespace version_900 {
+      class MyVector
+      {
+      public:
+        double x, y;
+        // \texttt{...}
+      };
+
+      // { testudo-support-my-vector-absdiff-testudo-manhattan
+      [[maybe_unused]] // @hide@
+      double absdiff_testudo(MyVector const &mv1,
+                             MyVector const &mv2)
+      {
+        double dx=mv1.x-mv2.y;
+        double dy=mv1.y-mv2.y;
+        return abs(dx)+abs(dy); // this is also \textsc{ok}
+      SPACE}
+      // }
+    }
+
+    namespace version_1000 {
+      // { testudo-support-my-vector-absdiff-testudo-absdiff
+      namespace my_space
+      {
+        template <typename T>
+        class MyPair
+        {
+        public:
+          // \texttt{...}
+          T first, second;
+        SPACE};
+
+        template <typename T>
+        double absdiff_testudo(MyPair<T> const &mp1,
+                               MyPair<T> const &mp2)
+        {
+          return (testudo::absdiff(mp1.first, mp2.first)
+                  +testudo::absdiff(mp1.second, mp2.second));
+        SPACE}
+      SPACE}
+      // }
+    }
+
+  }
+
+  namespace esperanto {
+    map<string, int> vortaro={{"unu", 1}};
+
+    define_test_node(examples, (esperanto_test, "Esperanto test"));
+
+    // { esperanto
+    difini_teston(esperanto_test, (numbers, "numbers"))
+    {
+      deklari(auto const dictionary = vortaro);
+      certigi(dictionary.at("unu"))_egalas(1);
+    }
+    // }
+  }
+
+}
+
+#endif

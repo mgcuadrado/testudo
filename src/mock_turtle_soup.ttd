@@ -57,9 +57,9 @@ namespace {
   public:
     mock_method((void), wait, ());
 
-    mock_method((void), set_heat, ((int)), override);
+    mock_method((void), set_heat, ((int)), (override));
 
-    mock_method((int), (temperature, temp), (), const final);
+    mock_method((int), (temperature, temp), (), (const, final));
 
     wrap_method((int),
                 (add_ingredient, add_ingr),
@@ -71,15 +71,15 @@ namespace {
     map<string, int> content;
 
     // give a default value
-    mock_method((bool), is_tasty, (), const)=true;
+    mock_method((bool), is_tasty, (), (const))=true;
 
-    wrap_method((pair<int, int>), reverse, ((pair<int, int> p)), const) const
+    wrap_method((pair<int, int>), reverse, ((pair<int, int> p)), (const))
       { return {p.second, p.first}; }
     wrap_method((pair<float, float>),
-                reverse_float, ((pair<float, float> p)), const) const
+                reverse_float, ((pair<float, float> p)), (const))
       { return {p.second, p.first}; }
 
-    mock_method((int), forty_two, (), const);
+    mock_method((int), forty_two, (), (const));
     wrap_method((void), add_counter, ((int delta))) { counter+=delta; }
     wrap_method((void), inc_counter, ()) { ++counter; }
   };
@@ -205,9 +205,9 @@ namespace {
     MockLevel(int level) : level(level) { }
     MockLevel(int level, function<void ()> call_back_creation)
       : MockClass(call_back_creation), level(level) { }
-    wrap_method((int), readout, (), const override) const { return level; }
-    wrap_method((void), large_up, (), override) { level+=10; }
-    wrap_method((void), small_up, (), override) { level+=1; }
+    wrap_method((int), readout, (), (const, override)) { return level; }
+    wrap_method((void), large_up, (), (override)) { level+=10; }
+    wrap_method((void), small_up, (), (override)) { level+=1; }
   private:
     int level;
   };
@@ -299,13 +299,13 @@ namespace {
     : public testudo::MockClass<Namable> {
   public:
     bool created=false;
-    wrap_method((void), create, (), override) {
+    wrap_method((void), create, (), (override)) {
       if (created)
         throw runtime_error("already created");
       created=true;
     }
     bool named=false;
-    wrap_method((bool), set_name_is_good, ((string)), override) {
+    wrap_method((bool), set_name_is_good, ((string)), (override)) {
       if (named)
         throw runtime_error("already named");
       named=true;
@@ -316,6 +316,40 @@ namespace {
   define_test(mock_turtle, "exceptions with wrap") {
     declare(WrapNamable namable);
     test_namable(test_management, namable);
+  }
+
+  class LambdaMock
+    : public testudo::MockClass<> {
+  public:
+    int n;
+    LambdaMock(int n) : n(n) { }
+    mock_method((int), sum_plus_n, ((int), (int)), (const))
+      =[this](int a, int b) { return a+b+n; };
+  };
+
+  int always_333() { return 333; }
+  int sum_plus_100(int a, int b) { return 100+a+b; }
+
+  define_test(mock_turtle, "functions for default mock method values") {
+    declare(LambdaMock lm(5));
+    check(lm.sum_plus_n(2, 7))_equal(14);
+    perform(lm.set_ret_default(sum_plus_n, []() { return 3; }));
+    check(lm.sum_plus_n(2, 7))_equal(3);
+    perform(lm.set_ret_default(sum_plus_n, sum_plus_100));
+    check(lm.sum_plus_n(2, 7))_equal(109);
+    perform(lm.set_ret_default(sum_plus_n, always_333));
+    check(lm.sum_plus_n(2, 7))_equal(333);
+    perform(lm.schedule_ret(sum_plus_n,
+                            sum_plus_100,
+                            sum_plus_100,
+                            always_333,
+                            sum_plus_100));
+    check(lm.sum_plus_n(20, 4))_equal(124);
+    check(lm.sum_plus_n(20, 5))_equal(125);
+    check(lm.sum_plus_n(20, 6))_equal(333);
+    check(lm.sum_plus_n(20, 7))_equal(127);
+    print_text("now, back to default value");
+    check(lm.sum_plus_n(20, 8))_equal(333);
   }
 
 }

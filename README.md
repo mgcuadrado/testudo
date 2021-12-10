@@ -151,4 +151,4 @@ check is in line 15 of the test file).
 
 Testudo has many more features and syntax elements than i can show you
 comfortably in this `README.md`.  Please refer to the
-![guide](/doc/testudo.pdf).
+![guide](/doc/testudo_lc_cl.pdf).

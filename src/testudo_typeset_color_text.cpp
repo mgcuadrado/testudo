@@ -53,7 +53,7 @@ namespace {
       loc_begin, loc_end;
     string ok_label, fail_label, error_label;
     string track_loc_begin, track_loc_end;
-    string same_label, good_label, bad_label;
+    string same_label, good_label, bad_label, very_bad_label;
     function<string::size_type (string s, string::size_type from)> skip_codes=
       [](string, string::size_type) { return 0; };
     string::size_type real_length(string s) const {
@@ -104,7 +104,7 @@ namespace {
     color.show_ident=add_color("?");
     color.show_sep=add_color(":");
     color.show_tab=add_color("|");
-    color.show_cont=color.normal+"\\";
+    color.show_cont=color.ident+"\\";
     color.name_open=color.ident+"{";
     color.name_close="}"+color.normal;
     color.loc_begin=color.lines;
@@ -119,6 +119,7 @@ namespace {
     color.same_label="["+color.plain_tag+"same"+color.normal+"]";
     color.good_label="["+color.success_tag+"good"+color.normal+"]";
     color.bad_label="["+color.failure_tag+"-BAD-"+color.normal+"]";
+    color.very_bad_label="["+color.error+"-VERY-BAD-"+color.normal+"]";
   }
 
   Color const &get_color() {
@@ -167,7 +168,7 @@ namespace {
 
   template <typename... A>
   void regex_in_place_replace(string &s, A &&...a)
-    { s=regex_replace(s, a...); }
+    { s=regex_replace(s, std::forward<A>(a)...); }
 
   bool to_bool(string s) { return TestFormat::to_bool(s); }
 
@@ -227,8 +228,6 @@ namespace {
            : non_last.substr(
                last_color_pos,
                non_last.find("m", last_color_pos)+1-last_color_pos));
-        if (color_code==color.normal)
-          color_code="";
         non_last+=color.show_cont+'\n';
         text=indentation+pad(cut_indent)+color_code+text.substr(cut_at);
       }
@@ -273,12 +272,17 @@ namespace {
       unset_format_text_prefix();
     }
 
-    void format_check(ostream &stream, string text, bool check) {
-      if (check)
+    void format_check(ostream &stream, string text, string success) {
+      if (success==true_tag)
         format_label(stream, text, ' ', color.ok_label);
-      else
+      else if (success==false_tag)
         format_label(stream, text, '-', color.fail_label,
                      color.failure, color.normal);
+      else if (success==error_tag)
+        format_label(stream, text, '-', color.error_label,
+                     color.failure, color.normal);
+      else
+        assert(false);
     }
 
     void format_fill(ostream &stream, char fill,
@@ -322,6 +326,8 @@ namespace {
     }
 
 
+    void interactive_test() override { format_text(ts, "interactive test"); }
+
     void title(string location, string name, string title) override {
       string title_location=show_location ? location : "";
       string brief_name=
@@ -360,7 +366,15 @@ namespace {
 
     void location(string brief_location) override {
       if (show_location and not brief_location.empty())
-        set_format_text_prefix(color.loc_begin+brief_location+color.loc_end+" ");
+        set_format_text_prefix(
+          color.loc_begin+brief_location+color.loc_end+" ");
+    }
+
+    void begin_indent() override {
+      increase_indent();
+    }
+    void end_indent() override {
+      decrease_indent();
     }
 
     void begin_scope(string name) override {
@@ -438,7 +452,7 @@ namespace {
       else {
         oss << " " << color.catch_begin << " " << error << " "
             << color.catch_end;
-        format_check(ts, oss.str(), to_bool(caught));
+        format_check(ts, oss.str(), caught);
       }
       try_first_part="";
     }
@@ -492,7 +506,7 @@ namespace {
       if (n_errors not_eq "0")
         format_error(ts, oss.str());
       else
-        format_check(ts, oss.str(), to_bool(success));
+        format_check(ts, oss.str(), success);
     }
 
     static bool is_any_multiline(list<string> const &texts) {
@@ -516,15 +530,15 @@ namespace {
         if (not to_bool(success) and not multiline)
           report+=
             " "+color.show_sep+" "+to_string_delim(additional_fail_text, " ");
-        format_check(ts, report, to_bool(success));
+        format_check(ts, report, success);
         if (not to_bool(success) and multiline)
-        for (auto const &text: additional_fail_text)
-          ts << tabify(text) << endl;
+          for (auto const &text: additional_fail_text)
+            ts << tabify(text) << endl;
       }
     }
 
     void check_true(string expr_str, string success, string prefix) override {
-      output_check_general(prefix, {expr_str}, success, {"false"});
+      output_check_general(prefix, {expr_str}, success, {false_tag});
     }
 
     void check_true_for(string expr_str,
@@ -533,9 +547,9 @@ namespace {
                         string prefix) override {
       output_check_general(
         prefix,
-        {expr_str},
+        {expr_str, color.show_ident, exprv_str},
         success,
-        {"false", color.show_ident, exprv_str, color.show_sep, valv_str});
+        {false_tag, color.show_sep, valv_str});
     }
 
     void check_equal(string expr1_str, string val1_str,
@@ -591,6 +605,8 @@ namespace {
 
     list<pair<string, ostringstream>> test_stack;
 
+    void interactive_test() override { format_text(ts, "interactive test"); }
+
     void title(string, string name, string) override {
       test_stack.emplace_back();
       test_stack.back().first=name;
@@ -613,7 +629,7 @@ namespace {
       if (n_errors not_eq "0")
         format_error(this_summary, summary_line);
       else
-        format_check(this_summary, summary_line, to_bool(success));
+        format_check(this_summary, summary_line, success);
 
       string accumulated=this_summary.str()+test_stack.back().second.str();
       test_stack.pop_back();
@@ -624,6 +640,8 @@ namespace {
     }
 
     void location(string) { }
+    void begin_indent() { }
+    void end_indent() { }
     void begin_scope(string) { }
     void end_scope(string) { }
     void begin_declare_scope(string) { }
@@ -675,6 +693,8 @@ namespace {
     }
 
     string delta_tag(string delta_stats) const {
+      if (delta_stats==error_tag)
+        return color.very_bad_label;
       auto delta_stats_i=stoll(delta_stats);
       return
         (delta_stats_i<0) ? color.bad_label
@@ -683,6 +703,8 @@ namespace {
     }
 
     string delta_color(string delta_stats) const {
+      if (delta_stats==error_tag)
+        return color.error;
       auto delta_stats_i=stoll(delta_stats);
       return
         (delta_stats_i<0) ? color.failure_tag
