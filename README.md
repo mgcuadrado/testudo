@@ -31,6 +31,19 @@ code.  Its key features are:
 - you can produce progress tracking reports, that show exactly and succintly
   how your code changes affect the test results.
 
+# Installation
+
+In order to use Testudo, you'll need a C++17 compiler at the very least.  If
+you also have `bash`, `sed`, `awk`, `m4`, and `make`, you'll be able to use the
+default deployment.
+
+Installation procedure with the default deployment:
+
+- `make install` will install Testudo under the `~/local` prefix; if you want a
+  different prefix, use `make install PREFIX=<your prefix>`;
+
+- make sure your `PREFIX/bin` directory is in your `PATH`.
+
 # A simple example
 
 Here's a very simple example of a Testudo test file, containing a test node and
