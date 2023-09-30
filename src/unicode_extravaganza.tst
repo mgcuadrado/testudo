@@ -11,7 +11,7 @@ STEP_ID              step_id
 PRINT_TEXT           print_text
 PRINT_BREAK          print_break
 
-DECLARE              🖵
+DECLARE              deklari
 PERFORM              biểu_diễn
 FAKE_DECLARE         fake_declare
 FAKE_PERFORM         fake_perform
@@ -40,12 +40,6 @@ NOT_EQUAL  _not_equal
 APPROX     _근접한
 NOT_APPROX _not_approx
 TOL        _tol
-VERIFY     _verify
-NOT_VERIFY _not_verify
-
-PREDICATE     predicate
-PREDICATE_A   predicate_a
-PREDICATE_C_A predicate_c_a
 
 TFOS tfos
 

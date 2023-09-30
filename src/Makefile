@@ -1,4 +1,4 @@
-# Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+# Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 # This file is part of Testudo.
 
@@ -25,7 +25,7 @@ TESTUDOBIN = $(OBJDIR)/$(TESTUDONAME)
 STYLES := $(wildcard *.tst)
 STYLE_HEADERS := $(STYLES:%.tst=testudo_%)
 
-XML_TO_COLOR_LATEX = $(TESTUDOBIN) xml_to_color -w 63 | ./color_to_latex
+XML_TO_TEXT_LATEX = $(TESTUDOBIN) xml_to_color -w 63 | ./color_to_latex
 COLOR_NO_LOC_INFO = ./color_no_loc_info
 UNCOLOR = ./uncolor
 
@@ -159,57 +159,69 @@ clean_exe:
 	rm -f $(STYLE_HEADERS)
 	rm -f testudo_macros_n.gh testudo_macros_n_customize.m4
 
-diff_xml_text_test_bw: $(TEST_PREREQUISITES)
+XML_TO_TEXT_REPEATABLE = $(TESTUDOBIN) xml_to_color -w 78
+XML_TO_TEXT_SUMMARY_REPEATABLE = $(XML_TO_TEXT_REPEATABLE) -s
+
+dev_diff_xml_text_test_bw: $(TEST_PREREQUISITES)
+	diff -u \
+	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+		  | $(XML_TO_TEXT_REPEATABLE) $(BW)) \
+	    <($< run $(NO_XML_TEXT_FORMAT) $(TESTUDOOPT) \
+			$(ALLTESTUDOSPEC) \
+		  | $(UNCOLOR))
+dev_diff_xml_text_test_color: $(TEST_PREREQUISITES)
 	diff -u \
 	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
 		  | $(XML_TO_TEXT)) \
-	    <($< run $(SYNC_COLOR_TEXT_FORMAT) $(TESTUDOOPT) \
-			$(ALLTESTUDOSPEC) \
-		  | $(UNCOLOR))
-diff_xml_text_test_color: $(TEST_PREREQUISITES)
+	    <($< run $(NO_XML_TEXT_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC))
+dev_diff_xml_text_test_color_ansi: $(TEST_PREREQUISITES)
 	diff -u \
 	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-		  | $(XML_TO_COLOR)) \
-	    <($< run $(SYNC_COLOR_TEXT_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC))
-diff_xml_text_test_color_ansi: $(TEST_PREREQUISITES)
-	diff -u \
-	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-		  | $(XML_TO_COLOR) | ./show_ansi) \
-	    <($< run $(SYNC_COLOR_TEXT_FORMAT) $(TESTUDOOPT) \
+		  | $(XML_TO_TEXT) | ./show_ansi) \
+	    <($< run $(NO_XML_TEXT_FORMAT) $(TESTUDOOPT) \
 			$(ALLTESTUDOSPEC) \
 		  | ./show_ansi)
-diff_xml_text_test_saved_color: $(TEST_PREREQUISITES)
+dev_diff_xml_text_test_saved_color: $(TEST_PREREQUISITES)
 	diff -u \
 	    <(cat testudo.report.saved | $(COLOR_NO_LOC_INFO)) \
 	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-		  | $(XML_TO_COLOR) | $(COLOR_NO_LOC_INFO))
-diff_xml_summary_test_saved_color: $(TEST_PREREQUISITES)
+		  | $(XML_TO_TEXT_REPEATABLE) | $(COLOR_NO_LOC_INFO))
+dev_diff_xml_summary_test_saved_color: $(TEST_PREREQUISITES)
 	diff -u \
 	    testudo.summary.saved \
 	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-		  | $(XML_TO_COLOR_SUMMARY))
+		  | $(XML_TO_TEXT_SUMMARY_REPEATABLE))
 
-save_color: $(TEST_PREREQUISITES)
+dev_save_color: $(TEST_PREREQUISITES)
 	cp -i \
 	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-		  | $(XML_TO_COLOR)) \
+		  | $(XML_TO_TEXT_REPEATABLE)) \
 	    testudo.report.saved
-save_summary_color: $(TEST_PREREQUISITES)
+dev_save_summary_color: $(TEST_PREREQUISITES)
 	cp -i \
 	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-		  | $(XML_TO_COLOR_SUMMARY)) \
+		  | $(XML_TO_TEXT_SUMMARY_REPEATABLE)) \
 	    testudo.summary.saved
+
+dev_diff_tests: dev_diff_xml_text_test_bw \
+		dev_diff_xml_text_test_color \
+		dev_diff_xml_text_test_saved_color \
+		dev_diff_xml_summary_test_saved_color \
+		progress
+
+dev_save_tests: dev_save_color dev_save_summary_color save_progress
+
 
 reports/%.tex: $(TESTUDOBIN) $(TESTUDOBINDIR)/testudo_doc.ttb
 	mkdir -p reports
 	$< run $(XML_FORMAT) $(TESTUDOBINDIR)/testudo_doc.ttb -s $* \
-	    | $(XML_TO_COLOR_LATEX) > $@
+	    | $(XML_TO_TEXT_LATEX) > $@
 
 
 run_dune_buggy_test_%: $(TESTUDOBIN) \
 			$(TESTUDOBINDIR)/dune_buggy_%/dune_buggy.o \
 		$(TESTUDOBINDIR)/dune_buggy_%/dune_buggy.ttb
-	$< run $(SYNC_COLOR_TEXT_WITH_LINES_FORMAT) $(TESTUDOOPT) \
+	$< run $(NO_XML_COLOR_TEXT_WITH_LINES_FORMAT) $(TESTUDOOPT) \
 	    -d dune_buggy_$* $(filter-out $<,$^) \
 	    | tee $(TRACKDIR)/dune_buggy_$*/report
 	mkdir -p $(TRACKDIR)/dune_buggy_$*
@@ -236,14 +248,6 @@ clean_report:
 	rm -rf reports
 
 clean:: clean_doc clean_exe clean_report clean_ascii_logo clean_examples
-
-diff_tests: diff_test \
-		diff_xml_text_test_bw \
-		diff_xml_text_test_color \
-		diff_xml_text_test_saved_color \
-		diff_xml_summary_test_saved_color
-
-save_test: save_color save_summary_color
 
 PREFIX?=$(HOME)/local
 BIN_DIR=$(PREFIX)/bin

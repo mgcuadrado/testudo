@@ -1,0 +1,138 @@
+-------------------------------------------------------------------------------
+
+Testarudo the Turtle and Rauda the Rabbit agreed to race across the forest.
+Rauda was as fast as her cousin the Hare, but unlike him, she was not lazy;
+quite on the contrary, once she started running, she never stopped until she
+reached her goal.  Testarudo, on the other hand, was as undefatigable as his
+cousin the Tortoise, but more importantly, he was insistently conscientious,
+and very perceptive.
+
+The goal was set at clearing atop Mount Parnasse, and marked with a big fire
+that sent a column of smoke skywards.  But no course was decided: the racers
+would have to find their own way.
+
+[ from here on, shaped typesetting ]
+
+1111111111111111111111111111111111    3333333333333333333333333
+                    2222222222   11         3333333333333
+                  222222           111         3333333
+                 2222         111               3333
+                   2222            1111         3333
+                 4444       111         111     5555
+              4444               111            5555
+                 4444       666                 5555
+                    4444            666         5555
+                4444         6666               5555
+              8888                 6666         7777
+     888                   666                   77
+        888                         66           77
+           888                            66     77
+
+(1) The Crow gave the start signal and immediately flew up high into the sky,
+to see the race from above. (2) Rauda darted away towards the goal.  (3)
+Testarudo started off with a firm gait.
+
+(4) Rauda was soon deep in the dense forest, where she couldn't see the column
+of smoke, but she was confident she was on the right track.  She also made a
+point of always choosing the steepest path upwards.  She would get to the fire
+in no time.  And, assuredly, soon she was got out of the forest and could see
+the summit a few dozen steps ahead.  But where were the fire and the column of
+smoke?  She turned around and realised she hadn't come to the right mount.  So
+she quickly got back in the forest, towards the goal.  Fearing another blunder,
+she decided to stop to ask everyone she met where Mount Parnasse was, and every
+time, she darted again in the reported direction.  At the back of her mind, she
+had a nagging sensation that the animals' answers didn't quite agree, and she
+had a feeling that she was going several times through the same patches of
+forest.  But she was too much in a hurry to stop and verify; time was of the
+essence!  Soon, she was near the goal.  Was she?  She got out of the forest
+again, only to find that she was even farther away from the goal than the first
+time.  Frustrated, she entered the forest once again.  She had lost so much
+time...  She had to do something.  But what?  Run even faster, of course!
+Thus, she reached many summits that were not Mount Parnasse; sometimes she was
+nearer the goal and felt mildly relieved, but sometimes she was farther away
+and felt truly frustrated.  After many attempts, she arrived at what she
+thought, again, was the clearing around the goal.  But it wasn't, again!  What
+was worse, when she looked around at the smoke column, she saw something
+unexpected: Testarudo had just entered the correct clearing, and was inexorably
+approaching the goal.  Quick!  There's no time to waste!  And off she darted
+again, with all her might.
+
+(5) Testarudo wasn't as fast as Rauda, by a long shot.  But being slower and
+calmer afforded him more vision and more time to check and think.  Every few
+steps, he checked his bearings and looked for landmarks.  If he could see some
+light at the top of the forest roof, he would check its direction.  If he saw
+some patch of forest with an open top, he would carefully deviate from his path
+to get there, find the smoke column, and correct his course.  If he found a
+high rock, he would climb atop it, even if it was a lot of effort, and check
+his landmarks.  And he would ask every creature he encountered for the
+direction to Mount Parnasse; in this respect, he soon realised the animals of
+the forest were often unreliable, especially the smaller ones, so, although he
+kept asking and taking into account their answers, especially those of the
+bigger ones, he always assessed them against his own findings.  And thus, step
+by step, always approaching the goal, he reached the clearing at the top of
+Mount Parnasse.
+
+(6) The crow, from his privileged vantage point, inaccessible to anyone else,
+saw the two racers evolve.  He saw Testudo advancing slowly but steadily,
+always approaching the goal.  Rauda's evolution was more surprising: she would
+make good progress towards the goal, but soon she would deviate, or squarely
+take a sharp bend, in a different direction, very often away from the goal;
+then she would emerge from the forest, look for the goal, and dart again into
+the forest.
+
+(7) Rauda emerges from the forest into the river at high speed...
+
+(8) Testudo reaches the goal...
+
+(9) Is there a possibility Testarudo, Rauda, and the Mock Turtle join their
+forces?...
+
+Can i modify the tale so it isn't clear Testarudo won.  Like, in fact,
+Testarudo and Rauda needed each other to win.
+
+Don't forget:
+
+    * Rauda is creative and fast; she moves in high-risk, high-yield domains;
+
+    * Testarudo is conscientious and repeatable; his business is security and
+      constant push forward;
+
+    * the two of them together achieve sustained maximum speed with low risk of
+      setbacks.
+
+How about setting the tale in coloured ASCII-art panels, with text under each
+panel.  When the panel is about several characters, there are several
+character-specific columns of text that can be read in parallel.  In this
+situation, Rauda should always be on the left, and Testarudo on the right,
+because Rauda represents the possible current situation and Testarudo
+represents the Testudo-based solution.  The text under each panel can also be
+in ASCII-art, or it can be typeset by LaTeX (this will look better; and i could
+even use different fonts for the different characters).
+
+-------------------------------------------------------------------------------
+
+The Crow gave the start signal and immediately
+                           flew up
+Rauda darted away                high into the sky,     Testarudo started off
+    towards tho goal.       to                            with a firm gait.
+        She was soon             see                      He wasn't as fast
+  deep in the dense                    the                as Rauda, by a long
+     forest, where she                      race        shot.  But being slower
+couldn't see the column         from                    and calmer afforded him
+       of smoke                      above.             more vision & more time
+                                                          to check and think.
+                             From his vantage point,
+                           inaccessible to anyone else,
+                          he saw the two racers evolve.
+
+                                       Testudo avanced
+                                  slowly but steadily,
+                                    always approaching
+                                             the goal.
+
+                          Rauda started fast
+                          towards the goal
+                          but deviated or
+                          took sharp bends,
+                          often away from
+                          the goal.

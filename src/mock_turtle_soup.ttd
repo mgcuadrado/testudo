@@ -122,7 +122,7 @@ namespace {
     check(soup_mock->counter)_equal(4);
     perform(soup_mock->schedule_ret(temp, 20, 40, 60, 80, 100));
     perform(queen_of_hearts_mock_turtle_soup(soup_mock));
-    show_value(print_calls(soup_mock->calls()));
+    show_value(testudo::unquoted(print_calls(soup_mock->calls())));
     with_declare(auto it=iterate(soup_mock)) {
       with_declare(auto call=it.pop_call(*soup_mock, reverse)) {
         check(call)_equal({{2, 1}}, {{1, 2}});
@@ -223,7 +223,7 @@ namespace {
     perform(equalize(lev1, lev2));
     check(lev1.readout())_equal(52);
     check(lev2.readout())_equal(52);
-    show_value(print_calls(cl.calls()));
+    show_value(testudo::unquoted(print_calls(cl.calls())));
     declare(auto it=iterate(cl));
     perform(while (it.method_name() not_eq "large_up")
               it.next());
@@ -238,21 +238,23 @@ namespace {
 
   define_test(mock_turtle, "predicates") {
     declare(using namespace testudo);
-    check(list<tuple<int, string>>{{1, "one"}, {1, "one"}})
-      _verify(is_always(1, "one"));
-    check(list<tuple<int, string>>{{1, "one"}, {2, "one"}})
-      _verify(is_always(1, "one"));
-    check(list{2, 2, 2})_verify(is_always(2));
-    check(list<tuple<int>>{{2}, {2}, {2}})_verify(is_always(2));
-    check(list{2, 3, 2})_verify(is_always(2));
-    check(list<tuple<int>>{{2}, {3}, {2}})_verify(is_always(2));
-    check(list{1, 2, 3})_verify(is_never(4));
-    check(list{1, 2, 3})_verify(is_never(1));
-    check(list{1, 1, 4})_verify(is_constant);
-    check(list{1, 1, 1})_verify(is_constant);
-    check(list{1, 2, 3})_verify(all_different);
-    check(list{1, 2, 1})_verify(all_different);
-    check(list{1, 2, 2})_verify(all_different);
+    check(
+      is_always(1, "one")(list<tuple<int, string>>{{1, "one"}, {1, "one"}}))
+      _true;
+    check(
+      is_always(1, "one")(list<tuple<int, string>>{{1, "one"}, {2, "one"}}))
+      _true;
+    check(is_always(2)(list{2, 2, 2}))_true;
+    check(is_always(2)(list<tuple<int>>{{2}, {2}, {2}}))_true;
+    check(is_always(2)(list{2, 3, 2}))_true;
+    check(is_always(2)(list<tuple<int>>{{2}, {3}, {2}}))_true;
+    check(is_never(4)(list{1, 2, 3}))_true;
+    check(is_never(1)(list{1, 2, 3}))_true;
+    check(is_constant(list{1, 1, 4}))_true;
+    check(is_constant(list{1, 1, 1}))_true;
+    check(all_different(list{1, 2, 3}))_true;
+    check(all_different(list{1, 2, 1}))_true;
+    check(all_different(list{1, 2, 2}))_true;
   }
 
   class Namable {

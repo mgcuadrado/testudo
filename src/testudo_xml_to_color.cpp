@@ -1,4 +1,4 @@
-// Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+// Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 // This file is part of Testudo.
 
@@ -61,169 +61,190 @@ namespace testudo___implementation {
 
     using enc_t=element_t::node_const_t;
 
-    action_t process;
+    // wrap an action with location info
+    auto locate=
+      [&](action_t f) -> action_t {
+        if (f)
+          return
+            [&, f](enc_t e) {
+              if (has_attribute(e, "brief_location"))
+                typeset->location(attribute(e, "brief_location"));
+              f(e);
+            };
+        else
+          return f;
+      };
 
-    action_t process_test=
-      [&](enc_t e) {
-        typeset->title(attribute(e, "location"),
-                       attribute(e, "name"),
-                       attribute(e, "title"));
-        process(e);
-        typeset->summary(attribute(e, "name"),
-                         attribute(e, "n_failed"),
-                         attribute(e, "n_total"),
-                         attribute(e, "n_errors"),
-                         attribute(e, "success"));
-      };
-    action_t process_indent=
-      [&](enc_t e) {
-        typeset->begin_indent();
-        process(e);
-        typeset->end_indent();
-      };
-    action_t process_scope=
-      [&](enc_t e) {
-        typeset->begin_scope(attribute(e, "name"));
-        process(e);
-        typeset->end_scope(attribute(e, "name"));
-      };
-    action_t process_declare_scope=
-      [&](enc_t e) {
-        typeset->begin_declare_scope(attribute(e, "declare"));
-        process(e);
-        typeset->end_declare_scope();
-      };
-    action_t process_separator=[&](enc_t) { typeset->separator(); };
-    action_t process_step_id=
-      [&](enc_t e) { typeset->step_id(attribute(e, "id")); };
-    action_t process_text=
-      [&](enc_t e) { typeset->text(text(e)); };
-    action_t process_declare=[&](enc_t e) { typeset->declare(text(e)); };
-    action_t process_perform=[&](enc_t e) { typeset->perform(text(e)); };
-    action_t process_try=[&](enc_t e) { typeset->try_catch_try(text(e)); };
-    action_t process_catch=
-      [&](enc_t e) {
-        typeset->try_catch_catch(attribute(e, "exception_type"),
-                                 text(e),
-                                 attribute(e, "success"));
-      };
-    action_t process_show_value=
-      [&](enc_t e) {
-        auto expr=get_child(e, "expression1");
-        typeset->show_value(text(expr),
-                            attribute(expr, "value"));
-      };
-    action_t process_with=
-      [&](enc_t e) {
-        typeset->begin_with(attribute(e, "var"),
-                            attribute(e, "container_first"),
-                            attribute(e, "container_rest"));
-        process(e);
-        if (has_attribute(e, "success"))
-          typeset->with_summary(attribute(e, "summary"),
-                                attribute(e, "n_failed"),
-                                attribute(e, "n_total"),
-                                attribute(e, "n_errors"),
-                                attribute(e, "success"));
-        typeset->end_with();
-      };
-    action_t process_with_results=
-      [&](enc_t e) {
-        typeset->begin_with_results();
-        process(e);
-        typeset->end_with_results();
-      };
-    action_t process_check_true=
-      [&](enc_t e) {
-        auto expr=get_child(e, "expression1");
-        typeset->check_true(text(expr),
-                            attribute(e, "success"),
-                            attribute(e, "prefix"));
-      };
-    action_t process_check_true_for=
-      [&](enc_t e) {
-        auto expr=get_child(e, "expression1");
-        auto exprv=get_child(e, "expressionv");
-        typeset->check_true_for(text(expr),
-                                text(exprv), attribute(exprv, "value"),
+#define recursive_element(name, open, close)                            \
+    {name, {locate(open), close}}
+    // terminal elements either have no content, or they handle children
+    // explicitly; therefore, they have no need for a "close" action
+#define terminal_element(name, open)                                    \
+    {name, {locate(open), {}, false}}
+
+    traverse_map_t testudo_xml_to_color_map{
+
+      terminal_element(
+        "interactive_test",
+        [&](enc_t) { typeset->interactive_test(); }),
+
+      recursive_element("testudo", {}, {}),
+
+      recursive_element(
+        "test",
+        [&](enc_t e) {
+          typeset->title(attribute(e, "location"),
+                         attribute(e, "name"),
+                         attribute(e, "title"));
+        },
+        {}),
+
+      terminal_element(
+        "stats",
+        [&](enc_t e) {
+          typeset->summary(attribute(e, "name"),
+                           attribute(e, "n_failed"),
+                           attribute(e, "n_total"),
+                           attribute(e, "n_errors"),
+                           attribute(e, "success"));
+        }),
+
+      recursive_element(
+        "indent",
+        [&](enc_t) { typeset->begin_indent(); },
+        [&](enc_t) { typeset->end_indent(); }),
+
+      recursive_element(
+        "scope",
+        [&](enc_t e) { typeset->begin_scope(attribute(e, "name")); },
+        [&](enc_t e) { typeset->end_scope(attribute(e, "name")); }),
+
+      recursive_element(
+        "declare_scope",
+        [&](enc_t e) { typeset->begin_declare_scope(attribute(e, "declare")); },
+        [&](enc_t) { typeset->end_declare_scope(); }),
+
+      terminal_element(
+        "separator",
+        [&](enc_t) { typeset->separator(); }),
+
+      terminal_element(
+        "step_id",
+        [&](enc_t e) { typeset->step_id(attribute(e, "id")); }),
+
+      terminal_element(
+        "text",
+        [&](enc_t e) { typeset->text(text(e)); }),
+
+      terminal_element(
+        "declare",
+        [&](enc_t e) { typeset->declare(text(e)); }),
+
+      terminal_element(
+        "perform",
+        [&](enc_t e) { typeset->perform(text(e)); }),
+
+      terminal_element(
+        "try",
+        [&](enc_t e) { typeset->try_catch_try(text(e)); }),
+
+      terminal_element(
+        "catch",
+        [&](enc_t e) {
+          typeset->try_catch_catch(attribute(e, "exception_type"),
+                                   text(e),
+                                   attribute(e, "success"));
+        }),
+
+      terminal_element( // we handle children explicitly
+        "show_value",
+        [&](enc_t e) {
+          auto expr=get_child(e, "expression1");
+          typeset->show_value(text(expr), attribute(expr, "value"));
+        }),
+
+      recursive_element(
+        "with",
+        [&](enc_t e) {
+          typeset->begin_with(attribute(e, "var"),
+                              attribute(e, "container_first"),
+                              attribute(e, "container_rest"));
+        },
+        [&](enc_t) { typeset->end_with(); }),
+
+      terminal_element(
+        "with_stats",
+        [&](enc_t e) {
+          if (has_attribute(e, "success"))
+            typeset->with_summary(attribute(e, "name"),
+                                  attribute(e, "n_failed"),
+                                  attribute(e, "n_total"),
+                                  attribute(e, "n_errors"),
+                                  attribute(e, "success"));
+        }),
+
+      recursive_element(
+        "with_results",
+        [&](enc_t) { typeset->begin_with_results(); },
+        [&](enc_t) { typeset->end_with_results(); }),
+
+      terminal_element( // we handle children explicitly
+        "check_true",
+        [&](enc_t e) {
+          auto expr=get_child(e, "expression1");
+          typeset->check_true(text(expr),
+                              attribute(e, "success"),
+                              attribute(e, "prefix"));
+        }),
+
+      terminal_element( // we handle children explicitly
+        "check_true_for",
+        [&](enc_t e) {
+          auto expr=get_child(e, "expression1");
+          auto exprv=get_child(e, "expressionv");
+          typeset->check_true_for(text(expr),
+                                  text(exprv), attribute(exprv, "value"),
+                                  attribute(e, "success"),
+                                  attribute(e, "prefix"));
+        }),
+
+      terminal_element( // we handle children explicitly
+        "check_equal",
+        [&](enc_t e) {
+          auto expr1=get_child(e, "expression1");
+          auto expr2=get_child(e, "expression2");
+          typeset->check_equal(text(expr1), attribute(expr1, "value"),
+                               text(expr2), attribute(expr2, "value"),
+                               attribute(e, "success"),
+                               attribute(e, "prefix"));
+        }),
+
+      terminal_element( // we handle children explicitly
+        "check_approx",
+        [&](enc_t e) {
+          auto expr1=get_child(e, "expression1");
+          auto expr2=get_child(e, "expression2");
+          typeset->check_approx(text(expr1), attribute(expr1, "value"),
+                                text(expr2), attribute(expr2, "value"),
+                                attribute(e, "max_error"),
                                 attribute(e, "success"),
                                 attribute(e, "prefix"));
-      };
-    action_t process_check_equal=
-      [&](enc_t e) {
-        auto expr1=get_child(e, "expression1");
-        auto expr2=get_child(e, "expression2");
-        typeset->check_equal(text(expr1), attribute(expr1, "value"),
-                             text(expr2), attribute(expr2, "value"),
-                             attribute(e, "success"),
-                             attribute(e, "prefix"));
-      };
-    action_t process_check_approx=
-      [&](enc_t e) {
-        auto expr1=get_child(e, "expression1");
-        auto expr2=get_child(e, "expression2");
-        typeset->check_approx(text(expr1), attribute(expr1, "value"),
-                              text(expr2), attribute(expr2, "value"),
-                              attribute(e, "max_error"),
-                              attribute(e, "success"),
-                              attribute(e, "prefix"));
-      };
-    action_t process_check_verify=
-      [&](enc_t e) {
-        auto expr=get_child(e, "expression1");
-        auto pred=get_child(e, "predicate");
-        typeset->check_verify(text(expr), attribute(expr, "value"),
-                              text(pred),
-                              attribute(e, "success"),
-                              attribute(e, "prefix"));
-      };
-    action_t process_uncaught_exception=
-      [&](enc_t e) { typeset->uncaught_exception(text(e)); };
+        }),
 
-    auto locate=
-      [&](auto f) {
-        return
-          [&](enc_t e) {
-            if (has_attribute(e, "brief_location"))
-              typeset->location(attribute(e, "brief_location"));
-            f(e);
-          };
-      };
+      terminal_element(
+        "uncaught_exception",
+        [&](enc_t e) { typeset->uncaught_exception(text(e)); })
 
-    actions_t const actions=
-      {
-#define element(name) {#name, locate(process_##name)}
-       element(test),
-       element(indent),
-       element(scope),
-       element(declare_scope),
-       element(separator),
-       element(step_id),
-       element(text),
-       element(declare),
-       element(perform),
-       element(try),
-       element(catch),
-       element(show_value),
-       element(with),
-       element(with_results),
-       element(check_true),
-       element(check_true_for),
-       element(check_equal),
-       element(check_approx),
-       element(check_verify),
-       element(uncaught_exception)
-#undef element
-      };
+    };
 
-    process=[&](enc_t e) { process_children(e, actions); };
+#undef terminal_element
+#undef recursive_element
 
-    auto root=read_element(cin);
-    if (must_be_element(root)->name=="interactive_test")
-      typeset->interactive_test();
-    else {
-      must_be_element(root, "testudo");
-      process(root);
+    try {
+      interpret_element(cin, testudo_xml_to_color_map);
+    } catch (read_ended_unexpectedly const &excp) {
+      typeset->aborted(
+        "incomplete XML report; the test probably crashed!");
     }
   }
 

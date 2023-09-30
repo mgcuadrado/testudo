@@ -1,4 +1,4 @@
-// Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+// Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 // This file is part of Testudo.
 
@@ -633,18 +633,20 @@ namespace testudo___implementation {
 
   template <typename... T>
   inline auto is_always(T const &...t) {
-    return testudo__PREDICATE_C_A((t...), implementation::is_always(a, t...));
+    return [t...](auto const &a)
+             { return implementation::is_always(a, t...); };
   }
 
   template <typename... T>
   inline auto is_never(T const &...t) {
-    return testudo__PREDICATE_C_A((t...), implementation::is_never(a, t...));
+    return [t...](auto const &a)
+             { return implementation::is_never(a, t...); };
   }
 
   inline auto is_constant=
-    testudo__PREDICATE_A(implementation::is_constant(a));
+    [](auto const &a) { return implementation::is_constant(a); };
   inline auto all_different=
-    testudo__PREDICATE_A(implementation::all_different(a));
+    [](auto const &a) { return implementation::all_different(a); };
 
 }
 

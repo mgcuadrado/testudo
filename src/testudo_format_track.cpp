@@ -1,4 +1,4 @@
-// Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+// Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 // This file is part of Testudo.
 
@@ -168,13 +168,6 @@ namespace {
                      prefix+expr1_str+expr2_str+max_error_str,
                      success, informative);
     }
-    void output_check_verify(string expr_str, string,
-                             string pred_str,
-                             string success,
-                             string prefix, bool informative) override {
-      encode_check("check_verify", prefix+expr_str+pred_str,
-                   success, informative);
-    }
     void uncaught_exception(string exception) override
       { encode_uncaught(exception); }
     //  we ignore the "TestStats" for "produce_summary()" since we want to
@@ -182,7 +175,7 @@ namespace {
     void produce_summary(string name, TestStats) override
       { encode('t', "produce_summary", name); }
 
-    void print_test_readout() const override { }
+    void print_test_readout() const override { } // already wrote everything
 
   private:
     inline static pattern::register_creator<TestFormatTrack>

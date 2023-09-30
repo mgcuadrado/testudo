@@ -1,3 +1,64 @@
+541 testudo-0.9
+  updated copyright notices
+540
+  corrected a couple of target names
+539
+  testudo version 0.9
+538
+  updated "testudo_doc.ttd" not to be copyrighted
+537
+  wrote a rationale for keeping the distinction between "declare" and
+  "perform"
+536 [merge]
+  merge
+535
+  made it possible for the XML-to-text conversion to detect, recover from, and
+  notify about a report that's been prematurely ended by a crash in the tests
+534
+  reorganised targets in "Makefile.testudo" and documented development targets
+533
+  made "<interactive_test/>" one of the normally detected XML elements,
+  instead of giving it a special treatment
+531
+  cleaned up "kmsxml::process()" and "testudo_xml_to_color()"
+530
+  since we're now outputting XML as the test tree is constructed, avoided
+  actually constructing the tree altogether
+529
+  replaced the driven traversal of the read XML tree that used
+  "process_children()" with an automatic one that uses "process()"
+528
+  made XML test output synchronous, i.e., it's output as the test runs,
+  so even if the test crashes, everything until the crash is output;
+  i still have to make the XML-to-text conversion synchronous too
+524
+  replaced the "set_no_quotes_around_string()" mechanism with the simpler
+  "testudo::unquoted()" function
+523
+  corrected some variable names ("TO_COLOR" is now "TO_TEXT")
+522
+  made track reports aware of terminal size and colour capabilities
+518
+  made Makefile targets that report results aware of the terminal colour
+  capabilities
+517
+  separated "auto_weak_ptr<>" into its own header file
+516
+  made Makefile targets that report results terminal-size aware
+515
+  avoided a Unicode character that isn't allowed in C++ identifiers
+514
+  print quotes around strings by default, configurable with one macro and
+  two functions
+513
+  s/g++10/g++/
+511
+  explicitly converted the argument to a "_true" or "_false" check to bool
+510
+  testudo version 0.9rc
+509
+  added the one-style manuals to the release and changed the link in
+  "README.md" to point to the lower-case manual
 508 testudo-0.8
   testudo version 0.8
 507

@@ -9,7 +9,7 @@
 définir_test(flux_capacitor, // parent
              "FC after construction", // title
              με_προσάρτημα(DeloreanFixture)) { // use a fixture
-  🖵(FluxCapacitor fc);
+  deklari(FluxCapacitor fc);
   biểu_diễn(fc.connect_to(delorean)); // "delorean" is created by the fixture
   تحقق(not fc.is_on())_правда; // check bool is true
   تحقق(fc.missing_jw())_근접한(1.21); // check approximate value

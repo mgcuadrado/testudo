@@ -1,4 +1,4 @@
-// Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+// Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 // This file is part of Testudo.
 
@@ -130,11 +130,6 @@ namespace testudo___implementation {
     virtual void output_check_approx(string expr1_str, string val1_str,
                                      string expr2_str, string val2_str,
                                      string max_error_str,
-                                     string success,
-                                     string prefix,
-                                     bool informative)=0;
-    virtual void output_check_verify(string expr_str, string val_str,
-                                     string pred_str,
                                      string success,
                                      string prefix,
                                      bool informative)=0;

@@ -1,4 +1,4 @@
-% Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+% Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 % This file is part of Testudo.
 
@@ -235,9 +235,9 @@ Brief rundown of Testudo's features:
 \item easy definition of tests (\Sref{cha:test-steps});
 \item clear, complete, flexible test reports;
 \item straightforward syntax for declarations, actions, showing values, checks
-  on values, predicate checks, and scopes (\Sref{cha:test-steps});
+  on values, and scopes (\Sref{cha:test-steps});
 \item support for exception checks (\Sref{sec:exception-checks}) and unexpected
-  exceptions (\Sref{sec:unexpected-exceptions});
+  exceptions (\Sref{sec:unexpected-exceptions-crashes});
 \item support for complex types (\Sref{cha:testudo-support-stl-types});
 \item easy support for new types (\Sref{cha:adding-testudo-support-your-types});
 \item fixtures (\Sref{cha:fixtures});
@@ -530,15 +530,9 @@ summary, giving the check statistics for each test node and each test.
 The ``\texttt{color\_text}'' format outputs the printout directly as a full
 text report with colours, virtually identical to the one
 ``\texttt{xml\_to\_color}'' produces.  The difference is that this format
-produces its output synchronously, so even if a fatal error happens, you'll get
-the whole output until just before the error, whereas the ``\texttt{xml}''
-won't output anything\footnote{This is so because the ``\texttt{xml}'' format
-  first builds the whole \textsc{xml} object for the printout before printing
-  it.}.
-
-The ``\texttt{color\_text\_with\_lines}'' format is similar to
-``\texttt{color\_text}'', but it also prints source code line information for
-each test step.
+doesn't get confused by output the test program might write directly to its
+output, whereas the regular workflow that uses the intermediate \textsc{xml}
+representation will fail when such an output is mixed with the \textsc{xml}.
 
 
 \chapter{Test definition and test instruction styles}
@@ -624,77 +618,81 @@ done by ``\texttt{make}'', using \textsc{gnu} \texttt{g++} flags
 \label{sec:using-make}
 
 If you're using the makefile template, as described
-in~\Sref{sec:makefile-template}, you can use a set of ``\texttt{make}''
-commands to perform Testudo-related tasks.  The standard workflow assumes you
-have a saved report and a saved track that represent your ``baseline'';
-differences and progress and measured with respect to the baseline.  When using
-a version control system, you must add the saved report and track, and commit
-them with their matching version of the code and test code.
+in~\Sref{sec:makefile-template}, you can use a set of ``\texttt{make}'' targets
+to perform Testudo-related tasks.  The standard workflow assumes you have a
+saved report and a saved track that represent your ``baseline''; differences
+and progress and measured with respect to the baseline.  When using a version
+control system, you must add the saved report and track, and commit them with
+their matching version of the code and test code.
+
+The main available ``\texttt{make}'' targets\footnote{A ``\texttt{make}''
+  target is triggered by the command ``\texttt{make}'' followed by the target.
+  So, for instance, the command ``\texttt{make report}'' will trigger the
+  ``\texttt{report}'' target.} are shown in~\tref{tab:main-make-commands}.
+These ``\texttt{make}'' targets will automatically detect the size and colour
+capabilities of the terminal they're run in, and adapt to them.  If you want to
+force black-and-white output in a colour terminal, suffix them with
+``\texttt{\_bw}''.  For instance, ``\texttt{make report\_bw}'' will print a
+black-and-white report.
+
+There are some additional targets, target prefixes, and target suffixes:
+\begin{itemize}
+\item target ``\texttt{report\_xml}'', which prints the intermediate
+  \textsc{xml} format of the report (see~\Sref{cha:test-output-formats});
+\item prefix ``\texttt{noxml\_}'', which prints the output directly with a
+  colour text format, rather than using the intermediate \textsc{xml}
+  representation (see~\Sref{cha:test-output-formats}); use this if you're
+  adding direct text output to your code to trace a problem;
+\item suffix ``\texttt{\_noloc}'', which outputs a report without any source
+  file and line number information; in combination with the
+  ``\texttt{\_bw}'', the suffix is ``\texttt{\_noloc\_bw}'';
+\item prefix ``\texttt{view\_}'', which pages the output through the
+  ``\texttt{less}'' command for easier viewing, especially for long outputs.
+\end{itemize}
 
 \begin{table}
   \centering
+  \renewcommand\arraystretch{1.75}
   \begin{tabularx}{\linewidth}{lX}
     \toprule
     \emph{``\texttt{make}'' target} & \emph{effect} \\
     \midrule
-    \texttt{show\_report}
-      & runs the tests and shows a colour text report \\
-    \texttt{show\_report\_bw}
-      & same as the previous one, but with no colour codes; this is useful
-        when you're using a terminal or terminal emulator that doesn't support
-        colours (e.g., if you're using Emacs' ``\texttt{compile}'' command) \\
-    \texttt{show\_sync\_report}
-      & runs the tests and shows a colour text report, but bypassing
-        \textsc{xml} generation; this is useful if your code is crashing
-        (see~\Sref{cha:test-output-formats}) \\
-    \texttt{summary\_report}
-      & runs the tests and shows a test summary \\
-    \texttt{view\_report}
-      & runs the tests and shows a colour text report using the
-        ``\texttt{less}'' text viewer \\
+    \texttt{report} & runs the tests and prints a report \\
+    \texttt{report\_summary} & runs the tests and prints a report summary \\
     \texttt{diff\_report}
       & shows the (plain Unix) ``\texttt{diff}'' between the baseline and the
         current report; this is useful if you want to see just the new tests
         you've coded, and how they affect the tallies \\
-    \texttt{diff\_report\_bw}
-      & same as the previous one, but with no colour codes \\
     \texttt{save\_report}
       & runs the tests and saves the current report as a baseline for
-        ``\texttt{diff\_test}'' and similar targets \\
-    \texttt{track\_progress}
-      & shows the tracked progress with respect to the baseline \\
-    \texttt{track\_progress\_bw}
-      & same as the previous one, but with no colour codes \\
+        ``\texttt{diff\_report}'' and similar targets \\
+    \texttt{track} & shows the tracked progress with respect to the baseline \\
     \texttt{save\_track}
       & runs the tests and saves the current track as a baseline for
         ``\texttt{track\_progress}'' \\
-    \texttt{diff\_track}
+    \texttt{progress}
       & runs ``\texttt{diff\_report}'' unconditionally followed by
-        ``\texttt{track\_progress}'' \\
-    \texttt{diff\_track\_bw}
-      & same as the previous one, but with no colour codes \\
-    \texttt{save\_test}
+        ``\texttt{track}'' \\
+    \texttt{save\_progress}
       & runs ``\texttt{save\_report}'' and ``\texttt{save\_track}'' \\
     \bottomrule
   \end{tabularx}
-  \caption{``\texttt{make}'' commands}
-  \label{tab:make-commands}
+  \caption{Main ``\texttt{make}'' commands}
+  \label{tab:main-make-commands}
 \end{table}
 
-\tref{tab:make-commands} shows the available ``\texttt{make}'' commands.  In
-most cases, you can do with only
+In most cases, you can do with only
 \begin{itemize}
-\item \texttt{make diff\_track};
-\item \texttt{make diff\_track\_bw};
-\item \texttt{make save\_test}.
+\item ``\texttt{make view progress}'' to check your progress;
+\item ``\texttt{make save\_progress}'' to save your progress.
 \end{itemize}
 
 Using these ``\texttt{make}'' commands, a simple coding workflow is
 \begin{enumerate}
 \item\label{step:code} code, change, solve, refactor\ellipsis{}
-\item \texttt{make diff\_track};
+\item \texttt{make progress};
 \item iterate (to step \ref{step:code}) until happy;
-\item \texttt{make save\_test};
+\item \texttt{make save\_progress};
 \item commit;
 \item go to step \ref{step:code}.
 \end{enumerate}
@@ -939,8 +937,6 @@ Validity is also checked for other expressions known to the check syntax:
   (\Sref{sec:check-expression-true}, \Sref{sec:check-expression-false});
 \item the argument to the ``approx'' and ``not-approx'' syntaxes
   (\Sref{sec:check-expression-near-reference});
-\item the argument to the ``verify'' and ``not-verify'' syntaxes
-  (\Sref{sec:predicate-checks});
 \item the argument to the ``true-for'' and ``false-for'' syntaxes
   (\Sref{sec:check-expression-true-for},
   \Sref{sec:check-expression-false-for}).
@@ -970,7 +966,7 @@ macro, the test output marks this check with the word ``nay''\footnote{I've
   equivalent to ``\texttt{(not a) and b}'' rather than ``\texttt{not (a and
     b)}''.  No such confusion with ``\texttt{nay a and b}''.}.  This will be
 true of all the other negating checks explained below (``not-equal'',
-``not-approx'', ``not-verify'', and ``false-for'').
+``not-approx'', and ``false-for'').
 
 \typesetexample{check-false}
 
@@ -1079,57 +1075,6 @@ check, by attaching the ``tol'' macro with the tolerance value before the
 \typesetexample{check-approx-tol}
 
 
-\subsectiontestudopair{Predicate checks}{\_verify}{VERIFY}
-\label{sec:predicate-checks}
-
-The checked value can also be tested with a \emph{predicate}.  In Testudo, a
-predicate is a function object that accepts one argument and returns a
-bool.  A predicate can be constructed in one of three ways:
-\begin{itemize}
-\item from a lambda expression: \testudopair{predicate}{PREDICATE}
-
-  \typesetexample{predicate}
-
-\item from a bool expression:
-  \testudopair{predicate\_a}{PREDICATE\_A} (the expression must use the
-  parameter name ``\texttt{a}'')
-
-  \typesetexample{predicate-a}
-
-\item from a bool expression with capture:
-  \testudopair{predicate\_c\_a}{PREDICATE\_C\_A} (like the previous one, but a
-  first parenthesised\footnote{Captures are usually surrounded with square
-    brackets, but in this syntax, they must me surrounded by regular brackets.}
-  argument gives the list of captures)
-
-  \typesetexample{predicate-c-a}
-\end{itemize}
-
-
-Using such predicate objects, the ``check-verify'' syntax checks whether the
-checked value verifies the predicate:
-
-\typesetexample{verify}
-
-Predicates can be combined with the standard \Cpp{} logical operators
-``\texttt{not}'', ``\texttt{and}'', and ``\texttt{or}'' (or their synonyms
-``\texttt{!}'', ``\texttt{\&\&}'', and ``\texttt{||}'' respectively):
-
-\typesetexample{verify-logical-ops}
-
-The ``check-verify'' syntax, when it is the natural means of expression for a
-check, is superior to the ``check-true'' syntax because
-\begin{itemize}
-\item in case of failure, it shows the value of the checked value;
-\item it makes it possible to define and reuse concise predicates with good
-  names, that improve clarity and raise the level of abstraction of the tests.
-\end{itemize}
-
-The opposite of the ``verify'' macro is the ``not-verify'' macro:
-\begin{center}
-  \testudopair{\_not\_verify}{NOT\_VERIFY}
-\end{center}
-
 \subsectiontestudopair{Check the expression is true for certain values}%
 {\_true\_for}{TRUE\_FOR}
 \label{sec:check-expression-true-for}
@@ -1167,7 +1112,7 @@ with the expected type (``\texttt{std::exception}'' by default) is thrown, the
 exception is reported, and the test step is successful.  If no exception is
 thrown, the test step is failed. If an exception with an unexpected type is
 thrown, the test step is failed, and an unexpected exception error is reported
-(see~\Sref{sec:unexpected-exceptions}).
+(see~\Sref{sec:unexpected-exceptions-crashes}).
 
 \typesetexample{check-try-catch}
 
@@ -1199,6 +1144,12 @@ embedded newlines are displayed in a suitable format.
 The ``show value'' instruction shows the value of its argument inline.
 
 \typesetexample{show-value}
+
+String values are shown surrounded by quotes.  In order to show the value of a
+string expression without the quotes, pass it through the
+``\texttt{testudo::unquoted()}'' function:
+
+\typesetexample{show-value-unquoted}
 
 \subsectiontestudopair{Scopes}{in\_scope}{IN\_SCOPE}
 \label{sec:scopes}
@@ -1335,8 +1286,8 @@ format stored in \emph{tfos}.
 \typesetexample{tfos-to-text}
 
 
-\section{Unexpected exceptions}
-\label{sec:unexpected-exceptions}
+\section{Unexpected exceptions and crashes}
+\label{sec:unexpected-exceptions-crashes}
 
 If an unexpected exception (i.e., an exception not in a ``check-try-catch''
 instruction; see~\Sref{sec:exception-checks}, or one in a ``check-try-catch''
@@ -1353,23 +1304,22 @@ aren't an expected situation, even in a failed test that you may be using to do
 when there is at least one error.  A test that has at least one error isn't
 marked with the \verb|[FAIL]| flag, but rather with \verb|[ERR-]|.
 
+If the test program crashes during its execution, the ``\texttt{color\_text}''
+output report format won't be able to detect it, and you'll simple get a
+truncated report.  The regular workflow with the intermediate \textsc{xml}
+representation will detect an incomplete \textsc{xml} and report it with a
+\verb|[ABRT]| flag.  With both formats, the last test step before the crash is
+realiably reported, so that should give you a clear indication as to where the
+crash happened.
 
-\section{Fatal errors}
-\label{sec:fatal-errors}
-
-Fatal errors (i.e., errors that cause immediate termination of the executable,
-rather than throwing an exception) are something Testudo can't do anything
-about.  They will terminate the whole test suite execution.  There's a couple
-of things you can do to investigate what's going on.  First, you can run the
-tests using a synchronous format like ``\texttt{color\_text}''
-(see~\Sref{cha:test-output-formats}), to see where the execution stops (which
-test and which test step).  You can then go investigate and fix the error, or
-run the tests excluding that particular test to know what the current situation
-is, barring the failing test.  You can also run the test with a debugger, but
-in that case, be aware that Testudo's macros add management code (classes,
-methods, functions, variables, statements\ellipsis{}) to your instructions to
-achieve the intended results, and their workings may be confusing, so try to
-pay no attention to that man behind the curtain.
+If you run the test with a debugger, be aware that Testudo's macros add
+management code (classes, methods, functions, variables, statements\ellipsis{})
+to your instructions to achieve the intended results, and their workings may be
+confusing, so try to pay no attention to that man behind the curtain.  If you
+add printed traces to your test instead, remember to use the
+``\texttt{color\_text}'' (see~\Sref{cha:test-output-formats}) format, or the
+``\texttt{noxml\_}'' prefix for the ``\texttt{make}'' target
+(see~\Sref{sec:using-make}), when running the tests again.
 
 
 \chaptertestudopair{Check-guarded code sections}{provided}{PROVIDED}
@@ -2211,6 +2161,28 @@ When defining this function, you may have to use
 ``\texttt{testudo::absdiff()}'' on other values contained in your type:
 
 \typesetexample{testudo-support-my-vector-absdiff-testudo-absdiff}
+
+
+% \chapter{Miscellaneous Testudo configuration}
+
+% \begin{quote}
+%   \emph{There's only one aspect of Testudo that can be configured for the time
+%   being.  If i add more in the future, i'll code a more comprehensive flag
+%   management system.}
+% \end{quote}
+
+% By default, when a string value is printed by Testudo (with the ``show-value''
+% syntax, or when a check fails), it's surrounded by quotes.  You can tell
+% Testudo not to use the quotes in two ways.  First, if you want that for all
+% tests, just write the following at global scope in any source code file that is
+% linked:
+% \typesetexample{testudo-global-set-no-quotes-around-string}
+
+% If you want to turn the quotes off and on as needed, use the following
+% functions instead:
+% \typesetexample{testudo-local-set-unset-no-quotes-around-string}
+% You should probably use them inside a ``perform'' syntax so that the report
+% explains the change in string format.
 
 
 \cleartooddpage

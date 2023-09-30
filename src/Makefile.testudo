@@ -1,4 +1,4 @@
-GPP ?= g++-10 -std=c++17 -pedantic
+GPP ?= g++ -std=c++17 -pedantic
 
 BASICOPTS := -ggdb3
 CODEOPTS :=
@@ -82,97 +82,121 @@ $(EXE): $(OBJDIR)/%: %.cpp $(SHAREDLIBS)
 
 -include $(ALLTESTUDODEPENDS)
 
+TERMINAL_OPTIONS =
+TPUT = $(shell which tput)
+ifneq ($(strip $(TPUT)), )
+TERMINAL_COLUMNS = $(shell $(TPUT) cols)
+TERMINAL_OPTIONS += -w $(shell expr $(TERMINAL_COLUMNS) - 2)
+TERMINAL_COLORS = $(shell $(TPUT) colors)
+ifeq ($(strip $(TERMINAL_COLORS)), -1)
+TERMINAL_OPTIONS += -b
+endif
+endif
+
 NO_LOC_INFO = $(BINSDIR)/no_loc_info
-XML_TO_COLOR = $(TESTUDOBIN) xml_to_color
-XML_TO_COLOR_NO_LINE_INFO = $(TESTUDOBIN) xml_to_color -n
-XML_TO_COLOR_SUMMARY = $(TESTUDOBIN) xml_to_color -s
-XML_TO_TEXT = $(TESTUDOBIN) xml_to_color -b
+XML_TO_TEXT = $(TESTUDOBIN) xml_to_color $(TERMINAL_OPTIONS)
+NO_LOC = -n
+BW = -b
+XML_TO_TEXT_SUMMARY = $(XML_TO_TEXT) -s
 XML_FORMAT = -f xml
 TRACK_FORMAT = -f track
-SYNC_COLOR_TEXT_FORMAT = -f color_text
-SYNC_COLOR_TEXT_WITH_LINES_FORMAT = -f color_text_with_lines
+NO_XML_TEXT_FORMAT = -f color_text
 SAVE_FILE = testudo.report
 TRACK_FILE = testudo.track
 
+TEXT_PAGER = less -R +g
+TEST_PAGER_BW = less +g
+
 TEST_PREREQUISITES = $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
 
-run_test: $(TEST_PREREQUISITES)
-	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) | $(XML_TO_COLOR)
-run_test_bw: $(TEST_PREREQUISITES)
-	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) | $(XML_TO_TEXT)
-run_test_raw: $(TEST_PREREQUISITES)
+# new-style targets
+
+report_xml: $(TEST_PREREQUISITES)
+	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC)
+report: $(TEST_PREREQUISITES)
+	@ -$(MAKE) --silent report_xml \
+	    | $(XML_TO_TEXT)
+report_summary: $(TEST_PREREQUISITES)
+	@ -$(MAKE) --silent report_xml \
+	    | $(XML_TO_TEXT_SUMMARY)
+track_info: $(TEST_PREREQUISITES)
+	$< run $(TRACK_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC)
+track: $(TEST_PREREQUISITES)
+	$< diff $(TERMINAL_OPTIONS) $(TRACK_FILE) \
+		<($(MAKE) --silent track_info)
+
+report_bw: $(TEST_PREREQUISITES)
+	@ -$(MAKE) --silent report_xml \
+	    | $(XML_TO_TEXT) $(BW)
+report_summary_bw: $(TEST_PREREQUISITES)
 	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-	    | $(XML_TO_COLOR) -r
-run_test_no_loc: $(TEST_PREREQUISITES)
-	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-	    | $(NO_LOC_INFO) | $(XML_TO_COLOR)
-runsync_test: $(TEST_PREREQUISITES)
-	$< run $(SYNC_COLOR_TEXT_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC)
-runsync_test_with_lines: $(TEST_PREREQUISITES)
-	$< run $(SYNC_COLOR_TEXT_WITH_LINES_FORMAT) $(TESTUDOOPT) \
-		$(ALLTESTUDOSPEC)
-summary_test: $(TEST_PREREQUISITES)
-	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-	    | $(XML_TO_COLOR_SUMMARY)
-view_test: $(TEST_PREREQUISITES)
-	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-	    | $(XML_TO_COLOR) | less -R
-view_test_no_loc: $(TEST_PREREQUISITES)
-	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-	    | $(NO_LOC_INFO) | $(XML_TO_COLOR) | less -R
-diff_test: $(TEST_PREREQUISITES)
-	diff -bwu <(cat $(SAVE_FILE) | $(XML_TO_COLOR)) \
-	    <($< run $(TESTUDOOPT) $(XML_FORMAT) $(ALLTESTUDOSPEC) \
-		  | $(NO_LOC_INFO) | $(XML_TO_COLOR))
-diff_test_bw: $(TEST_PREREQUISITES)
-	diff -bwu <(cat $(SAVE_FILE) | $(XML_TO_TEXT)) \
-	    <($< run $(TESTUDOOPT) $(XML_FORMAT) $(ALLTESTUDOSPEC) \
-		  | $(NO_LOC_INFO) | $(XML_TO_TEXT))
-diffxml_test: $(TEST_PREREQUISITES)
-	diff -bwu <(cat $(SAVE_FILE)) \
-	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC))
+	    | $(XML_TO_TEXT_SUMMARY) $(BW)
+track_bw: $(TEST_PREREQUISITES)
+	$< diff $(TERMINAL_OPTIONS) $(TRACK_FILE) \
+		<($< run $(TRACK_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC)) $(BW)
+
+report_noloc: $(TEST_PREREQUISITES)
+	@ -$(MAKE) --silent report_xml \
+	    | $(XML_TO_TEXT) $(NO_LOC)
+report_noloc_bw: $(TEST_PREREQUISITES)
+	@ -$(MAKE) --silent report_xml \
+	    | $(XML_TO_TEXT) $(NO_LOC) $(BW)
+
 save_report: $(TEST_PREREQUISITES)
-	cp -i <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
-		    | $(NO_LOC_INFO)) \
+	cp -i <($(MAKE) --silent report_xml) \
 	    $(SAVE_FILE)
-
-# aliases
-show_report: run_test
-show_report_bw: run_test_bw
-show_sync_report: runsync_test
-summary_report: summary_test
-view_report: view_test
-view_report_no_loc: view_test_no_loc
-diff_report: diff_test
-diff_report_bw: diff_test_bw
-diffxml_report: diff_xml_test
-save_report: save_test
-success_test: save_test
-
 save_track: $(TEST_PREREQUISITES)
-	cp -i <($< run $(TRACK_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC)) \
+	cp -i <($(MAKE) --silent track_info) \
 		$(TRACK_FILE)
-track_progress: $(TEST_PREREQUISITES)
-	$< diff $(TRACK_FILE) \
-		<($< run $(TRACK_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC))
-track_progress_bw: $(TEST_PREREQUISITES)
-	$< diff -b $(TRACK_FILE) \
-		<($< run $(TRACK_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC))
 
-diff_track:
+
+# in the "diff_*" targets, "|| true" prevents the "make" command from failing
+# when "diff" finds differences
+diff_report: $(TEST_PREREQUISITES)
+	diff -bwu <(cat $(SAVE_FILE) | $(XML_TO_TEXT) $(NO_LOC)) \
+	    <($(MAKE) --silent report_noloc) || true
+diff_report_bw: $(TEST_PREREQUISITES)
+	diff -bwu <(cat $(SAVE_FILE) | $(XML_TO_TEXT) $(NO_LOC) $(BW)) \
+	    <($(MAKE) --silent report_noloc_bw) || true
+
+diff_report_summary: $(TEST_PREREQUISITES)
+	diff -bwu <(cat $(SAVE_FILE) | $(XML_TO_TEXT_SUMMARY)) \
+	    <($(MAKE) --silent report_summary) || true
+diff_report_summary_bw: $(TEST_PREREQUISITES)
+	diff -bwu <(cat $(SAVE_FILE) | $(XML_TO_TEXT_SUMMARY) $(BW)) \
+	    <($(MAKE) --silent report_summary_bw) || true
+
+progress: $(TEST_PREREQUISITES)
 	@ -$(MAKE) --silent $(TEST_PREREQUISITES)
 	@ echo ---- diff ------------------------------------------------------
 	@ -$(MAKE) --silent diff_report
 	@ echo ---- track -----------------------------------------------------
-	@ -$(MAKE) --silent track_progress
-diff_track_bw:
+	@ -$(MAKE) --silent track
+progress_bw: $(TEST_PREREQUISITES)
 	@ -$(MAKE) --silent $(TEST_PREREQUISITES)
 	@ echo ---- diff ------------------------------------------------------
 	@ -$(MAKE) --silent diff_report_bw
 	@ echo ---- track -----------------------------------------------------
-	@ -$(MAKE) --silent track_progress_bw
+	@ -$(MAKE) --silent track_bw
+save_progress: save_report save_track
 
-save_test: save_report save_track
+noxml_report: $(TEST_PREREQUISITES)
+	$< run $(NO_XML_TEXT_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC)
+noxml_report_noloc: $(TEST_PREREQUISITES)
+	FIXME
+noxml_report_bw: $(TEST_PREREQUISITES)
+	@ -$(MAKE) --silent noxml_report | $(UNCOLOR)
+noxml_report_noloc_bw: $(TEST_PREREQUISITES)
+	FIXME
+
+view_report view_report_summary view_track view_progress \
+	    view_report_bw view_report_summary_bw \
+	    view_report_noloc view_report_noloc_bw \
+	    view_track_bw view_progress_bw \
+	    view_noxml_report view_noxml_report_noloc \
+	    view_noxml_report_bw view_noxml_report_noloc_bw: \
+	view_%: $(TEST_PREREQUISITES)
+	-$(MAKE) --silent $* | $(TEXT_PAGER)
 
 .PHONY: clean
 

@@ -1,0 +1,49 @@
+ Makefile targets
+----------------
+
+The targets prefixed with "noxml_" in "Makefile.testudo" output text directly,
+without going through XML.
+
+The file "Makefile" isn't part of a Testudo installation, unline
+"Makefile.testudo".  It contains a targets for building the manual and targets for the "bootstrapped" testing of Testudo:
+
+    * "make dev_diff_xml_text_test_color" shows the diff between the regular
+      Testudo report (the one that goes through XML) and the direct one built
+      with the "color_text" output format; it should be empty
+
+    * "make dev_diff_xml_text_test_bw" is the same with no colour
+
+    * "make dev_diff_xml_text_test_ansi" is the same but shows ANSI codes as
+      readable ASCII; it's meant to debug differences in the ANSI codes
+
+    * "make dev_diff_xml_text_test_saved_color" shows the diff between a saved
+      version of the report "testudo.report.saved" and the regular Testudo
+      report
+
+    * "make dev_diff_xml_summary_test_saved_color" is the same between file
+      "testudo.summary.saved" and the regular Testudo report summary
+
+    * "make dev_save_color" saves the current Testudo report in
+      "testudo.report.saved"
+
+    * "make dev_save_summary_color" saves the current Testudo report summary in
+      "testudo.summary.saved"
+
+    * "make dev_diff_tests" runs all "dev_diff_*" targets above, and "progress"
+
+    * "make dev_save_tests" runs all "dev_save_*" targets above, and
+      "save_progress"
+
+ Rationales
+------------
+
+Why keep the distinction between "declare" and "perform"?
+
+    We could almost always use "declare" instead of "perform", but not always:
+
+        if (condition)
+          perform(do_this());
+
+    works as expected because "perform" puts its code in a "[&]() { ... }()"
+    block; "declare", on the other hand, needs to do without such a block,
+    because its declarations must be in effect for the rest of the scope.

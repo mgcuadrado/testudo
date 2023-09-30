@@ -1,4 +1,4 @@
-// Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+// Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 // This file is part of Testudo.
 
@@ -104,32 +104,6 @@ namespace testudo___implementation {
 #undef define_support_for
   }
 
-  // // textual representation for a value; if available, use "ostream <<";
-  // // otherwise, return a placeholder
-  // template <typename T>
-  // std::enable_if_t<
-  //   (not implementation::support_for_cbegin_cend_v<T>
-  //    and not implementation::support_for_tuple_size_v<T>),
-  //   std::string>
-  // to_text_testudo(T const &t) {
-  //   if constexpr (implementation::support_for_textual_representation_v<T>) {
-  //     std::ostringstream oss;
-  //     oss << std::boolalpha << t;
-  //     return oss.str();
-  //   }
-  //   else
-  //     return "<...>";
-  // }
-
-  // template <typename C, typename T, typename A>
-  // std::string to_text_testudo(std::basic_string<C, T, A> const &s)
-  //   { return s; }
-
-  // template <typename T>
-  // std::string to_text(T const &t)
-  //   { return to_text_testudo(t); }
-
-
   // textual representation for a value; if available, use "ostream <<";
   // otherwise, return a placeholder
   template <typename T>
@@ -145,10 +119,19 @@ namespace testudo___implementation {
       os << "<...>";
   }
 
-  template <typename C, typename T, typename A>
-  void to_stream_testudo(
-      std::ostream &os, std::basic_string<C, T, A> const &s)
-    { os << s; }
+  template <typename... T>
+  void to_stream_testudo(std::ostream &os, std::basic_string<T...> const &s)
+    { os << "\"" << s << "\""; }
+
+  // a string type that will be printed by Testudo without surrounding quotes
+  struct unquoted_text {
+    std::string text;
+  };
+  inline void to_stream_testudo(std::ostream &os, unquoted_text const &ut)
+    { os << ut.text; }
+
+  template <typename T>
+  inline unquoted_text unquoted(T const &s) { return {s}; }
 
   template <typename T>
   void to_stream(std::ostream &os, T const &t)
@@ -377,6 +360,6 @@ namespace testudo___implementation {
 
 }
 
-testudo___BRING(is_valid, are_equal, to_stream, to_text, absdiff)
+testudo___BRING(is_valid, are_equal, to_stream, to_text, absdiff, unquoted)
 
 #endif

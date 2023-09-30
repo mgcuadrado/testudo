@@ -1,4 +1,4 @@
-# Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+# Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 # This file is part of Testudo.
 
@@ -127,16 +127,10 @@ print_macro_loc_v_string() {
     print_macro_string APPROX
     print_macro_string NOT_APPROX
     print_macro_string TOL
-    print_macro_string VERIFY
-    print_macro_string NOT_VERIFY
     print_macro_no_f   TRUE
     print_macro_no_f   FALSE
     print_macro_string TRUE_FOR
     print_macro_string FALSE_FOR
-    echo
-    print_macro_no_f    PREDICATE
-    print_macro_forward PREDICATE_A
-    print_macro_forward PREDICATE_C_A
     echo
     print_macro_no_f    TFOS
     echo

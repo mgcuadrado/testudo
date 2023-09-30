@@ -40,12 +40,6 @@ NOT_EQUAL  _not_equal
 APPROX     _approx
 NOT_APPROX _not_approx
 TOL        _tol
-VERIFY     _verify
-NOT_VERIFY _not_verify
-
-PREDICATE     predicate
-PREDICATE_A   predicate_a
-PREDICATE_C_A predicate_c_a
 
 TFOS tfos
 

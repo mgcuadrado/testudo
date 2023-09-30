@@ -1,4 +1,4 @@
-// Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+// Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 // This file is part of Testudo.
 
@@ -25,5 +25,10 @@ namespace testudo___implementation {
 
   static bool default_fmt_os_initialized=
     []() { default_fmt_os << boolalpha; return true; }();
+
+  bool no_quotes_around_strings=false;
+
+  void set_no_quotes_around_string() { no_quotes_around_strings=true; }
+  void unset_no_quotes_around_string() { no_quotes_around_strings=false; }
 
 }

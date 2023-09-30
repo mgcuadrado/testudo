@@ -1,4 +1,4 @@
-// Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+// Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 // This file is part of Testudo.
 
@@ -30,7 +30,7 @@ namespace {
     : public TestFormat {
   public:
     TestFormatColorText(ostream &os, bool color=true, bool show_location=true)
-      : typeset((color ? color_text_report_typeset: text_report_typeset)( 
+      : typeset((color ? color_text_report_typeset : text_report_typeset)(
                   os, default_max_line_length, show_location)) { }
   private:
     shared_ptr<TextTypeset> const typeset;
@@ -177,14 +177,6 @@ namespace {
                             max_error_str, success, prefix);
     }
 
-    void output_check_verify(string expr_str, string val_str,
-                             string pred_str,
-                             string success,
-                             string prefix, bool) override {
-      output_location();
-      typeset->check_verify(expr_str, val_str, pred_str, success, prefix);
-    }
-
     void produce_summary(string name, TestStats test_stats) override
       { output_summary(&TextTypeset::summary, name, test_stats); }
 
@@ -192,7 +184,7 @@ namespace {
       typeset->uncaught_exception(exception);
     }
 
-    void print_test_readout() const { } // already wrote everything
+    void print_test_readout() const override { } // already wrote everything
 
   private:
     inline static pattern::register_creator<TestFormatColorText>
@@ -207,16 +199,6 @@ namespace {
   private:
     inline static pattern::register_creator<TestFormatText>
       rc{test_format_named_creator(), "text"};
-  };
-
-  class TestFormatColorTextWithLines
-    : public TestFormatColorText {
-  public:
-    TestFormatColorTextWithLines(ostream &os)
-      : TestFormatColorText(os, true, true) { }
-  private:
-    inline static pattern::register_creator<TestFormatColorTextWithLines>
-      rc{test_format_named_creator(), "color_text_with_lines"};
   };
 
 }

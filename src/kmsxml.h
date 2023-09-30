@@ -1,4 +1,4 @@
-// Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+// Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 // This file is part of Testudo.
 
@@ -21,6 +21,7 @@
 // this header file implements a seriously impaired subset of XML for writing
 // and reading; it's just enough for Testudo
 
+#include "auto_weak_ptr.h"
 #include <iostream>
 #include <string>
 #include <list>
@@ -28,51 +29,26 @@
 #include <map>
 #include <functional>
 
-namespace kmsxml {
+#ifdef KMSXML_TEST
+namespace kmsxml_test
+#else
+namespace kmsxml
+#endif
+{
 
   namespace structure {
 
-    // weak pointer with auto locking
-    template <typename T>
-    class auto_weak_ptr {
-    public:
-      template <typename U>
-      auto_weak_ptr(std::weak_ptr<U> const &wp) : wp(wp) { }
-      template <typename U>
-      auto_weak_ptr(std::shared_ptr<U> const &sp) : wp(sp) { }
-      template <typename U>
-      operator auto_weak_ptr<U>() const { return auto_weak_ptr<U>(wp); }
-
-      explicit operator bool() const { return not wp.expired(); }
-      auto operator*() const { return *wp.lock(); }
-      auto operator->() const { return wp.lock(); }
-      void reset() { wp.reset(); }
-      template <typename U>
-      auto_weak_ptr<U> cast() const
-        { return std::dynamic_pointer_cast<U>(wp.lock()); }
-      auto_weak_ptr<T const> to_const() const { return *this; }
-    private:
-      std::weak_ptr<T> wp;
-      template <typename U, typename V>
-      friend bool operator==(auto_weak_ptr<U> const &,
-                             auto_weak_ptr<V> const &);
-      template <typename U>
-      friend class auto_weak_ptr;
-    };
-
-    template <typename T, typename U>
-    bool operator==(auto_weak_ptr<T> const &a, auto_weak_ptr<U> const &b)
-      { return a.wp.lock()==b.wp.lock(); }
-
-    // the "append_...()" methods return "this" as a "chaining_ptr_t<>", so
-    // that calls can be chained
+    // the "append_...()" methods return "shared_from_this()" as a
+    // "chaining_ptr_t<>", so that calls can be chained
     template <typename T>
     class chaining_ptr_t {
     public:
-      chaining_ptr_t(T *ptr) : ptr(ptr) { }
+      chaining_ptr_t(std::shared_ptr<T> ptr) : ptr(ptr) { }
       auto operator->() const { return ptr; }
+      // operator std::shared_ptr<T>() const { return ptr; }
+      // operator auto_weak_ptr<T>() const { return ptr; }
     private:
-      T *const ptr;
+      std::shared_ptr<T> const ptr;
     };
 
   }
@@ -91,7 +67,15 @@ namespace kmsxml {
       {"\"", "&quot;"},
       {"\n", "&#xa;"} // to preserve newlines
     };
-    inline std::string const additional_indent="  ";
+    constexpr size_t indent_width=2;
+    inline text_t indent_text(size_t indent)
+      { return text_t(indent*indent_width, ' '); }
+    inline text_t tree_indent_text(size_t indent) {
+      text_t tree_indent;
+      for (size_t i=0; i<indent; ++i)
+        tree_indent+="| ";
+      return tree_indent;
+    }
 
     // encode entity references in a text
     inline text_t xml_encode_text(text_t t) {
@@ -157,14 +141,14 @@ namespace kmsxml {
     // output to output stream "os", with a carried indent of "indent"; if
     // "nl", output in a separate line (only applicable to text content, when
     // an element only has a child, and it is a text content)
-    virtual void output(std::ostream &os, text_t indent, bool nl) const=0;
+    virtual void output(std::ostream &os, size_t indent, bool nl) const=0;
     std::string print_tree() const {
       std::ostringstream oss;
       print_tree(oss);
       return oss.str();
     }
-    void print_tree(std::ostream &os) const { print_tree(os, ""); }
-    virtual void print_tree(std::ostream &os, std::string indent) const=0;
+    void print_tree(std::ostream &os) const { print_tree(os, 0); }
+    virtual void print_tree(std::ostream &os, size_t indent) const=0;
   };
 
   class text_content_t
@@ -173,18 +157,21 @@ namespace kmsxml {
     text_content_t(text_t text) : text(text) { }
     // text content is output in the holding element's body; if "nl", output in
     // a separate line
-    void output(std::ostream &os, text_t indent, bool nl) const override {
-      os << (nl ? indent : "") << implementation::xml_encode_text(text)
+    void output(std::ostream &os, size_t indent, bool nl) const override {
+      os << (nl ? implementation::indent_text(indent) : "")
+         << implementation::xml_encode_text(text)
          << (nl ? "\n" : "");
     }
     using content_t::print_tree;
-    void print_tree(std::ostream &os, std::string indent) const override
-      { os << indent << "\"" << text << "\"" << std::endl; }
+    void print_tree(std::ostream &os, size_t indent) const override {
+      os << implementation::tree_indent_text(indent)
+         << "\"" << text << "\"" << std::endl;
+    }
     text_t const text;
   };
 
   class element_t
-    : public content_t {
+    : public content_t, public std::enable_shared_from_this<element_t> {
   public:
     using root_t=std::shared_ptr<element_t>;
     using root_const_t=std::shared_ptr<element_t const>;
@@ -200,7 +187,7 @@ namespace kmsxml {
     structure::chaining_ptr_t<element_t> append_attribute(A &&...a) {
       attributes.push_back(
         std::make_shared<attribute_t>(std::forward<A>(a)...));
-      return this;
+      return shared_from_this();
     }
 
     template <typename C>
@@ -217,41 +204,55 @@ namespace kmsxml {
 
     structure::chaining_ptr_t<element_t> append_text(text_t text) {
       contents.push_back(std::make_shared<text_content_t>(text));
-      return this;
+      return shared_from_this();
     }
 
+    // "output_begin()" and "output_end()" are accessible for sync'ed output
+    // (i.e., outputting a tree as it's being constructed); in that situation,
+    // if the element is still to be given content, the "sync" argument must be
+    // true, so that the no-content syntax ("<name ... />") isn't used
+    void output_begin(std::ostream &os, size_t indent, bool sync=false) const {
+      os << implementation::indent_text(indent) << "<" << name;
+      for (auto const &a: attributes)
+        a->output(os << " ");
+      if (not contents.empty() or sync)
+        os << ">"
+           << (single_text_content() and not sync
+               ? ""
+               : "\n");
+      else
+        os << "/>\n";
+    }
+    void output_end(std::ostream &os, size_t indent, bool sync=false) const {
+      if (not contents.empty() or sync)
+        os << (single_text_content() and not sync
+               ? ""
+               : implementation::indent_text(indent))
+           << "</" << name << ">\n";
+    }
     //     <{name} {attributes...}> {children...} </{name}>
     //
     // or, when childless,
     //
     //     <{name}/>
-    void output(std::ostream &os, text_t indent, bool) const override {
-      os << indent << "<" << name;
-      for (auto const &a: attributes)
-        a->output(os << " ");
-      if (contents.empty())
-        os << "/>\n";
-      else {
-        bool single_text_content=
-          contents.size()==1
-          and std::dynamic_pointer_cast<text_content_t>(
-                contents.front());
-        bool nl_after_content=not single_text_content;
-        text_t new_indent=indent+implementation::additional_indent;
-        os << ">" << (nl_after_content ? "\n" : "");
-        for (auto const &c: contents)
-          c->output(os, new_indent, nl_after_content);
-        os << (nl_after_content ? indent : "") << "</" << name << ">\n";
-      }
+    void output(std::ostream &os, size_t indent, bool) const override {
+      output_begin(os, indent);
+
+      size_t new_indent=indent+1;
+      for (auto const &c: contents)
+        c->output(os, new_indent, not single_text_content());
+
+      output_end(os, indent);
     }
+
     using content_t::print_tree;
-    void print_tree(std::ostream &os, std::string indent) const override {
-      os << indent << name;
+    void print_tree(std::ostream &os, size_t indent) const override {
+      os << implementation::tree_indent_text(indent) << name;
       for (auto const &a: attributes)
         os << " " << a->name << "=\"" << a->value << "\"";
       os << std::endl;
       for (auto const &c: contents)
-        c->print_tree(os, indent+"| ");
+        c->print_tree(os, indent+1);
     }
 
     name_t const name;
@@ -259,12 +260,25 @@ namespace kmsxml {
     std::list<std::shared_ptr<content_t>> contents;
   private:
     element_t(name_t name) : name(name) { }
+
+    bool single_text_content() const {
+      return
+        contents.size()==1
+        and std::dynamic_pointer_cast<text_content_t>(contents.front());
+    }
   };
 
+  using action_t=std::function<void (element_t::node_const_t)>;
+
   inline std::ostream &operator<<(std::ostream &os, element_t const &e) {
-    e.output(os, "", true);
+    e.output(os, 0, true);
     return os;
   }
+
+  struct read_ended_unexpectedly
+    : public std::runtime_error {
+    using runtime_error::runtime_error;
+  };
 
   namespace implementation {
 
@@ -287,8 +301,7 @@ namespace kmsxml {
     }
 
     template <typename F>
-    inline auto expect_char(std::istream &is,
-                            F const &f, std::string f_name) {
+    inline auto expect_char(std::istream &is, F const &f, std::string f_name) {
       if (is.eof())
         throw std::runtime_error("EOF while expecting "+f_name);
       else if (char c=char(is.get()); not f(c))
@@ -336,7 +349,14 @@ namespace kmsxml {
       return result;
     }
 
-    inline content_t::root_t read_content(std::istream &is) {
+    using recurse_f_t=std::function<bool (element_t::node_const_t)>;
+
+    inline content_t::root_t read_content(
+        std::istream &is,
+        action_t open={},
+        action_t close={},
+        recurse_f_t recurse={},
+        bool build_tree=true) {
       is >> std::ws;
       if (is.peek() not_eq '<') {
         text_t text;
@@ -348,7 +368,8 @@ namespace kmsxml {
       std::string name=read_name(is);
       auto e=element_t::make_root(name);
 
-      if (name[0]=='/') { // "closing-name"
+      if (name[0]=='/') {
+        // "closing-name"; not a real element, caught in the "while" loop below
         expect_char(is >> std::ws, '>');
         return e;
       }
@@ -367,20 +388,38 @@ namespace kmsxml {
       switch (is.get()) {
       case '/': {
         expect_char(is >> std::ws, '>');
+
+        if (open) open(e);
+        if (close) close(e);
+
         return e;
       } break;
       case '>': {
+        bool recurse_this=not recurse or recurse(e);
+        if (recurse_this and open) open(e);
+
         while (true) {
-          auto child=read_content(is);
+          if (is.eof())
+            throw read_ended_unexpectedly(
+              "the \""+e->name+"\" element ended unexpectedly");
+          auto child=
+            recurse_this
+            ? read_content(is, open, close, recurse, build_tree)
+            : read_content(is);
           auto child_as_element=std::dynamic_pointer_cast<element_t>(child);
           if (child_as_element and (child_as_element->name[0]=='/')) {
             if (child_as_element->name.substr(1) not_eq e->name)
               std::runtime_error(
                 "closing \""+child_as_element->name
                 +"\" doesn't match opening \""+e->name+"\"");
+
+            if (not recurse_this and open) open(e);
+            if (close) close(e);
+
             return e;
           }
-          e->adopt_child(child);
+          if (build_tree or not recurse_this)
+            e->adopt_child(child);
         }
       } break;
       default:
@@ -394,14 +433,17 @@ namespace kmsxml {
   inline element_t::root_t read_element(std::istream &is) {
     auto e=
       std::dynamic_pointer_cast<element_t>(implementation::read_content(is));
-    if (e)
+    if (e or not is)
       return e;
     else
       throw std::runtime_error("couldn't read an element");
   }
 
+  inline element_t::node_const_t as_element(content_t::node_const_t c)
+    { return c.cast<element_t const>(); }
+
   inline element_t::node_const_t must_be_element(content_t::node_const_t c) {
-    auto e=c.cast<element_t const>();
+    auto e=as_element(c);
     if (not e)
       throw std::runtime_error("not an element");
     return e;
@@ -448,20 +490,57 @@ namespace kmsxml {
                              +"\" element");
   }
 
-  using action_t=std::function<void (element_t::node_const_t)>;
-  using actions_t=std::map<name_t, action_t>;
+  struct traverse_t {
+    action_t open={};
+    action_t close={};
+    bool recurse=true;
+  };
+  using traverse_map_t=std::map<name_t, traverse_t>;
 
-  inline void process_children(element_t::node_const_t e,
-                               actions_t const &actions) {
-    for (auto const &c: e->contents) {
-      auto ce=must_be_element(c);
-      if (auto cei=actions.find(ce->name); cei not_eq actions.end())
-        cei->second(ce);
-      else
-        throw std::runtime_error("no action for \""+ce->name+"\" element");
+  inline void process(element_t::node_const_t e,
+                      traverse_map_t const &ocm) {
+    if (auto ei=ocm.find(e->name); ei not_eq ocm.end()) {
+      auto traverse=ei->second;
+
+      if (traverse.open)
+        traverse.open(e);
+
+      if (traverse.recurse)
+        for (auto const &c: e->contents)
+          if (auto ce=as_element(c))
+            process(ce, ocm);
+
+      if (traverse.close)
+        traverse.close(e);
     }
+    else
+      throw std::runtime_error("no action for \""+e->name+"\" element");
   }
 
+  inline content_t::root_t interpret_element(std::istream &is,
+                                             traverse_map_t const &ocm) {
+    auto const get_traverse=
+      [&ocm] (element_t::node_const_t e) {
+        if (auto ei=ocm.find(e->name); ei not_eq ocm.end())
+          return ei->second;
+        else
+          throw std::runtime_error("no action for \""+e->name+"\" element");
+      };
+    return implementation::read_content(
+      is,
+      [&ocm, &get_traverse] (element_t::node_const_t e) {
+        if (auto t=get_traverse(e); t.open)
+          t.open(e);
+      },
+      [&ocm, &get_traverse] (element_t::node_const_t e) {
+        if (auto t=get_traverse(e); t.close)
+          t.close(e);
+      },
+      [&ocm, &get_traverse] (element_t::node_const_t e) {
+        return get_traverse(e).recurse;
+      },
+      false);
+  }
 }
 
 #endif

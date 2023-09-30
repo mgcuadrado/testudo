@@ -1,4 +1,4 @@
-// Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+// Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 // This file is part of Testudo.
 
@@ -78,8 +78,6 @@ namespace testudo___implementation {
     void output_check_approx(
       string, string, string, string, string, string,
       string, bool) override { }
-    void output_check_verify(
-      string, string, string, string, string, bool) override { }
 
     void uncaught_exception(string exception) override
       { parent_test_format->uncaught_exception(exception); }
@@ -371,23 +369,6 @@ namespace testudo___implementation {
       if (recursively_last_time) {
         non_with_ancestor->output_check_approx(
           expr1_str, "", expr2_str, "", max_error_str, "with", prefix, true);
-        log->output(get_location());
-      }
-    }
-    void output_check_verify(string expr_str, string val_str,
-                             string pred_str,
-                             string success,
-                             string prefix, bool) override {
-      log->incr_counter();
-      if_false_log_output_with_failed(
-        success,
-        [=, nwa=non_with_ancestor]() {
-          nwa->output_check_verify(expr_str, val_str, pred_str,
-                                   success, prefix, false);
-        });
-      if (recursively_last_time) {
-        non_with_ancestor->output_check_verify(
-          expr_str, "", pred_str, "with", prefix, true);
         log->output(get_location());
       }
     }

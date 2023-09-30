@@ -49,52 +49,6 @@ namespace {
     check("there's nothing")_equal("penultimate");
   }
 
-  template <typename T>
-  auto gt(T &&t) { return predicate_c_a((t), a>t); }
-  template <typename T>
-  auto lt(T &&t) { return predicate_c_a((t), a<t); }
-  template <typename T>
-  auto ge(T &&t) { return predicate_c_a((t), a>=t); }
-  template <typename T>
-  auto le(T &&t) { return predicate_c_a((t), a<=t); }
-  template <typename T>
-  auto eq(T &&t) { return predicate_c_a((t), a==t); }
-  template <typename T>
-  auto ne(T &&t) { return predicate_c_a((t), a not_eq t); }
-
-  define_test(complex, "\"verify\" syntax") {
-    declare(auto is_even=predicate_a((a%2)==0));
-    declare(auto is_multiple_of=
-            [](auto n) { return predicate_c_a((n), (a%n)==0); });
-    check(2*4)_verify(is_even);
-    check(2*4+1)_verify(is_even);
-    check(2*4)_verify(not is_even);
-    check(2*4+1)_verify(not is_even);
-    check(2*4)_verify(is_even and is_multiple_of(3));
-    check(6*5)_verify(is_even and is_multiple_of(3));
-    check(7*11)_verify(is_even and is_multiple_of(3));
-    check(2*4)_verify(is_even and not is_multiple_of(3));
-    check(6*5)_verify(is_even and not is_multiple_of(3));
-    check(7*11)_verify(is_even and not is_multiple_of(3));
-    check(2*4)_verify(is_even or is_multiple_of(3));
-    check(6*5)_verify(is_even or is_multiple_of(3));
-    check(7*11)_verify(is_even or is_multiple_of(3));
-    print_text("the check syntax works with pure lambdas too:");
-    declare(auto is_positive=predicate([](int n) { return n>0; }));
-    check(2*4)_verify(is_positive);
-    check(-2*4)_verify(is_positive);
-    check(2*4)_not_verify(is_even);
-    check(2*4+1)_not_verify(is_even);
-    check(8)_verify(predicate_a(a>6));
-    check(5)_verify(predicate_a(a>6));
-    check(8)_verify(gt(6));
-    check(5)_verify(gt(6));
-    check(8)_verify(ne(6));
-    check(6)_verify(ne(6));
-    check(8)_verify(gt(6) and lt(10));
-    check(4)_verify(gt(6) and lt(10));
-  }
-
   define_test(complex, "\"true_for\" syntax") {
     declare(int a=7);
     declare(int b=8);
@@ -194,15 +148,15 @@ namespace {
     print_break();
 
     with_data(x, numbers_1) {
-      declare(auto is_even=predicate_a((a%2)==0));
-      check(x)_verify(is_even);
+      declare(auto is_even=[](auto const &a) { return ((a % 2) == 0); });
+      check(is_even(x))_true_for(x);
       print_text("let's do something, just to see how it's shown");
       declare(auto y=x+1);
       show_value(y);
     }
     with_data(x, numbers_2) {
-      declare(auto is_even=predicate_a((a%2)==0));
-      check(x)_verify(is_even);
+      declare(auto is_even=[](auto const &a) { return ((a % 2) == 0); });
+      check(is_even(x))_true_for(x);
       print_text("let's do something, just to see how it's shown");
       declare(auto y=x+1);
       show_value(y);
@@ -222,29 +176,29 @@ namespace {
 
     print_break();
 
-    declare(auto is_even=predicate_a((a%2)==0));
-    with_data(x, numbers_1) check(x)_verify(is_even);
+    declare(auto is_even=[](auto const &a) { return ((a % 2) == 0); });
+    with_data(x, numbers_1) check(is_even(x))_true_for(x);
     with_data(x, numbers_1) {
       declare(int y=x+1);
-      check(y)_verify(not is_even);
+      check(is_even(y))_false_for(y);
     }
     with_data(x, numbers_1) {
-      check(x)_verify(is_even);
+      check(is_even(x))_true_for(x);
       with_data(y, numbers_1)
         check(x%2)_equal(y%2);
     }
     with_data(x, numbers_1) {
-      check(x)_verify(is_even);
+      check(is_even(x))_true_for(x);
       with_data(y, numbers_2)
         check(x%2)_equal(y%2);
     }
     with_data(x, numbers_2) {
-      check(x)_verify(is_even);
+      check(is_even(x))_true_for(x);
       with_data(y, numbers_1)
         check(x%2)_equal(y%2);
     }
     with_data(x, numbers_2) {
-      check(x)_verify(is_even);
+      check(is_even(x))_true_for(x);
       with_data(y, numbers_2)
         check(x%2)_equal(y%2);
     }
@@ -254,17 +208,17 @@ namespace {
     with_data(x, numbers_1) {
       with_data(y, numbers_1)
         check(x%2)_equal(y%2);
-      check(x)_verify(is_even);
+      check(is_even(x))_true_for(x);
       with_data(y, numbers_2)
         check(x%2)_equal(y%2);
-      check(x)_verify(is_even);
+      check(is_even(x))_true_for(x);
       with_data(y, numbers_1)
         check(x%2)_equal(y%2);
-      check(x)_verify(is_even);
+      check(is_even(x))_true_for(x);
       with_data(y, list<int>{2, 4, 9})
         check(x%2)_equal(y%2);
     }
-    with_data(x, numbers_1) check(0)_verify(is_even);
+    with_data(x, numbers_1) check(is_even(0))_true_for(0);
 
     with_data(x, {1, 2, 3})
       check(x)_equal(x);

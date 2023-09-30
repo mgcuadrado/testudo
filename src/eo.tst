@@ -40,12 +40,6 @@ NOT_EQUAL  _ne_egalas
 APPROX     _proksimas
 NOT_APPROX _ne_proksimas
 TOL        _tol
-VERIFY     _verigas
-NOT_VERIFY _ne_verigas
-
-PREDICATE     predikato
-PREDICATE_A   predikato_a
-PREDICATE_C_A predikato_c_a
 
 TFOS tfos
 

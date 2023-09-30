@@ -1,4 +1,4 @@
-// Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+// Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 // This file is part of Testudo.
 
@@ -92,12 +92,10 @@ namespace testudo___implementation {
                               string max_error_str,
                               string success,
                               string prefix)=0;
-    virtual void check_verify(string expr_str, string val_str,
-                              string pred_str,
-                              string success,
-                              string prefix)=0;
 
     virtual void uncaught_exception(string exception)=0;
+
+    virtual void aborted(string message)=0;
   };
 
   class TextTrackTypeset {

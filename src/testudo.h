@@ -1,4 +1,4 @@
-// Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+// Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 // This file is part of Testudo.
 
@@ -458,17 +458,6 @@ namespace testudo___implementation {
     return approx(val, ref, max_error);
   }
 
-  // check whether a value verifies a predicate and convert it to text (in the
-  // "string &" argument)
-  template <typename ValT, typename P>
-  bool to_text_verify(value_format_ostream_t test_vfos,
-                      ValT const &val, std::string &sval,
-                      P const &p) {
-    sval=to_text(test_vfos->fmt_os, val);
-    test_vfos->use_up_one_time_manipulators();
-    return p(val);
-  }
-
   // the following is a way to run several instructions while making them
   // appear as a single one, which can be used braceless in a while-loop or
   // if-statement; just surround the instructions in a pair of
@@ -912,7 +901,7 @@ namespace testudo___implementation {
 
     template <typename A>
     bool check(Check<A> const &c, truth_f tf, std::string prefix) {
-      bool result=tf(c.a.value);
+      bool result=tf(bool(c.a.value));
       std::string text_result=c.check_result_to_text(result);
       c.test_management.format
         ->output_check_true(c.sa, text_result, prefix, false);
@@ -1038,41 +1027,6 @@ namespace testudo___implementation {
                                         std::forward<B>(b), sb, tol, stol);
   }
 
-  // class to check for predicate-verification
-  template <typename B>
-  struct CheckVerify {
-    value_format_ostream_t const test_vfos;
-    bool const is_b_valid;
-    HoldValue<B> const b;
-    std::string const sb;
-
-    template <typename BB>
-    CheckVerify(value_format_ostream_t test_vfos,
-                BB &&b, std::string sb)
-      : test_vfos(test_vfos),
-        is_b_valid(is_valid(b)), b(std::forward<BB>(b)), sb(sb) { }
-
-    template <typename A>
-    bool check(Check<A> const &c, truth_f tf, std::string prefix) {
-      std::string vala;
-      bool result=
-        tf(to_text_verify(test_vfos, c.a.value, vala, b.value));
-      std::string text_result=c.check_result_to_text(result);
-      c.test_management.format->output_check_verify(
-        c.sa, vala, sb, text_result, prefix, false);
-      c.test_management.stats+=check_result(text_result);
-      return result;
-    }
-  };
-  // see "Check" for the reason to have a function to construct this templated
-  // class, rather than construct it directly
-  template <typename B>
-  auto make_check_verify(value_format_ostream_t test_vfos,
-                         B &&b, std::string sb) {
-    return CheckVerify<std::decay_t<B>>(test_vfos,
-                                        std::forward<B>(b), sb);
-  }
-
   template <typename T>
   struct testarudo_decay {
     using type=T;
@@ -1151,52 +1105,6 @@ namespace testudo___implementation {
                          s, __VA_ARGS__));                              \
   testudo___END_GROUP)
 
-#define testudo__VERIFY_S(s, ...)                                       \
-    check_cont(testudo___implementation::make_check_verify(             \
-                 test_management.test_vfos,                             \
-                 (__VA_ARGS__), s));                                    \
-  testudo___END_GROUP)
-#define testudo__NOT_VERIFY_S(s, ...)                                   \
-    check_cont_inverse(testudo___implementation::make_check_verify(     \
-                         test_management.test_vfos,                     \
-                         (__VA_ARGS__), s));                            \
-  testudo___END_GROUP)
-
-  /// predicates
-  template <typename L>
-  class predicate_t {
-  public:
-    predicate_t(L const &l) : l(l) { }
-    template <typename T>
-    bool operator()(T const &t) const { return l(t); }
-  private:
-    L const l;
-  };
-
-  template <typename L>
-  auto operator not(predicate_t<L> const &p) {
-    return predicate_t([p](auto const &v)
-                         { return not p(v); });
-  }
-
-  template <typename L1, typename L2>
-  auto operator and(predicate_t<L1> const &p1, predicate_t<L2> const &p2) {
-    return predicate_t([p1, p2](auto const &v)
-                         { return p1(v) and p2(v); });
-  }
-
-  template <typename L1, typename L2>
-  auto operator or(predicate_t<L1> const &p1, predicate_t<L2> const &p2) {
-    return predicate_t([p1, p2](auto const &v)
-                         { return p1(v) or p2(v); });
-  }
-
-#define testudo__PREDICATE testudo___implementation::predicate_t
-#define testudo__PREDICATE_A(...)                                       \
-  testudo__PREDICATE_C_A((), __VA_ARGS__)
-#define testudo__PREDICATE_C_A(b_c, ...)                                \
-  testudo__PREDICATE([testudo___REMOVE_BRACKETS b_c](auto const &a)     \
-                       { return (__VA_ARGS__); })
 
   template <typename F>
   auto generate_data(std::size_t size, F const &f) {

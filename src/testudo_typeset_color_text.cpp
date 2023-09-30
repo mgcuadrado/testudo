@@ -1,4 +1,4 @@
-// Copyright © 2020 Miguel González Cuadrado <mgcuadrado@gmail.com>
+// Copyright © 2020-2023 Miguel González Cuadrado <mgcuadrado@gmail.com>
 
 // This file is part of Testudo.
 
@@ -47,11 +47,11 @@ namespace {
       begin_scope_ident, end_scope_ident,
       try_ident, catch_ident, catch_begin, catch_end,
       check_ident, check_equal_sign, check_approx_sign, check_max_error,
-      check_verify_sign,
+      check_with_sign,
       show_ident, show_sep, show_tab, show_cont,
       name_open, name_close,
       loc_begin, loc_end;
-    string ok_label, fail_label, error_label;
+    string ok_label, fail_label, error_label, abort_label;
     string track_loc_begin, track_loc_end;
     string same_label, good_label, bad_label, very_bad_label;
     function<string::size_type (string s, string::size_type from)> skip_codes=
@@ -100,7 +100,7 @@ namespace {
     color.check_equal_sign=add_color("==");
     color.check_approx_sign=add_color("//");
     color.check_max_error=add_color("+/-");
-    color.check_verify_sign=add_color("~");
+    color.check_with_sign=add_color("~");
     color.show_ident=add_color("?");
     color.show_sep=add_color(":");
     color.show_tab=add_color("|");
@@ -113,6 +113,7 @@ namespace {
     color.ok_label="["+color.success_tag+" OK "+color.normal+"]";
     color.fail_label="["+color.failure_tag+"FAIL"+color.normal+"]";
     color.error_label="["+color.error+"ERR-"+color.normal+"]";
+    color.abort_label="["+color.error+"ABRT"+color.normal+"]";
 
     color.track_loc_begin=color.plain_tag+"["+color.normal;
     color.track_loc_end=color.plain_tag+"]"+color.normal;
@@ -256,6 +257,8 @@ namespace {
              color.real_length(color.ok_label));
       assert(color.real_length(color.fail_label)==
              color.real_length(color.error_label));
+      assert(color.real_length(color.fail_label)==
+             color.real_length(color.abort_label));
 
       // if "fill" is not ' ', we want it to be present at least once;
       // therefore, we append a space to the text
@@ -296,6 +299,11 @@ namespace {
 
     void format_error(ostream &stream, string text) {
       format_label(stream, text, '-', color.error_label,
+                   color.failure, color.normal);
+    }
+
+    void format_abort(ostream &stream, string text) {
+      format_label(stream, text, '-', color.abort_label,
                    color.failure, color.normal);
     }
   };
@@ -474,7 +482,7 @@ namespace {
     void begin_with(string var_name,
                     string container_first, string container_rest) override {
       ostringstream oss;
-      oss << color.check_verify_sign << " " << var_name << " in "
+      oss << color.check_with_sign << " " << var_name << " in "
           << container_first;
       format_text(ts, oss.str());
       if (not container_rest.empty()) {
@@ -575,20 +583,16 @@ namespace {
         {val1_str, color.check_approx_sign, val2_str});
     }
 
-    void check_verify(string expr_str, string val_str,
-                      string pred_str,
-                      string success,
-                      string prefix) override {
-      output_check_general(prefix,
-                           {expr_str, color.check_verify_sign, pred_str},
-                           success,
-                           {val_str});
-    }
-
     void uncaught_exception(string exception) override {
       format_error(ts,
                    (color.catch_ident+" uncaught exception "
                     +color.catch_begin+" "+exception+" "+color.catch_end));
+    }
+
+    void aborted(string message) override {
+      format_abort(ts,
+                   (color.catch_ident+" aborted "
+                    +color.catch_begin+" "+message+" "+color.catch_end));
     }
   };
 
@@ -666,8 +670,12 @@ namespace {
     void check_equal(string, string, string, string, string, string) { }
     void check_approx(string, string, string, string, string, string,
                       string) { }
-    void check_verify(string, string, string, string, string) { }
     void uncaught_exception(string) { }
+    void aborted(string message) override {
+      format_abort(ts,
+                   (color.catch_ident+" aborted "
+                    +color.catch_begin+" "+message+" "+color.catch_end));
+    }
 
   };
 

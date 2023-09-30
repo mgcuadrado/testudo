@@ -139,6 +139,10 @@ namespace {
     double remaining_fuel() const { return 0.; }
   };
 
+  struct Root {
+    string tree() const { return ""; }
+  };
+
   struct LoggedDestruction {
     LoggedDestruction(string) { }
     static int n_destructions() { return 0; }
@@ -212,37 +216,6 @@ namespace {
     check(area)_tol(.1)_approx(3.5); // use one-tenth tolerance just this once
     // }
 
-    // { predicate
-    declare(auto is_negative =
-            predicate([](int x) {SPACE return x < 0; SPACE}));
-    // }
-
-    // { predicate-a
-    declare(auto is_even = predicate_a((a % 2) == 0));
-    // }
-
-    // { predicate-c-a
-    declare(auto is_multiple_of =
-            [](auto n)
-              {SPACE return predicate_c_a((n), (a % n) == 0); SPACE});
-    // }
-
-    declare(int number_of_cards = 0);
-    declare(int score = 0);
-
-    // { verify
-    check(number_of_cards)_verify(is_even);
-    check(score)_verify(is_multiple_of(5));
-    // }
-
-    declare(int iterations = 0);
-
-    // { verify-logical-ops
-    check(iterations)
-      _verify(not is_negative
-            CLSP and (is_even or is_multiple_of(5)));
-    // }
-
     declare(int a=0);
     declare(int b=0);
     declare(int c=0);
@@ -277,6 +250,12 @@ namespace {
 
     // { show-value
     show_value(helicopter.remaining_fuel());
+    // }
+
+    declare(Root root);
+
+    // { show-value-unquoted
+    show_value(testudo::unquoted(root.tree()));
     // }
 
     // { in-scope
@@ -441,14 +420,14 @@ namespace {
   define_test(examples, "300")
   {
     // { with-data
-    declare(auto is_even=predicate_a((a % 2) == 0));
+    declare(auto is_even=[](auto const &a) { return ((a % 2) == 0); });
     declare(list<int> even_numbers{ 2, 4, 8 }); // even numbers
     with_data(x, even_numbers)
-      check(x)_verify(is_even);
+      check(is_even(x))_true_for(x);
     with_data(x, even_numbers)
     {
       declare(int y = x + 1);
-      check(y)_verify(not is_even);
+      check(is_even(y))_false_for(y);
     }
     with_data(x, even_numbers)
       with_data(y, { 2, 4, 9 })

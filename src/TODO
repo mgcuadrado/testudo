@@ -9,11 +9,6 @@
   but if it did, it would take an additional almost empty line (with just the
   line information); so i don't know what to do yet
 
-[ ] i think "make diff_test" should make both "make diff_report" and "make
-  diff_track", even if the former returns an error (i.e., if there are diffs in
-  the report); no, wait, that's "make diff_track"; what does "make diff_test"
-  do?
-
 ---- big but important things ------------------------------
 
 [ ] write a cheatsheet in the form of a complete Testudo example that exercises
@@ -48,11 +43,10 @@
 
 [ ] support outputting test report in the same run as the test track
 
-[ ] make the XML parser resistant to unfinished XML, so that we can have at
-  least an incomplete report even if the test crashes
-
 [ ] consider running each test as a separate process, so that the whole
   procedure is more resistant to crashes
+
+[ ] what happens to "make track_progress" when something crashes?
 
 [ ] make track progress reports more beautiful
 
@@ -141,9 +135,6 @@
         * what are the new test ids, and what are the test ids that have
           disappeared
 
-[ ] consider removing predicate checks ("VERIFY", "PREDICATE", et cetera) in
-  favour of "TRUE_FOR"
-
 ---- high priority -----------------------------------------
 
 [ ] Google Mock lays down expectations _before_ the function runs, and i guess
@@ -151,6 +142,11 @@
   approach of "mock-turtle"?
 
 ---- easy --------------------------------------------------
+
+[ ] consider: for progress tracking, we're saying that deleting tests that
+  succeed is "bad" and deleting tests that fail is "good"; i'd say we can't be
+  sure; maybe we should add a new category "can't say if it's good or bad; just
+  be aware you have deleted tests that succeeded, or tests that failed"
 
 [ ] document (and add to "testarudo.ttd") this most interesting fact: if you
   define a lambda inside a test, you only need to add "this" to its captures to
@@ -180,29 +176,17 @@
 
 ---- tasks -------------------------------------------------
 
-[ ] "literature"
-
-    [ ] write a reimagining of the turtle (actually tortoise...) and the hare,
-      where the hare isn't actually lazy but unfocused, and runs with all his
-      speed but in any direction, not stopping in time to check his course, and
-      the turtle walks more slowly, but always checking his direction; thus,
-      the turtle always moves towards the goal, where the hare doesn't most of
-      the time, and actually often runs away from it; is coding with tests
-      slower than coding without them? only in terms of total lines written per
-      hour (most of which are wrong for the hare-style coding); if you count
-      functionality per hour, it's way faster, and the result is cleaner, more
-      elegant, better documented (tests document too), easier to understand,
-      and more maintainable
-
-    [ ] then, maybe write about Testarudo's friend, Mock Turtle, connecting the
-      software to Lewis Carroll's character
-
 [ ] add the possibility for fixtures to have construct arguments; these should
   be passed with something like "with_fixture_arguments(...)" when defining a
   test with a fixture
 
 [ ] print results to a different stream than "cout", so that it doesn't get
   mixed with other, non-test output?
+
+[ ] diffs can't have line number info because that would mess up big time with
+  diffs (line numbers can be shifted by the addition of a single instruction),
+  but at the same time, it would be good if we could spot quickly the origin of
+  a difference; can this be done?
 
 [ ] it may be possible to have a command that computes result diffs with
   respect to any past version, using the appropriate version control command
@@ -1077,3 +1061,41 @@
 
 [X] in track reports, distinguish between [bad] ([OK] instances turning [FAIL])
   and [very-bad] (having new [ERR-] instances)
+
+[X] i think "make diff_test" should make both "make diff_report" and "make
+  diff_track", even if the former returns an error (i.e., if there are diffs in
+  the report); no, wait, that's "make diff_track"; what does "make diff_test"
+  do?
+
+[X] harmonise Makefile targets that report results
+
+[X] make the XML parser resistant to unfinished XML, so that we can have at
+  least an incomplete report even if the test crashes
+
+[X] line number for "with fixture" in the report seems to be wrong
+
+[X] when i add a test that adds an uncaught exception in a new with-data loop,
+  the track is reported as "no progress and no regress"; it should be very bad
+  instead
+
+[X] consider removing predicate checks ("VERIFY", "PREDICATE", et cetera) in
+  favour of "TRUE_FOR"
+
+[X] "literature"
+
+    [I] write a reimagining of the turtle (actually tortoise...) and the hare,
+      where the hare isn't actually lazy but unfocused, and runs with all his
+      speed but in any direction, not stopping in time to check his course, and
+      the turtle walks more slowly, but always checking his direction; thus,
+      the turtle always moves towards the goal, where the hare doesn't most of
+      the time, and actually often runs away from it; is coding with tests
+      slower than coding without them? only in terms of total lines written per
+      hour (most of which are wrong for the hare-style coding); if you count
+      functionality per hour, it's way faster, and the result is cleaner, more
+      elegant, better documented (tests document too), easier to understand,
+      and more maintainable
+
+    [X] then, maybe write about Testarudo's friend, Mock Turtle, connecting the
+      software to Lewis Carroll's character
+
+[X] is "make runsync_test" the same as "make runsync_test_with_lines"?
