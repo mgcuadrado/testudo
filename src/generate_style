@@ -53,8 +53,16 @@ print_macro_loc() {
     print_macro $1 "()" "@_L((__FILE__, __LINE__))"
 }
 
+print_macro_loc_no_f() {
+    print_macro $1 "" "@_L((__FILE__, __LINE__))"
+}
+
 print_macro_no_f() {
     print_macro $1 "" "@"
+}
+
+print_macro_zero_args() {
+    print_macro $1 "()" "@()"
 }
 
 print_macro_forward() {
@@ -97,10 +105,10 @@ print_macro_loc_v_string() {
     print_macro_loc_forward DEFINE_TEST
     print_macro_forward WITH_FIXTURE
     print_macro_forward VISIBLE_FIXTURE
+    print_macro_forward FIXTURE_ARGS
     echo
-    print_macro_forward STEP_ID
-    print_macro_loc_forward PRINT_TEXT
-    print_macro_loc         PRINT_BREAK
+    print_macro_loc_no_f TOUT
+    print_macro_no_f     TFOS
     echo
     print_macro_loc_string   DECLARE
     print_macro_loc_string   PERFORM
@@ -121,18 +129,15 @@ print_macro_loc_v_string() {
     print_macro_loc         SHOW_APPROX_EPSILON
     echo
     print_macro_loc_string CHECK
-    print_macro_loc_string PROVIDED
-    print_macro_string EQUAL
-    print_macro_string NOT_EQUAL
-    print_macro_string APPROX
-    print_macro_string NOT_APPROX
-    print_macro_string TOL
-    print_macro_no_f   TRUE
-    print_macro_no_f   FALSE
-    print_macro_string TRUE_FOR
-    print_macro_string FALSE_FOR
-    echo
-    print_macro_no_f    TFOS
+    print_macro_forward    PROVIDED
+    print_macro_zero_args  TRUE
+    print_macro_zero_args  FALSE
+    print_macro_string     EQUAL
+    print_macro_string     NOT_EQUAL
+    print_macro_string     APPROX
+    print_macro_string     NOT_APPROX
+    print_macro_string     WITH_TOL
+    print_macro_string     SHOW
     echo
     print_macro_forward MOCK_METHOD
     print_macro_forward WRAP_METHOD

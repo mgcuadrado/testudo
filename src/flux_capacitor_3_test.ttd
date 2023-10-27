@@ -11,6 +11,6 @@ difini_teston(flux_capacitor, // patro
               kun_fiksaĵo(DeloreanFixture)) { // uzu fiksaĵon
   deklari(FluxCapacitor fc);
   fari(fc.connect_to(delorean)); // "delorean" estas kreata de la fiksaĵo
-  certigi(not fc.is_on())_vera; // certigi ke buleo veras
+  certigi(not fc.is_on())_vera(); // certigi ke buleo veras
   certigi(fc.missing_jw())_proksimas(1.21); // certigi proksiman valoron
 }

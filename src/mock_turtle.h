@@ -389,58 +389,21 @@ namespace testudo___implementation {
   auto iterate(CLP clp) { return iterate(*clp); }
 
 
-  // implementation for "testudo___IS_EMPTY()" adapted from
-  // https://gustedt.wordpress.com/2010/06/08/detect-empty-macro-arguments
-// #define testudo___HAS_COMMA(...)
-#define testudo___TRIGGER_PARENTHESIS_(...) ,
-
-#define testudo___ISEMPTY(...)                                          \
-  testudo___ISEMPTY_IMPL(                                               \
-    /* test if there is just one argument, eventually an empty one */   \
-    testudo___HAS_COMMA(__VA_ARGS__),                                   \
-    /* test if TRIGGER_PARENTHESIS_ together with the argument adds a   \
-       comma */                                                         \
-    testudo___HAS_COMMA(testudo___TRIGGER_PARENTHESIS_ __VA_ARGS__),    \
-    /* test if the argument together with a parenthesis adds a comma */ \
-    testudo___HAS_COMMA(__VA_ARGS__ (/*empty*/)),                       \
-    /* test if placing it between TRIGGER_PARENTHESIS_ and the          \
-       parenthesis adds a comma */                                      \
-    testudo___HAS_COMMA(                                                \
-      testudo___TRIGGER_PARENTHESIS_ __VA_ARGS__ (/*empty*/))           \
-  )
-
-#define testudo___PASTE5(_0, _1, _2, _3, _4) _0 ## _1 ## _2 ## _3 ## _4
-#define testudo___ISEMPTY_IMPL(_0, _1, _2, _3)                          \
-  testudo___HAS_COMMA(testudo___PASTE5(                                 \
-    testudo___IS_EMPTY_CASE_, _0, _1, _2, _3))
-#define testudo___IS_EMPTY_CASE_0001 ,
-
-
-  // WITH_IS_EMPTY(abcd_, ) -> abcd_1
-  // WITH_IS_EMPTY(abcd_, something) -> abcd_0
-#define testudo___WITH_IS_EMPTY(base, ...)                              \
-  testudo___CAT(base, testudo___ISEMPTY(__VA_ARGS__))
-
-
-// for-each with numeric argument in reverse order; separate all invocations
-// with commas; the action is the first argument:
-// #define testudo___FOR_EACH_N_REV(...)
-
-#define testudo___FOR_EACH_N_REV_BRACKETS_IS_EMPTY_1(action, ...)
-#define testudo___FOR_EACH_N_REV_BRACKETS_IS_EMPTY_0(action, ...)    \
-  testudo___FOR_EACH_N_REV(action, __VA_ARGS__)
+#define testudo___FOR_EACH_N_REV_COMMA_BRACKETS_IS_EMPTY_1(action, ...)
+#define testudo___FOR_EACH_N_REV_COMMA_BRACKETS_IS_EMPTY_0(action, ...) \
+  testudo___FOR_EACH_N_REV_COMMA(action, __VA_ARGS__)
 // for-each with numeric argument in reverse order, with arguments grouped in
 // brackets; works with empty list of arguments
-#define testudo___FOR_EACH_N_REV_BRACKETS(action, b_args)               \
-  testudo___CAT(testudo___FOR_EACH_N_REV_BRACKETS_IS_EMPTY_,            \
-                testudo___ISEMPTY(testudo___REMOVE_BRACKETS b_args))    \
+#define testudo___FOR_EACH_N_REV_COMMA_BRACKETS(action, b_args)         \
+  testudo___CAT(testudo___FOR_EACH_N_REV_COMMA_BRACKETS_IS_EMPTY_,      \
+                testudo___IS_EMPTY(testudo___REMOVE_BRACKETS b_args))    \
     (action, testudo___REMOVE_BRACKETS b_args)
-
 
 #define testudo___PRODUCE_FULL_ARG(_, ...)                              \
   testudo___REMOVE_BRACKETS __VA_ARGS__
 #define testudo___ARGS(b_args)                                          \
-  testudo___FOR_EACH_N_REV_BRACKETS(testudo___PRODUCE_FULL_ARG, b_args)
+  testudo___FOR_EACH_N_REV_COMMA_BRACKETS(                              \
+    testudo___PRODUCE_FULL_ARG, b_args)
   // SIGNATURE((int), ((char c), (float f))) -> int (char c, float f)
 #define testudo___SIGNATURE(b_ret, b_args)                              \
   testudo___REMOVE_BRACKETS b_ret (testudo___ARGS(b_args))
@@ -451,14 +414,14 @@ namespace testudo___implementation {
 #define testudo___PRODUCE_ARG_TYPE_NAME_N(n, ...)                       \
   testudo___TYPE_FROM_TYPE_NAME __VA_ARGS__ arg_##n
 #define testudo___ARGS_TYPE_NAME(b_args)                                \
-  testudo___FOR_EACH_N_REV_BRACKETS(testudo___PRODUCE_ARG_TYPE_NAME_N,  \
-                                    b_args)
+  testudo___FOR_EACH_N_REV_COMMA_BRACKETS(                              \
+    testudo___PRODUCE_ARG_TYPE_NAME_N, b_args)
 
   // ARGS_NAME((int), ((char c), (float f))) -> arg_2, arg_1
 #define testudo___PRODUCE_ARG_NAME_N(n, ...) arg_##n
 #define testudo___ARGS_NAME(b_args)                                     \
-  testudo___FOR_EACH_N_REV_BRACKETS(testudo___PRODUCE_ARG_NAME_N,       \
-                                    b_args)
+  testudo___FOR_EACH_N_REV_COMMA_BRACKETS(                              \
+    testudo___PRODUCE_ARG_NAME_N, b_args)
 
 #define testudo___ARG3(_1, _2, _3, ...) _3
 

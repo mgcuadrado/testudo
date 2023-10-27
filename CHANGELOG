@@ -1,3 +1,146 @@
+598 testudo-0.10
+  testudo version 0.10
+597
+  task grooming
+596
+  explained why we can't split target "examples_generated" into closed and
+  open versions
+595
+  further simplified the generation of test report excerpts for the guide
+594
+  simplified the generation of test report excerpts for the guide
+593
+  task grooming
+592
+  minor edits for the example tests; i won't add any more test report excerpts
+  (i've decided the "Mock objects" section doesn't need them)
+591
+  code report excerpts for section "Fixtures"
+590
+  some more code report excerpts in the manual; only missing sections
+  "Fixtures" and "Mock objects"
+589
+  still more code report excerpts in the manual
+588
+  corrected report excerpt conversion to LaTeX for orange lines of dashes
+587
+  added a bug and a task
+586
+  fixed some locations appearing where they shouldn't (left over from
+  previous output)
+585
+  yet more code report excerpts in the manual
+584
+  more code report excerpts in the manual
+583
+  implemented closed vs open style for report excerpts; the system is ugly,
+  complicated, repetitive, and fragile, but it works; i'll have to refactor
+  it into something more maintainable
+582
+  added "nay" after the "?" for failed "not-" checks to show clearly what
+  we're checking for
+581
+  wrote a couple of sentences about example test code report excerpts
+580
+  a few more example report excerpts in the guide
+579
+  corrected some Makefile errors related to report excerpts
+578
+  put some elements in place to show the result of examples as report
+  excerpts; still a few things to do: close vs open style, more example
+  results, an explanation ("you'll find the report excerpt after the example
+  source code"), and better, more modular code to generate the excerpts
+577
+  explained how to define top-test nodes with no parent
+576
+  combined some pairs of lines in the macro names table, so that the table
+  is smaller and can be set in a bigger font size
+575
+  corrected some TOC entries
+574
+  perfect-forwarding fix
+572
+  coded "tout" to replace "print_text()", "print_break()", and "step_id()"
+571
+  extended "show_value()" to accept any number of arguments
+570
+  put relevant values ("_show(...)") and explanations ("<< ...") on the
+  own indented line after the failed test, and removed the output of loop
+  variable values in with-loops from the failed tests (add them as relevant
+  values if you want to see them)
+569
+  added a syntax based on "operator<<()" to add free-form explanations for
+  failed tests
+568
+  added the chainable "_show()" macro to show additional expression values
+  when a test fails
+567
+  make revelant expressions, but not their values, show even when a test
+  succeeds
+566
+  reorganised and corrected validity checks (we weren't checking
+  for validity of the second argument in "check(...)_equal(...)" or
+  "check(...)_approx(...)")
+565
+  tiniest typo
+564
+  moved the additional "_true()" relevant expressions and their values
+  up into "CheckTest<>", so that they can be later generalised for other
+  types of tests, and unified the "check_true_for" and "check_true" concepts
+  (in typeset, format, and XML) into a single "check_true" with additional
+  relevant expressions and values that may be empty
+561
+  updated comments to reflect new "provided" syntax
+560
+  made available "are_equal()" and "are_approx()" as methods of the default
+  test fixture, and as standalone functions
+559
+  discovered the post-fix "_with_tol()" syntax didn't work with "provided()",
+  so changed the "provided()" syntax to make them compatible
+558
+  unified macros "_true" and "_true\_for()" into "_true()"; so, "_true" ->
+  "_true()" and "_true_for(...)" -> "_true(...)"
+557
+  made "_true" use the same check test class "CheckTrueFor" as "_true_for()"
+556
+  removed unused macros
+555
+  made the colour text output slightly clearer for "_true_for()"
+554
+  removed "Check<...>::set()" and "Check<...>::get()" and handled "_approx()"
+  tolerances directly in "CheckApprox"
+553
+  removed the old prefix "_tol()" syntax in favour of the postfix
+  "_with_tol()"
+552
+  some cleaning of the code after the recent overhauling
+551
+  overhauled the multi-macro check system to accomodate postfix tolerance
+  setting (with the new "_with_tol()"); added a lot of explanations about
+  the multi-macro check system; still to be done: clean the code, remove
+  the old-style prefix tolerance setting "_tol()"
+550
+  extended the "fixture_init()" macro to accept more than one initialisation
+  argument
+549
+  a couple of illustrative examples about macro arguments with
+  non-parenthesised commas
+548
+  completed some "make" targets
+547
+  added "fixture_args()" to specify argument values to be passed to a
+  fixture constructor
+546
+  corrected decoloriser script
+545
+  reorganised and commented macros, and coded a Testudo test for them
+544
+  added "make" variable "TESTUDOOPTS" to specify additional options for
+  Testudo; for instance, to select what tests are run
+543
+  some simple instructions for installation
+542
+  testudo version 0.10rc
 541 testudo-0.9
   updated copyright notices
 540

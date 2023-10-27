@@ -1,0 +1,39 @@
+#!/bin/bash
+
+source=doc_examples.ttd
+testudobin_xml_format="$1"
+dir="$2"
+style="$3"
+xml_to_text_nl="$4"
+color_to_latex="$5"
+
+targets="$(
+    cat "$source" | sed -n '
+    /^ *\/\/ { /,/^ *\/\/ }/ {
+        /^ *\/\/ \({\|}\)/!d
+        p
+    }
+' | sed -n '
+    /^ *\/\/ { / { N; s/\n// }
+    s/^ *\/\/ { \([^ ]*\) \+\/\/ } \([^ ]*\) \(.*\)$/'"$dir"'\/\1@\3_\2/p
+' | sed 's/ /:/g')" # encode spaces as colons (this must be undone below)
+
+for target in $targets; do
+    echo generating $target $style | sed 's/:/ /g'
+    $testudobin_xml_format \
+        -s "$(echo $target \
+                  | sed 's/.*@\(.*\)_\(test\|content\)$/\1/;s/:/ /g')" \
+        | $xml_to_text_nl \
+        | $color_to_latex \
+        | (
+            if [[ $target == *_test ]]; then
+                cat
+            elif [[ $target == *_content ]]; then
+                sed '/^@color{orange}[^-]/d;/^@color{blue}@openbrace{}/d'
+            else
+                echo Error: $target $style isn\'t known
+                exit 1
+            fi
+        ) \
+        > $(echo $target | sed 's/@.*//')-$style.tex
+done

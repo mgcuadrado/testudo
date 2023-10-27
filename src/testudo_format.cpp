@@ -22,28 +22,6 @@ namespace testudo___implementation {
 
   using namespace std;
 
-  pair<string, string>
-  TestFormat::var_and_values_format(var_values_t var_values) {
-    ostringstream oss_var, oss_value;
-    if (var_values.size()==1) {
-      oss_var << var_values.front().first;
-      oss_value << var_values.front().second;
-    }
-    else {
-      bool first_time=true;
-      oss_var << "(";
-      oss_value << "(";
-      for (auto var_value: var_values) {
-        oss_var << (first_time ? "" : ", ") << var_value.first;
-        oss_value << (first_time ? "" : ", ") << var_value.second;
-        first_time=false;
-      }
-      oss_var << ")";
-      oss_value << ")";
-    }
-    return {oss_var.str(), oss_value.str()};
-  }
-
   class NullTestFormatForFixtures
     : public TestFormat {
   public:
@@ -70,14 +48,14 @@ namespace testudo___implementation {
     void output_begin_with_results() override { }
     void output_end_with_results() override { }
     void output_with_summary(string, TestStats) override { }
-    void output_check_true(string, string, string, bool) override { }
-    void output_check_true_for(string, string, string,
-                               string, string, bool) override { }
+    void output_check_true(string, string, string, string,
+                           string, string, bool) override { }
     void output_check_equal(
-      string, string, string, string, string, string, bool) override { }
+      string, string, string, string, string, string, string,
+      string, string, bool) override { }
     void output_check_approx(
-      string, string, string, string, string, string,
-      string, bool) override { }
+      string, string, string, string, string, string, string, string,
+      string, string, bool) override { }
 
     void uncaught_exception(string exception) override
       { parent_test_format->uncaught_exception(exception); }
@@ -194,13 +172,8 @@ namespace testudo___implementation {
 
     auto child_log() { return log->child(); }
 
-    void log_output(function<void ()> output) {
-      log->add(get_location(),
-               [nwa=non_with_ancestor,
-                fvvf=var_and_values_format(full_var_values)]()
-                 { nwa->output_show_value(fvvf.first, fvvf.second); });
-      log->add(get_location(), output);
-    }
+    void log_output(function<void ()> output)
+      { log->add(get_location(), output); }
     void failed() {
       log->failed();
       if (auto parent_with_loop=
@@ -307,68 +280,72 @@ namespace testudo___implementation {
     void output_end_with_results() override { assert(false); }
     void output_with_summary(string, TestStats) override { assert(false); }
 
-    void output_check_true(string expr_str, string success,
+    void output_check_true(string expr_str,
+                           string exprv_str, string valv_str,
+                           string explanation,
+                           string success,
                            string prefix, bool) override {
       log->incr_counter();
       if_false_log_output_with_failed(
         success,
         [=, nwa=non_with_ancestor]() {
-          nwa->output_check_true(expr_str, success, prefix, false);
+          nwa->output_check_true(
+            expr_str,
+            exprv_str, valv_str, explanation,
+            success, prefix, false);
         });
       if (recursively_last_time) {
-        non_with_ancestor->output_check_true(expr_str, "with", prefix, true);
-        log->output(get_location());
-      }
-    }
-    void output_check_true_for(string expr_str,
-                               string exprv_str, string valv_str,
-                               string success,
-                               string prefix, bool) override {
-      log->incr_counter();
-      if_false_log_output_with_failed(
-        success,
-        [=, nwa=non_with_ancestor]() {
-          nwa->output_check_true_for(expr_str, exprv_str, valv_str,
-                                     success, prefix, false);
-        });
-      if (recursively_last_time) {
-        non_with_ancestor->output_check_true_for(
-          expr_str, exprv_str, "", "with", prefix, true);
+        non_with_ancestor->output_check_true(
+          expr_str,
+          exprv_str, "", "",
+          "with", prefix, true);
         log->output(get_location());
       }
     }
     void output_check_equal(string expr1_str, string val1_str,
                             string expr2_str, string val2_str,
+                            string exprv_str, string valv_str,
+                            string explanation,
                             string success,
                             string prefix, bool) override {
       log->incr_counter();
       if_false_log_output_with_failed(
         success,
         [=, nwa=non_with_ancestor]() {
-          nwa->output_check_equal(expr1_str, val1_str, expr2_str, val2_str,
-                                  success, prefix, false);
+          nwa->output_check_equal(
+            expr1_str, val1_str, expr2_str, val2_str,
+            exprv_str, valv_str, explanation,
+            success, prefix, false);
         });
       if (recursively_last_time) {
         non_with_ancestor->output_check_equal(
-          expr1_str, "", expr2_str, "", "with", prefix, true);
+          expr1_str, "", expr2_str, "",
+          exprv_str, "", "",
+          "with", prefix, true);
         log->output(get_location());
       }
     }
     void output_check_approx(string expr1_str, string val1_str,
                              string expr2_str, string val2_str,
                              string max_error_str,
+                             string exprv_str, string valv_str,
+                             string explanation,
                              string success,
                              string prefix, bool) override {
       log->incr_counter();
       if_false_log_output_with_failed(
         success,
         [=, nwa=non_with_ancestor]() {
-          nwa->output_check_approx(expr1_str, val1_str, expr2_str, val2_str,
-                                   max_error_str, success, prefix, false);
+          nwa->output_check_approx(
+            expr1_str, val1_str, expr2_str, val2_str, max_error_str,
+            exprv_str, valv_str, explanation,
+            success, prefix, false);
         });
       if (recursively_last_time) {
         non_with_ancestor->output_check_approx(
-          expr1_str, "", expr2_str, "", max_error_str, "with", prefix, true);
+          expr1_str, "", expr2_str, "", max_error_str,
+          exprv_str, "", "",
+          "with", prefix, true);
         log->output(get_location());
       }
     }

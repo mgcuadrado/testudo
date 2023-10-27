@@ -31,9 +31,8 @@ OBJDIR := .object
 DEPDIR := .depend
 
 ALLTESTUDOTESTS := $(wildcard *.ttd)
-ALLTESTUDOBINS  := $(ALLTESTUDOTESTS:%.ttd=$(TESTUDOBINDIR)/%.ttb)
+TESTUDOBINS  := $(ALLTESTUDOTESTS:%.ttd=$(TESTUDOBINDIR)/%.ttb)
 ALLTESTUDODEPENDS := $(ALLTESTUDOTESTS:%.ttd=$(DEPDIR)/%.td)
-ALLTESTUDOSPEC  := $(ALLTESTUDOBINS:%=%)
 
 ALLHEADERS := $(wildcard *.h)
 ALLSOURCES := $(wildcard *.cpp)
@@ -50,7 +49,7 @@ BINSDIR ?= $(HOME)/local/bin
 
 TESTUDONAME := testudo
 TESTUDOBIN ?= $(BINSDIR)/$(TESTUDONAME)
-TESTUDOOPT = $(SHAREDLIBS)
+TESTUDOCONF = $(SHAREDLIBS)
 
 exe: $(EXE)
 
@@ -107,12 +106,12 @@ TRACK_FILE = testudo.track
 TEXT_PAGER = less -R +g
 TEST_PAGER_BW = less +g
 
-TEST_PREREQUISITES = $(TESTUDOBIN) $(ALLOBJLIBS) $(ALLTESTUDOBINS)
+TEST_PREREQUISITES = $(TESTUDOBIN) $(ALLOBJLIBS) $(TESTUDOBINS)
 
 # new-style targets
 
 report_xml: $(TEST_PREREQUISITES)
-	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC)
+	$< run $(XML_FORMAT) $(TESTUDOOPTS) $(TESTUDOCONF) $(TESTUDOBINS)
 report: $(TEST_PREREQUISITES)
 	@ -$(MAKE) --silent report_xml \
 	    | $(XML_TO_TEXT)
@@ -120,20 +119,20 @@ report_summary: $(TEST_PREREQUISITES)
 	@ -$(MAKE) --silent report_xml \
 	    | $(XML_TO_TEXT_SUMMARY)
 track_info: $(TEST_PREREQUISITES)
-	$< run $(TRACK_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC)
+	$< run $(TRACK_FORMAT) $(TESTUDOOPTS) $(TESTUDOCONF) $(TESTUDOBINS)
 track: $(TEST_PREREQUISITES)
-	$< diff $(TERMINAL_OPTIONS) $(TRACK_FILE) \
+	$< diff $(TERMINAL_OPTIONS) $(TESTUDOOPTS) $(TRACK_FILE) \
 		<($(MAKE) --silent track_info)
 
 report_bw: $(TEST_PREREQUISITES)
 	@ -$(MAKE) --silent report_xml \
 	    | $(XML_TO_TEXT) $(BW)
 report_summary_bw: $(TEST_PREREQUISITES)
-	$< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+	$< run $(XML_FORMAT) $(TESTUDOCONF) $(TESTUDOBINS) \
 	    | $(XML_TO_TEXT_SUMMARY) $(BW)
 track_bw: $(TEST_PREREQUISITES)
 	$< diff $(TERMINAL_OPTIONS) $(TRACK_FILE) \
-		<($< run $(TRACK_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC)) $(BW)
+		<($< run $(TRACK_FORMAT) $(TESTUDOCONF) $(TESTUDOBINS)) $(BW)
 
 report_noloc: $(TEST_PREREQUISITES)
 	@ -$(MAKE) --silent report_xml \
@@ -181,7 +180,7 @@ progress_bw: $(TEST_PREREQUISITES)
 save_progress: save_report save_track
 
 noxml_report: $(TEST_PREREQUISITES)
-	$< run $(NO_XML_TEXT_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC)
+	$< run $(NO_XML_TEXT_FORMAT) $(TESTUDOCONF) $(TESTUDOBINS)
 noxml_report_noloc: $(TEST_PREREQUISITES)
 	FIXME
 noxml_report_bw: $(TEST_PREREQUISITES)
@@ -194,7 +193,9 @@ view_report view_report_summary view_track view_progress \
 	    view_report_noloc view_report_noloc_bw \
 	    view_track_bw view_progress_bw \
 	    view_noxml_report view_noxml_report_noloc \
-	    view_noxml_report_bw view_noxml_report_noloc_bw: \
+	    view_noxml_report_bw view_noxml_report_noloc_bw \
+	    view_diff_report view_diff_report_bw \
+	    view_diff_report_summary view_diff_report_summary_bw: \
 	view_%: $(TEST_PREREQUISITES)
 	-$(MAKE) --silent $* | $(TEXT_PAGER)
 

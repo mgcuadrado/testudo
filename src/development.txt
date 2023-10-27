@@ -47,3 +47,86 @@ Why keep the distinction between "declare" and "perform"?
     works as expected because "perform" puts its code in a "[&]() { ... }()"
     block; "declare", on the other hand, needs to do without such a block,
     because its declarations must be in effect for the rest of the scope.
+
+ Why not have "_for()" like we have "_true_for()"
+--------------------------------------------------------
+
+Because "check(a+b)_equal(c)_for(a, b)" can always be written as
+"check(a+b==c)_true_for(a, b, c).
+
+ C preprocessor macros
+-----------------------
+
+These are difficult.  Here are a few interesting docs on the topic:
+
+    * Understanding the behavior of C's preprocessor when a macro indirectly
+      expands itself
+
+        https://stackoverflow.com/questions/66593868
+
+        See Chris Dodd's answer.
+
+    * cppreference.com: Replacing text macros
+
+        https://en.cppreference.com/w/cpp/preprocessor/replace
+
+    * C Preprocessor tricks, tips, and idioms
+
+        under https://github.com/pfultz2/Cloak/wiki/
+
+        Interesting read about some general techniques.  See also the Cloak
+        project https://github.com/pfultz2/Cloak that demonstrates how to
+        achieve a kind of recursivity with the preprocessor.
+
+
+    * C/C++ Preprocessor Metaprogramming - Macro Basics/Rules
+
+        http://saadahmad.ca/cc-preprocessor-metaprogramming-macro-basicsrules/
+
+I'll assume the following rules (from Chris Dodd) and see whether they fit my
+needs:
+
+    * there are macros without arguments (e.g., "#define N v") and macros with
+      arguments
+
+    * a macro (e.g., "#define M(A, B, C) A ## B C" ) has
+
+        * a name ("M")
+
+        * arguments with names ("A", "B", "C")
+
+        * a body ("A ## B C")
+
+    * the expansion of a macro without arguments is simply its body
+
+    * the expansion of a macro with arguments starts when the name of a macro
+      with arguments is found, but only if it's followed by "("
+
+        1. the arguments are scanned and assigned, without any expansion; each
+          macro argument gets an argument value
+
+            * only "," and matching pairs of "(" and ")" are relevant here
+
+        2. macro arguments whose name appears in the body not preceded by "#"
+          or next to "##" have their values recursively expanded
+
+            * each macro that is completely in the argument value is expanded;
+              each encountered macro with arguments gets the full treatment
+              from step 1 to step 4, with only its own name suppressed in its
+              own step 4
+
+            * careful: in the recursivity, only macro argument values get the
+              recursive treatment, not the expansion of macros
+
+        3. the resulting macro argument values are substituted into the body of
+          the macro; arguments involved in "#" or "##" operations are modified
+          and substituted based on their original values from step 1 (step 2
+          doesn't apply to them)
+
+        4. the resulting macro body is scanned again for macros to expand, but
+          the current macro is suppressed from the list of applicable macros;
+          each encountered macro gets the full treatment from step 1 to step 4,
+          with only its own name suppressed in its own step 4
+
+        5. the resulting macro body replaces the original macro and its
+          arguments

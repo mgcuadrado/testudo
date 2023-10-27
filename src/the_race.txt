@@ -55,7 +55,7 @@ race had caused a great excitement.
         ..   goal but deviated     ::        :':    slowly but steadily,
         ''   or took sharp bends,            : :    always in the direction
                often away from    ,,          : :   of the goal.
-          .`.     the goal        ''          : :
+          .`.     the goal.       ''          : :
            `    ..           ..               : :
                 ''     ::    ''  ,   .`.      : :
                 _               ','   `      : :

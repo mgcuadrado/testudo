@@ -52,7 +52,20 @@
 \newcommand*{\cpplistingindent}{1.25em}
 \input{keywords.tex}
 
-\providecommand\typesetexample[1]{%
+\newcommand\typesetexample[1]{%
+  \typesetexamplesource{#1}
+}
+
+\newcommand\typesetexampleandreport[1]{%
+  \typesetexamplesource{#1}
+  \typesetexamplereport{#1}
+}
+
+\providecommand\typesetexamplereport[1]{%
+  \input{reports/#1-cl}%
+  \input{reports/#1-op}%
+}
+\providecommand\typesetexamplesource[1]{%
   \input{examples/#1-lc-cl}%
   \input{examples/#1-uc-op}%
 }
@@ -79,7 +92,9 @@
     commentstyle=\rmfamily\itshape,
     resetmargins=true,
     backgroundcolor=\color{black!5},
-    showstringspaces=false, keepspaces=true, texcl=true, escapechar=|
+    showstringspaces=false, keepspaces=true, texcl=true, escapechar=|,
+    extendedchars=true, literate=%
+    {ú}{{\'u}}1%
   }%
 }
 \newcommand*\cpplistinglstset{%
@@ -534,6 +549,10 @@ doesn't get confused by output the test program might write directly to its
 output, whereas the regular workflow that uses the intermediate \textsc{xml}
 representation will fail when such an output is mixed with the \textsc{xml}.
 
+In the rest of this document, for each new syntax introduced, there will be
+examples of test source code.  Most of the source code examples will be
+followed by the report items they produce, in the colour text style.
+
 
 \chapter{Test definition and test instruction styles}
 \label{cha:test-definition-test-instruction-styles}
@@ -548,15 +567,16 @@ styles in the same file.  Out-of-the-box, the available styles are:
   continuing macros have a leading underscore, so that they can be stuck to the
   preceding expression nicely (but you can separate them if you want); this
   style is easy on the eyes, but may be too cluttered for some people; here's
-  an example:
+  an example (in the example, there's no space around operators, to match the
+  general denseness):
   \input{examples/styles-lc-cl.tex}
 
 \item ``\texttt{uc}'' (uppercase), where all macro names are in uppercase, and
   continuing macros are designed (but not required) to be separated from the
   preceding expression by a space; this style shows clearly the parts of check
-  instructions, but may be excessively macroish; here's the same example as for
-  ``\texttt{lc}'', but in ``\texttt{uc}'' style:
-  \input{examples/styles-uc-op.tex}
+  instructions, but may feel excessively macroish; here's the same example as
+  for ``\texttt{lc}'', but in ``\texttt{uc}'' style (and with space around
+  operators): \input{examples/styles-uc-op.tex}
 \end{itemize}
 
 See~\tref{tab:testudo-style-table} for a list of all macro syntax names, with
@@ -564,9 +584,9 @@ their macro name in the ``\texttt{lc}'' and ``\texttt{uc}'' styles.
 
 \begin{table}
   \centering
-  \begin{footnotesize}
+  % \begin{small}
     \input{style_table.tex}
-  \end{footnotesize}
+  % \end{small}
   \caption{Testudo macro names in the default styles}
   \label{tab:testudo-style-table}
 \end{table}
@@ -625,6 +645,9 @@ and progress and measured with respect to the baseline.  When using a version
 control system, you must add the saved report and track, and commit them with
 their matching version of the code and test code.
 
+\subsubsection{Available ``\texttt{make}'' targets}
+\label{sec:available-make-targets}
+
 The main available ``\texttt{make}'' targets\footnote{A ``\texttt{make}''
   target is triggered by the command ``\texttt{make}'' followed by the target.
   So, for instance, the command ``\texttt{make report}'' will trigger the
@@ -661,8 +684,11 @@ There are some additional targets, target prefixes, and target suffixes:
     \texttt{report\_summary} & runs the tests and prints a report summary \\
     \texttt{diff\_report}
       & shows the (plain Unix) ``\texttt{diff}'' between the baseline and the
-        current report; this is useful if you want to see just the new tests
+        current reports; this is useful if you want to see just the new tests
         you've coded, and how they affect the tallies \\
+    \texttt{diff\_report\_summary}
+      & shows the (plain Unix) ``\texttt{diff}'' between the baseline and the
+        current report summaries \\
     \texttt{save\_report}
       & runs the tests and saves the current report as a baseline for
         ``\texttt{diff\_report}'' and similar targets \\
@@ -683,9 +709,12 @@ There are some additional targets, target prefixes, and target suffixes:
 
 In most cases, you can do with only
 \begin{itemize}
-\item ``\texttt{make view progress}'' to check your progress;
+\item ``\texttt{make view\_progress}'' to check your progress;
 \item ``\texttt{make save\_progress}'' to save your progress.
 \end{itemize}
+
+\subsubsection{Coding workflow}
+\label{sec:coding-workflow}
 
 Using these ``\texttt{make}'' commands, a simple coding workflow is
 \begin{enumerate}
@@ -696,6 +725,17 @@ Using these ``\texttt{make}'' commands, a simple coding workflow is
 \item commit;
 \item go to step \ref{step:code}.
 \end{enumerate}
+
+\subsubsection{Testudo options using ``\texttt{make}''}
+\label{sec:testudo-options-using-make}
+
+You can add Testudo options (see \ref{sec:testudo-options-test-selection}) to
+the execution using the ``\texttt{TESTUDOOPTS}'' variable.  For instance, if
+you don't want to view a report for all tests, but only for those under the
+``\texttt{testudo.crc}'' node, do
+\begin{bashlisting}
+make view_report TESTUDOOPTS="-s testudo.crc"
+\end{bashlisting}
 
 
 \subsection{Directly calling the executable}
@@ -719,10 +759,13 @@ following arguments to execute tests:
   started.
 \end{itemize}
 
+\subsection{Testudo options for test selection}
+\label{sec:testudo-options-test-selection}
+
 You can instruct Testudo to start the test execution from a specific node by
 passing ``\texttt{-s <test-root>}'' to the executable, where
 ``\texttt{<test-root>}'' is the full name for the node.  The execution will be
-restritced to the subtree rooted at the node, and all test names and test node
+restricted to the subtree rooted at the node, and all test names and test node
 names will be relative to it.
 
 Additionally, you can restrict the test execution to a list of nodes (and the
@@ -774,7 +817,7 @@ a test node is an arbitrary string.
 When you define a test node or a test, you give its name and title in a
 comma-separated parenthesised group:
 
-\typesetexample{define-test-node}
+\typesetexample{define-test-node-no-report}
 
 The name allows you to refer to the test node or test later in the same
 translation unit, as a parent to another test node or test.  If you aren't
@@ -800,7 +843,7 @@ So, for instance, if you have already defined a test node called
 ``\texttt{tricorder}'', here's how to define a child test node called
 ``\texttt{medical}'', with the title ``medical capabilities'':
 
-\typesetexample{define-test-node}
+\typesetexampleandreport{define-test-node}
 
 For a test (a test node with a test function), the syntax includes the
 definition of the test function itself, as if it were a regular \Cpp{}
@@ -811,32 +854,43 @@ define an unnamed child test called titled ``switch on after creation'', that
 checks a tricorder medical sub-unit is off upon creation of the tricorder, and
 switches on appropriately:
 
-\typesetexample{define-test-full}
+\typesetexampleandreport{define-test-full}
 
 \section{Top test nodes}
 \label{sec:top-test-nodes}
 
-Top test nodes are test nodes whose parent you haven't defined in the same
-translation unit.  You mention their parent by their full name, and Testudo
-makes sure the parent exists before the new child is defined.  Test nodes
-created by mentioning their full name begin as \emph{unconfigured} test nodes;
-that's \textsc{ok}, and it won't cause any harm, but it means that you're not
+Top test nodes are test nodes with no parent or whose parent you haven't
+defined in the same translation unit.
+
+For top test nodes with no parent, just use the empty string as the parent name argument.
+
+For top test nodes with a parent not defined in the same translation unit,
+you'll have to mention their parent by their full name.  Testudo makes sure the
+parent exists before the new child is defined.  Test nodes created by
+mentioning their full name begin as \emph{unconfigured} test nodes; that's
+\textsc{ok}, and it won't cause any harm, but it means that you're not
 controlling their relative order to other test nodes (the order is still
 deterministic, though, since they get a default priority of \texttt{0}), and
 they don't have any title.  You can \emph{configure} an unconfigured test node
 by simply defining it, preferably at an appropriately higher-level translation
 unit, for clarity.
 
-Here's how to define a top test node called ``\texttt{flux\_capacitor}'', child
-to a test node whose full name is ``\texttt{outatime.delorean}'':
+Here's how to define a top test node called ``\texttt{búri}'' with no parent,
+and a non-top test node (see~\Sref{sec:non-top-test-nodes}) ``\texttt{borr}''
+that has ``\texttt{búri}'' as its parent:
 
-\typesetexample{top-test-node}
+\typesetexampleandreport{top-test-node-no-parent-and-child}
+
+And here's how to define a top test node called ``\texttt{flux\_capacitor}'',
+child to a test node whose full name is ``\texttt{outatime.delorean}'':
+
+\typesetexampleandreport{top-test-node}
 
 You can also define a top test (a top test node with a test function).  So,
 here's how to define a test titled ``doors closed after constructions'', child
 to a test node whole full name is ``\texttt{outatime.delorean}'':
 
-\typesetexample{top-test}
+\typesetexampleandreport{top-test}
 
 
 \chapter{Test steps}
@@ -896,7 +950,7 @@ std::sort(v.begin(), v.end());
 All declarations in a test must be enclosed in a ``declare'' instruction.  They
 will be carried out as written, and written out to the report.
 
-\typesetexample{declare}
+\typesetexampleandreport{declare}
 
 \subsectiontestudopair{Action}{perform}{PERFORM}
 \label{sec:action}
@@ -904,15 +958,18 @@ will be carried out as written, and written out to the report.
 All non-declaration instructions in a test must be enclosed in a ``perform''
 instruction.  They will be carried out as written, and written to the report.
 
-\typesetexample{perform}
+\typesetexampleandreport{perform}
 
 
 \section{Checks}
 \label{sec:checks}
 
-A check instruction is a verification made on the value of an expression.  It's
-outcome is true or false.  If true, it counts towards the tally of succeeded
+A check instruction is a verification made on the value of an expression.  Its
+outcome is true or false.  If true, it counts towards the tally of successful
 checks.  If false, it counts towards the tally of failed checks.
+
+In most of the check instruction examples, at least one successful and one
+failed check will be shown so that you can see what the format is for both.
 
 \subsectiontestudopair{Checked expression}{check}{CHECK}
 \label{sec:checked-expression}
@@ -921,6 +978,9 @@ An expression-check instruction starts with a ``check'' instruction containing
 the value to check (usually an expression resulting from previous actions); it
 must be followed by at least one continuing macro, stating what the expected
 value of the expression is, and how the comparison is done.
+
+\subsection{Argument validity}
+\label{sec:argument-validity}
 
 A check where the argument to the ``check'' instruction is \emph{invalid}
 always fails, no matter what the continuing macro says.  Values are considered
@@ -933,28 +993,28 @@ values would be successful.
 
 Validity is also checked for other expressions known to the check syntax:
 \begin{itemize}
-\item the argument to the ``true'' and ``false'' syntaxes
-  (\Sref{sec:check-expression-true}, \Sref{sec:check-expression-false});
+\item the argument to the ``equal'' and ``not-equal'' syntaxes
+  (\Sref{sec:check-expression-equal-reference});
 \item the argument to the ``approx'' and ``not-approx'' syntaxes
-  (\Sref{sec:check-expression-near-reference});
-\item the argument to the ``true-for'' and ``false-for'' syntaxes
-  (\Sref{sec:check-expression-true-for},
-  \Sref{sec:check-expression-false-for}).
+  (\Sref{sec:check-expression-near-reference}).
+\item the arguments to the ``show'' syntax
+  (\Sref{sec:check-show-relevant-values}).
 \end{itemize}
-For those syntaxes, if the argument is invalid, the check fails no matter what.
+For those syntaxes, if any argument is invalid, the check fails no matter what.
 
 \subsectiontestudopair{Check the expression is true}{\_true}{TRUE}
 \label{sec:check-expression-true}
 
-In order to check the value of the expression for trueness, attach the ``true''
+In order to check that the value of an expression is true, attach the ``true''
 macro to the ``check'' instruction: the expression is converted to
 ``\texttt{bool}'', and the test check is successful if and only if the
 resulting bool is true.
 
-\typesetexample{check-true}
+\typesetexampleandreport{check-true}
 
-See~\Sref{sec:check-expression-true-for} for an alternative version that can
-show you what the involved values were for a failed ``true'' check.
+Often, when such a test fails, it's good to know what the values involved in
+the boolean expression are.  \Sref{sec:check-show-relevant-values} explains how
+to do that.
 
 \subsectiontestudopair{Check the expression is false}{\_false}{FALSE}
 \label{sec:check-expression-false}
@@ -965,13 +1025,10 @@ macro, the test output marks this check with the word ``nay''\footnote{I've
   imagine seeing a check for ``\texttt{not a and b}'', which should be
   equivalent to ``\texttt{(not a) and b}'' rather than ``\texttt{not (a and
     b)}''.  No such confusion with ``\texttt{nay a and b}''.}.  This will be
-true of all the other negating checks explained below (``not-equal'',
-``not-approx'', and ``false-for'').
+true of the other negating checks explained below (``not-equal'' and
+``not-approx'').
 
-\typesetexample{check-false}
-
-See~\Sref{sec:check-expression-false-for} for an alternative version that can
-show you what the involved values were for a failed ``false'' check.
+\typesetexampleandreport{check-false}
 
 \subsectiontestudopair{Check the expression is equal to a reference}%
   {\_equal}{EQUAL}
@@ -983,12 +1040,14 @@ stating the reference value.  Testudo uses ``\texttt{operator==()}'' to
 compare the two values, and the test check is successful if and only if the
 result of the comparison is true.
 
-\typesetexample{check-equal}
+\typesetexampleandreport{check-equal}
 
 The opposite of the ``equal'' macro is the ``not-equal'' macro:
 \begin{center}
   \testudopair{\_not\_equal}{NOT\_EQUAL}
 \end{center}
+
+\typesetexampleandreport{check-not-equal}
 
 The expression in the ``equal'' and ``not-equal'' macros is automatically
 prefixed with the type of the expression in the ``check'' instruction, so you
@@ -996,8 +1055,18 @@ can leave out the type in many cases that would otherwise require more
 verboseness.  So, for instance, if ``\texttt{inventory}'' has type
 ``\texttt{map<string, int>}'', the following two checks are equivalent:
 
-\typesetexample{check-equal-automatic-type}
+\typesetexampleandreport{check-equal-automatic-type}
 
+% If in case of fail you need to print other values than the two values that
+% are tested for equality, transform the ``equal'' check into a ``true'' check
+% with relevant expressions.  In order to ensure you're using the same
+% semantics as Testudo, use the expression ``\texttt{are\_equal()}'', which is
+% actually a method provided by the enclosing test node.
+
+% \typesetexample{check-are-equal}
+
+% Outside of a Testudo test function (e.g., in a utility function for tests), use
+% ``\texttt{testudo::are\_equal()}'' instead.
 
 \subsectiontestudopair{Check the expression is near a reference}%
   {\_approx}{APPROX}
@@ -1015,12 +1084,14 @@ stating the reference value.  Testudo uses ``\texttt{absdiff()}''
 between the two values.  The test check is successful if and only if that
 absolute distance is less than a certain tolerance.
 
-\typesetexample{check-approx}
+\typesetexampleandreport{check-approx}
 
 The opposite of the ``approx'' macro is the ``not-approx'' macro:
 \begin{center}
   \testudopair{\_not\_approx}{NOT\_APPROX}
 \end{center}
+
+\typesetexampleandreport{check-not-approx}
 
 By default, the default tolerance used for nearness checks is taken from a
 variable named ``\texttt{approx\_epsilon}'', but we'll call it
@@ -1035,6 +1106,18 @@ Similar to the ``equal'' macro, the expression in the ``approx'' and
 ``not-approx'' macros is automatically prefixed with the type of the expression
 in the ``check'' instruction.
 
+% Also similar to the ``equal'' macro, you can transform the ``approx'' check
+% into a ``true'' check with relevant expressions, using use the expression
+% ``\texttt{are\_approx()}'' which can take either two or three arguments.
+% With two arguments, the tolerance is the current value of ``$\varepsilon$''.
+% With three arguments, the tolerance is the third argument.
+
+% \typesetexample{check-are-approx}
+
+% Outside of a Testudo test function (e.g., in a utility function for tests),
+% use ``\texttt{testudo::are\_approx()}'' instead, which only comes in the
+% three-argument variety.
+
 \subsubsectiontestudopair{Define a value for $\bm{\varepsilon}$}%
   {define\_approx\_epsilon}{DEFINE\_APPROX\_EPSILON}
 \label{sec:define-value-epsilon}
@@ -1042,7 +1125,7 @@ in the ``check'' instruction.
 In order to define $\varepsilon$ (in a situation where it isn't available), use
 the ``define approx epsilon'' macro with the initial value for $\varepsilon$.
 
-\typesetexample{define-approx-epsilon}
+\typesetexampleandreport{define-approx-epsilon}
 
 \subsubsectiontestudopair{Set the value of $\bm{\varepsilon}$}%
   {set\_approx\_epsilon}{SET\_APPROX\_EPSILON}
@@ -1053,52 +1136,70 @@ its value with the ``set approx epsilon'' macro, giving it the new value.  The
 new value will be used for all subsequent nearness checks, until it is changed
 again.
 
-\typesetexample{set-approx-epsilon}
+\typesetexampleandreport{set-approx-epsilon}
 
 \subsubsectiontestudopair{Show the value of $\bm{\varepsilon}$}%
   {show\_approx\_epsilon}{SHOW\_APPROX\_EPSILON}
 \label{sec:show-value-epsilon}
 
-You can also show what the value of $\varepsilon$ is in the test report, by
-using the ``show approx epsilon'' macro.
+You can also show what the current value of $\varepsilon$ is in the test
+report using the ``show approx epsilon'' macro.
 
-\typesetexample{show-approx-epsilon}
+\typesetexampleandreport{show-approx-epsilon}
 
 \subsubsectiontestudopair{Set a specific tolerance for nearness}%
   {\_tol}{TOL}
 \label{sec:specify-tolerance-nearness}
 
 You can also choose to override the default tolerance value for a specific
-check, by attaching the ``tol'' macro with the tolerance value before the
+check, by attaching the ``with tol'' macro with the tolerance value after the
 ``approx'' macro.
 
-\typesetexample{check-approx-tol}
+\typesetexampleandreport{check-approx-tol}
 
+\subsectiontestudopair{Add relevant values to show for failed checks}%
+  {\_show}{SHOW}
+\label{sec:check-show-relevant-values}
 
-\subsectiontestudopair{Check the expression is true for certain values}%
-{\_true\_for}{TRUE\_FOR}
-\label{sec:check-expression-true-for}
+When a test fails, Testudo will show the value of the arguments that were
+involved in it.  For instance, when checking for the equality of two values, if
+the test fails, the two values that turned out not to be equal will be added to
+the report.  But sometimes it's not only the values directly checked, but other
+involved values that are relevant.  Thus, if we're checking that $a+b=c$, we
+may want to know the values not only of~$a+b$ and~$c$, but also of~$a$ and~$b$.
 
-Compared to all the information the previous checks give in case of a fail, the
-``true'' (\Sref{sec:check-expression-true}) macro is quite uninformative.  For
-instance, when checking that a value is not greater than another value, if the
-check fails, that's all the information you'll get.  It would be good to know
-what the involved values were.  That is what the ``true-for'' macro does.
+This is particularly needed when checking a boolean expression with the
+``true'' or ``false'' macros, because none of the involved values is shown by
+default.  So, for instance, if checking that~$a<b$, the values of~$a$ and~$b$
+aren't shown because they aren't accessible to Testudo.  But clearly, we'd like
+to know them if the test fails.
 
-The ``check-true-for'' syntax works like ``check-true'', but you specify in
-parentheses a set of expressions whose values you'd like to see if the check
-fails.
+You can specify relevant values to show for a failed check with the ``show''
+macro.  Just chain the macro after the check specification, and list the
+relevant expressions as arguments to the macro:
 
-\typesetexample{check-true-for}
+\typesetexampleandreport{check-show}
 
-\subsectiontestudopair{Check the expression is false for certain values}%
-{\_false\_for}{FALSE\_FOR}
-\label{sec:check-expression-false-for}
+This works for all kinds of check.
 
-The opposite of the ``true-for'' macro is the ``false-for'' macro.
+\typesetexampleandreport{check-show-other}
 
-\typesetexample{check-false-for}
+The validity of all relevant expressions passed as arguments to the ``show''
+macro is required for the check to succeed (see~\Sref{sec:argument-validity}).
+That means that if any relevant expression returns an invalid value, the test
+will fail.
 
+\subsection{Free-form explanations for failed checks}
+\label{sec:check-free-form-explanations}
+
+You can add additional explanations to be written for a failed test: just use
+the check expression as if it were a regular output stream.  You can feed it
+any text or value using the redirection operator ``\texttt{<{}<}'':
+
+\typesetexampleandreport{check-explain}
+
+As you can see in the example, free-form explanations can be combined with the
+``show'' syntax.
 
 \subsectiontestudopair{Exception checks}%
   {check\_try \_catch}{CHECK\_TRY \_CATCH}
@@ -1114,14 +1215,14 @@ thrown, the test step is failed. If an exception with an unexpected type is
 thrown, the test step is failed, and an unexpected exception error is reported
 (see~\Sref{sec:unexpected-exceptions-crashes}).
 
-\typesetexample{check-try-catch}
+\typesetexampleandreport{check-try-catch}
 
 The ``check-try-catch'' instructions expects a exception with a type derived
 from ``\texttt{std::exception}'' by default.  You can change the expected
 exception type by passing it as an argument to the ``catch'' part of the
 instruction:
 
-\typesetexample{check-try-catch-exception}
+\typesetexampleandreport{check-try-catch-exception}
 
 
 \section{Adding information to the report}
@@ -1141,15 +1242,16 @@ embedded newlines are displayed in a suitable format.
   {show\_value}{SHOW\_VALUE}
 \label{sec:show-plain-value}
 
-The ``show value'' instruction shows the value of its argument inline.
+The ``show value'' instruction shows the values of its arguments inline (it can
+have any number of arguments).
 
-\typesetexample{show-value}
+\typesetexampleandreport{show-value}
 
 String values are shown surrounded by quotes.  In order to show the value of a
 string expression without the quotes, pass it through the
 ``\texttt{testudo::unquoted()}'' function:
 
-\typesetexample{show-value-unquoted}
+\typesetexampleandreport{show-value-unquoted}
 
 \subsectiontestudopair{Scopes}{in\_scope}{IN\_SCOPE}
 \label{sec:scopes}
@@ -1167,7 +1269,7 @@ longer, it may be clearer to name it, since the scope's begin and end lines
 will display its name.  This is done by passing the scope name to the
 ``in-scope'' macro.
 
-\typesetexample{in-scope}
+\typesetexampleandreport{in-scope}
 
 \subsectiontestudopair{With-declare scopes}{with\_declare}{WITH\_DECLARE}
 \label{sec:with-declare-scopes}
@@ -1180,14 +1282,47 @@ macro.  The declaration is identical to what you would give the ``declare''
 macro.  You can also use the ``with-declare'' macro with no braces if the scope
 contains only one statement.
 
-\typesetexample{with-declare}
+\typesetexampleandreport{with-declare}
 
 If you need to use the ``with-declare'' macro with several variable
-declarations, you can always use a ``structured binding declaration'':
+declarations, you can always use a \emph{structured binding declaration}:
 
-\typesetexample{with-declare-several}
+\typesetexampleandreport{with-declare-several}
 
-\section{Identifying steps}
+
+\section{Printing text, separations, and step \textsc{id}s}
+\label{sec:printing-text-separations-step-ids}
+
+You can add fixed messages to the report, to aid the comprehension of the
+reader.  They should be considered to play the same rôle as comments in source
+code.
+
+\subsectiontestudopair{Print inline text}{tout}{TOUT}
+\label{sec:tout}
+
+You can use the macro ``tout'' as if it were ``cout'', but output directed to
+it will be displayed in the test report with Testudo format (including line
+number and quote markers).  Don't output the final ``\texttt{endl}'': the
+newline will be handled automatically.  Text with embedded newlines will be
+displayed in a suitable format.
+
+\typesetexampleandreport{tout}
+
+Values printed by the ``tout'' are formatted according to the ``tfos'' format
+(see~\Sref{sec:value-textual-representation-format}).
+
+\subsection[Print a break]%
+  {Print a break: \testudopair{tout}{TOUT} \texttt{.print\_break()}}
+\label{sec:print-break}
+
+Calling the ``\texttt{print\_break()}'' method on the ``tout'' macro just
+prints a break (an orange line made of dashes in the colour text format), to
+show a change of focus in the test report.
+
+\typesetexampleandreport{print-break}
+
+\subsection[Identifying steps]%
+  {Identifying steps: \testudopair{tout}{TOUT} \texttt{.step\_id()}}
 \label{sec:identifying-steps}
 
 You can identify certain steps, to make it easier to follow their evolution.
@@ -1200,36 +1335,10 @@ name of the current test, so they must include only the necessary information
 within the test scope.  A step \textsc{id} must be a valid \Cpp{} variable
 name.
 
-The ``step id'' instruction prints a tag on the report that applies to the
-following step in the test.
+Calling the ``step id'' method on the ``tout'' macro prints a tag on the report
+that applies to the following step in the test.
 
-\typesetexample{step-id}
-
-
-\section{Printing fixed text and separations}
-\label{sec:printing-text-separations}
-
-You can add fixed messages to the report, to aid the comprehension of the
-reader.  They should be considered to play the same rôle as comments is source
-code.
-
-\subsectiontestudopair{Print inline text}{print\_text}{PRINT\_TEXT}
-\label{sec:print-inline-text}
-
-The ``print text'' instruction displays its argument inline.  The argument must
-be a string of any kind.  Text with embedded newlines is displayed in a
-suitable format.
-
-\typesetexample{print-text}
-
-
-\subsectiontestudopair{Print a break}{print\_break}{PRINT\_BREAK}
-\label{sec:print-break}
-
-The ``print break'' instruction just prints a break, to show a change of focus
-in the test report.
-
-\typesetexample{print-break}
+\typesetexampleandreport{step-id}
 
 
 \section{Fake declarations and actions}
@@ -1271,7 +1380,7 @@ The macro ``tfos'' works as if it were the output stream used to print values.
 If you need to change the format of value representation for subsequent test
 steps, insert manipulators into it in a ``perform'' macro.
 
-\typesetexample{tfos}
+\typesetexampleandreport{tfos}
 
 The format thus configured is used every time a value is printed to the output.
 So, it's used not only by ``show-value'', but also, for instance, by ``check''
@@ -1283,7 +1392,7 @@ representation (see~\Sref{sec:textual-representation}) with
 ``\texttt{testudo::to\_text(\textit{tfos}, v)}'', you'll be using the output
 format stored in \emph{tfos}.
 
-\typesetexample{tfos-to-text}
+\typesetexampleandreport{tfos-to-text}
 
 
 \section{Unexpected exceptions and crashes}
@@ -1297,6 +1406,8 @@ exception is written to the report, with a conspicuously coloured (where
 available) \verb|[ERR-]| flag, and the test is marked as having one error.
 Then, the execution of the rest of the tests resumes.  Other tests are not
 affected by the exception, and are executed as normal.
+
+\typesetexampleandreport{unexpected-exception}
 
 Errors aren't the same as failed checks.  They get their own tally.  Errors
 aren't an expected situation, even in a failed test that you may be using to do
@@ -1330,18 +1441,17 @@ met.  A simple example is checking the state of a resource (such as an object
 accessed through a pointer): if the resource hasn't even been acquired (if the
 pointer isn't non-null), then it doesn't make sense to check its status,
 because it's bound to yield a lot of meaningless fails or even uncaught
-exceptions.
+exceptions or crashes.
 
 You can express and efficiently deal with that state of affairs by using a
-``provide'' instruction.  Its syntax is exactly the same as that of the
-``check'' instruction, except it's followed by the guarded test steps as though
-it were a regular ``if'' statement.  Regarding the guarded test steps, the
-behaviour is identical to a ``if'' statement: the guarded test steps must be in
-curly braces, unless there's only one of them, in which case it can stand on
-its own with no curly braces; and you can also chain ``provided'' instructions
-as you would chain ``if'' statements.
+``provide'' statement.  Its syntax is exactly the same as that of the standard
+``if'' statement, where the condition is a check (starting with the ``check''
+macro).  Like in the case of the ``if'' statement, the guarded test steps must
+be in curly braces, unless there's only one of them, in which case it can stand
+on its own with no curly braces; and you can also chain ``provided''
+instructions as you would chain ``if'' statements.
 
-\typesetexample{provided}
+\typesetexampleandreport{provided}
 
 In the test report, the check steps that are guarded by a ``provided''
 instruction are typeset with an indentation relative to their ``provided''
@@ -1373,7 +1483,7 @@ The ``\texttt{test\_management\_t}'' is always available as
 
 Here's an example where we test emptiness of two container-like classes:
 
-\typesetexample{test-aware-functions}
+\typesetexampleandreport{test-aware-functions}
 
 
 \chaptertestudopair{With-data loops}{with\_data}{WITH\_DATA}
@@ -1404,12 +1514,12 @@ outputting only one success line in case of success.
 
 Here is an example:
 
-\typesetexample{with-data}
+\typesetexampleandreport{with-data}
 
 If you want to use structured binding for the variable in the ``with-data''
 macro, surround the variable names with parenthesis instead of square brackets:
 
-\typesetexample{with-data-structured-binding}
+\typesetexampleandreport{with-data-structured-binding}
 
 \sectiontestudopair{With-data loops with multiline containers}%
   {with\_multiline\_data}{WITH\_MULTILINE\_DATA}
@@ -1421,7 +1531,7 @@ obscure the structure of the container.  In such cases, you can use the
 ``with-multiline-data'' macro instead.  It will do its best to break the
 container in such a way that the report shows one element per line.
 
-\typesetexample{with-multiline-data}
+\typesetexampleandreport{with-multiline-data}
 
 \section{Showing values in with-data loops}
 \label{sec:showing-values-with-data-loops}
@@ -1457,21 +1567,21 @@ You can code a pseudorandom ``\texttt{VectorI2}'' generator
 and use it like this to check the theorem on $100 \times 100$ pairs of
 pseudorandom values with a maximum absolute coordinate value of~$20$:
 
-\typesetexample{data-for-with-data-loop}
+\typesetexampleandreport{data-for-with-data-loop}
 
 For with-data loops with several variables, you can use
 ``\texttt{generate\_data\_tuple(\textit{n}, \textit{gen...})}'', which
 generates \texttt{\textit{n}} tuples, each containing an element generated with
 a call to each one of the \texttt{\textit{gen()...}} functions:
 
-\typesetexample{data-for-with-data-generate-data-tuple}
+\typesetexampleandreport{generate-data-tuple}
 
 Using ``\texttt{generate\_data\_tuple(\textit{n}, \textit{gen...})}'' gives you
 tuples generated independently.  If you need the cartesian product of two or
 more lists of data instead, use ``\texttt{cartesian\_product(dataset...)}'',
 which returns the cartesion product of all its arguments:
 
-\typesetexample{data-for-with-data-cartesian-product}
+\typesetexampleandreport{cartesian-product}
 
 
 \chapter{Fixtures}
@@ -1484,15 +1594,19 @@ commonly test setup and test teardown.
 \label{sec:fixture-definition}
 
 This is how fixtures are implemented in Testudo.  If you want to code a
-fixture, you have to code a class that derives from
-``\texttt{Fixture}''.  Its constructor must accept an object of type
+fixture, you have to code a class that derives from ``\texttt{Fixture}''.  Its
+constructor must accept as its first argument an object of type
 ``\texttt{test\_management\_t}, and pass it out to the constructor of
-``\texttt{Fixture}''.  The constructor is the setup procedure; the
-destructor, if you code it, is the teardown procedure.
+``\texttt{Fixture}''; it can accept additional arguments if required.  The
+constructor is the setup procedure; the destructor, if you code it, is the
+teardown procedure.
 
 Here's an example:
 
 \typesetexample{fixture-outatime-definition}
+
+In this example, the fixture constructor accepts optional additional arguments.
+Some of the usage examples below don't specify values for them, and some do.
 
 \section{Usage}
 \label{sec:fixture-usage}
@@ -1502,13 +1616,18 @@ macro or the ``visible-fixture'' macro just after the title in the definition
 (before other arguments if any); this works both with non-top and with top
 tests.  Like this:
 
-\typesetexample{fixture-outatime-test}
+\typesetexampleandreport{fixture-outatime-test}
 
 If you use the ``with-fixture'' macro, Testudo macros used in the fixture
 implementation, whether in the constructor, the destructor, or any other
 method, aren't logged to the test report.  If you use the ``visible-fixture''
 instead, Testudo macros in the fixture implementation are logged as usual, and
 the end of the constructor and the beginning of the destructor are logged.
+
+Use the ``fixture-args'' macro to specify additional argument values for the
+fixture constructor:
+
+\typesetexampleandreport{fixture-outatime-test-arguments}
 
 You can code other methods in a fixture, and you can call them from test
 functions.  In fact, the test function ends up being one of the methods of the
@@ -1528,10 +1647,18 @@ used with the ``visible-fixture'' macro.  This is done by using the
 ``fixture-init'' macro for attribute initialisations.  The ``fixture-member''
 macro encloses an attribute declaration of any kind: it can contain several
 declarations, or default values.  The ``fixture-init'' macro accepts as its
-first argument the name of the attribute, and as its second argument its
-initial value.  Here's an example of usage:
+arguments the name of the attribute, followed by the initialisation arguments.
+Here's an example of usage:
 
-\typesetexample{fixture-members}
+\typesetexampleandreport{fixture-members}
+
+The ``fixture-init'' macro has a couple of limitations:
+\begin{itemize}
+\item it must have at least one initialisation argument;
+\item if the first initialisation argument contains unparenthesised commas,
+  you'll need to enclose it between parentheses; so, for instance, instead of
+  using ``\texttt{f<int, float>()}'' use ``\texttt{(f<int, float>())}''.
+\end{itemize}
 
 Other actions in the fixture implementation are enclosed in Testudo macros in
 the usual way (with the ``declare'' macro, the ``perform'' macro, and so on).
@@ -1578,8 +1705,8 @@ usual way to achieve this in \Cpp{} is by replacing the affected parts by
 objects that have the same interface as the problematic ones, but ad-hoc
 implementations tailored to the test.
 
-How you implement a mock class depends on how the mocked class is defined, and
-you use it.  It's usually a matter of replicating the interface or deriving
+How you implement a mock class depends on how the mocked class is defined and
+how you use it.  It's usually a matter of replicating the interface or deriving
 from the mock class and overriding its virtual methods.  The first approach
 would be appropriate, e.g., if the class is a template argument to function or
 another class.  The second one is good for polymorphic designs.
@@ -1996,7 +2123,7 @@ although \textsc{stl} containers can be compared with the standard
 Testudo implements the following two features
 \begin{itemize}
 \item an \textsc{stl} container is considered valid
-  (\Sref{sec:checked-expression}) if and only if all its elements are;
+  (\Sref{sec:sec:argument-validity}) if and only if all its elements are;
 \item ``approx'' checks (\Sref{sec:check-expression-near-reference}) will use
   the Manhattan distance on the container elements.
 \end{itemize}
@@ -2011,8 +2138,8 @@ A type needs four features in order to be fully Testudo-supported:
 \begin{itemize}
 \item it \emph{may} support the notion of validity; any check done on an
   invalid value is failed, irrespective of the value or the precise check made
-  on it (\Sref{sec:checked-expression}); by default, all values of a type are
-  considered valid unless you decide to code validity for the type, so you
+  on it (\Sref{sec:sec:argument-validity}); by default, all values of a type
+  are considered valid unless you decide to code validity for the type, so you
   often won't need to deal with validity at all;
 \item it \emph{must} have a textual representation if you want to see its
   values in the reports; this is used when you show a value with the
@@ -2066,7 +2193,7 @@ type ``\texttt{list<T>}'', then you'll have to use
 \label{sec:validity}
 
 All values are considered valid by default by Testudo
-(\Sref{sec:checked-expression}).  If you have a type that may have invalid
+(\Sref{sec:sec:argument-validity}).  If you have a type that may have invalid
 values (i.e., values that always yield failed Testudo checks), you have code a
 ``\texttt{bool is\_valid\_testudod()}'' function in the type's namespace, that
 accepts as its sole argument an object of the type:

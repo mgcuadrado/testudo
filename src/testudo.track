@@ -51,14 +51,58 @@ t-produce_summary [c933b39d8fea1703]
 t-produce_summary [b31cc7cdcdca3524]
 t-produce_summary [aee7943b86a5c496]
 t-produce_summary [26a86825e45d8c28]
+t-title [a02ee04bdf8cc91b]
+t-title [5baa8831cb785552]
+i-declare [a8cb217a51c72e0d]
+[doc_examples.ttd:615] c-check_true [16121d4d6b2174d0] r-1-0-0
+t-produce_summary [227afe1355b33de1]
+t-title [ea52f3452dbed2fd]
+i-declare [d8524e304df7314d]
+[doc_examples.ttd:615] c-check_true [16121d4d6b2174d0] r-1-0-0
+t-produce_summary [97dc2809c9c0fe80]
+t-produce_summary [a0b0ce028391ab16]
+t-title [17726e8b50dcfc84]
+t-title [e3707fcd074ca2a2]
+t-title [fc9a08f4f6f6b8e8]
+i-text [65d9f156e6c40bbd]
+[doc_examples.ttd:773] c-check_true [608612af142c94c7] r-1-0-0
+t-produce_summary [662d9a308d4aa190]
+t-title [11e1fde4cd379075]
+i-text [5e1863a8c9f6803f]
+i-perform [2911e277a9f5405c]
+i-text [77f82d94598c380b]
+[doc_examples.ttd:780] c-check_approx [d08dd12db4fc95f6] r-1-0-0
+i-text [510c3de129271e9e]
+i-perform [2d1cab392194d58e]
+t-produce_summary [548af9337498af5e]
+t-produce_summary [ff9a1890fb71bc31]
+t-title [364661ca31c43553]
+i-text [05a0f6573a08e621]
+[doc_examples.ttd:790] c-check_true [573fe0c02ea27a4c] r-1-0-0
+t-produce_summary [53d04d8bb92e077d]
+t-produce_summary [6a742ae71e225005]
+t-title [8eaa3c34dabcdf8c]
+t-title [d967e7226760856f]
+i-text [db85aa8ab0bfddb3]
+i-declare [830948f36f609842]
+i-perform [ee1f39721184d34b]
+i-declare [480c6fa19440e659]
+i-perform [e5f60b1c7193a82e]
+i-text [77f82d94598c380b]
+[doc_examples.ttd:810] c-check_approx [1fc8dbc236c71aaf] r-1-0-0
+[doc_examples.ttd:811] c-check_approx [8de9164b6ca9c366] r-1-0-0
+[doc_examples.ttd:812] c-check_approx [2d28913a14858b70] r-1-0-0
+i-text [510c3de129271e9e]
+t-produce_summary [54e30a1a1bb559d9]
+t-produce_summary [9f99eb76668cfe27]
 t-title [bd7651cd177aca41]
 t-title [1d0de0c622a0faa2]
-t-title [73b3f2671150fef5]
+t-title [ac90562a001d8c8a]
 i-declare [8058641589bc5469]
-[doc_examples.ttd:126] c-check_true [75cbd3e02fb95dc1] r-0-1-0
-[doc_examples.ttd:127] c-check_true [6f0facecbf4b0b26] r-0-1-0
-t-produce_summary [2256168b17f031e1]
-t-title [0556cf6b779f5a3e]
+[doc_examples.ttd:151] c-check_true [75cbd3e02fb95dc1] r-1-0-0
+[doc_examples.ttd:152] c-check_true [6f0facecbf4b0b26] r-1-0-0
+t-produce_summary [653ce0a1fe368c04]
+t-title [8d1ab9fc8355b003]
 t-produce_summary [8ebfd3c6767e6ede]
 t-produce_summary [a06539d8b83b231b]
 t-produce_summary [5d76511dce298856]
@@ -67,7 +111,7 @@ t-title [61c8b751b2dd08d0]
 t-title [3bde8579362a3601]
 i-declare [1b6dab9cdb34ffca]
 i-perform [84f7a3ecdddf66c0]
-v-show_value [3a83fdf5375dac35]
+v-show_value [72528d09c22fb048]
 t-produce_summary [bb55a1e4c0a16ada]
 t-produce_summary [0033a6cba324e1a7]
 t-title [8d873baa783e8f09]
@@ -134,62 +178,133 @@ t-produce_summary [5c204963a1685f2c]
 t-title [9013f3e622b1ff71]
 [testarudo.ttd:49] c-check_equal [e74a95df50c4aa95] r-0-1-0
 t-produce_summary [7faaedce2786a3a8]
-t-title [d6ec4254fbfa90f0]
+t-title [1499ee157f374d9e]
 i-declare [46851bc5905e81f1]
 i-declare [cc42067e88962acd]
 [testarudo.ttd:55] c-check_true [a1bd29464dc2faa5] r-1-0-0
 [testarudo.ttd:56] c-check_true [086fda62f46318bf] r-0-1-0
-[testarudo.ttd:57] c-check_true_for [193647e278f06d5c] r-1-0-0
-[testarudo.ttd:58] c-check_true_for [da3fed5c9cd4a2d0] r-0-1-0
+[testarudo.ttd:57] c-check_true [fa11f9f11ef939d5] r-1-0-0
+[testarudo.ttd:58] c-check_true [3918534ffaddf659] r-0-1-0
 [testarudo.ttd:59] c-check_true [96c7bbbcd89bd3ce] r-0-1-0
 [testarudo.ttd:60] c-check_true [3f154898613a31d4] r-1-0-0
-[testarudo.ttd:61] c-check_true_for [6fc0ca2a2c02e0e6] r-0-1-0
-[testarudo.ttd:62] c-check_true_for [acc96094c8262f6a] r-1-0-0
-t-produce_summary [fc07f9630cc79bd8]
+[testarudo.ttd:61] c-check_true [fdf373d9f416a81c] r-0-1-0
+[testarudo.ttd:62] c-check_true [3efad96710326790] r-1-0-0
+[testarudo.ttd:63] c-check_equal [46b3dd185b66b230] r-1-0-0
+[testarudo.ttd:64] c-check_true [86aa3fd0b7b3dc1f] r-1-0-0
+[testarudo.ttd:65] c-check_equal [0119a7f1f0814d04] r-0-1-0
+[testarudo.ttd:66] c-check_true [27b784dc3723eea1] r-0-1-0
+i-declare [554464d854a1c9a2]
+i-declare [b78e7cdc4869a6ca]
+[testarudo.ttd:69] c-check_approx [807ba565c61b1526] r-0-1-0
+[testarudo.ttd:70] c-check_true [b00e9ebae049ead7] r-0-1-0
+[testarudo.ttd:71] c-check_approx [ecfd93b77f4c7315] r-1-0-0
+[testarudo.ttd:72] c-check_true [e38248c2ade5cd1a] r-1-0-0
+i-perform [b0eb0efbbdf2169f]
+[testarudo.ttd:74] c-check_approx [807ba565c61b1526] r-1-0-0
+[testarudo.ttd:75] c-check_true [b00e9ebae049ead7] r-1-0-0
+t-produce_summary [395a7b2a52ab2b0d]
 t-title [9e709ab776fec26b]
 i-declare [1216ac6e43f19794]
 i-declare [98d1b1d55b393ca8]
 i-declare [978f9d388aae6a0b]
 i-perform [b7d16e858360855a]
-[testarudo.ttd:90] c-check_true [b4650ab621bdcfec] r-1-0-0
-[testarudo.ttd:91] c-check_true [ef71d43410743e40] r-0-1-0
-[testarudo.ttd:92] c-check_equal [1be5186b4a87f071] r-0-1-0
-[testarudo.ttd:93] c-check_equal [3358dca3b48fe3db] r-0-1-0
-[testarudo.ttd:94] c-check_true_for [de8556f86cc0a5fa] r-0-1-0
-[testarudo.ttd:95] c-check_true_for [039607394ad5873c] r-0-1-0
-[testarudo.ttd:96] c-check_true_for [8b1ef5ce3261528c] r-0-1-0
-[testarudo.ttd:97] c-check_true_for [adbc8926f6fe29d4] r-0-1-0
-[testarudo.ttd:98] c-check_true [074b4608221a9083] r-0-1-0
-[testarudo.ttd:99] c-check_true [5c5f988a13d3612f] r-1-0-0
-[testarudo.ttd:100] c-check_equal [a8cb54d54920af1e] r-0-1-0
-[testarudo.ttd:101] c-check_equal [8076901db728bcb4] r-0-1-0
-[testarudo.ttd:102] c-check_true_for [b0c7d943e7fcaa90] r-0-1-0
-[testarudo.ttd:103] c-check_true_for [fc542a4d5c24e1b9] r-0-1-0
-[testarudo.ttd:104] c-check_true_for [62af137f45ea255b] r-0-1-0
-[testarudo.ttd:105] c-check_true_for [df4395f3e5708cea] r-0-1-0
-[testarudo.ttd:106] c-check_true [25a3c266de02dabe] r-1-0-0
-[testarudo.ttd:107] c-check_true [02064612fe027abb] r-0-1-0
-[testarudo.ttd:108] c-check_true_for [e663d47a77c7ac26] r-1-0-0
-[testarudo.ttd:109] c-check_true_for [acdee4a79f0e6859] r-0-1-0
-[testarudo.ttd:110] c-check_true [074ccf3feafbbe52] r-1-0-0
-[testarudo.ttd:111] c-check_true [20e94b4bcafb1e57] r-0-1-0
-[testarudo.ttd:112] c-check_true_for [5ce669de88c2239e] r-0-1-0
-[testarudo.ttd:113] c-check_true_for [165b5903600be7e1] r-0-1-0
-[testarudo.ttd:114] c-check_true [535f7feb14eea012] r-0-1-0
-[testarudo.ttd:115] c-check_true [74fafb9f34ee0017] r-1-0-0
-[testarudo.ttd:116] c-check_true_for [d996cd3fc737a6cd] r-0-1-0
-[testarudo.ttd:117] c-check_true_for [932bfde22ffe62b2] r-1-0-0
-[testarudo.ttd:118] c-check_true [71b072b22017c4fe] r-0-1-0
-[testarudo.ttd:119] c-check_true [5615f6c6001764fb] r-1-0-0
-[testarudo.ttd:120] c-check_true_for [6313709b38322975] r-0-1-0
-[testarudo.ttd:121] c-check_true_for [29ae4046d0fbed0a] r-0-1-0
+[testarudo.ttd:130] c-check_true [b4650ab621bdcfec] r-1-0-0
+[testarudo.ttd:131] c-check_true [ef71d43410743e40] r-0-1-0
+[testarudo.ttd:132] c-check_equal [1be5186b4a87f071] r-0-1-0
+[testarudo.ttd:133] c-check_equal [3358dca3b48fe3db] r-0-1-0
+[testarudo.ttd:134] c-check_true [1daead88aeb790b5] r-0-1-0
+[testarudo.ttd:135] c-check_true [8e96bca5728d6223] r-0-1-0
+[testarudo.ttd:136] c-check_true [a3dfe83e59f678c1] r-0-1-0
+[testarudo.ttd:137] c-check_true [04664b0d9934e60a] r-0-1-0
+[testarudo.ttd:138] c-check_true [074b4608221a9083] r-0-1-0
+[testarudo.ttd:139] c-check_true [5c5f988a13d3612f] r-1-0-0
+[testarudo.ttd:140] c-check_equal [a8cb54d54920af1e] r-0-1-0
+[testarudo.ttd:141] c-check_equal [8076901db728bcb4] r-0-1-0
+[testarudo.ttd:142] c-check_true [3dc762dfdfa44f8f] r-0-1-0
+[testarudo.ttd:143] c-check_true [d49537bd37b3cbf4] r-0-1-0
+[testarudo.ttd:144] c-check_true [cb75d1542a20ea85] r-0-1-0
+[testarudo.ttd:145] c-check_true [e3160e179e7a9f2c] r-0-1-0
+[testarudo.ttd:146] c-check_true [25a3c266de02dabe] r-1-0-0
+[testarudo.ttd:147] c-check_true [02064612fe027abb] r-0-1-0
+[testarudo.ttd:148] c-check_true [a517170219e28937] r-1-0-0
+[testarudo.ttd:149] c-check_true [efaa27dff12b4d48] r-0-1-0
+[testarudo.ttd:150] c-check_true [074ccf3feafbbe52] r-1-0-0
+[testarudo.ttd:151] c-check_true [20e94b4bcafb1e57] r-0-1-0
+[testarudo.ttd:152] c-check_true [1f92aaa6e6e7068f] r-0-1-0
+[testarudo.ttd:153] c-check_true [552f9a7b0e2ec2f0] r-0-1-0
+[testarudo.ttd:154] c-check_true [535f7feb14eea012] r-0-1-0
+[testarudo.ttd:155] c-check_true [74fafb9f34ee0017] r-1-0-0
+[testarudo.ttd:156] c-check_true [d5476ccaeaa11b3c] r-0-1-0
+[testarudo.ttd:157] c-check_true [9ffa5c170268df43] r-1-0-0
+[testarudo.ttd:158] c-check_true [71b072b22017c4fe] r-0-1-0
+[testarudo.ttd:159] c-check_true [5615f6c6001764fb] r-1-0-0
+[testarudo.ttd:160] c-check_true [6fc2d16e15a49484] r-0-1-0
+[testarudo.ttd:161] c-check_true [257fe1b3fd6d50fb] r-0-1-0
+i-separator
+i-declare [32d3a04374ebad76]
+i-declare [d28da4960af92d8e]
+[testarudo.ttd:165] c-check_equal [a806c4899125653b] r-0-1-0
+i-text [86f30f9e06eb4121]
+[testarudo.ttd:167] c-check_true [4facdc0add045a59] r-1-0-0
+i-text [47af465e229b7497]
+[testarudo.ttd:169] c-check_true [57fb0361cf7ba8fe] r-1-0-0
+i-text [ab9d89a5017899ea]
+[testarudo.ttd:171] c-check_true [e4d54fdfccdcf791] r-0-1-0
+i-text [c16a97da03d21107]
+[testarudo.ttd:173] c-check_true [a728337b0d2de7ca] r-0-1-0
+[testarudo.ttd:174] c-check_equal [4fc1f1a5ce52cb59] r-0-1-0
+i-text [86f30f9e06eb4121]
+[testarudo.ttd:176] c-check_true [e16c1aeafc8fa4ea] r-1-0-0
+i-text [ab9d89a5017899ea]
+[testarudo.ttd:178] c-check_true [ec11412da3c826c2] r-0-1-0
+i-text [47af465e229b7497]
+[testarudo.ttd:180] c-check_true [5f3f0d93a06f79ad] r-1-0-0
+i-text [c16a97da03d21107]
+[testarudo.ttd:182] c-check_true [8f7b1754d8e56667] r-0-1-0
 t-produce_summary [d918bf14bc51dccf]
+t-title [bc6ed1323054b9d3]
+i-declare [1216ac6e43f19794]
+i-declare [98d1b1d55b393ca8]
+i-declare [978f9d388aae6a0b]
+i-perform [0f8b63bf48725364]
+i-declare [32d3a04374ebad76]
+i-declare [d28da4960af92d8e]
+[testarudo.ttd:192] c-check_equal [4ce4ef31b2db4a61] r-0-1-0
+[testarudo.ttd:193] c-check_equal [73a9f612f3192b16] r-0-1-0
+[testarudo.ttd:194] c-check_equal [a66ad4998883dd30] r-1-0-0
+[testarudo.ttd:195] c-check_equal [8c1c6764e9328743] r-1-0-0
+[testarudo.ttd:196] c-check_equal [154498278b24825f] r-0-1-0
+[testarudo.ttd:197] c-check_equal [d8f51ef6b5e2764e] r-0-1-0
+[testarudo.ttd:198] c-check_equal [5c436bebf5d8d28e] r-0-1-0
+[testarudo.ttd:199] c-check_equal [08fdc46214eb64b4] r-0-1-0
+[testarudo.ttd:200] c-check_equal [190cf66a2d67f54c] r-1-0-0
+[testarudo.ttd:201] c-check_equal [51e6c1f70137f32b] r-0-1-0
+i-declare [0c7d87608ccd4230]
+[testarudo.ttd:203] c-check_approx [0535c5abd34d7bf1] r-0-1-0
+[testarudo.ttd:204] c-check_approx [66cf3ec34cca3e32] r-0-1-0
+[testarudo.ttd:205] c-check_approx [501f8882dd1b1c1c] r-1-0-0
+[testarudo.ttd:206] c-check_approx [0f282292f8d0911e] r-1-0-0
+t-produce_summary [6571e431215ccb0b]
+t-title [99a129c504520157]
+i-declare [c9d1ee16c7917f99]
+i-declare [cf67b720dfc836f0]
+[testarudo.ttd:212] c-check_equal [46b3dd185b66b230] r-1-0-0
+[testarudo.ttd:213] c-check_equal [0119a7f1f0814d04] r-0-1-0
+[testarudo.ttd:214] c-check_equal [04df4d22a9f228aa] r-0-1-0
+[testarudo.ttd:216] c-check_equal [46b3dd185b66b230] r-1-0-0
+i-begin_indent
+[testarudo.ttd:217] c-check_equal [fc222d4715f05e13] r-1-0-0
+i-end_indent
+[testarudo.ttd:218] c-check_equal [0119a7f1f0814d04] r-0-1-0
+i-begin_indent
+i-end_indent
+t-produce_summary [efb326a61f20b00b]
 t-title [aeb76740d2986198]
-[testarudo.ttd:125] c-try-catch  [f55790a26299bbc6] r-0-1-0
-[testarudo.ttd:126] c-try-catch  [619ee82af9ec7b4b] r-1-0-0
-[testarudo.ttd:127] c-try-catch  [65a04fa89c63fc0d] r-1-0-0
-[testarudo.ttd:128] c-try-catch  [3826e86ec77eec23] r-0-1-0
-[testarudo.ttd:128] e-uncaught_exception [08f32873dc4f430c] r-0-0-1
+[testarudo.ttd:223] c-try-catch  [f55790a26299bbc6] r-0-1-0
+[testarudo.ttd:224] c-try-catch  [619ee82af9ec7b4b] r-1-0-0
+[testarudo.ttd:225] c-try-catch  [65a04fa89c63fc0d] r-1-0-0
+[testarudo.ttd:226] c-try-catch  [3826e86ec77eec23] r-0-1-0
+[testarudo.ttd:226] e-uncaught_exception [08f32873dc4f430c] r-0-0-1
 t-produce_summary [b90208f729cb012f]
 t-title [c6447ceca6993256]
 t-produce_summary [222aff4bc37d315f]
@@ -197,329 +312,287 @@ t-title [e256d8c584447c2f]
 i-declare [54f626a31d6c0a9a]
 i-declare [fcf3d22b6724869e]
 i-begin_with [a9b4eed8df10af89]
-i-check_true [2b867376a21d2353]
-[testarudo.ttd:141] c-with_summary [be89af319504f065] r-3-0-0
+i-check_true [54ba9890e45aadba]
+[testarudo.ttd:239] c-with_summary [be89af319504f065] r-3-0-0
 i-end_with
 i-begin_with [ee1e943174f750bd]
-i-check_true [2b867376a21d2353]
+i-check_true [54ba9890e45aadba]
 i-begin_with_results
-v-show_value [1681cd372d35440d]
-[testarudo.ttd:142] c-check_true [2b867376a21d2353] r-0-1-0
+[testarudo.ttd:240] c-check_true [54ba9890e45aadba] r-0-1-0
 i-end_with_results
-[testarudo.ttd:142] c-with_summary [f923d5d83ee30f51] r-2-1-0
+[testarudo.ttd:240] c-with_summary [f923d5d83ee30f51] r-2-1-0
 i-end_with
 i-begin_with [ade6393750da2004]
-i-check_true [2b867376a21d2353]
+i-check_true [54ba9890e45aadba]
 i-begin_with_results
-v-show_value [99d538e47afaba65]
-[testarudo.ttd:143] c-check_true [2b867376a21d2353] r-0-1-0
+[testarudo.ttd:241] c-check_true [54ba9890e45aadba] r-0-1-0
 i-end_with_results
-[testarudo.ttd:143] c-with_summary [1706eab35e4d8e4a] r-2-1-0
+[testarudo.ttd:241] c-with_summary [1706eab35e4d8e4a] r-2-1-0
 i-end_with
 i-begin_with [5b3c52a2b9f41d05]
-i-check_true [2b867376a21d2353]
+i-check_true [54ba9890e45aadba]
 i-begin_with_results
-v-show_value [e205fb608575e456]
-[testarudo.ttd:144] c-check_true [2b867376a21d2353] r-0-1-0
+[testarudo.ttd:242] c-check_true [54ba9890e45aadba] r-0-1-0
 i-end_with_results
-[testarudo.ttd:144] c-with_summary [1706eab35e4d8e4a] r-2-1-0
+[testarudo.ttd:242] c-with_summary [1706eab35e4d8e4a] r-2-1-0
 i-end_with
 i-begin_with [a9b4eed8df10af89]
-i-check_equal [4de91dcc3e183f75]
-[testarudo.ttd:145] c-with_summary [be89af319504f065] r-3-0-0
+i-check_equal [20bf405dab6f9a5c]
+[testarudo.ttd:243] c-with_summary [be89af319504f065] r-3-0-0
 i-end_with
 i-begin_with [ee1e943174f750bd]
-i-check_equal [4de91dcc3e183f75]
+i-check_equal [20bf405dab6f9a5c]
 i-begin_with_results
-v-show_value [1681cd372d35440d]
-[testarudo.ttd:146] c-check_equal [4de91dcc3e183f75] r-0-1-0
+[testarudo.ttd:244] c-check_equal [20bf405dab6f9a5c] r-0-1-0
 i-end_with_results
-[testarudo.ttd:146] c-with_summary [f923d5d83ee30f51] r-2-1-0
+[testarudo.ttd:244] c-with_summary [f923d5d83ee30f51] r-2-1-0
 i-end_with
 i-separator
 i-begin_with [a9b4eed8df10af89]
 i-declare [97bd9b9dec978244]
-i-check_true_for [a5c3bfd9150084ec]
+i-check_true [8d02a2297e97aea1]
 i-text [f46c43f5d8589984]
 i-declare [d8567ae89f632362]
-v-show_value [67549353cb88b86c]
+v-show_value [be5e440058cdb338]
 i-begin_with_results
-v-show_value [2afb745a795de50a]
-v-show_value [cd3c4176262a4b68]
-v-show_value [a5af81892e921b62]
-v-show_value [4268b4a571e5b500]
-v-show_value [29dec5042e03f937]
-v-show_value [ce19f02871745755]
+v-show_value [3af19216289da9aa]
+v-show_value [f9c25a01b3b9930a]
+v-show_value [ed7d65052afff8cf]
 i-end_with_results
-[testarudo.ttd:150] c-with_summary [be89af319504f065] r-3-0-0
+[testarudo.ttd:248] c-with_summary [be89af319504f065] r-3-0-0
 i-end_with
 i-begin_with [ee1e943174f750bd]
 i-declare [97bd9b9dec978244]
-i-check_true_for [a5c3bfd9150084ec]
+i-check_true [8d02a2297e97aea1]
 i-begin_with_results
-v-show_value [1681cd372d35440d]
-[testarudo.ttd:159] c-check_true_for [a5c3bfd9150084ec] r-0-1-0
+[testarudo.ttd:257] c-check_true [8d02a2297e97aea1] r-0-1-0
 i-end_with_results
 i-text [f46c43f5d8589984]
 i-declare [d8567ae89f632362]
-v-show_value [67549353cb88b86c]
+v-show_value [be5e440058cdb338]
 i-begin_with_results
-v-show_value [2afb745a795de50a]
-v-show_value [cd3c4176262a4b68]
-v-show_value [1681cd372d35440d]
-v-show_value [05c2ce4cda024a34]
-v-show_value [29dec5042e03f937]
-v-show_value [ce19f02871745755]
+v-show_value [3af19216289da9aa]
+v-show_value [a386aab63a72cde2]
+v-show_value [ed7d65052afff8cf]
 i-end_with_results
-[testarudo.ttd:157] c-with_summary [f923d5d83ee30f51] r-2-1-0
+[testarudo.ttd:255] c-with_summary [f923d5d83ee30f51] r-2-1-0
 i-end_with
 i-separator
 i-begin_with [a9b4eed8df10af89]
 i-begin_with [bdf915694c73348b]
-i-check_equal [2f7955862bdc3a5a]
+i-check_equal [4dff50ac83983585]
 i-begin_with_results
-v-show_value [9c04d59e0d88e3d3]
-[testarudo.ttd:169] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [c63349f50a1e3c92]
-[testarudo.ttd:169] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [725c712305338210]
-[testarudo.ttd:169] c-check_equal [2f7955862bdc3a5a] r-0-1-0
+[testarudo.ttd:267] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:267] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:267] c-check_equal [4dff50ac83983585] r-0-1-0
 i-end_with_results
 i-end_with
-[testarudo.ttd:167] c-with_summary [be89af319504f065] r-6-3-0
+[testarudo.ttd:265] c-with_summary [be89af319504f065] r-6-3-0
 i-end_with
 i-begin_with [23b1d50acb8d8e49]
 i-begin_with [bdf915694c73348b]
-i-check_equal [2f7955862bdc3a5a]
+i-check_equal [4dff50ac83983585]
 i-begin_with_results
-v-show_value [9c04d59e0d88e3d3]
-[testarudo.ttd:172] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [c63349f50a1e3c92]
-[testarudo.ttd:172] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [1237c5970fcb6be8]
-[testarudo.ttd:172] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [abc70b5da1ff2215]
-[testarudo.ttd:172] c-check_equal [2f7955862bdc3a5a] r-0-1-0
+[testarudo.ttd:270] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:270] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:270] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:270] c-check_equal [4dff50ac83983585] r-0-1-0
 i-end_with_results
 i-end_with
-[testarudo.ttd:170] c-with_summary [1706eab35e4d8e4a] r-5-4-0
+[testarudo.ttd:268] c-with_summary [1706eab35e4d8e4a] r-5-4-0
 i-end_with
 i-begin_with [a9b4eed8df10af89]
 i-begin_with [3124b81521277419]
-i-check_equal [2f7955862bdc3a5a]
+i-check_equal [4dff50ac83983585]
 i-end_with
-[testarudo.ttd:173] c-with_summary [be89af319504f065] r-9-0-0
+[testarudo.ttd:271] c-with_summary [be89af319504f065] r-9-0-0
 i-end_with
 i-separator
 i-declare [97bd9b9dec978244]
 i-begin_with [a9b4eed8df10af89]
-i-check_true_for [a5c3bfd9150084ec]
-[testarudo.ttd:180] c-with_summary [be89af319504f065] r-3-0-0
+i-check_true [8d02a2297e97aea1]
+[testarudo.ttd:278] c-with_summary [be89af319504f065] r-3-0-0
 i-end_with
 i-begin_with [a9b4eed8df10af89]
 i-declare [d9b03cc09a532771]
-i-check_true_for [0f446ec54352cd10]
-[testarudo.ttd:181] c-with_summary [be89af319504f065] r-3-0-0
+i-check_true [a69eacee2c9802ce]
+[testarudo.ttd:279] c-with_summary [be89af319504f065] r-3-0-0
 i-end_with
 i-begin_with [a9b4eed8df10af89]
-i-check_true_for [a5c3bfd9150084ec]
+i-check_true [8d02a2297e97aea1]
 i-begin_with [fa536f80e794cbbf]
-i-check_equal [2f7955862bdc3a5a]
+i-check_equal [4dff50ac83983585]
 i-end_with
-[testarudo.ttd:185] c-with_summary [be89af319504f065] r-12-0-0
+[testarudo.ttd:283] c-with_summary [be89af319504f065] r-12-0-0
 i-end_with
 i-begin_with [a9b4eed8df10af89]
-i-check_true_for [a5c3bfd9150084ec]
+i-check_true [8d02a2297e97aea1]
 i-begin_with [bdf915694c73348b]
-i-check_equal [2f7955862bdc3a5a]
+i-check_equal [4dff50ac83983585]
 i-begin_with_results
-v-show_value [9c04d59e0d88e3d3]
-[testarudo.ttd:193] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [c63349f50a1e3c92]
-[testarudo.ttd:193] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [725c712305338210]
-[testarudo.ttd:193] c-check_equal [2f7955862bdc3a5a] r-0-1-0
+[testarudo.ttd:291] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:291] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:291] c-check_equal [4dff50ac83983585] r-0-1-0
 i-end_with_results
 i-end_with
-[testarudo.ttd:190] c-with_summary [be89af319504f065] r-9-3-0
+[testarudo.ttd:288] c-with_summary [be89af319504f065] r-9-3-0
 i-end_with
 i-begin_with [ee1e943174f750bd]
-i-check_true_for [a5c3bfd9150084ec]
+i-check_true [8d02a2297e97aea1]
 i-begin_with_results
-v-show_value [1681cd372d35440d]
-[testarudo.ttd:196] c-check_true_for [a5c3bfd9150084ec] r-0-1-0
+[testarudo.ttd:294] c-check_true [8d02a2297e97aea1] r-0-1-0
 i-end_with_results
 i-begin_with [fa536f80e794cbbf]
-i-check_equal [2f7955862bdc3a5a]
+i-check_equal [4dff50ac83983585]
 i-begin_with_results
-v-show_value [a658fd4100e6d56a]
-[testarudo.ttd:198] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [cef74707650aedc1]
-[testarudo.ttd:198] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [1fa8338baed29c97]
-[testarudo.ttd:198] c-check_equal [2f7955862bdc3a5a] r-0-1-0
+[testarudo.ttd:296] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:296] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:296] c-check_equal [4dff50ac83983585] r-0-1-0
 i-end_with_results
 i-end_with
-[testarudo.ttd:195] c-with_summary [f923d5d83ee30f51] r-8-4-0
+[testarudo.ttd:293] c-with_summary [f923d5d83ee30f51] r-8-4-0
 i-end_with
 i-begin_with [ee1e943174f750bd]
-i-check_true_for [a5c3bfd9150084ec]
+i-check_true [8d02a2297e97aea1]
 i-begin_with_results
-v-show_value [1681cd372d35440d]
-[testarudo.ttd:201] c-check_true_for [a5c3bfd9150084ec] r-0-1-0
+[testarudo.ttd:299] c-check_true [8d02a2297e97aea1] r-0-1-0
 i-end_with_results
 i-begin_with [bdf915694c73348b]
-i-check_equal [2f7955862bdc3a5a]
+i-check_equal [4dff50ac83983585]
 i-begin_with_results
-v-show_value [9c04d59e0d88e3d3]
-[testarudo.ttd:203] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [a658fd4100e6d56a]
-[testarudo.ttd:203] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [1fa8338baed29c97]
-[testarudo.ttd:203] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [725c712305338210]
-[testarudo.ttd:203] c-check_equal [2f7955862bdc3a5a] r-0-1-0
+[testarudo.ttd:301] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:301] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:301] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:301] c-check_equal [4dff50ac83983585] r-0-1-0
 i-end_with_results
 i-end_with
-[testarudo.ttd:200] c-with_summary [f923d5d83ee30f51] r-7-5-0
+[testarudo.ttd:298] c-with_summary [f923d5d83ee30f51] r-7-5-0
 i-end_with
 i-separator
 i-begin_with [a9b4eed8df10af89]
 i-begin_with [fa536f80e794cbbf]
-i-check_equal [2f7955862bdc3a5a]
+i-check_equal [4dff50ac83983585]
 i-end_with
-i-check_true_for [a5c3bfd9150084ec]
+i-check_true [8d02a2297e97aea1]
 i-begin_with [bdf915694c73348b]
-i-check_equal [2f7955862bdc3a5a]
+i-check_equal [4dff50ac83983585]
 i-begin_with_results
-v-show_value [9c04d59e0d88e3d3]
-[testarudo.ttd:213] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [c63349f50a1e3c92]
-[testarudo.ttd:213] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [725c712305338210]
-[testarudo.ttd:213] c-check_equal [2f7955862bdc3a5a] r-0-1-0
+[testarudo.ttd:311] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:311] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:311] c-check_equal [4dff50ac83983585] r-0-1-0
 i-end_with_results
 i-end_with
-i-check_true_for [a5c3bfd9150084ec]
+i-check_true [8d02a2297e97aea1]
 i-begin_with [fa536f80e794cbbf]
-i-check_equal [2f7955862bdc3a5a]
+i-check_equal [4dff50ac83983585]
 i-end_with
-i-check_true_for [a5c3bfd9150084ec]
+i-check_true [8d02a2297e97aea1]
 i-begin_with [6ed39eb4b8364705]
-i-check_equal [2f7955862bdc3a5a]
+i-check_equal [4dff50ac83983585]
 i-begin_with_results
-v-show_value [4d5ba112c6509285]
-[testarudo.ttd:219] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [176c3d79c1c64dc4]
-[testarudo.ttd:219] c-check_equal [2f7955862bdc3a5a] r-0-1-0
-v-show_value [a30305afceebf346]
-[testarudo.ttd:219] c-check_equal [2f7955862bdc3a5a] r-0-1-0
+[testarudo.ttd:317] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:317] c-check_equal [4dff50ac83983585] r-0-1-0
+[testarudo.ttd:317] c-check_equal [4dff50ac83983585] r-0-1-0
 i-end_with_results
 i-end_with
-[testarudo.ttd:208] c-with_summary [be89af319504f065] r-39-6-0
+[testarudo.ttd:306] c-with_summary [be89af319504f065] r-39-6-0
 i-end_with
 i-begin_with [a9b4eed8df10af89]
-i-check_true_for [2ddfc3cb59777414]
-[testarudo.ttd:221] c-with_summary [be89af319504f065] r-3-0-0
+i-check_true [051ede3b32e05e59]
+[testarudo.ttd:319] c-with_summary [be89af319504f065] r-3-0-0
 i-end_with
 i-begin_with [97a54f463a8ca320]
-i-check_equal [1b28883792823a54]
-[testarudo.ttd:223] c-with_summary [5c7a9f5b5a4d8659] r-3-0-0
+i-check_equal [68f08f06f10293a4]
+[testarudo.ttd:321] c-with_summary [5c7a9f5b5a4d8659] r-3-0-0
 i-end_with
 i-begin_with [97a54f463a8ca320]
-i-check_true_for [4d078e98478b9fc5]
+i-check_true [d70cae7e73f91c79]
 i-begin_with_results
-v-show_value [6d510eb3d2ba1a3e]
-[testarudo.ttd:226] c-check_true_for [4d078e98478b9fc5] r-0-1-0
-v-show_value [2afb745a795de50a]
-[testarudo.ttd:226] c-check_true_for [4d078e98478b9fc5] r-0-1-0
-v-show_value [99d538e47afaba65]
-[testarudo.ttd:226] c-check_true_for [4d078e98478b9fc5] r-0-1-0
+[testarudo.ttd:324] c-check_true [d70cae7e73f91c79] r-0-1-0
+[testarudo.ttd:324] c-check_true [d70cae7e73f91c79] r-0-1-0
+[testarudo.ttd:324] c-check_true [d70cae7e73f91c79] r-0-1-0
 i-end_with_results
-i-check_true_for [c039818351dc6cbc]
-i-check_true_for [33104c0d655f4453]
+i-check_true [03127af393ab59f3]
+i-check_true [a91b6ceb512dc7ef]
 i-begin_with_results
-v-show_value [6d510eb3d2ba1a3e]
-[testarudo.ttd:228] c-check_true_for [33104c0d655f4453] r-0-1-0
-v-show_value [2afb745a795de50a]
-[testarudo.ttd:228] c-check_true_for [33104c0d655f4453] r-0-1-0
-v-show_value [99d538e47afaba65]
-[testarudo.ttd:228] c-check_true_for [33104c0d655f4453] r-0-1-0
+[testarudo.ttd:326] c-check_true [a91b6ceb512dc7ef] r-0-1-0
+[testarudo.ttd:326] c-check_true [a91b6ceb512dc7ef] r-0-1-0
+[testarudo.ttd:326] c-check_true [a91b6ceb512dc7ef] r-0-1-0
 i-end_with_results
-[testarudo.ttd:225] c-with_summary [5c7a9f5b5a4d8659] r-3-6-0
+[testarudo.ttd:323] c-with_summary [5c7a9f5b5a4d8659] r-3-6-0
 i-end_with
 i-begin_with [3779e28a551b1a78]
 i-check_true [2b867376a21d2353]
 i-begin_with_results
-v-show_value [b593a205d0b1a376]
-[testarudo.ttd:232] c-check_true [2b867376a21d2353] r-0-1-0
+[testarudo.ttd:330] c-check_true [2b867376a21d2353] r-0-1-0
 i-end_with_results
-[testarudo.ttd:231] c-with_summary [24d0f7fa2b765256] r-2-1-0
+[testarudo.ttd:329] c-with_summary [24d0f7fa2b765256] r-2-1-0
 i-end_with
 i-declare [dcf570b711ebed67]
 i-begin_with [fca079611f0697e1]
 i-check_equal [81e161d26b9e6340]
 i-begin_with_results
-v-show_value [58d068623760f4a5]
-[testarudo.ttd:236] c-check_equal [81e161d26b9e6340] r-0-1-0
+[testarudo.ttd:334] c-check_equal [81e161d26b9e6340] r-0-1-0
 i-end_with_results
-[testarudo.ttd:235] c-with_summary [778bb1605f693a09] r-2-1-0
+[testarudo.ttd:333] c-with_summary [778bb1605f693a09] r-2-1-0
 i-end_with
 i-begin_with [ead010f4b59869d5]
 i-check_true [2b867376a21d2353]
-[testarudo.ttd:237] c-with_summary [24d0f7fa2b765256] r-3-0-0
+[testarudo.ttd:335] c-with_summary [24d0f7fa2b765256] r-3-0-0
 i-end_with
 i-declare [e148ed6612e0009c]
 i-begin_with [300f51ee74b24ce6]
 i-check_equal [81e161d26b9e6340]
-[testarudo.ttd:241] c-with_summary [7c4b93ffe95e89d5] r-3-0-0
+[testarudo.ttd:339] c-with_summary [7c4b93ffe95e89d5] r-3-0-0
 i-end_with
 t-produce_summary [86a20257cf6b1b0e]
 t-produce_summary [a5b734e936425aef]
 t-title [b579c4d3f42de731]
 t-title [0aa8638a0501ebd9]
-[testarudo.ttd:254] c-check_true [0530c414083e7ca7] r-0-1-0
+[testarudo.ttd:352] c-check_true [0530c414083e7ca7] r-0-1-0
 t-produce_summary [72b1b06a4ccdd560]
 t-title [e1cc2526fa076306]
-[testarudo.ttd:249] c-check_true [2cbb8fc266368578] r-1-0-0
+[testarudo.ttd:347] c-check_true [2cbb8fc266368578] r-1-0-0
 t-produce_summary [8de359f1a72ff6d6]
 t-title [81bb3f111b7ee90e]
 i-perform [da21eac2dd2cf55a]
-[testarudo.ttd:263] c-check_approx [604db5a07e6947f1] r-1-0-0
-[testarudo.ttd:264] c-check_approx [0d550109b6a0238b] r-1-0-0
-[testarudo.ttd:265] c-check_approx [acb6137a5514ea04] r-1-0-0
-[testarudo.ttd:266] c-check_approx [a1e20bc5a34c8b3f] r-1-0-0
+[testarudo.ttd:361] c-check_approx [604db5a07e6947f1] r-1-0-0
+[testarudo.ttd:362] c-check_approx [0d550109b6a0238b] r-1-0-0
+[testarudo.ttd:363] c-check_approx [acb6137a5514ea04] r-1-0-0
+[testarudo.ttd:364] c-check_approx [a1e20bc5a34c8b3f] r-1-0-0
+[testarudo.ttd:365] c-check_approx [873c47c2cabd535e] r-1-0-0
+[testarudo.ttd:366] c-check_approx [fcec844635320d6d] r-0-1-0
 t-produce_summary [8202903cb6f42fff]
 t-title [4ad31b9ab52f7774]
 i-perform [4aa3e45ee0dd149f]
 i-declare [fab5a081fdbb0c09]
 i-declare [8bbbc7e8a7192780]
-[testarudo.ttd:279] c-check_approx [3f6862b29f6619dc] r-0-1-0
+[testarudo.ttd:379] c-check_approx [3f6862b29f6619dc] r-0-1-0
 v-show_value [60e778a1c64b9ae5]
 i-declare [a8d6a685c6c76744]
-[testarudo.ttd:282] c-check_approx [2286e8ecbd4ab800] r-1-0-0
+[testarudo.ttd:382] c-check_approx [2286e8ecbd4ab800] r-1-0-0
 i-separator
 i-declare [3ba9fef39846c4a9]
 i-declare [040f4ed51263bc33]
-[testarudo.ttd:286] c-check_approx [d9575d3898722ef7] r-0-1-0
+[testarudo.ttd:386] c-check_approx [d9575d3898722ef7] r-0-1-0
 v-show_value [62a16993ca8999ea]
 i-declare [69caf8f7a33aafe4]
-[testarudo.ttd:289] c-check_approx [c4b9d766ba5e8f2b] r-1-0-0
+[testarudo.ttd:389] c-check_approx [c4b9d766ba5e8f2b] r-1-0-0
 i-begin_declare_scope [a7c9b6d4feba1109]
-[testarudo.ttd:291] c-check_equal [5dd45db77f4ba16b] r-1-0-0
-[testarudo.ttd:292] c-check_equal [20bc0cfd4509a3ec] r-1-0-0
+[testarudo.ttd:391] c-check_equal [5dd45db77f4ba16b] r-1-0-0
+[testarudo.ttd:392] c-check_equal [20bc0cfd4509a3ec] r-1-0-0
 i-end_declare_scope
 i-begin_declare_scope [47f7d337eb2b0973]
-[testarudo.ttd:295] c-check_equal [6ae88be223b3341d] r-0-1-0
-[testarudo.ttd:296] c-check_equal [e7289ad5d3b0ed0d] r-1-0-0
+[testarudo.ttd:395] c-check_equal [6ae88be223b3341d] r-0-1-0
+[testarudo.ttd:396] c-check_equal [e7289ad5d3b0ed0d] r-1-0-0
 i-end_declare_scope
 i-begin_declare_scope [714ef22e667b4c02]
-[testarudo.ttd:299] c-check_equal [bb0b996987f4afea] r-1-0-0
-[testarudo.ttd:300] c-check_equal [b176659de272123c] r-1-0-0
+[testarudo.ttd:399] c-check_equal [bb0b996987f4afea] r-1-0-0
+[testarudo.ttd:400] c-check_equal [b176659de272123c] r-1-0-0
 i-end_declare_scope
 t-produce_summary [67d53e5c8d784609]
 t-title [2e175cb6e394f1f6]
-[testarudo.ttd:271] c-check_equal [4113e588b006e95b] r-0-1-0
+[testarudo.ttd:371] c-check_equal [4113e588b006e95b] r-0-1-0
 t-produce_summary [a1ae409a829e2332]
 t-produce_summary [cc2e54d939b4e8e7]
 t-title [34922caf05f399e3]
@@ -535,40 +608,45 @@ v-show_value [7bb14e76046afa65]
 [testarudo_util.ttd:12] c-check_equal [060270e1a403cdc1] r-1-0-0
 t-produce_summary [6db049c587f88671]
 t-title [3c1bf28514a32d66]
-[testarudo.ttd:431] c-check_approx [095af8663a75be47] r-1-0-0
-[testarudo.ttd:432] c-check_approx [b504ae196148018b] r-0-1-0
-[testarudo.ttd:433] c-check_approx [c352c87ed7645f8d] r-0-1-0
-[testarudo.ttd:434] c-check_approx [9d1aba543db67569] r-1-0-0
+[testarudo.ttd:555] c-check_approx [095af8663a75be47] r-1-0-0
+[testarudo.ttd:556] c-check_approx [b504ae196148018b] r-0-1-0
+[testarudo.ttd:557] c-check_approx [c352c87ed7645f8d] r-0-1-0
+[testarudo.ttd:558] c-check_approx [9d1aba543db67569] r-1-0-0
 t-produce_summary [e81ac86e4619d123]
 t-title [1452b2e9860cf80f]
 i-declare [e1a5fbfc13f5955a]
 i-declare [74582fbb3d860bdb]
+i-declare [b0fb06ef8833a244]
 i-perform [46419f639e7e8a03]
-[testarudo.ttd:441] c-check_approx [a327ca58be5eb938] r-1-0-0
+[testarudo.ttd:566] c-check_approx [a327ca58be5eb938] r-1-0-0
 i-begin_indent
-[testarudo.ttd:442] c-check_approx [851454bad82b5b5c] r-1-0-0
-[testarudo.ttd:443] c-check_approx [d4d034eb794a93f4] r-0-1-0
+[testarudo.ttd:567] c-check_approx [851454bad82b5b5c] r-1-0-0
+[testarudo.ttd:568] c-check_approx [d4d034eb794a93f4] r-0-1-0
 i-end_indent
-[testarudo.ttd:445] c-check_approx [f2e3aa091f3f7190] r-0-1-0
-i-begin_indent
-i-end_indent
-[testarudo.ttd:449] c-check_equal [a99a33158dd0ecc4] r-0-1-0
+[testarudo.ttd:570] c-check_approx [f2e3aa091f3f7190] r-0-1-0
 i-begin_indent
 i-end_indent
-[testarudo.ttd:451] c-check_equal [1ab47fab8e77b3ab] r-1-0-0
+[testarudo.ttd:574] c-check_approx [93c86cc58ff2959d] r-1-0-0
 i-begin_indent
-[testarudo.ttd:452] c-check_approx [851454bad82b5b5c] r-1-0-0
+[testarudo.ttd:575] c-check_approx [acc38d8f1e98f856] r-1-0-0
 i-end_indent
-[testarudo.ttd:453] c-check_equal [1ab47fab8e77b3ab] r-1-0-0
+[testarudo.ttd:576] c-check_equal [a99a33158dd0ecc4] r-0-1-0
 i-begin_indent
-[testarudo.ttd:454] c-check_equal [00fd5824bc6af0c8] r-1-0-0
-i-begin_indent
-[testarudo.ttd:455] c-check_equal [a09017e148faa19e] r-0-1-0
-[testarudo.ttd:456] c-check_equal [7b11e1192eb1c65a] r-1-0-0
-i-begin_indent
-[testarudo.ttd:457] c-check_equal [4df155cb60b6c82c] r-1-0-0
 i-end_indent
-[testarudo.ttd:458] c-check_equal [95ca10a5248a3aac] r-0-1-0
+[testarudo.ttd:578] c-check_equal [1ab47fab8e77b3ab] r-1-0-0
+i-begin_indent
+[testarudo.ttd:579] c-check_approx [851454bad82b5b5c] r-1-0-0
+i-end_indent
+[testarudo.ttd:580] c-check_equal [1ab47fab8e77b3ab] r-1-0-0
+i-begin_indent
+[testarudo.ttd:581] c-check_equal [00fd5824bc6af0c8] r-1-0-0
+i-begin_indent
+[testarudo.ttd:582] c-check_equal [a09017e148faa19e] r-0-1-0
+[testarudo.ttd:583] c-check_equal [7b11e1192eb1c65a] r-1-0-0
+i-begin_indent
+[testarudo.ttd:584] c-check_equal [4df155cb60b6c82c] r-1-0-0
+i-end_indent
+[testarudo.ttd:585] c-check_equal [95ca10a5248a3aac] r-0-1-0
 i-begin_indent
 i-end_indent
 i-end_indent
@@ -576,97 +654,68 @@ i-end_indent
 t-produce_summary [e879fa28779bff32]
 t-title [4f006de2f19c4569]
 v-show_value [2f8b36020de38814]
-[testarudo.ttd:465] c-check_equal [ce97780919e2dd49] r-0-1-0
+[testarudo.ttd:592] c-check_equal [ce97780919e2dd49] r-0-1-0
+i-text [cc8a977b747d55ec]
 i-perform [85f5a26bc08a7bd6]
 v-show_value [dedf2faa53df0258]
-[testarudo.ttd:468] c-check_equal [ce97780919e2dd49] r-0-1-0
+i-text [b0173239ee7858f4]
+[testarudo.ttd:597] c-check_equal [ce97780919e2dd49] r-0-1-0
 i-perform [81eb3e08e6a434c4]
-[testarudo.ttd:470] c-check_equal [ce97780919e2dd49] r-0-1-0
+[testarudo.ttd:599] c-check_equal [ce97780919e2dd49] r-0-1-0
 v-show_value [f7e78f2b060adbec]
-[testarudo.ttd:472] c-check_equal [2cfe02a03272d438] r-1-0-0
-[testarudo.ttd:473] c-check_equal [326107b7651870f4] r-1-0-0
+[testarudo.ttd:601] c-check_equal [2cfe02a03272d438] r-1-0-0
+[testarudo.ttd:602] c-check_equal [326107b7651870f4] r-1-0-0
 t-produce_summary [54d9b755f42d6855]
 t-title [c2684305a5cd66b4]
 i-declare [59a5ecbf74ef05cd]
 i-begin_with [a9b4eed8df10af89]
-v-show_value [cb7848848a76a394]
+v-show_value [1b5bb1a04617a1c4]
 i-begin_with_results
-v-show_value [2afb745a795de50a]
-v-show_value [e5c343e469248b76]
-v-show_value [1681cd372d35440d]
-v-show_value [a269390dc2c37442]
-v-show_value [512bb7de86d2bb39]
-v-show_value [114775b3c1642b2d]
-v-show_value [e205fb608575e456]
-v-show_value [114775b3c1642b2d]
-v-show_value [29dec5042e03f937]
-v-show_value [2d3dccde950c8a2a]
-v-show_value [9af089ba2da4a658]
-v-show_value [2d3dccde950c8a2a]
-v-show_value [93b1b4f0d7246716]
-v-show_value [d9b9fa893d4c2a71]
-v-show_value [e1decb95659a8a69]
-v-show_value [002e8a7e9442c240]
+v-show_value [d032938a5505a5ad]
+v-show_value [c6115ef910253f8d]
+v-show_value [530c8ca575f78286]
+v-show_value [4ee206fb57db235a]
+v-show_value [cc655afdfc11e9a9]
+v-show_value [d18bd0a3de3d4875]
+v-show_value [f2d046ea2a76d818]
+v-show_value [23b1a245d3e92783]
 i-end_with_results
 i-check_equal [c766a95af476a4f2]
 i-begin_with_results
-v-show_value [1681cd372d35440d]
-[testarudo.ttd:480] c-check_equal [c766a95af476a4f2] r-0-1-0
-v-show_value [e205fb608575e456]
-[testarudo.ttd:480] c-check_equal [c766a95af476a4f2] r-0-1-0
-v-show_value [9af089ba2da4a658]
-[testarudo.ttd:480] c-check_equal [c766a95af476a4f2] r-0-1-0
+[testarudo.ttd:609] c-check_equal [c766a95af476a4f2] r-0-1-0
+[testarudo.ttd:609] c-check_equal [c766a95af476a4f2] r-0-1-0
+[testarudo.ttd:609] c-check_equal [c766a95af476a4f2] r-0-1-0
 i-end_with_results
-v-show_value [6d969b72eaa6e2b9]
+v-show_value [bdb5625626c7e0e9]
 i-begin_with_results
-v-show_value [2afb745a795de50a]
-v-show_value [e9f3684ec23c2bc3]
-v-show_value [1681cd372d35440d]
-v-show_value [e60c8715cecef5c2]
-v-show_value [512bb7de86d2bb39]
-v-show_value [1288b142668e5599]
-v-show_value [e205fb608575e456]
-v-show_value [9ddc44913141abf1]
-v-show_value [29dec5042e03f937]
-v-show_value [695872c699010baa]
-v-show_value [9af089ba2da4a658]
-v-show_value [11ad001c31d049a4]
-v-show_value [93b1b4f0d7246716]
-v-show_value [60e7ce27d430b8e6]
-v-show_value [e1decb95659a8a69]
-v-show_value [843930ecb14d6218]
+v-show_value [e524e0cc4e5a6cd8]
+v-show_value [2d8ae74e7dda4981]
+v-show_value [3d7948b981d68938]
+v-show_value [ee00ca0ae5dd570e]
+v-show_value [4a9c5d2b16fc2935]
+v-show_value [6e4458918de94b65]
+v-show_value [f75c8bd0dac29b73]
+v-show_value [eb3896912e1f3686]
 i-end_with_results
 i-check_equal [12953de6de6e63a2]
 i-begin_with_results
-v-show_value [2afb745a795de50a]
-[testarudo.ttd:482] c-check_equal [12953de6de6e63a2] r-0-1-0
-v-show_value [1681cd372d35440d]
-[testarudo.ttd:482] c-check_equal [12953de6de6e63a2] r-0-1-0
-v-show_value [e205fb608575e456]
-[testarudo.ttd:482] c-check_equal [12953de6de6e63a2] r-0-1-0
-v-show_value [29dec5042e03f937]
-[testarudo.ttd:482] c-check_equal [12953de6de6e63a2] r-0-1-0
+[testarudo.ttd:611] c-check_equal [12953de6de6e63a2] r-0-1-0
+[testarudo.ttd:611] c-check_equal [12953de6de6e63a2] r-0-1-0
+[testarudo.ttd:611] c-check_equal [12953de6de6e63a2] r-0-1-0
+[testarudo.ttd:611] c-check_equal [12953de6de6e63a2] r-0-1-0
 i-end_with_results
-v-show_value [7856043a89d1fcfb]
+v-show_value [a875fd1e45b0feab]
 i-begin_with_results
-v-show_value [2afb745a795de50a]
-v-show_value [020476c836532514]
-v-show_value [1681cd372d35440d]
-v-show_value [b12a3a7635f47a7b]
-v-show_value [512bb7de86d2bb39]
-v-show_value [f680409f9e13854f]
-v-show_value [e205fb608575e456]
-v-show_value [f680409f9e13854f]
-v-show_value [29dec5042e03f937]
-v-show_value [f680409f9e13854f]
-v-show_value [9af089ba2da4a658]
-v-show_value [45ae0c219db4da20]
-v-show_value [93b1b4f0d7246716]
-v-show_value [79d4b54cc9dc7b27]
-v-show_value [e1decb95659a8a69]
-v-show_value [f5a5f1c1c94d9972]
+v-show_value [3f31a8546566da9c]
+v-show_value [dd9653708806e0e7]
+v-show_value [bc0fb77b4594fdb7]
+v-show_value [a1e13d2567b85c6b]
+v-show_value [1f1cd84e981a379f]
+v-show_value [b1dc1eaeb991c92c]
+v-show_value [67d0a5e2f0241f85]
+v-show_value [43b1450b681259fa]
 i-end_with_results
-[testarudo.ttd:478] c-with_summary [be89af319504f065] r-9-7-0
+[testarudo.ttd:607] c-with_summary [be89af319504f065] r-9-7-0
 i-end_with
 t-produce_summary [9bd10f75af64f4da]
 t-title [4fccbd2a4cc26d67]
@@ -693,69 +742,53 @@ v-show_value [cf0501e29d9c5215]
 v-show_value [ced0ede048e61850]
 i-perform [bd0199ea615b6e69]
 i-begin_with [48bc00638ff8ab54]
-v-show_value [deb8d7cce901bdd6]
+v-show_value [4ee11217b3655092]
 i-begin_with_results
-v-show_value [ebfd97c5ed0b5792]
-v-show_value [499e278b36ac7a95]
-v-show_value [074e0097d653e623]
-v-show_value [0e345d629d4b85a1]
-v-show_value [f31ba4d9958a2d26]
-v-show_value [5653938c086b6661]
-v-show_value [4aeb6a133bbe64db]
-v-show_value [d907665f5fa49809]
+v-show_value [47ecf1e7b3d62b0a]
+v-show_value [58761be253efbc3a]
+v-show_value [f9e08121d25c363b]
+v-show_value [98ecd04f8d28a990]
 i-end_with_results
-[testarudo.ttd:510] c-with_summary [4ef81488ef0c5f75] r-0-0-0
+[testarudo.ttd:639] c-with_summary [4ef81488ef0c5f75] r-0-0-0
 i-end_with
 i-perform [bd0199ea615b6e69]
 i-begin_with [0302978ac805c85b]
-v-show_value [deb8d7cce901bdd6]
+v-show_value [4ee11217b3655092]
 i-begin_with_results
-v-show_value [53a779058a83172e]
-v-show_value [bd1a11dc9eecdace]
-v-show_value [3b08c343ef6f2f85]
-v-show_value [d907665f5fa49809]
-v-show_value [074e0097d653e623]
-v-show_value [0e345d629d4b85a1]
-v-show_value [bbe536b3b66a89f2]
-v-show_value [824519ef9dda67f4]
-v-show_value [d34a8cf5d386b159]
-v-show_value [11f9e965a38c9955]
-v-show_value [ef0c4f21eaba78ff]
-v-show_value [d907665f5fa49809]
-v-show_value [b7d0e0a5decf77cc]
-v-show_value [fab06b35350b25fa]
-v-show_value [df7f5ae3bb234f67]
-v-show_value [9ead1cb6f443673d]
-v-show_value [e3399937821f86c1]
-v-show_value [316b55519e7d389b]
-v-show_value [55bd920ebed1e831]
-v-show_value [8160a8b1ca847bc9]
-v-show_value [3d122848db3dd09a]
-v-show_value [824519ef9dda67f4]
-v-show_value [0154eb9ce201193c]
-v-show_value [bd1a11dc9eecdace]
+v-show_value [f6b6dd0272644289]
+v-show_value [dbb7c45f3975e976]
+v-show_value [58761be253efbc3a]
+v-show_value [e51a28ee9e8b310a]
+v-show_value [182ac7f2c2d97774]
+v-show_value [d6cea3c30aa38937]
+v-show_value [d62db00084881089]
+v-show_value [6106af6d7515e907]
+v-show_value [0018043a0dd2ac34]
+v-show_value [264146e0a8e2dd0a]
+v-show_value [6903ca7a335705ff]
+v-show_value [07d575d3dea6ddd1]
 i-end_with_results
-[testarudo.ttd:513] c-with_summary [99476a3a83a7775a] r-0-0-0
+[testarudo.ttd:642] c-with_summary [99476a3a83a7775a] r-0-0-0
 i-end_with
 t-produce_summary [5163974cfb3f2895]
 t-title [c117ddcece52eb2d]
-[testarudo.ttd:519] c-check_equal [445a33193c86b70d] r-1-0-0
-[testarudo.ttd:520] c-check_equal [f7747fa73f21e862] r-0-1-0
+[testarudo.ttd:648] c-check_equal [445a33193c86b70d] r-1-0-0
+[testarudo.ttd:649] c-check_equal [f7747fa73f21e862] r-0-1-0
 i-perform [0da43a84d2dffa96]
-[testarudo.ttd:521] e-uncaught_exception [e22c3a0cf01cfe07] r-0-0-1
+[testarudo.ttd:650] e-uncaught_exception [e22c3a0cf01cfe07] r-0-0-1
 t-produce_summary [b1dc64972b3f1936]
 t-title [849dc829862bc846]
 i-declare [ddbb111a472a8a27]
 i-perform [904289e7d38abc16]
-[testarudo.ttd:551] c-check_equal [570dd6b2629333a1] r-1-0-0
+[testarudo.ttd:680] c-check_equal [570dd6b2629333a1] r-1-0-0
 i-perform [82f47319a9ea9b0d]
-[testarudo.ttd:551] c-check_equal [570dd6b2629333a1] r-1-0-0
+[testarudo.ttd:680] c-check_equal [570dd6b2629333a1] r-1-0-0
 i-perform [fa397a3e15e6de0a]
-[testarudo.ttd:551] c-check_equal [570dd6b2629333a1] r-1-0-0
+[testarudo.ttd:680] c-check_equal [570dd6b2629333a1] r-1-0-0
 i-perform [55e816582023d0cf]
-[testarudo.ttd:551] c-check_equal [570dd6b2629333a1] r-1-0-0
+[testarudo.ttd:680] c-check_equal [570dd6b2629333a1] r-1-0-0
 i-perform [32d0e16437cfbab7]
-[testarudo.ttd:551] c-check_equal [570dd6b2629333a1] r-0-1-0
+[testarudo.ttd:680] c-check_equal [570dd6b2629333a1] r-0-1-0
 t-produce_summary [803d19e27e64b8d8]
 t-produce_summary [1b1503b69600689c]
 t-title [cae227b81810e0a9]
@@ -773,23 +806,43 @@ i-declare [c6022821f3e231c5]
 i-perform [e5f60b1c7193a82e]
 i-text [77f82d94598c380b]
 i-perform [d6fefdf9f776e1a8]
-[testarudo.ttd:311] c-check_approx [1fc8dbc236c71aaf] r-1-0-0
-[testarudo.ttd:312] c-check_approx [8de9164b6ca9c366] r-1-0-0
-[testarudo.ttd:313] c-check_approx [2d28913a14858b70] r-1-0-0
-[testarudo.ttd:324] c-check_approx [2c64b416b6358469] r-1-0-0
+[testarudo.ttd:411] c-check_approx [1fc8dbc236c71aaf] r-1-0-0
+[testarudo.ttd:412] c-check_approx [8de9164b6ca9c366] r-1-0-0
+[testarudo.ttd:413] c-check_approx [2d28913a14858b70] r-1-0-0
+[testarudo.ttd:424] c-check_approx [2c64b416b6358469] r-1-0-0
 i-text [510c3de129271e9e]
 t-produce_summary [d77c127f84825e87]
 t-title [0ceadc6a5c3c1fcc]
 i-text [b9142a74f9a33c25]
 i-perform [d6fefdf9f776e1a8]
-[testarudo.ttd:330] c-check_approx [aaf756d94276fb77] r-1-0-0
+[testarudo.ttd:430] c-check_approx [aaf756d94276fb77] r-1-0-0
 t-produce_summary [2709f6d1da87e378]
 t-title [e6f4c8f7ac4cbb0c]
 i-text [b9142a74f9a33c25]
-[testarudo.ttd:335] c-check_approx [d2a3f382fb92a3bd] r-1-0-0
+[testarudo.ttd:435] c-check_approx [d2a3f382fb92a3bd] r-1-0-0
 i-perform [4abb9026a360bacb]
-[testarudo.ttd:336] e-uncaught_exception [0a682703137890e9] r-0-0-1
+[testarudo.ttd:436] e-uncaught_exception [0a682703137890e9] r-0-0-1
 t-produce_summary [f569afe370f9d2cf]
+t-title [af20732527719c72]
+i-text [b437c750febec3fb]
+[testarudo.ttd:451] c-check_equal [594cc9f69d42d633] r-1-0-0
+i-begin_with [23680cb7cc50ba9d]
+i-check_equal [b4459d99d237a094]
+[testarudo.ttd:452] c-with_summary [62725a0921b014d1] r-3-0-0
+i-end_with
+t-produce_summary [2ca83574cc3dfac5]
+t-title [8658aeeabd82a973]
+i-text [ecb48b845f4920e9]
+i-declare [67a027d9684b1d2b]
+i-perform [e60ea4be0f7e06da]
+i-text [77f82d94598c380b]
+[testarudo.ttd:459] c-check_equal [d6183c25ca8d285b] r-1-0-0
+i-begin_with [23680cb7cc50ba9d]
+i-check_equal [8d13c4771190f2de]
+[testarudo.ttd:460] c-with_summary [62725a0921b014d1] r-5-0-0
+i-end_with
+i-text [510c3de129271e9e]
+t-produce_summary [1aa4b39ea05e3999]
 t-produce_summary [eadf2730f678615b]
 t-title [895aae62b94c0930]
 i-declare [94cde0fd3a054a44]
@@ -797,21 +850,21 @@ i-begin_scope [d23a45ffd8026b73]
 i-declare [1de8cf8ba48ecbdb]
 i-begin_scope [5a503f255f66fe78]
 i-declare [7050e78d94fe84b6]
-[testarudo.ttd:351] c-check_equal [6f413be00c417a1a] r-1-0-0
+[testarudo.ttd:475] c-check_equal [6f413be00c417a1a] r-1-0-0
 i-text [957ff85fb0190632]
-[testarudo.ttd:354] c-check_equal [dc8911b17c2609e5] r-1-0-0
-[testarudo.ttd:355] c-check_equal [8860682320f6f8e8] r-0-1-0
+[testarudo.ttd:478] c-check_equal [dc8911b17c2609e5] r-1-0-0
+[testarudo.ttd:479] c-check_equal [8860682320f6f8e8] r-0-1-0
 i-end_scope [5edf78ad98c0da6f]
-[testarudo.ttd:357] c-check_equal [c693c8c4b5e09800] r-1-0-0
+[testarudo.ttd:481] c-check_equal [c693c8c4b5e09800] r-1-0-0
 i-end_scope [1f299a4ce8c84ead]
-[testarudo.ttd:359] c-check_equal [927ab156e930690d] r-1-0-0
+[testarudo.ttd:483] c-check_equal [927ab156e930690d] r-1-0-0
 t-produce_summary [07ee3546f3756440]
 t-title [5aa111e91f8e4434]
 i-text [ab6b7aaf14b33524]
 i-text [adad84fdb0a6fcf5]
 i-declare [4537e6c20b813cb5]
 v-show_value [25a0de5c7b52878d]
-[testarudo.ttd:367] c-check_equal [dce2dfdb7b9b5cf6] r-1-0-0
+[testarudo.ttd:491] c-check_equal [dce2dfdb7b9b5cf6] r-1-0-0
 t-produce_summary [42a53296a45fa873]
 t-title [04238394c0877f1f]
 i-text [8607ba084aae24c2]
@@ -820,21 +873,21 @@ i-declare [0b5b2b9ea6451b5f]
 i-declare [914afd7d9a1f3b86]
 v-show_value [c18779481aee397c]
 v-show_value [79b18a0d165f0567]
-[testarudo.ttd:377] c-check_equal [936f0e2bd1819e8f] r-1-0-0
-[testarudo.ttd:378] c-check_equal [a6bdef8db3e94850] r-0-1-0
-[testarudo.ttd:379] c-check_equal [a650cf151234d147] r-0-1-0
-[testarudo.ttd:380] c-check_equal [c88320f82b52f3bf] r-0-1-0
-[testarudo.ttd:381] c-check_equal [601500982857e885] r-0-1-0
-[testarudo.ttd:382] c-check_equal [7a9442f12ebc4c32] r-0-1-0
-[testarudo.ttd:383] c-check_equal [a35de50734637a0a] r-1-0-0
+[testarudo.ttd:501] c-check_equal [936f0e2bd1819e8f] r-1-0-0
+[testarudo.ttd:502] c-check_equal [a6bdef8db3e94850] r-0-1-0
+[testarudo.ttd:503] c-check_equal [a650cf151234d147] r-0-1-0
+[testarudo.ttd:504] c-check_equal [c88320f82b52f3bf] r-0-1-0
+[testarudo.ttd:505] c-check_equal [601500982857e885] r-0-1-0
+[testarudo.ttd:506] c-check_equal [7a9442f12ebc4c32] r-0-1-0
+[testarudo.ttd:507] c-check_equal [a35de50734637a0a] r-1-0-0
 t-produce_summary [6b14fea828b9c876]
 t-title [ed46d53ccedff395]
 i-declare [fdf361a2febbabc7]
-[testarudo.ttd:388] c-check_equal [b548c85f720fb654] r-1-0-0
-[testarudo.ttd:389] c-check_equal [d2af22192a267fa9] r-1-0-0
-[testarudo.ttd:390] c-check_equal [2a1c58e5a4af6c47] r-1-0-0
-[testarudo.ttd:391] c-check_equal [544836775103849b] r-1-0-0
-[testarudo.ttd:392] c-check_equal [079ed49f0f7bfcea] r-1-0-0
+[testarudo.ttd:512] c-check_equal [b548c85f720fb654] r-1-0-0
+[testarudo.ttd:513] c-check_equal [d2af22192a267fa9] r-1-0-0
+[testarudo.ttd:514] c-check_equal [2a1c58e5a4af6c47] r-1-0-0
+[testarudo.ttd:515] c-check_equal [544836775103849b] r-1-0-0
+[testarudo.ttd:516] c-check_equal [079ed49f0f7bfcea] r-1-0-0
 v-show_value [bbcb1298436f5b60]
 v-show_value [f9fc865882378a42]
 t-produce_summary [eb683c1002b257f6]
@@ -1014,322 +1067,6 @@ i-text [3ff465ef37b907cd]
 [mock_turtle_soup.ttd:354] c-check_equal [f2cfceb098c9a61b] r-1-0-0
 t-produce_summary [7d5f2d60c7729446]
 t-produce_summary [899133a76a5cd713]
-t-title [cd01ad79901be3ae]
-t-title [9254049441f7018d]
-i-declare [3a434a1c10264864]
-[doc_examples.ttd:61] c-check_equal [69a9740c249cd17c] r-1-0-0
-t-produce_summary [ec0dd5396a59951e]
-t-title [7c407d41da4a09be]
-t-title [4131c36218967467]
-t-title [a1756adfa7d4b589]
-t-produce_summary [5ccbb8c56764e498]
-t-produce_summary [29133d6ac66dabeb]
-t-produce_summary [02cd850804bec265]
-t-title [ba146723f226aea6]
-t-title [7be22b2d3a73e4bc]
-t-title [d2f71ddd01f86767]
-i-declare [b5b4ce8ad3af75df]
-[doc_examples.ttd:96] c-check_true [5476a4f7cce075eb] r-0-1-0
-i-perform [a1bb0a0da7fb5938]
-[doc_examples.ttd:98] c-check_true [bba4202db0284aa9] r-1-0-0
-t-produce_summary [534d06332c15b50a]
-t-produce_summary [3448bf57bc73ded0]
-t-produce_summary [3af85f6982fbc174]
-t-title [8c544882fb152295]
-i-declare [b8c3c9807dba5aa2]
-i-declare [775f9bcd897834a6]
-i-perform [b6e3c361aab17c2f]
-i-declare [aa97c4820741da13]
-i-declare [70eb5bc13670e360]
-[doc_examples.ttd:174] c-check_true [154309cd5557a35e] r-1-0-0
-[doc_examples.ttd:178] c-check_true [f132811ed1e3d7f7] r-0-1-0
-i-declare [c26d0773bf071cef]
-[doc_examples.ttd:184] c-check_equal [1fcae3c658ddf202] r-1-0-0
-i-declare [daf64b4d938ae08a]
-[doc_examples.ttd:190] c-check_equal [67c5dd438054e1c7] r-0-1-0
-[doc_examples.ttd:192] c-check_equal [237349d01f8c4f8e] r-0-1-0
-i-declare [666b122c3a6ee594]
-[doc_examples.ttd:198] c-check_approx [08d9720f8e686b6f] r-0-1-0
-i-declare [dd04fbdd62b15e15]
-i-perform [825d6b641cf515c3]
-v-show_value [ea7e9a8250874598]
-i-declare [f796fb465ed435f9]
-[doc_examples.ttd:216] c-check_approx [f80c62cf1da5c08a] r-0-1-0
-i-declare [7affa2a8c43620f6]
-i-declare [3be38177778896ab]
-i-declare [04e8603de6e2fb60]
-[doc_examples.ttd:224] c-check_true_for [afea7d952b10e7b7] r-0-1-0
-[doc_examples.ttd:228] c-check_true_for [7de09a17df3dce5e] r-1-0-0
-i-begin_scope [5a503f255f66fe78]
-i-declare [3a5855ec31e4ada5]
-[doc_examples.ttd:235] c-try-catch  [b1067531fc2b7543] r-1-0-0
-i-end_scope [5edf78ad98c0da6f]
-i-begin_scope [5a503f255f66fe78]
-i-declare [3a5855ec31e4ada5]
-[doc_examples.ttd:244] c-try-catch  [02266dcf71c6373e] r-1-0-0
-i-end_scope [5edf78ad98c0da6f]
-i-declare [f092f6987f1a9beb]
-v-show_value [f1e8571322a5810a]
-i-declare [64b4b29785095485]
-v-show_value [0999065383185179]
-i-declare [72578e8a8689e423]
-[doc_examples.ttd:263] c-check_equal [5f663b1986c42401] r-1-0-0
-i-begin_scope [f36b85d9debed11c]
-i-declare [91c6d2b4a301fa34]
-i-begin_scope [5a503f255f66fe78]
-i-declare [cf49e6a14079f039]
-i-end_scope [5edf78ad98c0da6f]
-[doc_examples.ttd:269] c-check_equal [ec4877a785637b6e] r-0-1-0
-i-end_scope [cba7fe587fcb4959]
-[doc_examples.ttd:271] c-check_equal [abe20d4e2e84845a] r-0-1-0
-i-declare [48f2a618efb1f41d]
-i-begin_declare_scope [ce55c8b5616c7b5e]
-[doc_examples.ttd:278] c-check_true [8d835ce6804e8c9a] r-1-0-0
-[doc_examples.ttd:279] c-check_equal [cc237e42d56d10dc] r-0-1-0
-i-end_declare_scope
-i-begin_declare_scope [f70586714d172bf6]
-[doc_examples.ttd:282] c-check_true [8d835ce6804e8c9a] r-1-0-0
-i-end_declare_scope
-i-begin_declare_scope [1359f4cf0ad30c0a]
-[doc_examples.ttd:287] c-check_equal [bb0b996987f4afea] r-1-0-0
-[doc_examples.ttd:288] c-check_equal [201d74f6641bd866] r-1-0-0
-i-end_declare_scope
-t-produce_summary [20a92345e4d35449]
-t-title [0091da870d23211e]
-t-title [b008e9b1fedf3e58]
-t-title [a6c4043d07356c65]
-i-declare [b5b4ce8ad3af75df]
-i-step_id [b41a1b9e7e655714]
-[doc_examples.ttd:304] c-check_true [5476a4f7cce075eb] r-0-1-0
-t-produce_summary [3b72ee618fba8418]
-t-produce_summary [50242a08f877de2e]
-t-produce_summary [89d613d7815c9e1b]
-t-title [6fc514bcde9d3c82]
-i-text [ff3154ea96323ddf]
-i-separator
-i-declare [679fb45de13f06f5]
-i-perform [a81de97721788a2e]
-i-declare [1dcd519d65a7bc9d]
-i-declare [075c5063a14c8142]
-i-perform [b3101f766edeae10]
-i-perform [22308cb71a105911]
-i-perform [3607625a4ef37eaa]
-v-show_value [46446cfc5838ddae]
-i-declare [2fb94f9f56c717e2]
-i-perform [26baa63a54215a0f]
-[doc_examples.ttd:362] c-check_equal [4d3d6716a4c22baa] r-1-0-0
-i-declare [d9da2abeba3f48dd]
-i-declare [ac8279d8a790656d]
-i-declare [37c5cc587ce9a69d]
-[doc_examples.ttd:370] c-check_true [3221c86eb11f4559] r-1-0-0
-i-begin_indent
-[doc_examples.ttd:371] c-check_equal [63e525318c6828da] r-1-0-0
-i-end_indent
-[doc_examples.ttd:372] c-check_equal [65d250df2ad277c3] r-1-0-0
-i-begin_indent
-[doc_examples.ttd:373] c-check_true_for [2af0dc5665355668] r-1-0-0
-[doc_examples.ttd:375] c-check_true_for [9174396d359bf77c] r-1-0-0
-i-end_indent
-t-produce_summary [61b5009a576de214]
-t-title [b91e3f32986d5e37]
-t-title [d90619303b61ede3]
-i-declare [a8cb217a51c72e0d]
-[doc_examples.ttd:389] c-check_true [16121d4d6b2174d0] r-1-0-0
-t-produce_summary [f9688d5d191f2135]
-t-title [7dae416360778f4c]
-i-declare [d8524e304df7314d]
-[doc_examples.ttd:389] c-check_true [16121d4d6b2174d0] r-1-0-0
-t-produce_summary [8b0d6bf0797410e9]
-t-produce_summary [901810bf5522818e]
-t-title [314a20a93de5368f]
-i-declare [97bd9b9dec978244]
-i-declare [1285f5036d4346d5]
-i-begin_with [1ea09274d99ac4b9]
-i-check_true_for [a5c3bfd9150084ec]
-[doc_examples.ttd:425] c-with_summary [a9201e392ddfa918] r-3-0-0
-i-end_with
-i-begin_with [1ea09274d99ac4b9]
-i-declare [55faed78504583b7]
-i-check_true_for [0f446ec54352cd10]
-[doc_examples.ttd:427] c-with_summary [a9201e392ddfa918] r-3-0-0
-i-end_with
-i-begin_with [1ea09274d99ac4b9]
-i-begin_with [e1fa67a086db20bf]
-i-check_equal [088c7704289dae89]
-i-begin_with_results
-v-show_value [4d5ba112c6509285]
-[doc_examples.ttd:434] c-check_equal [088c7704289dae89] r-0-1-0
-v-show_value [176c3d79c1c64dc4]
-[doc_examples.ttd:434] c-check_equal [088c7704289dae89] r-0-1-0
-v-show_value [a30305afceebf346]
-[doc_examples.ttd:434] c-check_equal [088c7704289dae89] r-0-1-0
-i-end_with_results
-i-end_with
-[doc_examples.ttd:432] c-with_summary [a9201e392ddfa918] r-6-3-0
-i-end_with
-i-declare [78d7859e90c4c42c]
-i-begin_with [fca079611f0697e1]
-i-check_equal [81e161d26b9e6340]
-i-begin_with_results
-v-show_value [58d068623760f4a5]
-[doc_examples.ttd:443] c-check_equal [81e161d26b9e6340] r-0-1-0
-i-end_with_results
-[doc_examples.ttd:442] c-with_summary [778bb1605f693a09] r-2-1-0
-i-end_with
-i-begin_with [283bfc6a08d19851]
-i-check_equal [81e161d26b9e6340]
-i-begin_with_results
-v-show_value [58d068623760f4a5]
-[doc_examples.ttd:451] c-check_equal [81e161d26b9e6340] r-0-1-0
-i-end_with_results
-[doc_examples.ttd:447] c-with_summary [9c972aa1344fef1a] r-2-1-0
-i-end_with
-t-produce_summary [5ebee1d0c6078fdf]
-t-title [3a3f03eb3a831e29]
-i-begin_scope [5a503f255f66fe78]
-i-declare [2160c5081d415296]
-i-begin_with [2823290b2be16fbb]
-i-begin_with [a154818c80310698]
-i-check_equal [fcec40d230525059]
-i-end_with
-[doc_examples.ttd:485] c-with_summary [8258883672c2be73] r-10000-0-0
-i-end_with
-i-end_scope [5edf78ad98c0da6f]
-i-begin_scope [5a503f255f66fe78]
-i-declare [6a0ebac96a9d98f5]
-i-begin_with [d6459907775027a6]
-i-check_equal [fcec40d230525059]
-[doc_examples.ttd:496] c-with_summary [1574e07c38a35b3a] r-100-0-0
-i-end_with
-i-end_scope [5edf78ad98c0da6f]
-i-begin_scope [5a503f255f66fe78]
-i-declare [6a0ebac96a9d98f5]
-i-begin_with [37cdf91d5edb07a9]
-i-check_equal [fcec40d230525059]
-[doc_examples.ttd:509] c-with_summary [445fdee73d842096] r-10000-0-0
-i-end_with
-i-end_scope [5edf78ad98c0da6f]
-t-produce_summary [e38d472530108eae]
-t-title [93782cf29bd31d4f]
-t-title [f412910d9ea0c1af]
-i-text [65d9f156e6c40bbd]
-[doc_examples.ttd:542] c-check_true [608612af142c94c7] r-1-0-0
-t-produce_summary [0b38003f17593727]
-t-title [0941ab786f2fc750]
-i-text [5e1863a8c9f6803f]
-i-perform [c2d1e0d0bb6387f6]
-i-text [77f82d94598c380b]
-[doc_examples.ttd:549] c-check_approx [d08dd12db4fc95f6] r-1-0-0
-i-text [510c3de129271e9e]
-i-perform [2d1cab392194d58e]
-t-produce_summary [c62cd7d8cb539a86]
-t-produce_summary [2ed68338bdd93b2a]
-t-title [c8ff2983de9608af]
-i-text [db85aa8ab0bfddb3]
-i-declare [830948f36f609842]
-i-perform [ee1f39721184d34b]
-i-declare [480c6fa19440e659]
-i-perform [e5f60b1c7193a82e]
-i-text [77f82d94598c380b]
-[doc_examples.ttd:568] c-check_approx [1fc8dbc236c71aaf] r-1-0-0
-[doc_examples.ttd:569] c-check_approx [8de9164b6ca9c366] r-1-0-0
-[doc_examples.ttd:570] c-check_approx [2d28913a14858b70] r-1-0-0
-i-text [510c3de129271e9e]
-t-produce_summary [9311ddfd2b4a1d3e]
-t-title [463d1e12cb6c0e54]
-t-title [f13d887e2a53fd49]
-i-declare [4f6231bea8761164]
-i-declare [61af0f622c20dfa2]
-i-perform [56fc70c3b6e063ce]
-t-produce_summary [c8c42e57624c961a]
-t-title [c1ea5cc4ac7803ff]
-i-declare [4f6231bea8761164]
-i-perform [d4e277e3703689d6]
-t-produce_summary [a7dc8395470dd789]
-t-title [b40debe34ed39384]
-i-declare [990394f6ed43b212]
-[doc_examples.ttd:777] c-check_equal [752018b7fcb688b5] r-0-1-0
-[doc_examples.ttd:787] c-check_true [9bd3152d16e8b9cc] r-0-1-0
-i-begin_indent
-i-end_indent
-[doc_examples.ttd:794] c-check_true [9bd3152d16e8b9cc] r-0-1-0
-i-begin_indent
-i-end_indent
-t-produce_summary [99e857ffd4f17b77]
-t-title [998107367c8bda24]
-i-declare [990394f6ed43b212]
-[doc_examples.ttd:806] c-check_equal [77691b95d3719763] r-0-1-0
-t-produce_summary [d8f47420674fcd2a]
-t-title [0cb2c663f7b9e8c7]
-i-declare [990394f6ed43b212]
-[doc_examples.ttd:816] c-check_equal [50248b4fbb4fee4b] r-0-1-0
-t-produce_summary [e7ff956af625a0e1]
-t-title [c298de9c183b4964]
-i-declare [990394f6ed43b212]
-[doc_examples.ttd:831] c-check_equal [39828129da9aaa95] r-0-1-0
-t-produce_summary [5acc339f0032a190]
-t-title [57ab1fc993097b87]
-i-declare [990394f6ed43b212]
-i-declare [07e2a66882939193]
-i-declare [a0d148d88af10025]
-i-declare [48a62486ea845b4b]
-i-begin_declare_scope [0964340af50af460]
-[doc_examples.ttd:867] c-check_equal [42493a4674bda177] r-0-1-0
-i-end_declare_scope
-i-begin_declare_scope [7664b411f488ade2]
-[doc_examples.ttd:872] c-check_equal [42493a4674bda177] r-0-1-0
-i-end_declare_scope
-t-produce_summary [65c7d2d59158cc5b]
-t-title [7a27f31ca1513227]
-i-declare [990394f6ed43b212]
-i-begin_declare_scope [8bb96106b649671b]
-i-begin_declare_scope [7664b411f488ade2]
-i-end_declare_scope
-i-end_declare_scope
-[doc_examples.ttd:883] e-uncaught_exception [07643f9669b51fbb] r-0-0-1
-t-produce_summary [24dbf10a22e67a06]
-t-produce_summary [f06dac5e37d4e52d]
-t-title [1ed3dc6033b567e8]
-t-title [9f9403920838e47f]
-i-declare [733c182d646a7e93]
-i-perform [bc3aee025f64a736]
-t-produce_summary [af24a92d62e2e1c6]
-t-title [197dece6d2865e77]
-i-declare [733c182d646a7e93]
-i-perform [d3aa79a29290c162]
-t-produce_summary [bae0bb32869ff5d3]
-t-produce_summary [c41900ae1591e071]
-t-title [1941ac80961430c6]
-i-declare [07e2a66882939193]
-i-declare [01a456302c742ad1]
-i-perform [294f151dcb98fcdd]
-i-declare [b05e1b4bbffe1e91]
-i-perform [4e7e02f6969351e9]
-t-produce_summary [c471eef92681300f]
-t-title [434bdee86bee032b]
-i-declare [07e2a66882939193]
-i-declare [01a456302c742ad1]
-i-perform [294f151dcb98fcdd]
-i-declare [b3639b002c66bb68]
-i-perform [4e7e02f6969351e9]
-i-perform [3b6f5b3a18cc80ca]
-[doc_examples.ttd:915] c-check_equal [2295eedfe0f2a821] r-0-1-0
-[doc_examples.ttd:916] c-check_equal [d6b757776e792253] r-0-1-0
-i-declare [48a62486ea845b4b]
-i-perform [5651f778d2722873]
-[doc_examples.ttd:921] c-check_equal [aaa24df4d8f37d31] r-1-0-0
-[doc_examples.ttd:922] c-check_equal [92bbcb3a3ac4b096] r-1-0-0
-i-perform [2b2a59ee7621d167]
-[doc_examples.ttd:924] c-check_equal [aaa24df4d8f37d31] r-0-1-0
-[doc_examples.ttd:925] c-check_equal [73ac9e887d442c2d] r-0-1-0
-t-produce_summary [31b6efe94cceba8e]
-t-title [70352d8661230ad4]
-t-title [04f61ddd21fea9a7]
-i-declare [796a9e858cfbe3c5]
-[doc_examples.ttd:1182] c-check_equal [5ff1b03e333ed588] r-1-0-0
-t-produce_summary [93669d9005732437]
-t-produce_summary [0639967ad6f522f5]
-t-produce_summary [bf4fe91566053b0c]
 t-title [227d1d6320a22efe]
 t-title [1efffc9e626f98fa]
 t-title [ffbcb52d5321780b]
@@ -1543,8 +1280,447 @@ i-declare [e619e9339e11c764]
 v-show_value [d8e131204d958180]
 t-produce_summary [75939debf0042ac3]
 t-produce_summary [43eba2286587e061]
+t-title [98aed942e3c16561]
+t-title [d0df3b582ffb5f7a]
+i-declare [47649f6a9bee06e5]
+i-declare [bb8e6590dce059e1]
+i-declare [bd4954af0af12db3]
+i-declare [2faaea26943e03e9]
+i-declare [0329c1f435f2723c]
+t-produce_summary [817d34d95144e3d1]
+t-title [e1b70d0144e0303f]
+[macros.ttd:25] c-check_equal [1aad218f5309ba43] r-1-0-0
+[macros.ttd:26] c-check_equal [4dc7f54f43796ba6] r-1-0-0
+[macros.ttd:27] c-check_equal [6fd6b34d181f34dd] r-1-0-0
+t-produce_summary [620a0cd66426a18a]
+t-title [5759ccf355f7dc39]
+[macros.ttd:32] c-check_equal [dba8e4d2d302f7e7] r-1-0-0
+[macros.ttd:33] c-check_equal [5cc49ba58c46f8f6] r-1-0-0
+[macros.ttd:34] c-check_equal [8841c2fa3bc2fa60] r-1-0-0
+[macros.ttd:35] c-check_equal [fac802d17ccc4b55] r-1-0-0
+t-produce_summary [4478469bbe959b3c]
+t-title [43f14b779593b497]
+[macros.ttd:39] c-check_equal [bb4cf0d373680ad9] r-1-0-0
+[macros.ttd:40] c-check_equal [b89013c8c21ab228] r-1-0-0
+[macros.ttd:41] c-check_equal [19121a65ec38a2e5] r-1-0-0
+[macros.ttd:42] c-check_equal [e79d79b41c3ac925] r-1-0-0
+[macros.ttd:44] c-check_equal [73ec847f5e0c3ddc] r-1-0-0
+[macros.ttd:45] c-check_equal [ebb78b35890b3233] r-1-0-0
+t-produce_summary [34cfe67224df410e]
+t-title [2f4a1b101be26783]
+[macros.ttd:49] c-check_equal [616790d35e084c3c] r-1-0-0
+[macros.ttd:50] c-check_equal [8c7119795cc5a38c] r-1-0-0
+[macros.ttd:53] c-check_equal [b0ebe313614eea3d] r-1-0-0
+[macros.ttd:56] c-check_equal [b3a37689c27ac337] r-1-0-0
+t-produce_summary [4a4939390d98ba08]
+t-title [5c9ef54b4a8437f6]
+[macros.ttd:63] c-check_equal [da6b95d9c2cfadbd] r-1-0-0
+[macros.ttd:64] c-check_equal [3f1e8460ff228a74] r-1-0-0
+[macros.ttd:65] c-check_equal [35e6fb05b1cf475a] r-1-0-0
+t-produce_summary [71f00bf153b99d60]
+t-title [5ae1b16a48450df8]
+[macros.ttd:69] c-check_equal [95cafc3177e7ed9f] r-1-0-0
+[macros.ttd:70] c-check_equal [19931c4abddbe907] r-1-0-0
+[macros.ttd:71] c-check_equal [ec38dfa77fb6b8ed] r-1-0-0
+[macros.ttd:72] c-check_equal [aec0d6063b486cad] r-1-0-0
+t-produce_summary [67bdf41d70e0ffc2]
+t-title [c7abfa65760ece55]
+[macros.ttd:76] c-check_equal [a6a56e4e8d05f876] r-1-0-0
+[macros.ttd:77] c-check_equal [2128e1a0ea341411] r-1-0-0
+[macros.ttd:78] c-check_equal [c6f2e95986667241] r-1-0-0
+[macros.ttd:79] c-check_equal [7e40e761d89d9f0e] r-1-0-0
+[macros.ttd:80] c-check_equal [2f7c5d71ece55301] r-1-0-0
+[macros.ttd:81] c-check_equal [f8359205e09c9d69] r-1-0-0
+[macros.ttd:82] c-check_equal [e0ee37e5c5756e61] r-1-0-0
+i-text [a0da436bd29fc8c8]
+[macros.ttd:85] c-check_equal [f9e5623757983b58] r-1-0-0
+[macros.ttd:86] c-check_equal [f542f126d6586f59] r-1-0-0
+[macros.ttd:87] c-check_equal [a7e34014195935fe] r-1-0-0
+[macros.ttd:88] c-check_equal [d7702a8507bd08f8] r-1-0-0
+t-produce_summary [8c5381dafcccf09d]
+t-title [8c7837ad6331b454]
+i-declare [63740cfcf43350e6]
+[macros.ttd:96] c-check_equal [758e1636bb32f21c] r-1-0-0
+[macros.ttd:98] c-check_equal [ce6bd094587640f7] r-1-0-0
+i-declare [ca408ce4a2032708]
+t-produce_summary [bf7a76985d955109]
+t-title [2d007b8f96b6a904]
+[macros.ttd:107] c-check_equal [6db91972cc078210] r-1-0-0
+[macros.ttd:108] c-check_equal [4aab41856170ad45] r-1-0-0
+[macros.ttd:109] c-check_equal [c24295741afcdaed] r-1-0-0
+[macros.ttd:110] c-check_equal [3f216e4177f33982] r-1-0-0
+[macros.ttd:111] c-check_equal [0952a139cec71425] r-1-0-0
+[macros.ttd:112] c-check_equal [81ac4b3390a6a84e] r-1-0-0
+[macros.ttd:113] c-check_equal [edd57eb132b1d2f3] r-1-0-0
+t-produce_summary [36a9500d4298abf3]
+t-title [f2403f74acaa5f7c]
+[macros.ttd:117] c-check_equal [e4efa32915fbac76] r-1-0-0
+[macros.ttd:118] c-check_equal [d59be4a3d26eabd0] r-1-0-0
+[macros.ttd:119] c-check_equal [3413386d7a0c49f9] r-1-0-0
+t-produce_summary [260b3d1b72c49c1e]
+t-produce_summary [94a502ecd86b0fca]
 t-title [76fec565aa90c530]
 [testarudo.ttd:15] c-check_true [1183e68c10f46944] r-1-0-0
 t-produce_summary [2a0af749b5b1698c]
 t-produce_summary [5939e2a0801214af]
+t-title [6570a2389dab9e92]
+t-title [4ebf5a87e8d6e567]
+t-title [c8d1f90afe8c33c0]
+i-declare [b5b4ce8ad3af75df]
+[doc_examples.ttd:103] c-check_true [5bb7ddf301b7cf3d] r-0-1-0
+i-perform [a1bb0a0da7fb5938]
+[doc_examples.ttd:105] c-check_true [bba4202db0284aa9] r-1-0-0
+t-produce_summary [7462759f10f52eb8]
+t-produce_summary [8086280ff877cf57]
+t-produce_summary [32655bb5d20de8fd]
+t-title [19cb0f4395087039]
+t-title [b00767281b2f7ec9]
+t-title [869440d3c516504b]
+i-declare [b5b4ce8ad3af75df]
+i-step_id [b41a1b9e7e655714]
+[doc_examples.ttd:485] c-check_true [5bb7ddf301b7cf3d] r-0-1-0
+t-produce_summary [c06d05dc77abd940]
+t-produce_summary [933c4f4db90a8386]
+t-produce_summary [cab0caad4520f85c]
+t-title [785d90535c9c4a7c]
+t-title [30c2c94e5fc0e73b]
+t-produce_summary [48b5e35f5d0ca500]
+t-produce_summary [c8f8ab988f7cd4b8]
+t-title [6402a987a1135920]
+t-title [2795b9cc0e3f3923]
+i-declare [3a434a1c10264864]
+[doc_examples.ttd:61] c-check_equal [69a9740c249cd17c] r-1-0-0
+t-produce_summary [c0c37b6796ef40b9]
+t-title [013bcb467f47df6e]
+t-title [4eb72f88f4ae670f]
+t-title [efa4fb7048b36c56]
+t-produce_summary [034f130f6419e5be]
+t-produce_summary [cbed216e0a138e8f]
+t-produce_summary [a6edac2f56296118]
+t-title [89ea2f992494359e]
+i-declare [b8c3c9807dba5aa2]
+i-declare [775f9bcd897834a6]
+t-produce_summary [74e6e6f7a06ce0f3]
+t-title [d65cfcc0ef3d656a]
+i-perform [b6e3c361aab17c2f]
+t-produce_summary [5d5d3762c9ad91f5]
+t-title [7ff0bee34945adc0]
+[doc_examples.ttd:213] c-check_true [154309cd5557a35e] r-1-0-0
+[doc_examples.ttd:214] c-check_true [832fc2ba74e18134] r-0-1-0
+t-produce_summary [b6557b2ba858af6d]
+t-title [be4c1fb40c78aba9]
+[doc_examples.ttd:222] c-check_true [14ba185b7a14dd33] r-1-0-0
+[doc_examples.ttd:223] c-check_true [b09c7467634f24c5] r-1-0-0
+[doc_examples.ttd:224] c-check_true [65b769c3567d4101] r-0-1-0
+t-produce_summary [5e8f524155c4ab3a]
+t-title [401d308821402663]
+[doc_examples.ttd:234] c-check_equal [1fcae3c658ddf202] r-1-0-0
+[doc_examples.ttd:235] c-check_equal [904380c570ce19a1] r-0-1-0
+t-produce_summary [bb528cac1bf262ec]
+t-title [3f26272064f68d65]
+[doc_examples.ttd:245] c-check_equal [5a12e15ec4e6c7ad] r-0-1-0
+[doc_examples.ttd:246] c-check_equal [1abfb64a36187741] r-1-0-0
+t-produce_summary [744b7283de4bc9c3]
+t-title [c0092abe15e75632]
+[doc_examples.ttd:255] c-check_equal [67c5dd438054e1c7] r-1-0-0
+[doc_examples.ttd:257] c-check_equal [237349d01f8c4f8e] r-1-0-0
+t-produce_summary [9c15e2116bad2cae]
+t-title [a927a45dfa0d16ce]
+i-declare [b517bfcf47e9b60c]
+i-declare [16ca5c86b84229da]
+i-declare [769d928bdfeea883]
+[doc_examples.ttd:268] c-check_true [61ab870978f9c627] r-0-1-0
+i-declare [d404631679e7ea1c]
+i-declare [4f00316d3faeed76]
+[doc_examples.ttd:276] c-check_true [d989827f34bc5462] r-0-1-0
+[doc_examples.ttd:278] c-check_true [0d8e087f18adc090] r-1-0-0
+t-produce_summary [730bbde3048bd317]
+t-title [f3cdca402bed2596]
+[doc_examples.ttd:289] c-check_approx [08d9720f8e686b6f] r-1-0-0
+[doc_examples.ttd:290] c-check_approx [d83f5c6cd51397a5] r-0-1-0
+t-produce_summary [9bab0b51512f399c]
+t-title [1493260006c12f8d]
+[doc_examples.ttd:301] c-check_approx [3c7e7bf489ada040] r-1-0-0
+[doc_examples.ttd:302] c-check_approx [7a77894d5eeb5ed0] r-0-1-0
+t-produce_summary [ab886ebb77fa51c4]
+t-title [47948c59b0b5a661]
+i-declare [dd04fbdd62b15e15]
+t-produce_summary [ac75b050cf82eabf]
+t-title [d9f7503c5b636b46]
+i-perform [825d6b641cf515c3]
+t-produce_summary [5de3658308e7e4ae]
+t-title [8817f881878a7807]
+v-show_value [9dda977060017054]
+t-produce_summary [9db28f63081917ac]
+t-title [825b5204dca38621]
+[doc_examples.ttd:333] c-check_approx [ff439c5d93bb88ff] r-0-1-0
+[doc_examples.ttd:334] c-check_approx [f80c62cf1da5c08a] r-0-1-0
+[doc_examples.ttd:335] c-check_approx [bfa61826b6423fbe] r-1-0-0
+t-produce_summary [8e1ff56cd5be78e3]
+t-title [169c4777c0ec03ba]
+[doc_examples.ttd:347] c-check_true [6a6120fb8ec8dc8f] r-1-0-0
+[doc_examples.ttd:348] c-check_true [41ff41e0197749ce] r-0-1-0
+t-produce_summary [36e8c3dc70c058a9]
+t-title [98f5f9442c5ae72f]
+[doc_examples.ttd:363] c-check_equal [ff2bc5902655b3a5] r-1-0-0
+[doc_examples.ttd:364] c-check_equal [e9ae74108a09c04a] r-0-1-0
+[doc_examples.ttd:365] c-check_approx [c2d7c06e5e568f08] r-0-1-0
+t-produce_summary [d567759dce4f6159]
+t-title [10218f8f6350ae45]
+[doc_examples.ttd:378] c-check_true [4b62fe126d2c86e9] r-1-0-0
+[doc_examples.ttd:380] c-check_true [06b07eadaa9266c4] r-0-1-0
+[doc_examples.ttd:383] c-check_equal [8c4641c903647e7a] r-0-1-0
+t-produce_summary [11dee7822f9c7140]
+t-title [ed9895364ed9a8d8]
+i-declare [3a5855ec31e4ada5]
+[doc_examples.ttd:394] c-try-catch  [b1067531fc2b7543] r-1-0-0
+[doc_examples.ttd:395] c-try-catch  [a5ff71ac89b8c81c] r-0-1-0
+t-produce_summary [c486ff40ce47c59d]
+t-title [f71a9b77b5d69252]
+i-declare [3a5855ec31e4ada5]
+[doc_examples.ttd:403] c-try-catch  [02266dcf71c6373e] r-1-0-0
+[doc_examples.ttd:404] c-try-catch  [4a609e6eb48cb89e] r-0-1-0
+[doc_examples.ttd:404] e-uncaught_exception [d49a0a335e229f55] r-0-0-1
+t-produce_summary [739c2c4633bb7b34]
+t-title [90f8b8d40ad46d86]
+v-show_value [8cb2f248c78b6d74]
+v-show_value [586b22b28fbb30f1]
+t-produce_summary [f20922a9f12db424]
+t-title [90b3217c19bc8c11]
+v-show_value [c38bd646aa80d471]
+v-show_value [d7401433820961ad]
+t-produce_summary [8162caef3aa20e9e]
+t-title [e859a8a67356f1fa]
+i-declare [72578e8a8689e423]
+[doc_examples.ttd:436] c-check_equal [5f663b1986c42401] r-1-0-0
+i-begin_scope [f36b85d9debed11c]
+i-declare [91c6d2b4a301fa34]
+i-begin_scope [5a503f255f66fe78]
+i-declare [cf49e6a14079f039]
+i-end_scope [5edf78ad98c0da6f]
+[doc_examples.ttd:442] c-check_equal [ec4877a785637b6e] r-1-0-0
+i-end_scope [cba7fe587fcb4959]
+[doc_examples.ttd:444] c-check_equal [abe20d4e2e84845a] r-1-0-0
+t-produce_summary [bfdf8e248b7a889e]
+t-title [3f7eb6c76d00a51e]
+i-begin_declare_scope [ce55c8b5616c7b5e]
+[doc_examples.ttd:454] c-check_true [a520455ca53c6652] r-1-0-0
+[doc_examples.ttd:455] c-check_equal [cc237e42d56d10dc] r-1-0-0
+i-end_declare_scope
+i-begin_declare_scope [f70586714d172bf6]
+[doc_examples.ttd:458] c-check_true [a520455ca53c6652] r-1-0-0
+i-end_declare_scope
+t-produce_summary [8632755231956b4e]
+t-title [24bd43cadfa903a4]
+i-begin_declare_scope [02e9ebd1afe3493e]
+[doc_examples.ttd:468] c-check_equal [9026124f3ca92305] r-1-0-0
+[doc_examples.ttd:469] c-check_true [24002e35e05b9769] r-0-1-0
+i-end_declare_scope
+t-produce_summary [ac8d2699409e6c1c]
+t-title [3c4a1d4d5bf2d896]
+i-text [ff3154ea96323ddf]
+i-text [7aec58e3c6a58688]
+i-text [359af85123ff6901]
+t-produce_summary [680b7dec8d966ac0]
+t-title [1fcf74e2e06dcd97]
+[doc_examples.ttd:518] c-check_true [3cccf09957d97bd9] r-1-0-0
+i-separator
+i-perform [6cfdc9cf42413829]
+t-produce_summary [d31447cf4a9f5ff9]
+t-title [4ab6f863df8508d9]
+i-declare [679fb45de13f06f5]
+i-perform [a81de97721788a2e]
+i-declare [1dcd519d65a7bc9d]
+i-declare [075c5063a14c8142]
+i-perform [b3101f766edeae10]
+i-perform [22308cb71a105911]
+t-produce_summary [32179e3cb735654a]
+t-title [d4ecc1f884691260]
+v-show_value [e7c5da56d16078b3]
+i-perform [3607625a4ef37eaa]
+v-show_value [46446cfc5838ddae]
+t-produce_summary [984935a2edd6c8e2]
+t-title [62244f96c1cd982e]
+i-declare [2fb94f9f56c717e2]
+i-perform [26baa63a54215a0f]
+[doc_examples.ttd:567] c-check_equal [4d3d6716a4c22baa] r-1-0-0
+t-produce_summary [c289474add1231f8]
+t-title [2dfcca564ef859d2]
+i-declare [3a5855ec31e4ada5]
+[doc_examples.ttd:575] e-uncaught_exception [d49a0a335e229f55] r-0-0-1
+t-produce_summary [bebf6a23b8f1c77c]
+t-title [0aede9cbcf547f4a]
+[doc_examples.ttd:593] c-check_true [3221c86eb11f4559] r-1-0-0
+i-begin_indent
+[doc_examples.ttd:594] c-check_equal [63e525318c6828da] r-1-0-0
+i-end_indent
+[doc_examples.ttd:595] c-check_equal [65d250df2ad277c3] r-1-0-0
+i-begin_indent
+[doc_examples.ttd:596] c-check_true [26217da348a3eb99] r-1-0-0
+[doc_examples.ttd:597] c-check_true [60565112c1d1cd53] r-0-1-0
+i-end_indent
+[doc_examples.ttd:600] c-check_true [ce1efb082a114808] r-0-1-0
+i-begin_indent
+i-end_indent
+t-produce_summary [c5bceb5adfccb4a3]
+t-title [ce60d8385e3bf5c2]
+i-declare [5f39751761893e61]
+i-declare [1285f5036d4346d5]
+i-begin_with [1ea09274d99ac4b9]
+i-check_true [8d02a2297e97aea1]
+[doc_examples.ttd:651] c-with_summary [a9201e392ddfa918] r-3-0-0
+i-end_with
+i-begin_with [1ea09274d99ac4b9]
+i-declare [55faed78504583b7]
+i-check_true [a69eacee2c9802ce]
+[doc_examples.ttd:653] c-with_summary [a9201e392ddfa918] r-3-0-0
+i-end_with
+i-begin_with [1ea09274d99ac4b9]
+i-begin_with [e1fa67a086db20bf]
+i-check_equal [0b672f39f796ac43]
+i-begin_with_results
+[doc_examples.ttd:660] c-check_equal [0b672f39f796ac43] r-0-1-0
+[doc_examples.ttd:660] c-check_equal [0b672f39f796ac43] r-0-1-0
+[doc_examples.ttd:660] c-check_equal [0b672f39f796ac43] r-0-1-0
+i-end_with_results
+i-end_with
+[doc_examples.ttd:658] c-with_summary [a9201e392ddfa918] r-6-3-0
+i-end_with
+t-produce_summary [22dd44219466dda3]
+t-title [b44d67e6249edd24]
+i-declare [072859a49213de19]
+i-begin_with [fca079611f0697e1]
+i-check_equal [b68f6b5f0904d65f]
+i-begin_with_results
+[doc_examples.ttd:671] c-check_equal [b68f6b5f0904d65f] r-0-1-0
+i-end_with_results
+[doc_examples.ttd:670] c-with_summary [778bb1605f693a09] r-2-1-0
+i-end_with
+t-produce_summary [70e8766b4af53d20]
+t-title [48f5c93ad95d73d8]
+i-begin_with [db8ff6f8533d8ad6]
+i-check_equal [b68f6b5f0904d65f]
+i-begin_with_results
+[doc_examples.ttd:681] c-check_equal [b68f6b5f0904d65f] r-0-1-0
+i-end_with_results
+[doc_examples.ttd:677] c-with_summary [f3c9a36bb58ffe18] r-2-1-0
+i-end_with
+t-produce_summary [9255439a2423ba57]
+t-title [e33d3ab9e73bfef5]
+i-declare [8a4c25ba9495df19]
+i-begin_with [2823290b2be16fbb]
+i-begin_with [a154818c80310698]
+i-check_equal [fcec40d230525059]
+i-end_with
+[doc_examples.ttd:713] c-with_summary [8258883672c2be73] r-10000-0-0
+i-end_with
+t-produce_summary [4032eb79122a4d59]
+t-title [f545ba687993d72a]
+i-declare [8a4c25ba9495df19]
+i-begin_with [d6459907775027a6]
+i-check_equal [fcec40d230525059]
+[doc_examples.ttd:724] c-with_summary [1574e07c38a35b3a] r-100-0-0
+i-end_with
+t-produce_summary [18ed7509b83a1f42]
+t-title [e522592d1d6e9171]
+i-declare [8a4c25ba9495df19]
+i-begin_with [37cdf91d5edb07a9]
+i-check_equal [fcec40d230525059]
+[doc_examples.ttd:737] c-with_summary [445fdee73d842096] r-10000-0-0
+i-end_with
+t-produce_summary [5783bbd55d6a3caf]
+t-title [c44c339488e192d1]
+t-title [c997366b158a0f50]
+i-declare [990394f6ed43b212]
+i-declare [46f4437fca1805db]
+i-perform [56fc70c3b6e063ce]
+t-produce_summary [cf652130fb3a4658]
+t-title [fc032daf51124065]
+i-declare [990394f6ed43b212]
+i-perform [d4e277e3703689d6]
+t-produce_summary [436fd7b7f5ebbcac]
+t-title [85673454355ef8a0]
+i-declare [990394f6ed43b212]
+[doc_examples.ttd:1020] c-check_equal [752018b7fcb688b5] r-0-1-0
+[doc_examples.ttd:1030] c-check_true [9bd3152d16e8b9cc] r-0-1-0
+i-begin_indent
+i-end_indent
+[doc_examples.ttd:1037] c-check_true [9bd3152d16e8b9cc] r-0-1-0
+i-begin_indent
+i-end_indent
+t-produce_summary [4ebe22321a32f3f5]
+t-title [a8ebd8810706b100]
+i-declare [990394f6ed43b212]
+[doc_examples.ttd:1049] c-check_equal [77691b95d3719763] r-0-1-0
+t-produce_summary [0fa201eda98c45a8]
+t-title [3dd819d48c3483e3]
+i-declare [990394f6ed43b212]
+[doc_examples.ttd:1059] c-check_equal [50248b4fbb4fee4b] r-0-1-0
+t-produce_summary [30a9e0a738e62863]
+t-title [f3f2012b63b62240]
+i-declare [990394f6ed43b212]
+[doc_examples.ttd:1074] c-check_equal [39828129da9aaa95] r-0-1-0
+t-produce_summary [8d9a4652cef12912]
+t-title [66c1c07ee88410a3]
+i-declare [990394f6ed43b212]
+i-declare [07e2a66882939193]
+i-declare [a0d148d88af10025]
+i-declare [48a62486ea845b4b]
+i-begin_declare_scope [0964340af50af460]
+[doc_examples.ttd:1110] c-check_equal [42493a4674bda177] r-0-1-0
+i-end_declare_scope
+i-begin_declare_scope [7664b411f488ade2]
+[doc_examples.ttd:1115] c-check_equal [42493a4674bda177] r-0-1-0
+i-end_declare_scope
+t-produce_summary [b291a7185f9b44d9]
+t-title [4b4d2cabdadc5903]
+i-declare [990394f6ed43b212]
+i-begin_declare_scope [8bb96106b649671b]
+i-begin_declare_scope [7664b411f488ade2]
+i-end_declare_scope
+i-end_declare_scope
+[doc_examples.ttd:1126] e-uncaught_exception [07643f9669b51fbb] r-0-0-1
+t-produce_summary [f38d84c7ec25f284]
+t-produce_summary [e1f709789a2dac6f]
+t-title [daa2625ab005adc9]
+t-title [e16527825480e133]
+i-declare [733c182d646a7e93]
+i-perform [bc3aee025f64a736]
+t-produce_summary [8c9fa2805f2fd301]
+t-title [6bc7027139890a6f]
+i-declare [733c182d646a7e93]
+i-perform [d3aa79a29290c162]
+t-produce_summary [42627da0e1833f2d]
+t-produce_summary [30933b9b9bae35fe]
+t-title [dd3012ba15a4fae7]
+i-declare [07e2a66882939193]
+i-declare [01a456302c742ad1]
+i-perform [294f151dcb98fcdd]
+i-declare [1fc75a4f17822f13]
+i-perform [4e7e02f6969351e9]
+t-produce_summary [30fbd5cca8bee580]
+t-title [e05b635e10bdc34a]
+i-declare [07e2a66882939193]
+i-declare [01a456302c742ad1]
+i-perform [294f151dcb98fcdd]
+i-declare [b3639b002c66bb68]
+i-perform [4e7e02f6969351e9]
+i-perform [3b6f5b3a18cc80ca]
+[doc_examples.ttd:1158] c-check_equal [2295eedfe0f2a821] r-0-1-0
+[doc_examples.ttd:1159] c-check_equal [d6b757776e792253] r-0-1-0
+i-declare [48a62486ea845b4b]
+i-perform [5651f778d2722873]
+[doc_examples.ttd:1164] c-check_equal [aaa24df4d8f37d31] r-1-0-0
+[doc_examples.ttd:1165] c-check_equal [92bbcb3a3ac4b096] r-1-0-0
+i-perform [2b2a59ee7621d167]
+[doc_examples.ttd:1167] c-check_equal [aaa24df4d8f37d31] r-0-1-0
+[doc_examples.ttd:1168] c-check_equal [73ac9e887d442c2d] r-0-1-0
+t-produce_summary [3f6dd5d6ccd06d67]
+t-title [6295d16554a127e1]
+t-title [4ab6d153cdb6800d]
+i-declare [796a9e858cfbe3c5]
+[doc_examples.ttd:1426] c-check_equal [5ff1b03e333ed588] r-1-0-0
+t-produce_summary [810ab33258689d98]
+t-produce_summary [a381defcd633a0cf]
+t-produce_summary [0ccae3fd4b8c5602]
 t-produce_summary [c7fcd428ef7b17f7]

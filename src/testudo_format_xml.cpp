@@ -236,32 +236,31 @@ namespace {
       return check_element;
      }
 
-    void output_check_true(string expr_str, string success,
+    void output_check_true(string expr_str,
+                           string exprv_str, string valv_str,
+                           string expl_str,
+                           string success,
                            string prefix, bool) override {
       auto check_element=add_check_element("check_true", success, prefix);
       check_element
         ->add_element("expression1")
           ->append_text(escape_tilde(expr_str));
-      print(check_element);
-    }
-
-    void output_check_true_for(string expr_str,
-                               string exprv_str, string valv_str,
-                               string success,
-                               string prefix, bool) override {
-      auto check_element=add_check_element("check_true_for", success, prefix);
-      check_element
-        ->add_element("expression1")
-          ->append_text(escape_tilde(expr_str));
-      check_element
-        ->add_element("expressionv")
-        ->append_attribute("value", escape_tilde(valv_str))
-        ->append_text(escape_tilde(exprv_str));
+      if (not exprv_str.empty())
+        check_element
+          ->add_element("expressionv")
+          ->append_attribute("value", escape_tilde(valv_str))
+          ->append_text(escape_tilde(exprv_str));
+      if (not expl_str.empty())
+        check_element
+          ->add_element("explanation")
+          ->append_text(escape_tilde(expl_str));
       print(check_element);
     }
 
     void output_check_equal(string expr1_str, string val1_str,
                             string expr2_str, string val2_str,
+                            string exprv_str, string valv_str,
+                            string expl_str,
                             string success,
                             string prefix, bool) override {
       auto check_element=add_check_element("check_equal", success, prefix);
@@ -273,12 +272,23 @@ namespace {
         ->add_element("expression2")
           ->append_attribute("value", escape_tilde(val2_str))
           ->append_text(escape_tilde(expr2_str));
+      if (not exprv_str.empty())
+        check_element
+          ->add_element("expressionv")
+          ->append_attribute("value", escape_tilde(valv_str))
+          ->append_text(escape_tilde(exprv_str));
+      if (not expl_str.empty())
+        check_element
+          ->add_element("explanation")
+          ->append_text(escape_tilde(expl_str));
       print(check_element);
     }
 
     void output_check_approx(string expr1_str, string val1_str,
                              string expr2_str, string val2_str,
                              string max_error_str,
+                             string exprv_str, string valv_str,
+                             string expl_str,
                              string success,
                              string prefix, bool) override {
       auto check_element=add_check_element("check_approx", success, prefix);
@@ -292,6 +302,15 @@ namespace {
         ->add_element("expression2")
           ->append_attribute("value", escape_tilde(val2_str))
           ->append_text(escape_tilde(expr2_str));
+      if (not exprv_str.empty())
+        check_element
+          ->add_element("expressionv")
+          ->append_attribute("value", escape_tilde(valv_str))
+          ->append_text(escape_tilde(exprv_str));
+      if (not expl_str.empty())
+        check_element
+          ->add_element("explanation")
+          ->append_text(escape_tilde(expl_str));
       print(check_element);
     }
 

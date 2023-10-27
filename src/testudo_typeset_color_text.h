@@ -77,19 +77,22 @@ namespace testudo___implementation {
                          string n_failed, string n_total, string n_errors,
                          string success)=0;
 
-    virtual void check_true(string expr_str, string success,
+    virtual void check_true(string expr_str,
+                            string exprv_str, string valv_str,
+                            string explanation,
+                            string success,
                             string prefix)=0;
-    virtual void check_true_for(string expr_str,
-                                string exprv_str, string valv_str,
-                                string success,
-                                string prefix)=0;
     virtual void check_equal(string expr1_str, string val1_str,
                              string expr2_str, string val2_str,
+                             string exprv_str, string valv_str,
+                             string explanation,
                              string success,
                              string prefix)=0;
     virtual void check_approx(string expr1_str, string val1_str,
                               string expr2_str, string val2_str,
                               string max_error_str,
+                              string exprv_str, string valv_str,
+                              string explanation,
                               string success,
                               string prefix)=0;
 

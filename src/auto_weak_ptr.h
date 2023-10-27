@@ -33,6 +33,7 @@ namespace kmsxml
     template <typename T>
     class auto_weak_ptr {
     public:
+      auto_weak_ptr() { }
       template <typename U>
       auto_weak_ptr(std::weak_ptr<U> const &wp) : wp(wp) { }
       template <typename U>

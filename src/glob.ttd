@@ -9,53 +9,53 @@ namespace {
   define_top_test_node("testudo", (glob_test, "glob patterns"), 7500);
 
   define_test(glob_test, "no special character") {
-    check(matches("", ""))_true;
-    check(matches("", "a"))_false;
-    check(matches("a", ""))_false;
-    check(matches("a", "a"))_true;
-    check(matches("abcd", "abcd"))_true;
-    check(matches("abc", "abcd"))_false;
-    check(matches("abcd", "abc"))_false;
+    check(matches("", ""))_true();
+    check(matches("", "a"))_false();
+    check(matches("a", ""))_false();
+    check(matches("a", "a"))_true();
+    check(matches("abcd", "abcd"))_true();
+    check(matches("abc", "abcd"))_false();
+    check(matches("abcd", "abc"))_false();
   }
 
   define_test(glob_test, "question mark") {
-    check(matches("", "?"))_false;
-    check(matches("?", ""))_false;
-    check(matches("?", "?"))_true;
-    check(matches("a", "?"))_true;
-    check(matches(".", "?"))_true;
-    check(matches("ab", "?"))_false;
-    check(matches("ab", "??"))_true;
-    check(matches("abc", "??"))_false;
-    check(matches("ab", "???"))_false;
-    check(matches("abc", "???"))_true;
-    check(matches("abc", "?b?"))_true;
-    check(matches("abc", "?e?"))_false;
-    check(matches("abc", "a?c"))_true;
-    check(matches("abc", "a?e"))_false;
-    check(matches("abc", "e?c"))_false;
+    check(matches("", "?"))_false();
+    check(matches("?", ""))_false();
+    check(matches("?", "?"))_true();
+    check(matches("a", "?"))_true();
+    check(matches(".", "?"))_true();
+    check(matches("ab", "?"))_false();
+    check(matches("ab", "??"))_true();
+    check(matches("abc", "??"))_false();
+    check(matches("ab", "???"))_false();
+    check(matches("abc", "???"))_true();
+    check(matches("abc", "?b?"))_true();
+    check(matches("abc", "?e?"))_false();
+    check(matches("abc", "a?c"))_true();
+    check(matches("abc", "a?e"))_false();
+    check(matches("abc", "e?c"))_false();
   }
 
   define_test(glob_test, "asterisk") {
-    check(matches("", "*"))_true;
-    check(matches("*", ""))_false;
-    check(matches("*", "?"))_true;
-    check(matches("?", "*"))_true;
-    check(matches("*", "*"))_true;
-    check(matches("a", "*"))_true;
-    check(matches("ab", "*"))_true;
-    check(matches("ab", "a*"))_true;
-    check(matches("ab", "e*"))_false;
-    check(matches("ab", "*b"))_true;
-    check(matches("ab", "*e"))_false;
-    check(matches("ab", "a*b"))_true;
-    check(matches("abcd", "ab**cd"))_true;
-    check(matches("abcd", "*ab**cd*"))_true;
-    check(matches("abcd", "*ab*c*d*"))_true;
-    check(matches("abcd", "*a*b*cd*"))_true;
-    check(matches("abecd", "ab*cd"))_true;
-    check(matches("abeeecd", "ab*cd"))_true;
-    check(matches("abc", "ab*bc"))_false;
+    check(matches("", "*"))_true();
+    check(matches("*", ""))_false();
+    check(matches("*", "?"))_true();
+    check(matches("?", "*"))_true();
+    check(matches("*", "*"))_true();
+    check(matches("a", "*"))_true();
+    check(matches("ab", "*"))_true();
+    check(matches("ab", "a*"))_true();
+    check(matches("ab", "e*"))_false();
+    check(matches("ab", "*b"))_true();
+    check(matches("ab", "*e"))_false();
+    check(matches("ab", "a*b"))_true();
+    check(matches("abcd", "ab**cd"))_true();
+    check(matches("abcd", "*ab**cd*"))_true();
+    check(matches("abcd", "*ab*c*d*"))_true();
+    check(matches("abcd", "*a*b*cd*"))_true();
+    check(matches("abecd", "ab*cd"))_true();
+    check(matches("abeeecd", "ab*cd"))_true();
+    check(matches("abc", "ab*bc"))_false();
   }
 
   define_test(glob_test, "escape") {
@@ -65,22 +65,22 @@ namespace {
     check_try(matches("abcd", "\\."))_catch();
     check_try(matches("", "\\"))_catch();
     check_try(matches("abcd", "\\"))_catch();
-    check(matches("a\\b", "a\\\\b"))_true;
-    check(matches("a*b", "a\\*b"))_true;
-    check(matches("ab", "a\\*b"))_false;
-    check(matches("a?b", "a\\?b"))_true;
-    check(matches("aeb", "a\\?b"))_false;
+    check(matches("a\\b", "a\\\\b"))_true();
+    check(matches("a*b", "a\\*b"))_true();
+    check(matches("ab", "a\\*b"))_false();
+    check(matches("a?b", "a\\?b"))_true();
+    check(matches("aeb", "a\\?b"))_false();
   }
 
   define_test(glob_test, "complex") {
-    check(matches("bae\\an\\on", "ba*a*\\\\?n"))_true;
-    check(matches("bae\\n\\on", "ba*a*\\\\?n"))_false;
-    check(matches("bae\\an\\one", "ba*a*\\\\?n"))_false;
-    check(matches("bae\\an\\n", "ba*a*\\\\?n"))_false;
-    check(matches("bae\\anon", "ba*a*\\\\?n"))_false;
-    check(matches("bae\\an\\on", "ba*a*\\?n"))_false;
-    check(matches("bae\\an\\?n", "ba*a*\\?n"))_true;
-    check(matches("bae\\aeee?n", "ba*a*\\?n"))_true;
+    check(matches("bae\\an\\on", "ba*a*\\\\?n"))_true();
+    check(matches("bae\\n\\on", "ba*a*\\\\?n"))_false();
+    check(matches("bae\\an\\one", "ba*a*\\\\?n"))_false();
+    check(matches("bae\\an\\n", "ba*a*\\\\?n"))_false();
+    check(matches("bae\\anon", "ba*a*\\\\?n"))_false();
+    check(matches("bae\\an\\on", "ba*a*\\?n"))_false();
+    check(matches("bae\\an\\?n", "ba*a*\\?n"))_true();
+    check(matches("bae\\aeee?n", "ba*a*\\?n"))_true();
   }
 
 }

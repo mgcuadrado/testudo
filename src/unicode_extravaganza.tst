@@ -6,10 +6,10 @@ DEFINE_TOP_TEST define_top_test
 DEFINE_TEST     définir_test
 WITH_FIXTURE    με_προσάρτημα
 VISIBLE_FIXTURE visible_fixture
+FIXTURE_ARGS    fixture_args
 
-STEP_ID              step_id
-PRINT_TEXT           print_text
-PRINT_BREAK          print_break
+TOUT        tout
+TFOS        tfos
 
 DECLARE              deklari
 PERFORM              biểu_diễn
@@ -33,15 +33,12 @@ CHECK      تحقق
 PROVIDED   provided
 TRUE       _правда
 FALSE      _false
-TRUE_FOR   _true_for
-FALSE_FOR  _false_for
 EQUAL      _equal
 NOT_EQUAL  _not_equal
 APPROX     _근접한
 NOT_APPROX _not_approx
-TOL        _tol
-
-TFOS tfos
+WITH_TOL   _with_tol
+SHOW       _show
 
 MOCK_METHOD     mock_method
 WRAP_METHOD     wrap_method

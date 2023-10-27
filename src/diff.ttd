@@ -23,7 +23,7 @@ namespace {
         {"88", "88", "ccb"},
         {"88", "88", "ccc"}
       })
-      check(check_common_subsequence(a, b, d))_false;
+      check(check_common_subsequence(a, b, d))_false();
     with_multiline_data((a, b, d), list<tuple<string, string, lcs_t>>{
         {"", "", ""},
         {"0", "0", "c"},
@@ -39,7 +39,7 @@ namespace {
         {"1234500067", "9800032", "aaaaabbcccaabb"},
         {"234500067111189", "21110001117", "caaabbbcccaacccaaab"}
       }) {
-      check(check_common_subsequence(a, b, d))_true;
+      check(check_common_subsequence(a, b, d))_true();
       declare(auto diff_computed=longest_common_subsequence_debug(a, b));
       check(diff_computed)_equal(d);
     }
@@ -66,8 +66,8 @@ namespace {
         declare(auto diff=random_diff(rgs, a, diff_chars));
         declare(auto b=random_patch(rgs, a, diff, b_new_chars));
         declare(auto diff_computed=longest_common_subsequence(a, b));
-        check(check_common_subsequence(a, b, diff_computed))_true;
-        check(diff_computed.length()<=diff.length())_true;
+        check(check_common_subsequence(a, b, diff_computed))_true();
+        check(diff_computed.length()<=diff.length())_true();
       }
     }
   }
@@ -92,7 +92,7 @@ namespace {
         {"88", "88", "m2:0.m1:0"},
         {"8", "88", "m1:0.m1:0."}
       })
-      check(check_edit(s, t, e))_false;
+      check(check_edit(s, t, e))_false();
     with_multiline_data((s, t, e), list<tuple<string, string, edit_t>>{
         {"", "", ""},
         {"0", "0", "m1:0."},
@@ -109,7 +109,7 @@ namespace {
         //  "OH A BIG MAN SAW THE FOXY BANANA",
         //  "m2:0.m1:2.w1.m9:6.w3.m4:21.w5.m7:25."}
       }) {
-      check(check_edit(s, t, e))_true;
+      check(check_edit(s, t, e))_true();
       declare(auto edit_computed=shortest_edit_debug(s, t));
       check(edit_computed)_equal(e);
     }
@@ -135,7 +135,7 @@ namespace {
         declare(auto diff=random_diff(rgs, s, diff_chars));
         declare(auto t=random_patch(rgs, s, diff, t_new_chars));
         declare(auto edit=shortest_edit_debug(s, t));
-        check(check_edit(s, t, edit))_true;
+        check(check_edit(s, t, edit))_true();
       }
     }
 
@@ -148,7 +148,7 @@ namespace {
     //   show_value(t);
     //   auto e=shortest_edit_debug(s, t, 3);
     //   show_value(e);
-    //   check(check_edit(s, t, e))_true;
+    //   check(check_edit(s, t, e))_true();
     // }
 
     declare(string source="0123456");
@@ -205,11 +205,11 @@ namespace {
         check((i==j)
               ? ((not (i<j)) and (not (j<i)))
               : ((i<j) not_eq (j<i)))
-          _true;
+          _true();
         check((i==j)
               ? ((not (tt[i]<tt[j])) and (not (tt[j]<tt[i])))
               : ((tt[i]<tt[j]) not_eq (tt[j]<tt[i])))
-          _true;
+          _true();
     }
     declare(string ttsd=tts1_different_addresses());
     show_value(ttsd);

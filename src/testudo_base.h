@@ -25,9 +25,7 @@
 // comparison yielded true.  The "are_equal()" is equivalent by default to
 // "operator==()".  The "absdiff()" function computes the scalar difference
 // between two values, and is used to check whether a value is close to an
-// expected value.  The "to_text()" function converts a value to a text, and is
-// used by the test commands "show_value()", "check_approx()", and
-// "check_approx_tol()".
+// expected value.  The "to_text()" function converts a value to a text.
 //
 // These functions can be overloaded for new types that are to be used in
 // tests.  The overloads must be done in the same namespace as the new types,
@@ -70,6 +68,11 @@ namespace testudo___implementation {
   template <typename T, typename U>
   double absdiff(T const &t, U const &u)
     { return absdiff_testudo(t, u); }
+
+  // check whether two values are closer than a tolerance
+  template <typename T1, typename T2, typename TE>
+  bool are_approx(T1 const &arg1, T2 const &arg2, TE max_error)
+    { return (absdiff(arg1, arg2)<=max_error); }
 
   namespace implementation {
     template <typename...>
@@ -360,6 +363,7 @@ namespace testudo___implementation {
 
 }
 
-testudo___BRING(is_valid, are_equal, to_stream, to_text, absdiff, unquoted)
+testudo___BRING(is_valid, are_equal, are_approx,
+                to_stream, to_text, absdiff, unquoted)
 
 #endif

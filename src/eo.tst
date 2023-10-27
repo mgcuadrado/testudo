@@ -6,10 +6,10 @@ DEFINE_TOP_TEST difini_ĉefa_teston
 DEFINE_TEST     difini_teston
 WITH_FIXTURE    kun_fiksaĵo
 VISIBLE_FIXTURE videbla_fiksaĵo
+FIXTURE_ARGS    fiksaĵaj_arg
 
-STEP_ID              paŝo_id
-PRINT_TEXT           printi_tekston
-PRINT_BREAK          printi_paŭzon
+TOUT        tout
+TFOS        tfos
 
 DECLARE              deklari
 PERFORM              fari
@@ -33,15 +33,12 @@ CHECK      certigi
 PROVIDED   kondiĉe_ke
 TRUE       _vera
 FALSE      _malvera
-TRUE_FOR   _vera_por
-FALSE_FOR  _malvera_por
 EQUAL      _egalas
 NOT_EQUAL  _ne_egalas
 APPROX     _proksimas
 NOT_APPROX _ne_proksimas
-TOL        _tol
-
-TFOS tfos
+WITH_TOL   _kun_tol
+SHOW       _montri
 
 MOCK_METHOD     imita_metodo
 WRAP_METHOD     volva_metodo

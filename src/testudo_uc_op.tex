@@ -17,7 +17,10 @@
 
 \newcommand*\styleedition{``\texttt{uc}''-style edition}
 
-\newcommand\typesetexample[1]{%
+\newcommand\typesetexamplereport[1]{%
+  \input{reports/#1-op}%
+}
+\newcommand\typesetexamplesource[1]{%
   \input{examples/#1-uc-op}%
 }
 

@@ -37,7 +37,18 @@ for code in \
         echo " \\\\"
     fi
     last_code=$code
-done | sed 's/_/\\_/g' | sed '$s/\\midrule//'
+done \
+    | sed ' # transform some pairs of lines into combined single lines
+    /{check-try}/{
+        N
+        s/\(.*\) & \(.*\) & \(.*\) \\\\\n * \(.*\) & \(.*\) & \(.*\)/\1~\\ldots{}~\4 \& \2~\\ldots{}~\5 \& \3~\\ldots{}~\6/
+    }
+    /{\(true\|equal\|approx\)}/{
+        N
+        s/\(.*\) & \(.*\) & \(.*\) \\\\\n * \(.*\) & \(.*\) & \(.*\)/\1~\/~\4 \& \2~\/~\5 \& \3~\/~\6/
+    }
+' \
+    | sed 's/_/\\_/g' | sed '$s/\\midrule//'
 
 echo "\\bottomrule"
 echo "\\end{tabular}"

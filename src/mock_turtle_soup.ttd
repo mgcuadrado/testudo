@@ -89,7 +89,7 @@ namespace {
     check(soup_mock->reverse({1, 2}))_equal(pair(2, 1));
     perform(soup_mock->schedule_ret(temp, 20, 40, 60, 80, 100));
     declare(bool good=queen_of_hearts_mock_turtle_soup(soup_mock));
-    check(good)_true;
+    check(good)_true();
     check(soup_mock->logged_args(add_ingr))
       _equal({{"calf brains", 4},
               {"pork liver", 3},
@@ -147,7 +147,7 @@ namespace {
       }
       perform(while (it)
                 show_value(it.method_name()), it.next());
-      check(it.done())_true;
+      check(it.done())_true();
     }
   }
 
@@ -156,14 +156,14 @@ namespace {
     // FIXME: the following check should warn about checking equality of floats
     check(soup_mock->reverse_float({1., 2.}))_equal(pair(2., 1.));
     with_declare(auto it=iterate(soup_mock)) {
-      print_text("wrong method:");
+      tout << "wrong method:";
       with_declare(auto call=it.pop_call(*soup_mock, reverse)) {
         check(call)_approx({{2., 1.}}, {{1., 2.}});
         check(call)_approx({{3., 1.}}, {{1., 2.}});
         check(call)_not_approx({{2., 1.}}, {{1., 2.}});
         check(call)_not_approx({{3., 1.}}, {{1., 2.}});
       }
-      print_text("right method:");
+      tout << "right method:";
       with_declare(auto call=it.pop_call(*soup_mock, reverse_float)) {
         check(call)_approx({{2., 1.}}, {{1., 2.}});
         check(call)_approx({{3., 1.}}, {{1., 2.}});
@@ -218,7 +218,7 @@ namespace {
     perform(call_ledger_report_to(lev1, &cl));
     declare(bool created=false);
     declare(MockLevel lev2(47, [&created]() { created=true; }));
-    check(created)_true;
+    check(created)_true();
     perform(call_ledger_report_to(lev2, &cl));
     perform(equalize(lev1, lev2));
     check(lev1.readout())_equal(52);
@@ -240,21 +240,21 @@ namespace {
     declare(using namespace testudo);
     check(
       is_always(1, "one")(list<tuple<int, string>>{{1, "one"}, {1, "one"}}))
-      _true;
+      _true();
     check(
       is_always(1, "one")(list<tuple<int, string>>{{1, "one"}, {2, "one"}}))
-      _true;
-    check(is_always(2)(list{2, 2, 2}))_true;
-    check(is_always(2)(list<tuple<int>>{{2}, {2}, {2}}))_true;
-    check(is_always(2)(list{2, 3, 2}))_true;
-    check(is_always(2)(list<tuple<int>>{{2}, {3}, {2}}))_true;
-    check(is_never(4)(list{1, 2, 3}))_true;
-    check(is_never(1)(list{1, 2, 3}))_true;
-    check(is_constant(list{1, 1, 4}))_true;
-    check(is_constant(list{1, 1, 1}))_true;
-    check(all_different(list{1, 2, 3}))_true;
-    check(all_different(list{1, 2, 1}))_true;
-    check(all_different(list{1, 2, 2}))_true;
+      _true();
+    check(is_always(2)(list{2, 2, 2}))_true();
+    check(is_always(2)(list<tuple<int>>{{2}, {2}, {2}}))_true();
+    check(is_always(2)(list{2, 3, 2}))_true();
+    check(is_always(2)(list<tuple<int>>{{2}, {3}, {2}}))_true();
+    check(is_never(4)(list{1, 2, 3}))_true();
+    check(is_never(1)(list{1, 2, 3}))_true();
+    check(is_constant(list{1, 1, 4}))_true();
+    check(is_constant(list{1, 1, 1}))_true();
+    check(all_different(list{1, 2, 3}))_true();
+    check(all_different(list{1, 2, 1}))_true();
+    check(all_different(list{1, 2, 2}))_true();
   }
 
   class Namable {
@@ -350,7 +350,7 @@ namespace {
     check(lm.sum_plus_n(20, 5))_equal(125);
     check(lm.sum_plus_n(20, 6))_equal(333);
     check(lm.sum_plus_n(20, 7))_equal(127);
-    print_text("now, back to default value");
+    tout << "now, back to default value";
     check(lm.sum_plus_n(20, 8))_equal(333);
   }
 

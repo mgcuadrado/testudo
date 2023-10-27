@@ -144,37 +144,43 @@ namespace {
       { output_summary(&TextTypeset::with_summary, name, test_stats); }
 
 
-    void output_check_true(string expr_str, string success,
+    void output_check_true(string expr_str,
+                           string exprv_str, string valv_str,
+                           string explanation,
+                           string success,
                            string prefix, bool) override {
       output_location();
-      typeset->check_true(expr_str, success, prefix);
-    }
-
-    void output_check_true_for(string expr_str,
-                               string exprv_str, string valv_str,
-                               string success,
-                               string prefix, bool) override {
-      output_location();
-      typeset->check_true_for(expr_str, exprv_str, valv_str, success, prefix);
+      typeset->check_true(
+        expr_str,
+        exprv_str, valv_str, explanation,
+        success, prefix);
     }
 
     void output_check_equal(string expr1_str, string val1_str,
                             string expr2_str, string val2_str,
+                            string exprv_str, string valv_str,
+                            string explanation,
                             string success,
                             string prefix, bool) override {
       output_location();
-      typeset->check_equal(expr1_str, val1_str, expr2_str, val2_str,
-                           success, prefix);
+      typeset->check_equal(
+        expr1_str, val1_str, expr2_str, val2_str,
+        exprv_str, valv_str, explanation,
+        success, prefix);
     }
 
     void output_check_approx(string expr1_str, string val1_str,
                              string expr2_str, string val2_str,
                              string max_error_str,
+                             string exprv_str, string valv_str,
+                             string explanation,
                              string success,
                              string prefix, bool) override {
       output_location();
-      typeset->check_approx(expr1_str, val1_str, expr2_str, val2_str,
-                            max_error_str, success, prefix);
+      typeset->check_approx(
+        expr1_str, val1_str, expr2_str, val2_str, max_error_str,
+        exprv_str, valv_str, explanation,
+        success, prefix);
     }
 
     void produce_summary(string name, TestStats test_stats) override

@@ -1,10 +1,11 @@
 #!/bin/bash
 
+escchar='\o033'
 esc='\o033\['
 lines="${esc}0;33m"
 normal="${esc}0;39m"
 
 sed "
-    /^${lines}.*${normal}/d
+    /^${lines}[^${escchar}]*${normal}$/d
     s/^\( *\)${lines}[0-9]\+${normal} /\1/
 "

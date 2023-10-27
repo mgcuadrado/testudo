@@ -12,17 +12,17 @@ namespace {
   // a very short test to check the cartouche tag being longer than the
   // cartouched info
   define_top_test("testudo", "sh", 9999) {
-    check(true)_true;
+    check(true)_true();
   }
 
   define_top_test_node("testudo", (testarudo, "testarudo tests"), 10);
 
   define_test(testarudo, "simple testarudo tests") {
-    check(true)_true;
-    check(false)_true;
-    check(true)_false;
-    check(false)_false;
-    check(2+2==5)_false;
+    check(true)_true();
+    check(false)_true();
+    check(true)_false();
+    check(false)_false();
+    check(2+2==5)_false();
   }
 
   define_test_node(testarudo, (complex, "complex testarudo tests"));
@@ -41,7 +41,7 @@ namespace {
   define_test(complex, "test_with_error") {
     check(22+22)_equal(44);
     perform(throw runtime_error("see if you can catch me!"));
-    print_text("this should never appear");
+    tout << "this should never appear";
     check("this should never appear either")_equal(string());
   }
 
@@ -49,17 +49,30 @@ namespace {
     check("there's nothing")_equal("penultimate");
   }
 
-  define_test(complex, "\"true_for\" syntax") {
+  define_test(complex, "\"true()\"-with arguments syntax") {
     declare(int a=7);
     declare(int b=8);
-    check(a<b)_true;
-    check(a>b)_true;
-    check(a<b)_true_for(a, b);
-    check(a>b)_true_for(a, b);
-    check(a<b)_false;
-    check(a>b)_false;
-    check(a<b)_false_for(a, b);
-    check(a>b)_false_for(a, b);
+    check(a<b)_true();
+    check(a>b)_true();
+    check(a<b)_true()_show(a, b);
+    check(a>b)_true()_show(a, b);
+    check(a<b)_false();
+    check(a>b)_false();
+    check(a<b)_false()_show(a, b);
+    check(a>b)_false()_show(a, b);
+    check(a)_equal(a);
+    check(are_equal(a, a))_true()_show(a);
+    check(a)_equal(b);
+    check(are_equal(a, b))_true()_show(a, b);
+    declare(float x=3.14f);
+    declare(float y=3.1416f);
+    check(x)_approx(y);
+    check(are_approx(x, y))_true()_show(x, y);
+    check(x)_approx(y)_with_tol(.1);
+    check(are_approx(x, y, .1))_true()_show(x, y);
+    set_approx_epsilon(.1);
+    check(x)_approx(y);
+    check(are_approx(x, y))_true()_show(x, y);
   }
 
   struct WrappedInt {
@@ -77,48 +90,133 @@ namespace {
   bool operator not_eq(WrappedInt a, WrappedInt b)
     { return not (a==b); }
 
+  WrappedInt operator+(WrappedInt a, WrappedInt b) {
+    WrappedInt result(a.value+b.value);
+    result.valid=a.valid and b.valid;
+    return result;
+  }
+
   bool is_valid_testudo(WrappedInt wi) { return wi.valid; }
 
   ostream &operator<<(ostream &os, WrappedInt wi)
     { return os << "WI(" << wi.valid << "," << wi.value << ")"; }
+
+  struct LeakingWrappedInt {
+    LeakingWrappedInt(int value) : valid(true), value(value) { }
+    LeakingWrappedInt() : valid(false), value(0) { }
+    bool valid;
+    int value;
+  };
+
+  bool operator==(LeakingWrappedInt a, LeakingWrappedInt b)
+    { return a.value==b.value; } // not even considering validity!
+
+  LeakingWrappedInt operator+(LeakingWrappedInt a, LeakingWrappedInt b) {
+    LeakingWrappedInt result(a.value+b.value);
+    result.valid=a.valid and b.valid;
+    return result;
+  }
+
+  bool is_valid_testudo(LeakingWrappedInt lwi) { return lwi.valid; }
+
+  ostream &operator<<(ostream &os, LeakingWrappedInt lwi)
+    { return os << "LWI(" << lwi.valid << "," << lwi.value << ")"; }
 
   define_test(complex, "\"true_for\" checking for validity") {
     declare(WrappedInt a=7);
     declare(WrappedInt b=8);
     declare(WrappedInt c);
     perform(c.value=8);
-    check(c==c)_true;
-    check(c not_eq c)_true;
+    check(c==c)_true();
+    check(c not_eq c)_true();
     check(c)_equal(c);
     check(c)_not_equal(c);
-    check(c==c)_true_for(c);
-    check(c==c)_false_for(c);
-    check(c not_eq c)_true_for(c);
-    check(c not_eq c)_false_for(c);
-    check(c==b)_true;
-    check(c not_eq b)_true;
+    check(c==c)_true()_show(c);
+    check(c==c)_false()_show(c);
+    check(c not_eq c)_true()_show(c);
+    check(c not_eq c)_false()_show(c);
+    check(c==b)_true();
+    check(c not_eq b)_true();
     check(c)_equal(b);
     check(c)_not_equal(b);
-    check(c==b)_true_for(c, b);
-    check(c==b)_false_for(c, b);
-    check(c not_eq b)_true_for(c, b);
-    check(c not_eq b)_false_for(c, b);
-    check(a.value<b.value)_true;
-    check(a.value>b.value)_true;
-    check(a.value<b.value)_true_for(a, b);
-    check(a.value>b.value)_true_for(a, b);
-    check(a.value<c.value)_true;
-    check(a.value>c.value)_true;
-    check(a.value<c.value)_true_for(a, c);
-    check(a.value>c.value)_true_for(a, c);
-    check(a.value<b.value)_false;
-    check(a.value>b.value)_false;
-    check(a.value<b.value)_false_for(a, b);
-    check(a.value>b.value)_false_for(a, b);
-    check(a.value<c.value)_false;
-    check(a.value>c.value)_false;
-    check(a.value<c.value)_false_for(a, c);
-    check(a.value>c.value)_false_for(a, c);
+    check(c==b)_true()_show(c, b);
+    check(c==b)_false()_show(c, b);
+    check(c not_eq b)_true()_show(c, b);
+    check(c not_eq b)_false()_show(c, b);
+    check(a.value<b.value)_true();
+    check(a.value>b.value)_true();
+    check(a.value<b.value)_true()_show(a, b);
+    check(a.value>b.value)_true()_show(a, b);
+    check(a.value<c.value)_true();
+    check(a.value>c.value)_true();
+    check(a.value<c.value)_true()_show(a, c);
+    check(a.value>c.value)_true()_show(a, c);
+    check(a.value<b.value)_false();
+    check(a.value>b.value)_false();
+    check(a.value<b.value)_false()_show(a, b);
+    check(a.value>b.value)_false()_show(a, b);
+    check(a.value<c.value)_false();
+    check(a.value>c.value)_false();
+    check(a.value<c.value)_false()_show(a, c);
+    check(a.value>c.value)_false()_show(a, c);
+    tout.print_break();
+    declare(LeakingWrappedInt x=0);
+    declare(LeakingWrappedInt y);
+    check(x)_equal(y);
+    tout << "no validity check:";
+    check(x==y)_true();
+    tout << "check for \"x\" validity:";
+    check(x==y)_true()_show(x);
+    tout << "check for \"y\" validity:";
+    check(x==y)_true()_show(y);
+    tout << "check for \"x\" and \"y\" validity:";
+    check(x==y)_true()_show(x, y);
+    check(y)_equal(x);
+    tout << "no validity check:";
+    check(y==x)_true();
+    tout << "check for \"y\" validity:";
+    check(y==x)_true()_show(y);
+    tout << "check for \"x\" validity:";
+    check(y==x)_true()_show(x);
+    tout << "check for \"x\" and \"y\" validity:";
+    check(y==x)_true()_show(y, x);
+  }
+
+  define_test(complex, "show relevant expressions and check their validity") {
+    declare(WrappedInt a=7);
+    declare(WrappedInt b=8);
+    declare(WrappedInt c);
+    perform(c.value=15);
+    declare(LeakingWrappedInt x=0);
+    declare(LeakingWrappedInt y);
+    check(a+b)_equal(c);
+    check(a+b)_equal(c)_show(a, b);
+    check(x+x)_equal(x);
+    check(x+x)_equal(x)_show(x);
+    check(x+x)_equal(y);
+    check(x+x)_equal(y)_show(x);
+    check(y+y)_equal(y);
+    check(y+y)_equal(y)_show(y);
+    check(0)_equal(0);
+    check(0)_equal(0)_show(y);
+    declare(double z=2.);
+    check(2*z)_approx(4.1);
+    check(2*z)_approx(4.1)_show(z);
+    check(2*z)_approx(4.1)_with_tol(.5);
+    check(2*z)_approx(4.1)_with_tol(.5)_show(z);
+  }
+
+  define_test(complex, "explain fails") {
+    declare(int a=1);
+    declare(int b=2);
+    check(a)_equal(a) << "this should not be printed: " << a << "is " << a;
+    check(a)_equal(b) << "in a better world, " << a << " would be " << b;
+    check(3*a)_equal(b)_show(a)
+      << "hmm, why isn't thrice " << a << " equal to " << b << "?";
+    provided(check(a)_equal(a) << "always true")
+      check(b)_equal(b);
+    provided(check(a)_equal(b) << "wouldn't it be good?")
+      check(b)_equal(a);
   }
 
   define_test(complex, (try_catch, "try-catch checks")) {
@@ -126,7 +224,7 @@ namespace {
     check_try(throw runtime_error("this'll be caught"))_catch();
     check_try(throw "this'll be too")_catch(char const *);
     check_try(throw "but this shouldn't")_catch();
-    print_text("and this text should never be printed");
+    tout << "and this text should never be printed";
   }
 
   define_test(
@@ -138,104 +236,104 @@ namespace {
   define_test(complex, "\"with\" checks") {
     declare(list<int> numbers_1{2, 4, 8});
     declare(list<int> numbers_2{2, 5, 8});
-    with_data(x, numbers_1) check((x%2)==0)_true;
-    with_data(x, numbers_2) check((x%2)==0)_true;
-    with_data(x, list<int>{3, 4, 8}) check((x%2)==0)_true;
-    with_data(x, list<int>{2, 4, 7}) check((x%2)==0)_true;
-    with_data(x, numbers_1) check(0)_equal(x%2);
-    with_data(x, numbers_2) check(0)_equal(x%2);
+    with_data(x, numbers_1) check((x%2)==0)_true()_show(x);
+    with_data(x, numbers_2) check((x%2)==0)_true()_show(x);
+    with_data(x, list<int>{3, 4, 8}) check((x%2)==0)_true()_show(x);
+    with_data(x, list<int>{2, 4, 7}) check((x%2)==0)_true()_show(x);
+    with_data(x, numbers_1) check(0)_equal(x%2)_show(x);
+    with_data(x, numbers_2) check(0)_equal(x%2)_show(x);
 
-    print_break();
+    tout.print_break();
 
     with_data(x, numbers_1) {
       declare(auto is_even=[](auto const &a) { return ((a % 2) == 0); });
-      check(is_even(x))_true_for(x);
-      print_text("let's do something, just to see how it's shown");
+      check(is_even(x))_true()_show(x);
+      tout << "let's do something, just to see how it's shown";
       declare(auto y=x+1);
-      show_value(y);
+      show_value(x, y);
     }
     with_data(x, numbers_2) {
       declare(auto is_even=[](auto const &a) { return ((a % 2) == 0); });
-      check(is_even(x))_true_for(x);
-      print_text("let's do something, just to see how it's shown");
+      check(is_even(x))_true()_show(x) << "isn't " << x << " even?";
+      tout << "let's do something, just to see how it's shown";
       declare(auto y=x+1);
-      show_value(y);
+      show_value(x, y);
     }
 
-    print_break();
+    tout.print_break();
 
     with_data(x, numbers_1)
       with_data(y, numbers_2)
-        check(x%2)_equal(y%2);
+        check(x%2)_equal(y%2)_show(x, y);
     with_data(x, list<int>{2, 4, 9})
       with_data(y, numbers_2)
-        check(x%2)_equal(y%2);
+        check(x%2)_equal(y%2)_show(x, y);
     with_data(x, numbers_1)
       with_data(y, {2, 4, 10})
-        check(x%2)_equal(y%2);
+        check(x%2)_equal(y%2)_show(x, y);
 
-    print_break();
+    tout.print_break();
 
     declare(auto is_even=[](auto const &a) { return ((a % 2) == 0); });
-    with_data(x, numbers_1) check(is_even(x))_true_for(x);
+    with_data(x, numbers_1) check(is_even(x))_true()_show(x);
     with_data(x, numbers_1) {
       declare(int y=x+1);
-      check(is_even(y))_false_for(y);
+      check(is_even(y))_false()_show(y);
     }
     with_data(x, numbers_1) {
-      check(is_even(x))_true_for(x);
+      check(is_even(x))_true()_show(x);
       with_data(y, numbers_1)
-        check(x%2)_equal(y%2);
+        check(x%2)_equal(y%2)_show(x, y);
     }
     with_data(x, numbers_1) {
-      check(is_even(x))_true_for(x);
+      check(is_even(x))_true()_show(x);
       with_data(y, numbers_2)
-        check(x%2)_equal(y%2);
+        check(x%2)_equal(y%2)_show(x, y);
     }
     with_data(x, numbers_2) {
-      check(is_even(x))_true_for(x);
+      check(is_even(x))_true()_show(x);
       with_data(y, numbers_1)
-        check(x%2)_equal(y%2);
+        check(x%2)_equal(y%2)_show(x, y);
     }
     with_data(x, numbers_2) {
-      check(is_even(x))_true_for(x);
+      check(is_even(x))_true()_show(x);
       with_data(y, numbers_2)
-        check(x%2)_equal(y%2);
+        check(x%2)_equal(y%2)_show(x, y);
     }
 
-    print_break();
+    tout.print_break();
 
     with_data(x, numbers_1) {
       with_data(y, numbers_1)
-        check(x%2)_equal(y%2);
-      check(is_even(x))_true_for(x);
+        check(x%2)_equal(y%2)_show(x, y);
+      check(is_even(x))_true()_show(x);
       with_data(y, numbers_2)
-        check(x%2)_equal(y%2);
-      check(is_even(x))_true_for(x);
+        check(x%2)_equal(y%2)_show(x, y);
+      check(is_even(x))_true()_show(x);
       with_data(y, numbers_1)
-        check(x%2)_equal(y%2);
-      check(is_even(x))_true_for(x);
+        check(x%2)_equal(y%2)_show(x, y);
+      check(is_even(x))_true()_show(x);
       with_data(y, list<int>{2, 4, 9})
-        check(x%2)_equal(y%2);
+        check(x%2)_equal(y%2)_show(x, y);
     }
-    with_data(x, numbers_1) check(is_even(0))_true_for(0);
+    with_data(x, numbers_1) check(is_even(0))_true()_show(0);
 
     with_data(x, {1, 2, 3})
-      check(x)_equal(x);
+      check(x)_equal(x)_show(x);
     with_data(x, {1, 2, 3}) {
-      check(x<x)_true_for(x);
-      check(x==x)_true_for(x);
-      check(x>x)_true_for(x);
+      check(x<x)_true()_show(x);
+      check(x==x)_true()_show(x);
+      check(x>x)_true()_show(x);
     }
 
     with_data((x), list<tuple<int>>{{3}, {4}, {8}})
-      check((x%2)==0)_true;
+      check((x%2)==0)_true();
     declare(list<tuple<int, int, int>>
               list_of_sums{{1, 3, 4}, {3, 7, 11}, {10, 15, 25}});
     with_data((a, b, sum), list_of_sums)
       check(sum)_equal(a+b);
     with_data((x), list<tuple<int>>{{2}, {4}, {8}})
-      check((x%2)==0)_true;
+      check((x%2)==0)_true();
     declare(list<tuple<int, int, int>>
               list_of_sums_2{{1, 3, 4}, {3, 7, 10}, {10, 15, 25}});
     with_data((a, b, sum), list_of_sums_2)
@@ -246,12 +344,12 @@ namespace {
 
   define_top_test("testudo.testarudo.disorder",
                   (unu, "unu, but comes last"), 10) {
-    check(string("unu")>string("du"))_true;
+    check(string("unu")>string("du"))_true();
   }
 
   define_top_test("testudo.testarudo.disorder",
                   (du, "du, but comes first"), 10) {
-    check(string("unu")<string("du"))_true;
+    check(string("unu")<string("du"))_true();
   }
 
   struct ClassWithNoRepresentation { };
@@ -264,6 +362,8 @@ namespace {
     check(testudo::absdiff(7., 5.))_approx(2.);
     check(2.+2.)_approx(4.);
     check(2.+2.)_not_approx(5.);
+    check(2.+2.)_approx(4.2)_with_tol(.5);
+    check(2.+2.)_approx(4.2)_with_tol(.1);
   }
 
   define_top_test("testudo.testarudo.disorder",
@@ -280,7 +380,7 @@ namespace {
     show_value(testudo::absdiff(ta, tb));
     declare(tuple<float, int, double> tc={3.14, 8, 7.5});
     check(ta)_approx(tc);
-    print_break();
+    tout.print_break();
     declare(list<float> la={3.14, 8, 7.5});
     declare(list<float> lb={4.14, 7., 6});
     check(la)_approx(lb);
@@ -334,7 +434,31 @@ namespace {
               with_fixture(NumbersFixture)) {
     check(x*(y+z))_approx(x*y+x*z);
     perform(throw_something_unexpected());
-    print_text("this shouldn't show");
+    tout << "this shouldn't show";
+  }
+
+  struct DefaultSevenVectorFixture : testudo::Fixture {
+    DefaultSevenVectorFixture(testudo::test_management_t test_management,
+                              int size, int default_value=7)
+      : Fixture(test_management),
+        fixture_init(data, size, default_value) { }
+    fixture_member(vector<int> data);
+  };
+
+  define_test(fixture, "fixtures with arguments, specified size",
+              with_fixture(DefaultSevenVectorFixture),
+              fixture_args(3)) {
+    check(data.size())_equal(3);
+    with_data(x, data)
+      check(x)_equal(7);
+  }
+
+  define_test(fixture, "fixtures with arguments, specified size and value",
+              visible_fixture(DefaultSevenVectorFixture),
+              fixture_args(5, 11)) {
+    check(data.size())_equal(5);
+    with_data(x, data)
+      check(x)_equal(11);
   }
 
   struct AtDestruction {
@@ -349,8 +473,8 @@ namespace {
       in_scope() {
         declare(AtDestruction at_destruction_flag_30([&flag]() { flag=30; }));
         check(flag)_equal(10);
-        print_text("now, a long text to check line breaking within scopes"
-                   " (the following two tests have the same purpose)");
+        tout << "now, a long text to check line breaking within scopes"
+                " (the following two tests have the same purpose)";
         check(string("1 2 3 4 5 6 7 8 9"))_equal("1 2 3 4 5 6 7 8 9");
         check(string("1 2 3 4 5 6 7 8 9"))_equal("1 2 3 4 5 6 7 8 8");
       }
@@ -360,16 +484,16 @@ namespace {
   }
 
   define_top_test("testudo", "Testudo syntax", 500) {
-    print_text("tags in \"||~\"...\"~||\" are used internally");
-    print_text("but they should still appear here");
+    tout << "tags in \"||~\"...\"~||\" are used internally";
+    tout << "but they should still appear here";
     declare(string code="~pre~ ||~bold~|| ~post~");
     show_value(code);
     check(code)_equal("~pre~ ||~bold~|| ~post~");
   }
 
   define_top_test("testudo", "multiline", 550) {
-    print_text("all words in one line");
-    print_text("one\nword\nper\nline");
+    tout << "all words in one line";
+    tout << "one\nword\nper\nline";
     declare(string ol_text="all words in one line");
     declare(string ml_text="one\nword\nper\nline");
     show_value(ol_text);
@@ -437,25 +561,28 @@ namespace {
   define_test(testarudo, "provided") {
     declare(double a=4.);
     declare(double b=4.0001);
+    declare(double c=4.01);
     set_approx_epsilon(.001);
-    provided(a)_approx(b) {
+    provided (check(a)_approx(b)) {
       check(a)_approx(a);
       check(a)_not_approx(a);
     }
-    provided(a)_not_approx(b) {
+    provided (check(a)_not_approx(b)) {
       check(a)_approx(a);
       check(a)_not_approx(a);
     }
-    provided(1+2)_equal(2)
+    provided(check(a)_approx(c)_with_tol(.1))
+      check(a)_approx(b)_with_tol(.1);
+    provided (check(1+2)_equal(2))
       check(a)_approx(a);
-    provided(1+2)_equal(3)
+    provided (check(1+2)_equal(3))
       check(a)_approx(a);
-    provided(1+2)_equal(3)
-      provided(2+2)_equal(4) {
+    provided (check(1+2)_equal(3))
+      provided (check(2+2)_equal(4)) {
         check(2+3)_equal(6);
-        provided(2+5)_equal(7)
+        provided (check(2+5)_equal(7))
           check(2+6)_equal(8);
-        provided(2+7)_equal(10)
+        provided (check(2+7)_equal(10))
           check(2+8)_equal(10);
     }
   }
@@ -463,8 +590,10 @@ namespace {
   define_test(testarudo, "tfos") {
     show_value(26);
     check(26)_equal(29+31);
+    tout << "in decimal, it's " << 26;
     perform(tfos << hex << setfill('~') << setw(6));
     show_value(26);
+    tout << "in hexadecimal, it's " << 26;
     check(26)_equal(29+31);
     perform(tfos << setw(6));
     check(26)_equal(29+31);
@@ -476,11 +605,11 @@ namespace {
   define_test(testarudo, "show_value() in with_data()") {
     declare(list<int> numbers_1{2, 5, 6, 7, 8, 9, 12, 24});
     with_data(x, numbers_1) {
-      show_value(x/2);
+      show_value(x, x/2);
       check(x/2+x/2)_equal(x);
-      show_value(x+x);
+      show_value(x, x+x);
       check(x/3+x/3+x/3)_equal(x);
-      show_value(x/3);
+      show_value(x, x/3);
     }
   }
 
@@ -508,11 +637,11 @@ namespace {
     show_value(cartesian_product(a, b, c));
     perform(rg.seed(seed));
     with_data((x, y), generate_data_tuple(4, random_0_9, random_0_9))
-      show_value(x+y);
+      show_value(x, y, x+y);
     perform(rg.seed(seed));
     with_data((x, y), cartesian_product(generate_data(4, random_0_9),
                                         generate_data(3, random_0_9)))
-      show_value(x+y);
+      show_value(x, y, x+y);
   }
 
   define_test(testarudo, "track this") {

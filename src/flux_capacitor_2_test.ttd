@@ -12,6 +12,6 @@ DEFINE_TEST(flux_capacitor, // parent
 {
   DECLARE(FluxCapacitor fc);
   PERFORM(fc.connect_to(delorean)); // "delorean" is created by the fixture
-  CHECK(not fc.is_on()) TRUE; // check bool is true
+  CHECK(not fc.is_on()) TRUE(); // check bool is true
   CHECK(fc.missing_jw()) APPROX(1.21); // check approximate value
 }

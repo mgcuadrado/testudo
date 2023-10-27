@@ -25,12 +25,14 @@ lc_to_uc="$(cat lc.tst \
     # terrible hack follows: 'are_equal' is transformed to 'are EQUAL'; instead
     # of solving the real problem, i revert the offending transformation
     echo 's/are EQUAL/are_equal/g'
+    echo 's/are APPROX/are_approx/g'
     )
 "
 
 # uncomment the following to peruse the "lc_to_uc" script:
 # echo "$lc_to_uc" > generate_examples_script
-
+for openness in cl op; do
+source=examples/doc_examples_$openness.ttd
 for example in $(cat "$source" | sed -n '/^ *\/\/ { /s///p'); do
     echo $example
 
@@ -47,11 +49,11 @@ for example in $(cat "$source" | sed -n '/^ *\/\/ { /s///p'); do
                 p
             }
         ' | sed '1{/^$/d} # dunno why, i get a newline at the beginning' \
-        > $dir/$example.tex
+        > $dir/$example-$openness.tex
 
     (
         begin_listing
-        cat $dir/$example.tex \
+        cat $dir/$example-$openness.tex \
             | sed -n '
                 /@hide@/!H # store everything in hold space except @hide@ lines
                 ${
@@ -64,35 +66,12 @@ for example in $(cat "$source" | sed -n '/^ *\/\/ { /s///p'); do
                 }
             '
         end_listing
-    ) > $dir/$example-lc-op.tex
+    ) > $dir/$example-lc-$openness.tex
 
-    (
-        begin_listing
-        cat $dir/$example.tex \
-            | sed -n '
-                /@hide@/!H # store everything in hold space except @hide@ lines
-                ${
-                    g # recover hold space
-                    s/^\n// # remove the spurious \n from the first line append
-                    s/{ /{/g
-                    s/\ }/}/g
-                    s/\n *{\n/ {\n/g # get end-line keys on the preceding line
-                    s/ \([-+*/<>]=\) /\1/g
-                    s/ \([-+=%]\)/\1/g
-                    s/\([-+=%]\) /\1/g
-                    s/ \([<>*/]\) /\1/g
-                    s/SPACE//g # remove keep-space markers
-                    s/OPSP//g # remove "open-style spaces"
-                    s/CLSP/ /g # turn "cluttered-style spaces" into spaces
-                    p # print the whole pattern space
-                }
-            ' \
-            | sed 's/\( \/\/ .*\) {$/ {\1/' # correct " // comment { "
-        end_listing
-    ) > $dir/$example-lc-cl.tex
-
-    cat $dir/$example-lc-op.tex | sed "$lc_to_uc" > $dir/$example-uc-op.tex
-    cat $dir/$example-lc-cl.tex | sed "$lc_to_uc" > $dir/$example-uc-cl.tex
+    cat $dir/$example-lc-$openness.tex \
+        | sed "$lc_to_uc" \
+        > $dir/$example-uc-$openness.tex
+done
 done
 
 date

@@ -1,0 +1,27 @@
+#!/bin/bash
+sed -n '
+    H # store everything in hold space
+    ${
+        g # recover hold space
+        s/^\n// # remove the spurious \n from the first line append
+        s/{ /{/g
+        s/ }/}/g
+        s/\n *{\n/ {\n/g # get end-line keys on the preceding line
+        s/\([^ ]\) \([-+*/<>]=\) /\1\2/g
+        s/\([^ ]\) \([-+=%]\)/\1\2/g
+        s/\([-+=%]\) /\1/g
+        s/ \([<>*/]\) /\1/g
+        p # print the whole pattern space
+    }
+' \
+    | sed '
+    s/\( \/\/ .*\) {$/ {\1/ # correct " // comment { "
+    s/\/\/ {/\/\/ { /
+    s/{\/\//{ \/\//
+    s/\/\/}/\/\/ }/
+    s/^ *}/ &/
+    s/{return/{ return/ # for one-liner lambdas
+    s/;}/; }/           # ditto
+    s/^ \(    *{[^{ ]\)/\1/ # tuple elements in containers
+'
+

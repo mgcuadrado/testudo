@@ -481,13 +481,21 @@ namespace kmsxml
                              +"\" element");
   }
 
-  inline element_t::node_const_t get_child(element_t::node_const_t e,
-                                           name_t name) {
+  inline element_t::node_const_t get_child_or_null(element_t::node_const_t e,
+                                                   name_t name) {
     for (content_t::node_const_t c: e->contents)
       if (auto ce=c.cast<element_t const >(); ce and ce->name==name)
         return ce;
-    throw std::runtime_error("no \""+name+"\" child in \""+e->name
-                             +"\" element");
+    return {};
+  }
+
+  inline element_t::node_const_t get_child(element_t::node_const_t e,
+                                           name_t name) {
+    if (auto ce=get_child_or_null(e, name))
+      return ce;
+    else
+      throw std::runtime_error("no \""+name+"\" child in \""+e->name
+                               +"\" element");
   }
 
   struct traverse_t {

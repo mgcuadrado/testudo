@@ -1,0 +1,122 @@
+#include "crc.h"
+#include <testudo/testudo_lc>
+
+namespace {
+
+  using namespace std;
+
+  define_top_test_node("testudo", (macros, "macros"), 9000);
+
+  define_test(macros, "test definitions") {
+#define TEST_XY xy
+#define TEST_ZW() zw
+#define TEST_BRACKETIZE(...) (__VA_ARGS__)
+// "testudo___STRING()" with an additional expansion:
+#define STRING(...) testudo___STRING(__VA_ARGS__)
+
+    fake_declare("#define TEST_XY xy");
+    fake_declare("#define TEST_ZW() zw");
+    fake_declare("#define TEST_BRACKETIZE(...) (__VA_ARGS__)");
+    fake_declare("// \"testudo___STRING()\" with an additional expansion:");
+    fake_declare("#define STRING(...) testudo___STRING(__VA_ARGS__)");
+  }
+
+  define_test(macros, "EXPAND") {
+    check(STRING(TEST_ZW TEST_BRACKETIZE()))_equal("zw");
+    check(testudo___STRING(TEST_ZW TEST_BRACKETIZE()))_equal("TEST_ZW ()");
+    check(testudo___STRING(testudo___EXPAND(TEST_ZW TEST_BRACKETIZE())))
+      _equal("zw");
+  }
+
+  define_test(macros, "STRING") {
+    check(testudo___STRING(ab))_equal("ab");
+    check(testudo___STRING_EXPANDED(ab))_equal("ab");
+    check(testudo___STRING(TEST_XY))_equal("xy");
+    check(testudo___STRING_EXPANDED(TEST_XY))_equal("TEST_XY");
+  }
+
+  define_test(macros, "CAT") {
+    check(STRING(testudo___CAT(ab, cd)))_equal("abcd");
+    check(STRING(testudo___CAT_EXPANDED(ab, cd)))_equal("abcd");
+    check(STRING(testudo___CAT(TEST_XY, TEST_ZW())))_equal("xyzw");
+    check(STRING(testudo___CAT_EXPANDED(TEST_XY, TEST_ZW())))
+      _equal("TEST_XYTEST_ZW()");
+    check(STRING(testudo___CAT(TEST_, XY)))_equal("xy");
+    check(STRING(testudo___CAT_EXPANDED(TEST_, XY)))_equal("xy");
+  }
+
+  define_test(macros, "REMOVE_BRACKETS") {
+    check(STRING(TEST_BRACKETIZE(ab, cd)))_equal("(ab, cd)");
+    check(STRING(
+            testudo___REMOVE_BRACKETS TEST_BRACKETIZE(ab, cd)))
+      _equal("ab, cd");
+    check(testudo___STRING(
+            testudo___REMOVE_BRACKETS TEST_BRACKETIZE(ab, cd)))
+      _equal("testudo___REMOVE_BRACKETS (ab, cd)");
+    check(testudo___STRING(
+            testudo___EXPAND(
+              testudo___REMOVE_BRACKETS TEST_BRACKETIZE(ab, cd))))
+      _equal("ab, cd");
+  }
+
+  define_test(macros, "TAKE_SINGLE, TAKE_1ST, TAKE_2ND") {
+    check(STRING(testudo___TAKE_SINGLE(TEST_XY)))_equal("xy");
+    check(STRING(testudo___TAKE_1ST(TEST_XY, TEST_ZW())))_equal("xy");
+    check(STRING(testudo___TAKE_2ND(TEST_XY, TEST_ZW())))_equal("zw");
+  }
+
+  define_test(macros, "SINGLE_OR_1ST, SINGLE_OR_2nd") {
+    check(STRING(testudo___SINGLE_OR_1ST(TEST_XY)))_equal("xy");
+    check(STRING(testudo___SINGLE_OR_1ST((TEST_XY, TEST_ZW()))))_equal("xy");
+    check(STRING(testudo___SINGLE_OR_2ND(TEST_XY)))_equal("xy");
+    check(STRING(testudo___SINGLE_OR_2ND((TEST_XY, TEST_ZW()))))_equal("zw");
+  }
+
+  define_test(macros, "FIRST, COMMA_REST") {
+    check(STRING(testudo___FIRST()))_equal("");
+    check(STRING(testudo___FIRST(TEST_XY)))_equal("xy");
+    check(STRING(testudo___FIRST(TEST_XY, TEST_ZW())))_equal("xy");
+    check(STRING(testudo___COMMA_REST()))_equal("");
+    check(STRING(testudo___COMMA_REST(TEST_XY)))_equal("");
+    check(STRING(testudo___COMMA_REST(TEST_XY, TEST_ZW())))_equal(", zw");
+    check(STRING(testudo___COMMA_REST(TEST_XY, TEST_ZW(), -12)))
+      _equal(", zw, -12");
+    tout << "careful with arguments with non-parenthesised commas";
+    check(STRING(testudo___FIRST([a, b], c)))_equal("[a");
+    check(STRING(testudo___FIRST(C<A, B>)))_equal("C<A");
+    check(STRING(testudo___FIRST((C<A, B>))))_equal("(C<A, B>)");
+    check(STRING(testudo___REMOVE_BRACKETS testudo___FIRST((C<A, B>))))
+      _equal("C<A, B>");
+  }
+
+  define_test(macros, "FOR_EACH, FOR_EACH_N_REV_COMMA") {
+#define TESTUDO_MACRO_TEST_ANGLES(a) <a>
+#define TESTUDO_MACRO_TEST_ANGLES_N(n, a) <n ## a>
+    fake_declare("#define TESTUDO_MACRO_TEST_ANGLES(a) <a>");
+    check(STRING(testudo___FOR_EACH(TESTUDO_MACRO_TEST_ANGLES, z, y, x)))
+      _equal("<z><y><x>");
+    check(STRING(
+            testudo___FOR_EACH_N_REV_COMMA(TESTUDO_MACRO_TEST_ANGLES_N,
+                                           z, y, x)))
+      _equal("<3z>, <2y>, <1x>");
+    fake_declare("#undef TESTUDO_MACRO_TEST_ANGLES");
+#undef TESTUDO_MACRO_TEST_ANGLES
+  }
+
+  define_test(macros, "HAS_COMMA, IS_EMPTY") {
+    check(testudo___HAS_COMMA())_equal(0);
+    check(testudo___HAS_COMMA(ab))_equal(0);
+    check(testudo___HAS_COMMA(ab, cd))_equal(1);
+    check(testudo___HAS_COMMA(ab, cd, ef))_equal(1);
+    check(testudo___IS_EMPTY())_equal(1);
+    check(testudo___IS_EMPTY(a))_equal(0);
+    check(testudo___IS_EMPTY(a, 2))_equal(0);
+  }
+
+  define_test(macros, "COMMA_IF_NOT_EMPTY") {
+    check(STRING(testudo___COMMA_IF_NOT_EMPTY()))_equal("");
+    check(STRING(testudo___COMMA_IF_NOT_EMPTY(a)))_equal(",");
+    check(STRING(testudo___COMMA_IF_NOT_EMPTY(a, b)))_equal(",");
+  }
+
+}

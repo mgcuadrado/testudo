@@ -192,20 +192,15 @@ namespace testudo___implementation {
         "check_true",
         [&](enc_t e) {
           auto expr=get_child(e, "expression1");
+          auto exprv=get_child_or_null(e, "expressionv");
+          string exprv_str=exprv ? text(exprv) : "";
+          string valv_str=exprv ? attribute(exprv, "value") : "";
+          auto expl=get_child_or_null(e, "explanation");
+          string expl_str=expl ? text(expl) : "";
           typeset->check_true(text(expr),
+                              exprv_str, valv_str, expl_str,
                               attribute(e, "success"),
                               attribute(e, "prefix"));
-        }),
-
-      terminal_element( // we handle children explicitly
-        "check_true_for",
-        [&](enc_t e) {
-          auto expr=get_child(e, "expression1");
-          auto exprv=get_child(e, "expressionv");
-          typeset->check_true_for(text(expr),
-                                  text(exprv), attribute(exprv, "value"),
-                                  attribute(e, "success"),
-                                  attribute(e, "prefix"));
         }),
 
       terminal_element( // we handle children explicitly
@@ -213,8 +208,14 @@ namespace testudo___implementation {
         [&](enc_t e) {
           auto expr1=get_child(e, "expression1");
           auto expr2=get_child(e, "expression2");
+          auto exprv=get_child_or_null(e, "expressionv");
+          string exprv_str=exprv ? text(exprv) : "";
+          string valv_str=exprv ? attribute(exprv, "value") : "";
+          auto expl=get_child_or_null(e, "explanation");
+          string expl_str=expl ? text(expl) : "";
           typeset->check_equal(text(expr1), attribute(expr1, "value"),
                                text(expr2), attribute(expr2, "value"),
+                               exprv_str, valv_str, expl_str,
                                attribute(e, "success"),
                                attribute(e, "prefix"));
         }),
@@ -224,9 +225,15 @@ namespace testudo___implementation {
         [&](enc_t e) {
           auto expr1=get_child(e, "expression1");
           auto expr2=get_child(e, "expression2");
+          auto exprv=get_child_or_null(e, "expressionv");
+          string exprv_str=exprv ? text(exprv) : "";
+          string valv_str=exprv ? attribute(exprv, "value") : "";
+          auto expl=get_child_or_null(e, "explanation");
+          string expl_str=expl ? text(expl) : "";
           typeset->check_approx(text(expr1), attribute(expr1, "value"),
                                 text(expr2), attribute(expr2, "value"),
                                 attribute(e, "max_error"),
+                                exprv_str, valv_str, expl_str,
                                 attribute(e, "success"),
                                 attribute(e, "prefix"));
         }),

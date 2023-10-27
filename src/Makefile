@@ -25,7 +25,10 @@ TESTUDOBIN = $(OBJDIR)/$(TESTUDONAME)
 STYLES := $(wildcard *.tst)
 STYLE_HEADERS := $(STYLES:%.tst=testudo_%)
 
-XML_TO_TEXT_LATEX = $(TESTUDOBIN) xml_to_color -w 63 | ./color_to_latex
+COLOR_TO_LATEX = ./color_to_latex
+XML_TO_TEXT_LATEX = $(TESTUDOBIN) xml_to_color -w 63 | $(COLOR_TO_LATEX)
+XML_TO_TEXT_NL = $(TESTUDOBIN) xml_to_color -w 63 -n
+XML_TO_TEXT_LATEX_NL = $(XML_TO_TEXT_NL) | $(COLOR_TO_LATEX)
 COLOR_NO_LOC_INFO = ./color_no_loc_info
 UNCOLOR = ./uncolor
 
@@ -37,13 +40,60 @@ O_ADDITIONAL_PREREQUISITES := $(TTD_ADDITIONAL_PREREQUISITES)
 include Makefile.testudo
 
 EXAMPLESDIR := examples
+EXAMPLESTESTUDOBINDIR := $(EXAMPLESDIR)/$(TESTUDOBINDIR)
+EXAMPLESDEPDIR := $(EXAMPLESDIR)/$(DEPDIR)
+REPORTSDIR := reports
 
-$(EXAMPLESDIR)/examples_generated: doc_examples.ttd generate_examples
-	mkdir -p $(EXAMPLESDIR)
+$(EXAMPLESDIR)/doc_examples_op.ttd: doc_examples.ttd
+	@ mkdir -p $(EXAMPLESDIR)
+	cp $< $@
+
+$(EXAMPLESDIR)/doc_examples_cl.ttd: doc_examples.ttd
+	@ mkdir -p $(EXAMPLESDIR)
+	cat $< | ./op_to_cl > $@
+
+$(EXAMPLESTESTUDOBINDIR)/%.ttb: $(EXAMPLESDIR)/%.ttd \
+		$(ALLHEADERS) $(TTD_ADDITIONAL_PREREQUISITES)
+	@ mkdir -p $(EXAMPLESTESTUDOBINDIR) $(EXAMPLESDEPDIR)
+	@ echo compiling $@
+	@ $(GPP) -Wp,-MMD,$(EXAMPLESDEPDIR)/$*.td,-MP,-MT,$@ \
+		$(CFLAGS) $(COMPILEOPTS) \
+		-x c++ -I$(HEADERSDIR) -fPIC -shared $< -o $@
+
+-include $(EXAMPLESDEPDIR)/doc_examples_cl.td
+-include $(EXAMPLESDEPDIR)/doc_examples_op.td
+
+# we can't split "examples_generated" into a closed version and an open
+# version, because the guide includes both "styles-lc-cl.tex" and
+# "styles-uc-op.tex" for all versions
+$(EXAMPLESDIR)/examples_generated: \
+		$(EXAMPLESDIR)/doc_examples_op.ttd \
+		$(EXAMPLESDIR)/doc_examples_cl.ttd \
+		generate_examples
+	@ mkdir -p $(EXAMPLESDIR)
 	./generate_examples $(EXAMPLESDIR) > $@
+
+$(REPORTSDIR)/reports_generated: \
+	$(REPORTSDIR)/reports_generated_cl \
+	$(REPORTSDIR)/reports_generated_op
+	cat $^ > $@
+
+$(REPORTSDIR)/reports_generated_lc_cl: $(REPORTSDIR)/reports_generated_cl
+
+$(REPORTSDIR)/reports_generated_uc_op: $(REPORTSDIR)/reports_generated_op
+
+$(REPORTSDIR)/reports_generated_%: \
+		$(EXAMPLESTESTUDOBINDIR)/doc_examples_%.ttb $(TESTUDOBIN) \
+		generate_example_reports
+	@ mkdir -p $(REPORTSDIR)
+	./generate_example_reports \
+		"$(TESTUDOBIN) run $(XML_FORMAT) $<" $(REPORTSDIR) \
+		$* "$(XML_TO_TEXT_NL)" "$(COLOR_TO_LATEX)" > $@
 
 clean_examples:
 	rm -rf $(EXAMPLESDIR)
+clean_reports:
+	rm -rf $(REPORTSDIR)
 
 RUBBERDIR := rubbertmp
 
@@ -52,19 +102,21 @@ PDFMANUALS := $(MANUALS:%.tex=%.pdf)
 
 all_manuals: $(PDFMANUALS)
 
-$(PDFMANUALS): %.pdf: %.tex testudo.tex the_race.pdf \
+$(PDFMANUALS): testudo%.pdf: testudo%.tex testudo.tex the_race.pdf \
 		ascii_logo_colour_cropped.pdf\
 		ascii_logo_mig_colour_cropped.pdf \
 		version \
-		reports/testudo.use_instructions.tex \
+		$(REPORTSDIR)/testudo.use_instructions.tex \
 		style_table.tex keywords.tex copyright.txt \
-		$(EXAMPLESDIR)/examples_generated
-	mkdir -p $(RUBBERDIR)
-	rubber --jobname $(RUBBERDIR)/$* -d $*
+		$(EXAMPLESDIR)/examples_generated \
+		$(REPORTSDIR)/reports_generated%
+	@ mkdir -p $(RUBBERDIR)
+	rubber --force \
+		--jobname $(RUBBERDIR)/$(basename $@) --pdf $(basename $@)
 	mv $(RUBBERDIR)/$@ $@
 
-style_table.tex: generate_LaTeX_style_table lc.tst uc.tst
-	./$^ > $@
+style_table.tex: generate_LaTeX_style_table generate_style lc.tst uc.tst
+	./$< lc.tst uc.tst > $@
 
 keywords.tex: generate_keywords lc.tst uc.tst eo.tst
 	./$^ > $@
@@ -73,7 +125,7 @@ emacs_add_keywords_%.txt: generate_emacs_add_keywords %.tst
 	./$^ > $@
 
 the_race.pdf: %.pdf: %.tex %.txt
-	mkdir -p $(RUBBERDIR)
+	@ mkdir -p $(RUBBERDIR)
 	rubber -m xelatex --jobname $(RUBBERDIR)/$* $*
 	mv $(RUBBERDIR)/$@ $@
 
@@ -82,7 +134,7 @@ PDFLOGOS := $(LOGOS:%.tex=%.pdf)
 CROPPEDPDFLOGOS := $(PDFLOGOS:%.pdf=%_cropped.pdf)
 
 $(PDFLOGOS): %.pdf: %.tex
-	mkdir -p $(RUBBERDIR)
+	@ mkdir -p $(RUBBERDIR)
 	rubber -m xelatex --jobname $(RUBBERDIR)/$* $*
 	mv $(RUBBERDIR)/$@ $@
 
@@ -164,42 +216,42 @@ XML_TO_TEXT_SUMMARY_REPEATABLE = $(XML_TO_TEXT_REPEATABLE) -s
 
 dev_diff_xml_text_test_bw: $(TEST_PREREQUISITES)
 	diff -u \
-	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+	    <($< run $(XML_FORMAT) $(TESTUDOCONF) $(TESTUDOBINS) \
 		  | $(XML_TO_TEXT_REPEATABLE) $(BW)) \
-	    <($< run $(NO_XML_TEXT_FORMAT) $(TESTUDOOPT) \
-			$(ALLTESTUDOSPEC) \
+	    <($< run $(NO_XML_TEXT_FORMAT) $(TESTUDOCONF) \
+			$(TESTUDOBINS) \
 		  | $(UNCOLOR))
 dev_diff_xml_text_test_color: $(TEST_PREREQUISITES)
 	diff -u \
-	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+	    <($< run $(XML_FORMAT) $(TESTUDOCONF) $(TESTUDOBINS) \
 		  | $(XML_TO_TEXT)) \
-	    <($< run $(NO_XML_TEXT_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC))
+	    <($< run $(NO_XML_TEXT_FORMAT) $(TESTUDOCONF) $(TESTUDOBINS))
 dev_diff_xml_text_test_color_ansi: $(TEST_PREREQUISITES)
 	diff -u \
-	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+	    <($< run $(XML_FORMAT) $(TESTUDOCONF) $(TESTUDOBINS) \
 		  | $(XML_TO_TEXT) | ./show_ansi) \
-	    <($< run $(NO_XML_TEXT_FORMAT) $(TESTUDOOPT) \
-			$(ALLTESTUDOSPEC) \
+	    <($< run $(NO_XML_TEXT_FORMAT) $(TESTUDOCONF) \
+			$(TESTUDOBINS) \
 		  | ./show_ansi)
 dev_diff_xml_text_test_saved_color: $(TEST_PREREQUISITES)
 	diff -u \
 	    <(cat testudo.report.saved | $(COLOR_NO_LOC_INFO)) \
-	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+	    <($< run $(XML_FORMAT) $(TESTUDOCONF) $(TESTUDOBINS) \
 		  | $(XML_TO_TEXT_REPEATABLE) | $(COLOR_NO_LOC_INFO))
 dev_diff_xml_summary_test_saved_color: $(TEST_PREREQUISITES)
 	diff -u \
 	    testudo.summary.saved \
-	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+	    <($< run $(XML_FORMAT) $(TESTUDOCONF) $(TESTUDOBINS) \
 		  | $(XML_TO_TEXT_SUMMARY_REPEATABLE))
 
 dev_save_color: $(TEST_PREREQUISITES)
 	cp -i \
-	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+	    <($< run $(XML_FORMAT) $(TESTUDOCONF) $(TESTUDOBINS) \
 		  | $(XML_TO_TEXT_REPEATABLE)) \
 	    testudo.report.saved
 dev_save_summary_color: $(TEST_PREREQUISITES)
 	cp -i \
-	    <($< run $(XML_FORMAT) $(TESTUDOOPT) $(ALLTESTUDOSPEC) \
+	    <($< run $(XML_FORMAT) $(TESTUDOCONF) $(TESTUDOBINS) \
 		  | $(XML_TO_TEXT_SUMMARY_REPEATABLE)) \
 	    testudo.summary.saved
 
@@ -212,20 +264,20 @@ dev_diff_tests: dev_diff_xml_text_test_bw \
 dev_save_tests: dev_save_color dev_save_summary_color save_progress
 
 
-reports/%.tex: $(TESTUDOBIN) $(TESTUDOBINDIR)/testudo_doc.ttb
-	mkdir -p reports
+$(REPORTSDIR)/testudo.use_instructions.tex: $(REPORTSDIR)/%.tex: \
+		$(TESTUDOBIN) $(TESTUDOBINDIR)/testudo_doc.ttb color_to_latex
+	@ mkdir -p $(REPORTSDIR)
 	$< run $(XML_FORMAT) $(TESTUDOBINDIR)/testudo_doc.ttb -s $* \
 	    | $(XML_TO_TEXT_LATEX) > $@
-
 
 run_dune_buggy_test_%: $(TESTUDOBIN) \
 			$(TESTUDOBINDIR)/dune_buggy_%/dune_buggy.o \
 		$(TESTUDOBINDIR)/dune_buggy_%/dune_buggy.ttb
-	$< run $(NO_XML_COLOR_TEXT_WITH_LINES_FORMAT) $(TESTUDOOPT) \
+	$< run $(NO_XML_COLOR_TEXT_WITH_LINES_FORMAT) $(TESTUDOCONF) \
 	    -d dune_buggy_$* $(filter-out $<,$^) \
 	    | tee $(TRACKDIR)/dune_buggy_$*/report
-	mkdir -p $(TRACKDIR)/dune_buggy_$*
-	$< run $(TRACK_FORMAT) $(TESTUDOOPT) $(filter-out $<,$^) \
+	@ mkdir -p $(TRACKDIR)/dune_buggy_$*
+	$< run $(TRACK_FORMAT) $(TESTUDOCONF) $(filter-out $<,$^) \
 	    -d dune_buggy_$* > $(TRACKDIR)/dune_buggy_$*/track
 
 diff_dune_buggy_test: $(TESTUDOBIN) \
@@ -244,10 +296,7 @@ ascii_logo.png \
 clean_ascii_logo:
 	rm -f ascii_logo.png
 
-clean_report:
-	rm -rf reports
-
-clean:: clean_doc clean_exe clean_report clean_ascii_logo clean_examples
+clean:: clean_doc clean_exe clean_reports clean_ascii_logo clean_examples
 
 PREFIX?=$(HOME)/local
 BIN_DIR=$(PREFIX)/bin

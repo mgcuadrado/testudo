@@ -3,7 +3,7 @@
 echo '% use packages fancyvrb and soul'
 echo '% make \\sethlcolor{red}'
 echo '% define \openbrace{}, \closebrace{}, and \atsign{}'
-echo '\begin{Verbatim}[numbers=left, %'
+echo '\begin{Verbatim}[numbers=none, %'
 echo '  frame=single, rulecolor=\color{black!25}, commandchars=@\{\}]'
 
 esc='\o033\['

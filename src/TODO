@@ -9,7 +9,35 @@
   but if it did, it would take an additional almost empty line (with just the
   line information); so i don't know what to do yet
 
+[ ] make
+
+      make track TESTUDOOPTS="-i testudo.crc"
+
+  not fail; the "diff" Testudo command must read the "-i" option (and probably
+  others) to restrict its source track info to the specified tests; same thing
+  for "make diff_report" and possibly others
+
+[ ] if your current test suite gives one uncaught exception and you add a case
+  that gives the same uncaught exception, both have the same checksum in the
+  track file, and the new uncaught exception isn't reported with "make track";
+  this probably happens with other types of errors or fails that are identical
+  and get the same checksum; it can be detected by not only tracking the
+  checksum existence, but also the cardinality (how many elements with the same
+  checksum), but when reporting it, we have to resort to compromises, since
+  the different instances can't be told apart; hmm, maybe keeping the checksum
+  of the previous instruction as a secondary checksum can help in telling them
+  apart in most cases
+
 ---- big but important things ------------------------------
+
+[ ] R&D: can i modify the syntax for "fixture_init(...)" from
+  "fixture_init(var, arg1, arg2, ...)" to "fixture_init(var, (arg1, arg2,
+  ...))"? that may remove the limitations explained in the doc; but
+  unfortunately, i think it's impossible, because the need the first argument
+  to piggy back to add Testudo's machinery; still, to be researched fully;
+  "std::apply()" and "std::make_from_tuple()" seem to get close to what we
+  need, but not exactly, because we must use the constructor initializer list
+  syntax, which prevents our explicitly calling out a function or constructor
 
 [ ] write a cheatsheet in the form of a complete Testudo example that exercises
   everything, with annotations; it should fit in an A4 paper; well this seems
@@ -143,6 +171,42 @@
 
 ---- easy --------------------------------------------------
 
+[ ] new kind of check, alternative to "check()" but with the same follow-ups,
+  something like "ensure()" that aborts the rest of the test if the check isn't
+  successful; maybe it can throw a Testudo-specific kind of exception that is
+  caught and diagnosed ("test aborted because of a failed ensure"); kinda like
+  "provided()" but not just for a code section but for the rest of the test
+
+[ ] support
+
+    check_try(...)_catch(...) << "explanation"
+
+  and add it to the check-try-catch example in the manual; consider moving the
+  explanations about "show" and "explanations" to put them after
+  check-try-catch too
+
+[ ] code "provided_try(...)_catch(...)", or separate the "_try(...)" into
+  something that can be combined with "check()" and with "provided()", so that
+  it later plays well with "ensure()" too; but provided() and check() have
+  changed -> ensure whether "provided (check_try(...)_catch(...)) ..." works
+
+[ ] do we support this?:
+
+    if (not check(a+b)_equal(c))
+      print_text("a+b and c+d should be equal but aren't");
+
+[ ] other kinds of if-like macros (like "provided()")
+
+    [ ] ensure (check(...)_...);
+
+        kinda like an assert: if it fails, the whole test is skipped; this can
+        be done by raising a Testudo-specific exception
+
+    [ ] if_fail (check(...)_...) { print_text("indented explanation"); }
+
+        for explanations if a test fails (explanations if a test doesn't fail
+        should be written in all cases, not guarded by an if-like macro)
+
 [ ] consider: for progress tracking, we're saying that deleting tests that
   succeed is "bad" and deleting tests that fail is "good"; i'd say we can't be
   sure; maybe we should add a new category "can't say if it's good or bad; just
@@ -176,9 +240,13 @@
 
 ---- tasks -------------------------------------------------
 
-[ ] add the possibility for fixtures to have construct arguments; these should
-  be passed with something like "with_fixture_arguments(...)" when defining a
-  test with a fixture
+[ ] should i make the exception catched by "check_try(...)_catch(...)"
+  available for additional testing? yes; probably as part of a "provide
+  (check_try(...)_catch(...))" structure, where the catched exception is
+  available for the code in the block following the "provide(...)"
+
+[ ] fails in not visible fixtures add to the count, but in a mysterious manner;
+  maybe fails in a not visible fixture should always be made visible anyway
 
 [ ] print results to a different stream than "cout", so that it doesn't get
   mixed with other, non-test output?
@@ -1099,3 +1167,83 @@
       software to Lewis Carroll's character
 
 [X] is "make runsync_test" the same as "make runsync_test_with_lines"?
+
+[X] add the possibility for fixtures to have construct arguments; these should
+  be passed with something like "with_fixture_arguments(...)" when defining a
+  test with a fixture
+
+[X] extend "fixture_init()" so that the attribute it initialises can have any
+  number of arguments (right now, it only works with exactly one)
+
+[X] remove support for the "tol" syntax
+
+[X] remove "Check<...>::set()" and "Check<...>::get()" in favour of keeping the
+  necessary test-specific info in the "CheckTest"-derived class; this is
+  currently only used by "CheckApprox" for old-style tolerance setting ("tol"
+  and "stol")
+
+[-] turn "_true_for(...)" into "_true _for(...)" so that we can combine
+  "_for()" with all other check types, like in
+
+      check(a[i])_equal(b)_for(i);
+
+  no: see rationale about "_for()" in "development.txt"
+
+[X] ensure it's easy to transform "check(a+b)_approx(c)" into something like
+  "check(approx(a+b, c))_true_for(a, b, c)" so that we can add a value-based
+  explanation when the test fails
+
+[X] show additional relevant expressions but not their values even when a test
+  succeeds? because they contribute to the test with their validity; otherwise,
+  two tests apparently identical may have different outcomes, just because one
+  of them is also testing for the validity of a variable, without it showing in
+  any way
+
+[X] new kind of follow-up to "check()": "_explain_fail(explanation)" to print
+  an explanation if a check fails; maybe with the Googletest syntax:
+
+      check(a[i])_equal(b)
+        << "a[i] didn't match b for index " << i
+        << "which it should because blablah";
+
+  (but don't forget "_true_for" and "_false_for")
+
+  ideas for macro names:
+
+      * for relevant values, "_for", "_how", "_what", "_values", "_show",
+        "_see", "_from"
+
+      * for fail explanation, "_explain_fail", "_why", "_because", "_reason",
+        "_explain"
+
+  conversation avec Migouche: "_show()", "_explain()"
+
+[X] should relevant values ("_show(...)") and explanations ("<< ...") be on
+  their own indented line after the failed test text and label? that would
+  probably be clearer, and failing is the exceptional case; related to that,
+  right now, when a "with_data()" datum fails, the datum is shown _before_ the
+  failed test; maybe we shouldd unify with the modified relevant values and
+  explanations, and show the datum _after_ the failed test
+
+[X] extend "show_value()" to accept any number of arguments
+
+[X] for failed "not-" checks ("not-equal", "not-approx") add "nay" after the
+  "?" to show clearly what we're checking for
+
+[X] add coloured text results to code snippet examples in the guide
+
+[X] [...] in addition to that, should we support this, à la googletest?:
+
+    check(a+b)_equal(c)
+      << "the sum of a (" << a << ") and b (" << b << ") should be c";
+
+  although this would be better written
+
+    check(a+b)_equal(c)_with_values(a, b)
+      << "the sum of a and b should be c";
+
+  or even
+
+    check(a+b)_equal(c)_with_values(a, b)
+      _with_message(""the sum of a and b should be c");
+

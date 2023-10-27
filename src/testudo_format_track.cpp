@@ -142,30 +142,34 @@ namespace {
       { encode('i', "end_with_results"); }
     void output_with_summary(string name, TestStats test_stats) override
       { encode_summary("with_summary", name, test_stats); }
-    void output_check_true(string expr_str, string success,
-                           string prefix, bool informative) override
-      { encode_check("check_true", prefix+expr_str, success, informative); }
-    void output_check_true_for(string expr_str,
-                               string exprv_str, string,
-                               string success,
-                               string prefix, bool informative) override {
-      encode_check("check_true_for", prefix+expr_str+exprv_str,
+    void output_check_true(string expr_str,
+                           string exprv_str, string,
+                           string,
+                           string success,
+                           string prefix, bool informative) override {
+      encode_check("check_true",
+                   prefix+expr_str+exprv_str,
                    success, informative);
     }
     void output_check_equal(string expr1_str, string,
                             string expr2_str, string,
+                            string exprv_str, string,
+                            string,
                             string success,
                             string prefix, bool informative) override {
-      encode_check("check_equal", prefix+expr1_str+expr2_str,
+      encode_check("check_equal",
+                   prefix+expr1_str+expr2_str+exprv_str,
                    success, informative);
     }
     void output_check_approx(string expr1_str, string,
                              string expr2_str, string,
                              string max_error_str,
+                             string exprv_str, string,
+                             string,
                              string success,
                              string prefix, bool informative) override {
         encode_check("check_approx",
-                     prefix+expr1_str+expr2_str+max_error_str,
+                     prefix+expr1_str+expr2_str+max_error_str+exprv_str,
                      success, informative);
     }
     void uncaught_exception(string exception) override

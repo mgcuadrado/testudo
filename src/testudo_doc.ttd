@@ -51,27 +51,27 @@ namespace {
 
   define_top_test("testudo",
                   (use_instructions, "use instructions")) {
-    print_text("index:\n"
-               "  1. holding functionality\n"
-               "  2. exceptions\n"
-               "  3. list of forgotten doubles");
-    print_break(); // ------------------------------------------------------
+    tout << "index:\n"
+            "  1. holding functionality\n"
+            "  2. exceptions\n"
+            "  3. list of forgotten doubles";
+    tout.print_break(); // -------------------------------------------------
     declare(Hold hf);
-    check(not hf.is_holding())_true;
+    check(not hf.is_holding())_true();
     perform(hf.hold(3.14));
-    check(hf.is_holding())_true;
+    check(hf.is_holding())_true();
     check(hf.pop())_approx(3.14);
-    check(not hf.is_holding())_true;
-    print_break(); // ------------------------------------------------------
-    print_text("hf is empty now");
-    step_id(popping_empty);
+    check(not hf.is_holding())_true();
+    tout.print_break(); // -------------------------------------------------
+    tout << "hf is empty now";
+    tout.step_id("popping_empty");
     check_try(hf.pop())_catch();
     perform(hf.hold(2.72));
-    step_id(adding_to_already_holding);
+    tout.step_id("adding_to_already_holding");
     check_try(hf.hold(7.))_catch();
-    print_break(); // ------------------------------------------------------
-    print_text("the forgotten doubles list is still empty");
-    check(Hold::is_forgotten_empty())_true;
+    tout.print_break(); // -------------------------------------------------
+    tout << "the forgotten doubles list is still empty";
+    check(Hold::is_forgotten_empty())_true();
     check(Hold::get_forgotten().size())_equal(0u);
     in_scope("scope 1") {
       declare(Hold hf1(1.1)); // hold-on-construction syntax
@@ -79,18 +79,18 @@ namespace {
       in_scope() { // unnamed scope
         declare(Hold hf3(3.3)); // will add to the list on scope closing
       }
-      check(Hold::get_forgotten())_tol(.5)_approx({3.});
+      check(Hold::get_forgotten())_approx({3.})_with_tol(.5);
       show_value(hf2.pop());
-      print_text("hf2 now empty; it won't add to the list");
+      tout << "hf2 now empty; it won't add to the list";
     }
-    check(not Hold::is_forgotten_empty())_true;
+    check(not Hold::is_forgotten_empty())_true();
     check(Hold::get_forgotten())
       _approx({3.3, 1.1});
     perform(Hold::clear_forgotten());
     check(Hold::get_forgotten().size())_equal(0u);
-    print_text("the following will raise an error");
+    tout << "the following will raise an error";
     perform(hf.hold(9.9));
-    print_text("this won't show, because of the error");
+    tout << "this won't show, because of the error";
   }
 }
 #endif

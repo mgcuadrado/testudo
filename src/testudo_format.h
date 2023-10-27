@@ -114,22 +114,24 @@ namespace testudo___implementation {
     // format, this is used to mark the check as information rather than
     // trackable check result, both when listing the checks performed and when
     // reporting their results
-    virtual void output_check_true(string expr_str, string success,
+    virtual void output_check_true(string expr_str,
+                                   string exprv_str, string valv_str,
+                                   string explanation,
+                                   string success,
                                    string prefix,
                                    bool informative)=0;
-    virtual void output_check_true_for(string expr_str,
-                                       string exprv_str, string valv_str,
-                                       string success,
-                                       string prefix,
-                                       bool informative)=0;
     virtual void output_check_equal(string expr1_str, string val1_str,
                                     string expr2_str, string val2_str,
+                                    string exprv_str, string valv_str,
+                                    string explanation,
                                     string success,
                                     string prefix,
                                     bool informative)=0;
     virtual void output_check_approx(string expr1_str, string val1_str,
                                      string expr2_str, string val2_str,
                                      string max_error_str,
+                                     string exprv_str, string valv_str,
+                                     string explanation,
                                      string success,
                                      string prefix,
                                      bool informative)=0;

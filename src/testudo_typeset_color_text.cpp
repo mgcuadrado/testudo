@@ -295,6 +295,7 @@ namespace {
              << pad(separator_width-color.real_length(format_text_prefix),
                     fill)
              << post_color << endl;
+      unset_format_text_prefix();
     }
 
     void format_error(ostream &stream, string text) {
@@ -425,6 +426,7 @@ namespace {
         ostringstream ossml;
         ossml << text;
         ts << tabify(ossml.str()) << endl;
+        unset_format_text_prefix();
       }
       else // one line
         format_text(ts, color.text_ident+" "+text+" "+color.text_ident);
@@ -526,53 +528,90 @@ namespace {
 
     void output_check_general(string prefix,
                               list<string> const &text, string success,
-                              list<string> const &additional_fail_text) {
+                              list<string> const &additional_fail_text,
+                              string relevant_exprs, string relevant_values,
+                              string explanation) {
+      bool success_b=to_bool(success);
+      bool with_b=(success=="with");
+
       string report=color.check_ident+" ";
       if (not prefix.empty())
         report+=color.ident+prefix+color.normal+" ";
       report+=to_string_delim(text, " ");
-      if (success=="with")
+
+      if (with_b) {
+        if (not relevant_exprs.empty())
+          report+=" "+color.show_ident+" "+relevant_exprs;
         format_text(ts, report);
+      }
       else {
         bool multiline=is_any_multiline(additional_fail_text);
-        if (not to_bool(success) and not multiline)
-          report+=
-            " "+color.show_sep+" "+to_string_delim(additional_fail_text, " ");
+        if (not success_b and not additional_fail_text.empty()
+            and not multiline) {
+          report+=" "+color.show_ident;
+          if (not prefix.empty())
+            report+=" "+color.ident+prefix+color.normal;
+          report+=" "+to_string_delim(additional_fail_text, " ");
+        }
+
+        if (success_b and not relevant_exprs.empty())
+          report+=" "+color.show_ident+" "+relevant_exprs;
+
         format_check(ts, report, success);
-        if (not to_bool(success) and multiline)
+
+        if (not success_b and multiline) {
+          if (not prefix.empty())
+            ts << color.ident << prefix << color.normal;
           for (auto const &text: additional_fail_text)
             ts << tabify(text) << endl;
+        }
+
+        if (not success_b) {
+          increase_indent();
+
+          if (not relevant_exprs.empty())
+            format_text(ts, (color.show_ident+" "+relevant_exprs
+                             +" "+color.show_sep+" "+relevant_values));
+
+          if (not success_b and not explanation.empty())
+            format_text(ts, (color.show_ident+" "+color.text_ident
+                             +" "+explanation+" "+color.text_ident));
+
+          decrease_indent();
+        }
       }
     }
 
-    void check_true(string expr_str, string success, string prefix) override {
-      output_check_general(prefix, {expr_str}, success, {false_tag});
-    }
-
-    void check_true_for(string expr_str,
-                        string exprv_str, string valv_str,
-                        string success,
-                        string prefix) override {
+    void check_true(string expr_str,
+                    string exprv_str, string valv_str,
+                    string explanation,
+                    string success,
+                    string prefix) override {
       output_check_general(
-        prefix,
-        {expr_str, color.show_ident, exprv_str},
-        success,
-        {false_tag, color.show_sep, valv_str});
+        prefix, {expr_str}, success,
+        {},
+        exprv_str, valv_str, explanation);
     }
 
     void check_equal(string expr1_str, string val1_str,
                      string expr2_str, string val2_str,
+                     string exprv_str, string valv_str,
+                     string explanation,
                      string success,
                      string prefix) override {
-      output_check_general(prefix,
-                           {expr1_str, color.check_equal_sign, expr2_str},
-                           success,
-                           {val1_str, color.check_equal_sign, val2_str});
+      output_check_general(
+        prefix,
+        {expr1_str, color.check_equal_sign, expr2_str},
+        success,
+        {val1_str, color.check_equal_sign, val2_str},
+        exprv_str, valv_str, explanation);
     }
 
     void check_approx(string expr1_str, string val1_str,
                       string expr2_str, string val2_str,
                       string max_error_str,
+                      string exprv_str, string valv_str,
+                      string explanation,
                       string success,
                       string prefix) override {
       output_check_general(
@@ -580,7 +619,8 @@ namespace {
         {expr1_str, color.check_approx_sign, expr2_str,
          color.check_max_error, max_error_str},
         success,
-        {val1_str, color.check_approx_sign, val2_str});
+        {val1_str, color.check_approx_sign, val2_str},
+        exprv_str, valv_str, explanation);
     }
 
     void uncaught_exception(string exception) override {
@@ -643,34 +683,36 @@ namespace {
         test_stack.back().second << accumulated;
     }
 
-    void location(string) { }
-    void begin_indent() { }
-    void end_indent() { }
-    void begin_scope(string) { }
-    void end_scope(string) { }
-    void begin_declare_scope(string) { }
-    void end_declare_scope() { }
-    void separator() { }
-    void step_id(string) { }
-    void text(string) { }
-    void multiline_text(string) { }
-    void declare(string) { }
-    void perform(string) { }
-    void try_catch_try(string) { }
-    void try_catch_catch(string, string, string) { }
-    void show_value(string, string) { }
-    void show_multiline_value(string, string) { }
-    void begin_with(string, string, string) { }
-    void end_with() { }
-    void begin_with_results() { }
-    void end_with_results() { }
-    void with_summary(string, string, string, string, string) { }
-    void check_true(string, string, string) { }
-    void check_true_for(string, string, string, string, string) { }
-    void check_equal(string, string, string, string, string, string) { }
-    void check_approx(string, string, string, string, string, string,
-                      string) { }
-    void uncaught_exception(string) { }
+    void location(string) override { }
+    void begin_indent() override { }
+    void end_indent() override { }
+    void begin_scope(string) override { }
+    void end_scope(string) override { }
+    void begin_declare_scope(string) override { }
+    void end_declare_scope() override { }
+    void separator() override { }
+    void step_id(string) override { }
+    void text(string) override { }
+    void declare(string) override { }
+    void perform(string) override { }
+    void try_catch_try(string) override { }
+    void try_catch_catch(string, string, string) override { }
+    void show_value(string, string) override { }
+    void begin_with(string, string, string) override { }
+    void end_with() override { }
+    void begin_with_results() override { }
+    void end_with_results() override { }
+    void with_summary(string, string, string, string, string) override { }
+    void check_true(string,
+                    string, string, string,
+                    string, string) override { }
+    void check_equal(string, string, string, string,
+                     string, string, string,
+                     string, string) override { }
+    void check_approx(string, string, string, string, string,
+                      string, string, string,
+                      string, string) override { }
+    void uncaught_exception(string) override { }
     void aborted(string message) override {
       format_abort(ts,
                    (color.catch_ident+" aborted "
